@@ -1,0 +1,17 @@
+# Normalize text files to LF in the repository; Windows-only scripts keep CRLF.
+* text=auto eol=lf
+
+*.bat text eol=crlf
+gradlew text eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.ttf binary
+*.otf binary
+*.jar binary
+*.keystore binary
+*.jks binary
