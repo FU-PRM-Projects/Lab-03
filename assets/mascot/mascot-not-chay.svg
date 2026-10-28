@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -8 96 108" width="120" height="135" role="img" aria-label="Nốt Cháy">
+<path d="M26 15C21 7 29 4 30 -5C36 2 44 6 40 15Z" fill="#FFB020"></path>
+<path d="M30 15C28 10 32 8 33 4C36 8 39 10 37 15Z" fill="#FFE08A"></path>
+<path d="M36 82v9M60 82v9" stroke="#1B1D2A" stroke-width="4" stroke-linecap="round" fill="none"></path>
+<path d="M22 14H60L82 36V74Q82 82 74 82H22Q14 82 14 74V22Q14 14 22 14Z" fill="#F0524B"></path>
+<path d="M60 14V30Q60 36 66 36H82Z" fill="#C7302B"></path>
+<path d="M29 43l10 4M65 43l-10 4" stroke="#1B1D2A" stroke-width="3" stroke-linecap="round" fill="none"></path>
+<circle cx="36" cy="54" r="4.5" fill="#1B1D2A"></circle>
+<circle cx="58" cy="54" r="4.5" fill="#1B1D2A"></circle>
+<path d="M39 67q4-5 8 0t8 0" stroke="#1B1D2A" stroke-width="3" stroke-linecap="round" fill="none"></path>
+</svg>
