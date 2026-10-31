@@ -8,7 +8,6 @@ import 'package:lab03/screens/note_saved/note_saved_screen.dart';
 import 'package:lab03/screens/self_control/self_control_screen.dart';
 import 'package:lab03/screens/settings/settings_screen.dart';
 import 'package:lab03/screens/today/today_screen.dart';
-import 'package:lab03/screens/welcome/welcome_screen.dart';
 import 'package:lab03/widgets/app_bottom_nav.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -16,16 +15,10 @@ import '../support/pump.dart';
 
 /// Cấu trúc điều hướng Lab 2 (`user-flow.md` mục 1.1, handout mục 3).
 void main() {
-  Future<void> enterApp(WidgetTester tester) async {
-    await pumpApp(tester);
-    expect(find.byType(WelcomeScreen), findsOneWidget);
-    await tester.tap(find.text('Vào app (tạm, chưa đăng nhập)'));
-    await tester.pumpAndSettle();
-  }
+  // Đã đăng nhập sẵn (fake); luồng đăng nhập ở auth_flow_test.dart.
+  Future<void> enterApp(WidgetTester tester) => pumpApp(tester);
 
-  testWidgets('mở app ở S01, vào app tới S02 có thanh tab 4 mục', (
-    tester,
-  ) async {
+  testWidgets('đã đăng nhập: mở ở S02 có thanh tab 4 mục', (tester) async {
     await enterApp(tester);
 
     expect(find.byType(TodayScreen), findsOneWidget);

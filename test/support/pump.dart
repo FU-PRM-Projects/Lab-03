@@ -1,9 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lab03/app.dart';
+import 'package:lab03/router/app_router.dart';
+import 'package:lab03/services/auth_service.dart';
+import 'package:lab03/services/user_repository.dart';
 import 'package:lab03/theme/app_theme.dart';
 import 'package:material_ui/material_ui.dart';
+
+import 'fakes.dart';
 
 /// Khung thiết kế Lab 2 và khung kiểm tra thêm.
 const Size phone360 = Size(360, 800);
@@ -17,18 +23,39 @@ void setScreenSize(WidgetTester tester, Size size) {
   addTearDown(tester.view.reset);
 }
 
-/// Bơm cả app (router, theme) với các override service tuỳ chọn.
-Future<void> pumpApp(
+/// Service giả dùng chung cho một lần bơm app.
+class TestServices {
+  TestServices({bool signedIn = true})
+    : auth = FakeAuthService(signedIn: signedIn ? testUser : null);
+
+  final FakeAuthService auth;
+  final FakeUserRepository users = FakeUserRepository();
+
+  List<Override> get overrides => <Override>[
+    authServiceProvider.overrideWithValue(auth),
+    userRepositoryProvider.overrideWithValue(users),
+  ];
+}
+
+/// Bơm cả app (router, theme) với service giả. Mặc định đã đăng nhập.
+Future<TestServices> pumpApp(
   WidgetTester tester, {
   Size size = phone360,
-  List<Override> overrides = const <Override>[],
+  TestServices? services,
 }) async {
+  final s = services ?? TestServices();
   setScreenSize(tester, size);
   await tester.pumpWidget(
-    ProviderScope(overrides: overrides, child: const NotApp()),
+    ProviderScope(overrides: s.overrides, child: const NotApp()),
   );
   await tester.pumpAndSettle();
+  return s;
 }
+
+/// Router của app đang chạy trong test.
+GoRouter routerOf(WidgetTester tester) =>
+    ProviderScope.containerOf(tester.element(find.byType(NotApp)))
+        .read(appRouterProvider);
 
 /// Bơm một widget trong theme Lab 2.
 Future<void> pumpThemed(

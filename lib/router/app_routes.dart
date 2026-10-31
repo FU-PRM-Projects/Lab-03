@@ -1,5 +1,7 @@
 /// Đường dẫn route theo bảng điều hướng của `flutter-handoff.md` mục 3.
 abstract final class AppRoutes {
+  /// Màn chờ trong lúc chưa biết trạng thái đăng nhập (không có trong Figma).
+  static const String splash = '/splash';
   static const String welcome = '/welcome';
   static const String today = '/today';
   static const String noteNew = '/note/new';

@@ -37,3 +37,12 @@ test('R-03 user reads own profile; unauthenticated denied', async () => {
 test('R-04 unknown collection denied by default', async () => {
   await assertFails(setDoc(doc(env.authenticatedContext('root').firestore(), 'misc/x'), { a: 1 }));
 });
+test('R-05 user creates own profile with role user (first sign-in)', async () => {
+  const db = env.authenticatedContext('bob').firestore();
+  await assertSucceeds(setDoc(doc(db, 'users/bob'), { role: 'user', displayName: 'Bob' }));
+});
+test('R-06 user cannot create own profile as admin or for someone else', async () => {
+  const db = env.authenticatedContext('carol').firestore();
+  await assertFails(setDoc(doc(db, 'users/carol'), { role: 'admin' }));
+  await assertFails(setDoc(doc(db, 'users/dave'), { role: 'user' }));
+});
