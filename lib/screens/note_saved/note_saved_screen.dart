@@ -47,8 +47,9 @@ class NoteSavedScreen extends ConsumerWidget {
                 data: (summary) => _SavedContent(
                   summary: summary,
                   onDone: goToday,
-                  onWriteMore: () =>
-                      context.go(AppRoutes.noteDetail(summary.note.id)),
+                  onWriteMore: () => context.go(
+                    AppRoutes.noteDetail(summary.note.id, edit: true),
+                  ),
                   onPin: () async {
                     final error = await viewModel.pinSticker();
                     if (!context.mounted) return;

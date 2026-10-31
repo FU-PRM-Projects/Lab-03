@@ -11,6 +11,7 @@ import 'package:lab03/screens/today/today_screen.dart';
 import 'package:lab03/widgets/app_bottom_nav.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../support/fakes.dart';
 import '../support/pump.dart';
 
 /// Cấu trúc điều hướng Lab 2 (`user-flow.md` mục 1.1, handout mục 3).
@@ -35,12 +36,14 @@ void main() {
   });
 
   testWidgets('màn lồng che thanh tab; Back quay lại tab', (tester) async {
-    await enterApp(tester);
+    final services = TestServices();
+    services.notes.notes.add(sampleNote('n1', DateTime(2026, 10, 24)));
+    await pumpApp(tester, services: services);
     await tester.tap(find.text('Hũ'));
     await tester.pumpAndSettle();
     expect(find.byType(JarScreen), findsOneWidget);
 
-    await tester.tap(find.text('Mở một nốt (S06)'));
+    await tester.tap(find.text('Dọn bàn học, gửi email hỏi thầy'));
     await tester.pumpAndSettle();
     expect(find.byType(NoteDetailScreen), findsOneWidget);
     expect(find.byType(AppBottomNav), findsNothing);

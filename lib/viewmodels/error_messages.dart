@@ -27,6 +27,15 @@ abstract final class ErrorMessages {
     _ => 'Chưa lưu được. Nốt vẫn được giữ làm nháp, thử lại nhé.',
   };
 
+  /// Lỗi khi sửa nốt ở S06 (nội dung còn trên màn hình, không có nháp).
+  static String update(Object error) => switch (error) {
+    AppException(kind: AppErrorKind.permissionDenied) =>
+      'Chưa lưu được: phiên đăng nhập đã hết. Đăng nhập lại rồi thử lại.',
+    AppException(kind: AppErrorKind.notFound) =>
+      'Chưa lưu được: nốt này đã bị xoá ở thiết bị khác.',
+    _ => 'Chưa lưu được thay đổi. Thử lại nhé.',
+  };
+
   /// [ViewState] lỗi cho [error].
   static Failure<T> failure<T>(Object error) => Failure<T>(
     load(error),

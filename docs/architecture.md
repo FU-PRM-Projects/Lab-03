@@ -116,8 +116,9 @@ Khi Firestore trả lỗi quyền (`permission-denied`) hoặc lỗi khác, `Not
 | `TodayViewModel` | S02 | `ViewState<TodaySummary>` | `NoteRepository`, `DraftStore`, `Clock` |
 | `NoteComposerViewModel` | S03 | `NoteComposerState` (bước, tâm trạng, tiêu đề, nhật ký, saving, lỗi) | `NoteRepository`, `DraftStore`, `RemoteConfigService`, `AnalyticsService`, `CrashReporter`, `Clock` |
 | `NoteSavedViewModel` | S04 | `ViewState<SavedNoteSummary>` | `NoteRepository`, `RemoteConfigService` |
-| `JarViewModel` | S05 | `ViewState<List<Note>>` + phân trang + hoàn tác xoá | `NoteRepository`, `AnalyticsService` |
-| `NoteDetailViewModel` | S06 | `ViewState<Note>` + chế độ sửa | `NoteRepository`, `AnalyticsService` |
+| `JarViewModel` | S05 | `ViewState<JarData>` (nốt, số nốt tháng, nhãn dán, phân trang) | `NoteRepository`, `Clock`, `AnalyticsService` |
+| `NoteDeleter` | S06 → S05 | `PendingDelete` (nốt chờ xoá, lỗi xoá) | `NoteRepository` |
+| `NoteDetailViewModel` | S06 | `NoteDetailState` (`ViewState<Note>` + chế độ sửa, ô nhập, đang lưu) | `NoteRepository`, `AnalyticsService` |
 | `ChallengesViewModel` | S07 | `ViewState<ChallengeDeck>` | `ChallengeRepository`, `AnalyticsService` |
 | `ChallengeDetailViewModel` | S08 | `ViewState<Challenge>` + kết quả | `ChallengeRepository`, `NoteRepository`, `AnalyticsService` |
 | `SelfControlViewModel` | S09 | `ViewState<SelfControlSummary>` + khoá | `NoteRepository`, `HabitRepository`, `LocalAuthService`, `SettingsRepository` |
@@ -144,9 +145,11 @@ Khi Firestore trả lỗi quyền (`permission-denied`) hoặc lỗi khác, `Not
 | `LocalAuthService` | `local_auth` | Mở khoá phần Tự chủ |
 | `Clock` | `SystemClock` | Giờ hiện tại (test dùng giờ cố định) |
 
-Đã có: `AuthService`, `UserRepository`, `AuthViewModel` (Stage 3); `NoteRepository`, `DraftStore`, `Clock`, `RemoteConfigService` (giá trị mặc định), `TodayViewModel`, `NoteComposerViewModel`, `NoteSavedViewModel` (Stage 4, F1). Các dòng còn lại được dựng ở Stage 4–5.
+Đã có: `AuthService`, `UserRepository`, `AuthViewModel` (Stage 3); `NoteRepository`, `DraftStore`, `Clock`, `RemoteConfigService` (giá trị mặc định), `TodayViewModel`, `NoteComposerViewModel`, `NoteSavedViewModel` (Stage 4, F1); `JarViewModel`, `NoteDetailViewModel`, `NoteDeleter` (Stage 4, P4/P5). Các dòng còn lại được dựng ở Stage 4–5.
 
 `PrefsDraftStore` nằm trong `firebase/` dù không dùng Firebase: thư mục này là nơi duy nhất được gọi SDK bên ngoài (Firebase, `shared_preferences`), nên quy tắc import ở mục 2 vẫn giữ nguyên.
+
+**Xoá có hoàn tác:** `NoteDeleter` (không gắn với màn nào) ẩn nốt ngay, giữ hẹn giờ 5 giây và chỉ gọi `NoteRepository.delete` khi hết giờ mà người dùng không bấm Hoàn tác. Nó nằm ngoài ViewModel của S06 vì S06 đã đóng khi hẹn giờ chạy; `JarViewModel` nghe nó để ẩn và hiện lại nốt trong lưới. Nếu app bị tắt trong 5 giây đó thì nốt không bị xoá.
 
 **Ghi khi offline:** `FirestoreNoteRepository.add` gửi lệnh ghi rồi chờ server tối đa 2 giây. Quá thời gian thì trả nốt với `pendingSync = true` (lệnh ghi đã nằm trong bộ nhớ đệm, Firestore tự gửi lại khi có mạng), để S03 không treo khi mất mạng. Ngày tạo nốt là giờ trên máy, không dùng `serverTimestamp`, vì giá trị server là `null` cho tới khi đồng bộ và nốt offline sẽ không hiện trong truy vấn theo ngày.
 

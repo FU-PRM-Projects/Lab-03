@@ -20,6 +20,15 @@ abstract final class ViDateFormat {
   static String shortDate(DateTime date) =>
       '${_two(date.day)}/${_two(date.month)}';
 
+  /// "Hôm nay", "Hôm qua" hoặc "24/10" so với [now]: nhãn ngày trên tờ nốt.
+  static String relativeDay(DateTime date, DateTime now) {
+    final day = DateTime(date.year, date.month, date.day);
+    final today = DateTime(now.year, now.month, now.day);
+    if (day == today) return 'Hôm nay';
+    if (day == DateTime(now.year, now.month, now.day - 1)) return 'Hôm qua';
+    return shortDate(date);
+  }
+
   /// "21:30".
   static String time(DateTime date) =>
       '${_two(date.hour)}:${_two(date.minute)}';

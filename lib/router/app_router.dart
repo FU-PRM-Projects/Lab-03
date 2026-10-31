@@ -74,6 +74,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                     parentNavigatorKey: rootKey,
                     builder: (context, state) => NoteDetailScreen(
                       noteId: state.pathParameters['noteId']!,
+                      edit: state.uri.queryParameters['edit'] == '1',
                     ),
                   ),
                 ],
