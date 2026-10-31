@@ -20,6 +20,21 @@ abstract final class ViDateFormat {
   static String shortDate(DateTime date) =>
       '${_two(date.day)}/${_two(date.month)}';
 
+  /// "3,8": số thập phân kiểu Việt Nam, 1 chữ số sau dấu phẩy.
+  static String decimal(double value) =>
+      value.toStringAsFixed(1).replaceAll('.', ',');
+
+  /// Nhãn ngắn của thứ, chỉ số 0 = Thứ Hai.
+  static const List<String> weekdayShort = <String>[
+    'T2',
+    'T3',
+    'T4',
+    'T5',
+    'T6',
+    'T7',
+    'CN',
+  ];
+
   /// "Hôm nay", "Hôm qua" hoặc "24/10" so với [now]: nhãn ngày trên tờ nốt.
   static String relativeDay(DateTime date, DateTime now) {
     final day = DateTime(date.year, date.month, date.day);

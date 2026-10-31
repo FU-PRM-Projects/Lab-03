@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:lab03/models/app_user.dart';
 import 'package:lab03/models/challenge.dart';
 import 'package:lab03/models/mood.dart';
 import 'package:lab03/models/note.dart';
 import 'package:lab03/models/note_type.dart';
+import 'package:lab03/models/report.dart';
 import 'package:lab03/models/self_control.dart';
 import 'package:lab03/services/app_exception.dart';
 import 'package:lab03/services/auth_service.dart';
@@ -12,6 +14,7 @@ import 'package:lab03/services/challenge_repository.dart';
 import 'package:lab03/services/clock.dart';
 import 'package:lab03/services/draft_store.dart';
 import 'package:lab03/services/note_repository.dart';
+import 'package:lab03/services/report_services.dart';
 import 'package:lab03/services/self_control_services.dart';
 import 'package:lab03/services/user_repository.dart';
 
@@ -455,5 +458,38 @@ class FakeChallengeRepository implements ChallengeRepository {
       completed: <String>{...old.completed, challengeId},
     );
     _changes.add(null);
+  }
+}
+
+class FakeReportService implements ReportService {
+  final List<WeeklySummary> built = <WeeklySummary>[];
+  final List<String> shared = <String>[];
+  AppException? buildError;
+
+  @override
+  Future<Uint8List> weeklyCard(WeeklySummary summary) async {
+    if (buildError != null) throw buildError!;
+    built.add(summary);
+    return Uint8List.fromList(<int>[37, 80, 68, 70]);
+  }
+
+  @override
+  Future<void> share(Uint8List bytes, String fileName) async =>
+      shared.add(fileName);
+}
+
+class FakeStorageService implements StorageService {
+  final List<String> uploaded = <String>[];
+  AppException? uploadError;
+
+  @override
+  Stream<UploadProgress> uploadReport(String fileName, Uint8List bytes) async* {
+    yield const UploadProgress(0.5);
+    if (uploadError != null) throw uploadError!;
+    uploaded.add('reports/u-minh/$fileName');
+    yield UploadProgress(
+      1,
+      url: 'https://storage.example/reports/u-minh/$fileName',
+    );
   }
 }

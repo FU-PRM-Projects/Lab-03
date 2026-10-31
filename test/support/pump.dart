@@ -9,6 +9,7 @@ import 'package:lab03/services/challenge_repository.dart';
 import 'package:lab03/services/clock.dart';
 import 'package:lab03/services/draft_store.dart';
 import 'package:lab03/services/note_repository.dart';
+import 'package:lab03/services/report_services.dart';
 import 'package:lab03/services/self_control_services.dart';
 import 'package:lab03/services/user_repository.dart';
 import 'package:lab03/theme/app_theme.dart';
@@ -42,6 +43,8 @@ class TestServices {
   final FakeLocalAuth localAuth = FakeLocalAuth();
   final FakeScreenGuard screenGuard = FakeScreenGuard();
   final FakeChallengeRepository challenges = FakeChallengeRepository();
+  final FakeReportService reports = FakeReportService();
+  final FakeStorageService storage = FakeStorageService();
 
   List<Override> get overrides => <Override>[
     authServiceProvider.overrideWithValue(auth),
@@ -54,6 +57,8 @@ class TestServices {
     localAuthServiceProvider.overrideWithValue(localAuth),
     screenGuardProvider.overrideWithValue(screenGuard),
     challengeRepositoryProvider.overrideWithValue(challenges),
+    reportServiceProvider.overrideWithValue(reports),
+    storageServiceProvider.overrideWithValue(storage),
   ];
 }
 
