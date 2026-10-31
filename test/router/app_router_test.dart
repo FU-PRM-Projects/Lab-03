@@ -85,14 +85,16 @@ void main() {
     expect(find.byType(TodayScreen), findsOneWidget);
   });
 
-  testWidgets('F2 khung: Dừng lại → S09 → Thở 90 giây → S10', (tester) async {
+  testWidgets('F2: Dừng lại → S09 → Thở 90 giây → S10', (tester) async {
     await enterApp(tester);
     await tester.tap(find.bySemanticsLabel('Dừng lại'));
     await tester.pumpAndSettle();
     expect(find.byType(SelfControlScreen), findsOneWidget);
 
     await tester.tap(find.text('Khó dừng? Thở 90 giây'));
-    await tester.pumpAndSettle();
+    // S10 thở ngay khi mở nên không bao giờ "settle"; chỉ chờ chuyển màn.
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
     expect(find.byType(BreathingScreen), findsOneWidget);
   });
 

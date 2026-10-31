@@ -33,6 +33,14 @@ abstract final class ViDateFormat {
   static String time(DateTime date) =>
       '${_two(date.hour)}:${_two(date.minute)}';
 
+  /// "23:00" từ số phút kể từ 0h (giờ lưu trong `UserSettings`).
+  static String clock(int minutes) =>
+      '${_two(minutes ~/ 60 % 24)}:${_two(minutes % 60)}';
+
+  /// "1:12" từ số giây còn lại (đồng hồ S10).
+  static String countdown(int seconds) =>
+      '${seconds ~/ 60}:${_two(seconds % 60)}';
+
   /// "24 tháng 10": nhãn đọc cho trình đọc màn hình.
   static String spoken(DateTime date) => '${date.day} tháng ${date.month}';
 }

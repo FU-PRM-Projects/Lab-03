@@ -121,8 +121,8 @@ Khi Firestore trả lỗi quyền (`permission-denied`) hoặc lỗi khác, `Not
 | `NoteDetailViewModel` | S06 | `NoteDetailState` (`ViewState<Note>` + chế độ sửa, ô nhập, đang lưu) | `NoteRepository`, `AnalyticsService` |
 | `ChallengesViewModel` | S07 | `ViewState<ChallengeDeck>` | `ChallengeRepository`, `AnalyticsService` |
 | `ChallengeDetailViewModel` | S08 | `ViewState<Challenge>` + kết quả | `ChallengeRepository`, `NoteRepository`, `AnalyticsService` |
-| `SelfControlViewModel` | S09 | `ViewState<SelfControlSummary>` + khoá | `NoteRepository`, `HabitRepository`, `LocalAuthService`, `SettingsRepository` |
-| `BreathingViewModel` | S10 | `BreathingState` (nhịp, thời gian còn lại, xong) | `NoteRepository` (khi ghi vào hũ), `Clock` |
+| `SelfControlViewModel` | S09 | `SelfControlState` (`ViewState<SelfControlSummary>` + khoá, đang lưu) | `NoteRepository`, `HabitRepository`, `SettingsRepository`, `LocalAuthService`, `ScreenGuard`, `Clock` |
+| `BreathingViewModel` | S10 | `BreathingState` (kiểu thở, giây đã thở, màn sau khi thở) | `NoteRepository` (chỉ sau khi thở), `ScreenGuard`, `Clock` |
 | `JourneyViewModel` | S11a/b/c | `ViewState<JourneyData>` theo tab con | `NoteRepository`, `ChallengeRepository`, `JourneyStats` (hàm thuần) |
 | `WeeklyReportViewModel` | S11b Thẻ tuần | `ReportState` (idle, building, uploading(progress), done(url), failure) | `ReportService`, `StorageService`, `AnalyticsService`, `CrashReporter` |
 | `SettingsViewModel` | S12 | `ViewState<UserSettings>` | `SettingsRepository`, `MessagingService`, `AuthService`, `AnalyticsService` |
@@ -134,7 +134,7 @@ Khi Firestore trả lỗi quyền (`permission-denied`) hoặc lỗi khác, `Not
 | `UserRepository` | `FirestoreUserRepository` | `users/{uid}` (tạo lần đầu với `role = user`, cài đặt) |
 | `NoteRepository` | `FirestoreNoteRepository` | `users/{uid}/notes`: theo dõi nốt từ một ngày, đọc theo trang, đếm theo khoảng ngày, thêm nốt; nhãn dán tháng `users/{uid}/stickers` |
 | `ChallengeRepository` | `FirestoreChallengeRepository` | Đọc `challenges`, tiến độ `users/{uid}/challengeProgress` |
-| `HabitRepository`, `SettingsRepository` | Firestore | Thói quen muốn bớt, giờ nhắc, Giờ tỉnh, công tắc riêng tư |
+| `HabitRepository`, `SettingsRepository` | `FirestoreHabitRepository`, `FirestoreSettingsRepository` | `users/{uid}/private/habits` (thói quen muốn bớt), `users/{uid}/private/settings` (Giờ tỉnh, khoá Tự chủ; S12 thêm giờ nhắc) |
 | `DraftStore` | `PrefsDraftStore` (`shared_preferences`) | Nháp S03 trên máy; xoá khi đăng xuất |
 | `StorageService` | `FirebaseStorageService` | Tải PDF lên `reports/{uid}/…`, phát tiến độ, trả URL |
 | `ReportService` | `PdfReportService` | Dựng PDF Thẻ tuần từ dữ liệu đang xem |
@@ -142,12 +142,15 @@ Khi Firestore trả lỗi quyền (`permission-denied`) hoặc lỗi khác, `Not
 | `CrashReporter` | `FirebaseCrashReporter` | Lỗi non-fatal, crash thử, user ID, custom key |
 | `RemoteConfigService` | `InAppRemoteConfig` (Stage 4, giá trị mặc định) → `FirebaseRemoteConfigService` (Stage 5) | Giá trị mặc định trong app, fetch + activate, lắng nghe cập nhật realtime |
 | `MessagingService`, `NotificationInbox` | FCM + `flutter_local_notifications` | Xin quyền, nhận ở 3 trạng thái app, lưu danh sách, điều hướng khi chạm |
-| `LocalAuthService` | `local_auth` | Mở khoá phần Tự chủ |
+| `LocalAuthService` | `DeviceLocalAuthService` (`local_auth`) | Mở khoá phần Tự chủ bằng vân tay, khuôn mặt hoặc mã máy |
+| `ScreenGuard` | `MethodChannelScreenGuard` (kênh `lab03/window` trong `MainActivity.kt`) | `FLAG_SECURE` ở S09, giữ màn hình sáng ở S10 |
 | `Clock` | `SystemClock` | Giờ hiện tại (test dùng giờ cố định) |
 
-Đã có: `AuthService`, `UserRepository`, `AuthViewModel` (Stage 3); `NoteRepository`, `DraftStore`, `Clock`, `RemoteConfigService` (giá trị mặc định), `TodayViewModel`, `NoteComposerViewModel`, `NoteSavedViewModel` (Stage 4, F1); `JarViewModel`, `NoteDetailViewModel`, `NoteDeleter` (Stage 4, P4/P5). Các dòng còn lại được dựng ở Stage 4–5.
+Đã có: `AuthService`, `UserRepository`, `AuthViewModel` (Stage 3); `NoteRepository`, `DraftStore`, `Clock`, `RemoteConfigService` (giá trị mặc định), `TodayViewModel`, `NoteComposerViewModel`, `NoteSavedViewModel` (Stage 4, F1); `JarViewModel`, `NoteDetailViewModel`, `NoteDeleter` (Stage 4, P4/P5); `HabitRepository`, `SettingsRepository`, `LocalAuthService`, `ScreenGuard`, `SelfControlViewModel`, `BreathingViewModel` (Stage 4, F2). Các dòng còn lại được dựng ở Stage 4–5.
 
 `PrefsDraftStore` nằm trong `firebase/` dù không dùng Firebase: thư mục này là nơi duy nhất được gọi SDK bên ngoài (Firebase, `shared_preferences`), nên quy tắc import ở mục 2 vẫn giữ nguyên.
+
+**Android:** `MainActivity` kế thừa `FlutterFragmentActivity` vì `local_auth` cần hộp xác thực sinh trắc học. `LaunchTheme` vẫn là theme mặc định của Flutter; tài liệu `local_auth_android` khuyên dùng `Theme.AppCompat` để tránh lỗi trên Android 8 trở xuống, nên trên các máy đó hãy kiểm tra lại nút Mở khoá.
 
 **Xoá có hoàn tác:** `NoteDeleter` (không gắn với màn nào) ẩn nốt ngay, giữ hẹn giờ 5 giây và chỉ gọi `NoteRepository.delete` khi hết giờ mà người dùng không bấm Hoàn tác. Nó nằm ngoài ViewModel của S06 vì S06 đã đóng khi hẹn giờ chạy; `JarViewModel` nghe nó để ẩn và hiện lại nốt trong lưới. Nếu app bị tắt trong 5 giây đó thì nốt không bị xoá.
 
