@@ -2,10 +2,23 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null; }
+    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
     function roleOf(uid) {
       return get(/databases/$(database)/documents/users/$(uid)).data.role;
     }
     function isAdmin() { return signedIn() && roleOf(request.auth.uid) == 'admin'; }
+
+    // A valid note: known type and mood, title 1-120 chars, journal <= 2000
+    // chars (handout limits, deviation D-02).
+    function validNote(note) {
+      return note.keys().hasAll(['type', 'title', 'createdAt'])
+        && note.keys().hasOnly(['type', 'title', 'body', 'mood', 'createdAt'])
+        && note.type in ['chien_thang', 'tu_chu', 'thu_thach', 'nhat_ky']
+        && note.title is string && note.title.size() >= 1 && note.title.size() <= 120
+        && (!('body' in note) || (note.body is string && note.body.size() <= 2000))
+        && (!('mood' in note) || note.mood in ['vui', 'on', 'binh_thuong', 'met', 'roi'])
+        && note.createdAt is timestamp;
+    }
 
     // Deny by default: only the matches below are reachable.
     match /users/{uid} {
@@ -14,6 +27,18 @@ service cloud.firestore {
                     && request.resource.data.role == 'user';
       allow update: if isAdmin()
                     && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['role']);
+
+      match /notes/{noteId} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid) && validNote(request.resource.data);
+      }
+
+      match /stickers/{month} {
+        allow read: if isOwner(uid);
+        allow create, update: if isOwner(uid)
+                              && request.resource.data.keys().hasOnly(['month', 'createdAt'])
+                              && request.resource.data.month == month;
+      }
     }
   }
 }

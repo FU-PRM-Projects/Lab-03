@@ -5,8 +5,12 @@ import 'package:material_ui/material_ui.dart';
 import 'app.dart';
 import 'firebase/firebase_auth_service.dart';
 import 'firebase/firebase_bootstrap.dart';
+import 'firebase/firestore_note_repository.dart';
 import 'firebase/firestore_user_repository.dart';
+import 'firebase/prefs_draft_store.dart';
 import 'services/auth_service.dart';
+import 'services/draft_store.dart';
+import 'services/note_repository.dart';
 import 'services/user_repository.dart';
 
 /// Web client ID (OAuth) cho Google Sign-In; để trống thì plugin đọc từ
@@ -20,18 +24,21 @@ const String _googleServerClientId = String.fromEnvironment(
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initFirebase();
+  final auth = FirebaseAuthService(
+    serverClientId: _googleServerClientId.isEmpty
+        ? null
+        : _googleServerClientId,
+  );
 
   runApp(
     ProviderScope(
       overrides: [
-        authServiceProvider.overrideWithValue(
-          FirebaseAuthService(
-            serverClientId: _googleServerClientId.isEmpty
-                ? null
-                : _googleServerClientId,
-          ),
-        ),
+        authServiceProvider.overrideWithValue(auth),
         userRepositoryProvider.overrideWithValue(FirestoreUserRepository()),
+        noteRepositoryProvider.overrideWithValue(
+          FirestoreNoteRepository(currentUid: () => auth.currentUser?.uid),
+        ),
+        draftStoreProvider.overrideWithValue(PrefsDraftStore()),
       ],
       child: NotApp(
         font: (style) => GoogleFonts.beVietnamPro(textStyle: style),

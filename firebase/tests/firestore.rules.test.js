@@ -6,7 +6,7 @@ const {
   assertSucceeds,
   assertFails,
 } = require('@firebase/rules-unit-testing');
-const { doc, getDoc, setDoc, updateDoc } = require('firebase/firestore');
+const { doc, getDoc, setDoc, updateDoc, deleteDoc, Timestamp } = require('firebase/firestore');
 
 let env;
 before(async () => {
@@ -45,4 +45,40 @@ test('R-06 user cannot create own profile as admin or for someone else', async (
   const db = env.authenticatedContext('carol').firestore();
   await assertFails(setDoc(doc(db, 'users/carol'), { role: 'admin' }));
   await assertFails(setDoc(doc(db, 'users/dave'), { role: 'user' }));
+});
+
+const note = (extra = {}) => ({
+  type: 'chien_thang',
+  title: 'Dọn bàn học',
+  mood: 'on',
+  createdAt: Timestamp.now(),
+  ...extra,
+});
+
+test('R-07 user writes, reads and deletes own notes', async () => {
+  const db = env.authenticatedContext('alice').firestore();
+  await assertSucceeds(setDoc(doc(db, 'users/alice/notes/n1'), note({ body: 'Nhẹ hơn hôm qua.' })));
+  await assertSucceeds(getDoc(doc(db, 'users/alice/notes/n1')));
+  await assertSucceeds(deleteDoc(doc(db, 'users/alice/notes/n1')));
+});
+test("R-08 user cannot read or write someone else's notes", async () => {
+  const db = env.authenticatedContext('bob').firestore();
+  await assertFails(setDoc(doc(db, 'users/alice/notes/n2'), note()));
+  await assertFails(getDoc(doc(db, 'users/alice/notes/n1')));
+  await assertFails(getDoc(doc(env.unauthenticatedContext().firestore(), 'users/alice/notes/n1')));
+});
+test('R-09 invalid notes are rejected', async () => {
+  const db = env.authenticatedContext('alice').firestore();
+  await assertFails(setDoc(doc(db, 'users/alice/notes/x1'), note({ title: '' })));
+  await assertFails(setDoc(doc(db, 'users/alice/notes/x2'), note({ title: 'a'.repeat(121) })));
+  await assertFails(setDoc(doc(db, 'users/alice/notes/x3'), note({ body: 'a'.repeat(2001) })));
+  await assertFails(setDoc(doc(db, 'users/alice/notes/x4'), note({ type: 'spam' })));
+  await assertFails(setDoc(doc(db, 'users/alice/notes/x5'), note({ mood: 'angry' })));
+  await assertFails(setDoc(doc(db, 'users/alice/notes/x6'), note({ extra: true })));
+});
+test('R-10 user saves own month sticker only under its own id', async () => {
+  const db = env.authenticatedContext('alice').firestore();
+  await assertSucceeds(setDoc(doc(db, 'users/alice/stickers/2026-10'), { month: '2026-10' }));
+  await assertFails(setDoc(doc(db, 'users/alice/stickers/2026-11'), { month: '2026-10' }));
+  await assertFails(setDoc(doc(env.authenticatedContext('bob').firestore(), 'users/alice/stickers/2026-12'), { month: '2026-12' }));
 });

@@ -5,6 +5,9 @@ import 'package:go_router/go_router.dart';
 import 'package:lab03/app.dart';
 import 'package:lab03/router/app_router.dart';
 import 'package:lab03/services/auth_service.dart';
+import 'package:lab03/services/clock.dart';
+import 'package:lab03/services/draft_store.dart';
+import 'package:lab03/services/note_repository.dart';
 import 'package:lab03/services/user_repository.dart';
 import 'package:lab03/theme/app_theme.dart';
 import 'package:material_ui/material_ui.dart';
@@ -30,10 +33,16 @@ class TestServices {
 
   final FakeAuthService auth;
   final FakeUserRepository users = FakeUserRepository();
+  final FakeNoteRepository notes = FakeNoteRepository();
+  final FakeDraftStore drafts = FakeDraftStore();
+  final FixedClock clock = FixedClock();
 
   List<Override> get overrides => <Override>[
     authServiceProvider.overrideWithValue(auth),
     userRepositoryProvider.overrideWithValue(users),
+    noteRepositoryProvider.overrideWithValue(notes),
+    draftStoreProvider.overrideWithValue(drafts),
+    clockProvider.overrideWithValue(clock),
   ];
 }
 
