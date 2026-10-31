@@ -144,7 +144,9 @@ Khi Firestore trả lỗi quyền (`permission-denied`) hoặc lỗi khác, `Not
 | `LocalAuthService` | `local_auth` | Mở khoá phần Tự chủ |
 | `Clock` | `SystemClock` | Giờ hiện tại (test dùng giờ cố định) |
 
-Cột "Hiện thực" được dựng ở Stage 3–5; Stage 2 chỉ dựng lớp View, theme và model.
+Đã có (Stage 3): `AuthService`/`FirebaseAuthService`, `UserRepository`/`FirestoreUserRepository`, `AuthViewModel`. Các dòng còn lại được dựng ở Stage 4–5.
+
+**Khởi tạo Firebase** (`firebase/firebase_bootstrap.dart`): `main.dart` gọi `initFirebase()` trước `runApp`. Chạy với `--dart-define=USE_FIREBASE_EMULATOR=true` thì Auth và Firestore trỏ vào Emulator của `firebase/` (máy `10.0.2.2`, đổi bằng `FIREBASE_EMULATOR_HOST`). Cấu hình project nằm ở `lib/firebase_options.dart`, do `flutterfire configure` sinh ra.
 
 ## 6. Design system trong code
 

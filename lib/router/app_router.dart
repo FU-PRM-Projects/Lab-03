@@ -15,24 +15,38 @@ import '../screens/note_detail/note_detail_screen.dart';
 import '../screens/note_saved/note_saved_screen.dart';
 import '../screens/self_control/self_control_screen.dart';
 import '../screens/settings/settings_screen.dart';
+import '../screens/splash/splash_screen.dart';
 import '../screens/today/today_screen.dart';
 import '../screens/welcome/welcome_screen.dart';
+import '../viewmodels/auth_view_model.dart';
 import '../widgets/state_views.dart';
 import 'app_routes.dart';
 import 'app_shell.dart';
+import 'auth_redirect.dart';
 
 /// Router của app. Màn lồng gắn vào navigator gốc nên che thanh tab.
 ///
-/// Stage 3 thêm `redirect` theo trạng thái đăng nhập (chưa đăng nhập →
-/// `/welcome?next=…`).
+/// Chuyển hướng theo đăng nhập ở [authRedirect]; router chạy lại `redirect`
+/// mỗi khi [authUserProvider] đổi, không dựng lại GoRouter.
 final appRouterProvider = Provider<GoRouter>((ref) {
   final rootKey = GlobalKey<NavigatorState>(debugLabel: 'root');
+  final authChanged = ValueNotifier<int>(0);
+  ref
+    ..listen(authUserProvider, (_, _) => authChanged.value++)
+    ..onDispose(authChanged.dispose);
 
   final router = GoRouter(
     navigatorKey: rootKey,
-    initialLocation: AppRoutes.welcome,
+    initialLocation: AppRoutes.today,
+    refreshListenable: authChanged,
+    redirect: (context, state) =>
+        authRedirect(ref.read(authUserProvider), state.uri),
     routes: <RouteBase>[
       GoRoute(path: '/', redirect: (context, state) => AppRoutes.today),
+      GoRoute(
+        path: AppRoutes.splash,
+        builder: (context, state) => const SplashScreen(),
+      ),
       GoRoute(
         path: AppRoutes.welcome,
         builder: (context, state) =>

@@ -14,7 +14,7 @@ Cột trạng thái được cập nhật ở cuối mỗi stage.
 
 | Mã | Màn hình (Lab 2) | Route | Screen widget | ViewModel | Nguồn dữ liệu | Trạng thái |
 |---|---|---|---|---|---|---|
-| S01 | Chào mừng & Đăng nhập | `/welcome?next=` | `WelcomeScreen` | `AuthViewModel` | Firebase Auth (Google, email/mật khẩu) | Skeleton |
+| S01 | Chào mừng & Đăng nhập | `/welcome?next=` | `WelcomeScreen` | `AuthViewModel` | Firebase Auth (Google, email/mật khẩu), tạo `users/{uid}` lần đầu | Done (Stage 3; Google Sign-In cần project thật để chạy trên máy) |
 | S02 | Hôm nay (tab 1) | `/today` | `TodayScreen` | `TodayViewModel` | Firestore `users/{uid}/notes` (nốt hôm nay, nốt cũ ngày tệ), nháp trên máy | Skeleton |
 | S03 | Ghi nốt (3 bước `S03a`/`b`/`c`) | `/note/new?step=1..3` | `NoteComposerScreen` | `NoteComposerViewModel` | Firestore `users/{uid}/notes` (ghi), Remote Config `quick_win_chips`, nháp trên máy | Skeleton |
 | S04 | Nốt đã vào hũ | `/note/saved/:id` | `NoteSavedScreen` | `NoteSavedViewModel` | Firestore (nốt vừa lưu, số nốt tháng), Remote Config `monthly_milestone` | Skeleton |
@@ -25,7 +25,7 @@ Cột trạng thái được cập nhật ở cuối mỗi stage.
 | S09 | Tự chủ | `/self-control` | `SelfControlScreen` | `SelfControlViewModel` | Firestore `users/{uid}/notes` (đếm tự chủ), `users/{uid}/habits`; `local_auth` | Skeleton |
 | S10 | Thở 90 giây | `/breathe` | `BreathingScreen` | `BreathingViewModel` | Không gọi mạng khi mở (tiêu chí < 2 giây); ghi nốt khi "Ghi vào hũ" | Skeleton |
 | S11 | Hành trình (tab 4: `S11a` Con đường, `S11b` Thống kê, `S11c` Lịch) | `/journey?tab=path\|stats\|calendar` | `JourneyScreen` | `JourneyViewModel`, `WeeklyReportViewModel` | Firestore `users/{uid}/notes`, `challengeProgress`; PDF Thẻ tuần → Cloud Storage `reports/{uid}/` | Skeleton |
-| S12 | Cài đặt (+ khu demo Firebase) | `/settings` | `SettingsScreen` | `SettingsViewModel`, `FirebaseDemoViewModel` | Firestore `users/{uid}` (cài đặt), FCM, Remote Config, Crashlytics, Storage | Skeleton · Deviation D-01 |
+| S12 | Cài đặt (+ khu demo Firebase) | `/settings` | `SettingsScreen` | `SettingsViewModel`, `FirebaseDemoViewModel` | Firestore `users/{uid}` (cài đặt), FCM, Remote Config, Crashlytics, Storage | Một phần: TÀI KHOẢN + Đăng xuất (Stage 3) · Deviation D-01 |
 
 Tab cấp cao giữ đúng Lab 2: Hôm nay, Hũ, Thử thách, Hành trình trong `StatefulShellRoute.indexedStack` (mỗi tab giữ vị trí cuộn). Màn lồng (`S03`, `S04`, `S06`, `S08`, `S09`, `S10`, `S12`) nằm ngoài shell nên không có thanh tab, đúng mục 1.1 của `user-flow.md`.
 
@@ -35,7 +35,7 @@ Tab cấp cao giữ đúng Lab 2: Hôm nay, Hũ, Thử thách, Hành trình tron
 |---|---|---|---|
 | Dialog "Giữ nốt đang ghi?" — Bỏ / Giữ nháp | S03 | `showAppDialog(kind: confirmation)` | Planned |
 | Dialog "Xoá nốt này?" + snackbar Hoàn tác 5 giây | S06 → S05 | `showAppDialog(kind: destructive)` + `showUndoSnackBar` | Planned |
-| Dialog "Đăng xuất khỏi Nốt?" | S12 | `showAppDialog(kind: confirmation)` | Planned |
+| Dialog "Đăng xuất khỏi Nốt?" | S12 | `showAppDialog(kind: confirmation)` | Done |
 | Dialog "Bỏ thay đổi?" | S06 (sửa) | `showAppDialog(kind: confirmation)` | Planned |
 | Xin quyền thông báo Android 13+ | P1, P8 | `MessagingService.requestPermission()` (dialog hệ thống) | Planned |
 | Banner "Offline · đã lưu trên máy" | S02, S04, S05 | `OfflineBanner` | Planned |
@@ -60,14 +60,14 @@ Mã test case (`TC-xx`) sẽ được gán trong `docs/test-plan.md` ở Stage 6
 | F1 Ghi nốt buổi tối | S02 → S03a → S03b → S03c → S04 → S02 (hoặc thông báo 21:30 → S03a) | Bỏ qua nhật ký; tâm trạng Rối → "Sơ cứu 1 phút"; thoát giữa chừng → dialog Giữ nháp; mất mạng → lưu trên máy + banner | Planned |
 | F2 Tự chủ | S02 → S09 → S04 → S02; khó dừng: S09 → S10 → S04 | Đã lỡ lướt → sheet + "Nhận ra cũng là bắt đầu tự chủ"; phần thói quen khoá bằng `local_auth` | Planned |
 | F3 Thử thách | S07 → S08 → S04 → S07 | Đổi thẻ dễ hơn; để mai (Back, không trừ gì); Không như ý → "Mình đã mở lời" | Planned |
-| P1 Làm quen lần đầu | S01 → (xin quyền thông báo) → S02 | Đăng nhập thất bại / huỷ → SnackBar + Thử lại | Planned |
-| P2 Đăng ký email & quên mật khẩu | S01 (form email) → S02 | Lỗi dưới ô; quên mật khẩu → thông báo chung | Planned |
+| P1 Làm quen lần đầu | S01 → (xin quyền thông báo) → S02 | Đăng nhập thất bại / huỷ → SnackBar + Thử lại | Một phần: đăng nhập, huỷ, mất mạng (Stage 3); xin quyền thông báo ở Stage 5 |
+| P2 Đăng ký email & quên mật khẩu | S01 (form email) → S02 | Lỗi dưới ô; quên mật khẩu → thông báo chung | Done (form email trong bottom sheet) |
 | P3 Ghi một lần vận động | S02 → S07 → S08 → S04 | Dừng sớm vẫn lưu số phút | Planned |
 | P4 Viết nhật ký dài | S05 → S06 (sửa) | Bí ý → câu gợi ý; app bị tắt → "Tiếp tục bản nháp?" | Planned |
 | P5 Xem, sửa, xoá một nốt | S05 → S06 → S05 | Dialog xoá + Hoàn tác 5 giây | Planned |
 | P6 Ngày tệ: nhìn lại hành trình | S11 → S05 → S06 | Mệt/Rối 5 ngày liền → dialog hỗ trợ | Planned |
-| P7 Thông báo → mở đúng màn | Thông báo → S03 / S02 / S08 | Chưa đăng nhập → S01 rồi mới tới đích (`?next=`) | Planned |
-| P8 Hồ sơ & cài đặt | S02 → S12 → (đăng xuất) S01 | Từ chối quyền thông báo → banner "Mở cài đặt" | Planned |
+| P7 Thông báo → mở đúng màn | Thông báo → S03 / S02 / S08 | Chưa đăng nhập → S01 rồi mới tới đích (`?next=`) | Một phần: redirect `?next=` (Stage 3); nhận thông báo ở Stage 5 |
+| P8 Hồ sơ & cài đặt | S02 → S12 → (đăng xuất) S01 | Từ chối quyền thông báo → banner "Mở cài đặt" | Một phần: đăng xuất (Stage 3) |
 | T1 Hũ rỗng | S05 → S03 → S04 | Empty state + "Ghi nốt đầu tiên" | Planned |
 | T2 Mất mạng / tải lỗi | S05, S11 | Error state + Thử lại; có dữ liệu cũ → banner | Planned |
 | T3 Đang tải → kết quả | S11c | Quá 10 giây → T2 | Planned |
@@ -136,6 +136,8 @@ Mỗi dòng là một chỗ app khác Figma, kèm lý do. Cột "Figma" cho bi�
 | D-08 | "Lưu trên máy" khi mất mạng | Ghi vào bộ nhớ máy, cờ `pendingSync` | Dùng bộ nhớ đệm offline của Firestore: ghi xong ngay trên máy, tự đồng bộ khi có mạng; banner dựa trên `hasPendingWrites` | Cùng hành vi với thiết kế, ít code hơn và không mất dữ liệu | Không cần |
 | D-09 | S11b biểu đồ | Vẽ cố định 294 px | `fl_chart` co giãn theo chiều rộng thẻ | `design-decisions.md` mục 2 đã ghi | Không cần |
 | D-11 | `Note/Tờ nốt` (S04, S05) | `DESIGN.md` mục 10: tiêu đề tối đa 2 dòng; `flutter-handoff.md` (component, S05): tối đa 3 dòng | Tối đa **2 dòng** rồi "…" | Hai tài liệu Lab 2 mâu thuẫn. Ô lưới 158 × 137 dp chỉ chứa vừa nhãn loại + 2 dòng tiêu đề + ngày; dòng thứ 3 bị cắt ngang khi chạy thật ở 360 dp | Không cần (Figma vẽ 2 dòng); sửa handout |
+| D-12 | Mở app | Không có màn chờ | Màn chờ `/splash` (vòng xoay trên nền `surface`) trong lúc Firebase cho biết đã đăng nhập chưa, rồi chuyển tới S01 hoặc đích ban đầu | Tránh hiện S01 chớp nhoáng với người đã đăng nhập; giữ đích khi mở từ thông báo (P7) | Không cần (màn kỹ thuật, không có nội dung thiết kế) |
+| D-13 | S01 form email | Handoff: "Email / Đăng ký mở form email", không vẽ form | Form email là bottom sheet trên S01 (Email, Mật khẩu, nút chính, "Quên mật khẩu?"), lỗi hiện dưới ô | Figma không có frame cho form này; dùng component `Text field` và `Button` có sẵn | Cần cập nhật |
 | D-10 | Kho thẻ thử thách | Không nêu nguồn | Collection Firestore `challenges` chỉ đọc với người dùng; dữ liệu nạp bằng script trong `firebase/`. Final: staff quản lý ở web admin | Lab 3 cấm dữ liệu mock; Final cần một thực thể staff quản lý mà app đọc | Không cần |
 
 Thay đổi phát sinh ở các stage sau được thêm vào bảng này cùng commit với code.
