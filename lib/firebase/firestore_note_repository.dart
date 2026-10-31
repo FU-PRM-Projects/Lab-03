@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../models/challenge.dart';
 import '../models/mood.dart';
 import '../models/note.dart';
 import '../models/note_type.dart';
@@ -55,6 +56,21 @@ class FirestoreNoteRepository implements NoteRepository {
       mood: Mood.fromId(data['mood'] as String?),
       createdAt: createdAt.toDate(),
       pendingSync: doc.metadata.hasPendingWrites,
+      challenge: _toChallenge(data),
+    );
+  }
+
+  static ChallengeResult? _toChallenge(Map<String, Object?> data) {
+    final id = data['challengeId'];
+    final subtype = data['subtype'];
+    final outcome = ChallengeOutcome.fromId(data['outcome'] as String?);
+    if (id is! String || subtype is! String || outcome == null) return null;
+    return ChallengeResult(
+      challengeId: id,
+      subtype: subtype,
+      outcome: outcome,
+      anxietyBefore: data['anxietyBefore'] as int?,
+      minutes: data['minutes'] as int?,
     );
   }
 
@@ -167,6 +183,13 @@ class FirestoreNoteRepository implements NoteRepository {
             'body': ?(body.isEmpty ? null : body),
             'mood': ?draft.mood?.id,
             'createdAt': Timestamp.fromDate(createdAt),
+            if (draft.challenge case final c?) ...<String, Object?>{
+              'challengeId': c.challengeId,
+              'subtype': c.subtype,
+              'outcome': c.outcome.id,
+              'anxietyBefore': ?c.anxietyBefore,
+              'minutes': ?c.minutes,
+            },
           }),
         );
         return Note(
@@ -177,6 +200,7 @@ class FirestoreNoteRepository implements NoteRepository {
           mood: draft.mood,
           createdAt: createdAt,
           pendingSync: pending,
+          challenge: draft.challenge,
         );
       });
 
@@ -203,6 +227,7 @@ class FirestoreNoteRepository implements NoteRepository {
       mood: before.mood,
       createdAt: before.createdAt,
       pendingSync: pending,
+      challenge: before.challenge,
     );
   });
 

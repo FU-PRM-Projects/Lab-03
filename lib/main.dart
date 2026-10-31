@@ -6,11 +6,13 @@ import 'app.dart';
 import 'firebase/device_services.dart';
 import 'firebase/firebase_auth_service.dart';
 import 'firebase/firebase_bootstrap.dart';
+import 'firebase/firestore_challenge_repository.dart';
 import 'firebase/firestore_note_repository.dart';
 import 'firebase/firestore_self_control.dart';
 import 'firebase/firestore_user_repository.dart';
 import 'firebase/prefs_draft_store.dart';
 import 'services/auth_service.dart';
+import 'services/challenge_repository.dart';
 import 'services/draft_store.dart';
 import 'services/note_repository.dart';
 import 'services/self_control_services.dart';
@@ -43,6 +45,9 @@ Future<void> main() async {
           FirestoreNoteRepository(currentUid: uid),
         ),
         draftStoreProvider.overrideWithValue(PrefsDraftStore()),
+        challengeRepositoryProvider.overrideWithValue(
+          FirestoreChallengeRepository(currentUid: uid),
+        ),
         habitRepositoryProvider.overrideWithValue(
           FirestoreHabitRepository(currentUid: uid),
         ),

@@ -1,12 +1,14 @@
 import 'dart:async';
 
 import 'package:lab03/models/app_user.dart';
+import 'package:lab03/models/challenge.dart';
 import 'package:lab03/models/mood.dart';
 import 'package:lab03/models/note.dart';
 import 'package:lab03/models/note_type.dart';
 import 'package:lab03/models/self_control.dart';
 import 'package:lab03/services/app_exception.dart';
 import 'package:lab03/services/auth_service.dart';
+import 'package:lab03/services/challenge_repository.dart';
 import 'package:lab03/services/clock.dart';
 import 'package:lab03/services/draft_store.dart';
 import 'package:lab03/services/note_repository.dart';
@@ -211,6 +213,7 @@ class FakeNoteRepository implements NoteRepository {
       mood: draft.mood,
       createdAt: createdAt,
       pendingSync: offline,
+      challenge: draft.challenge,
     );
     notes.add(note);
     _changes.add(null);
@@ -235,6 +238,7 @@ class FakeNoteRepository implements NoteRepository {
       mood: old.mood,
       createdAt: old.createdAt,
       pendingSync: offline,
+      challenge: old.challenge,
     );
     notes[i] = note;
     _changes.add(null);
@@ -382,4 +386,74 @@ class FakeScreenGuard implements ScreenGuard {
 
   @override
   Future<void> setKeepScreenOn(bool enabled) async => keepScreenOn = enabled;
+}
+
+/// Kho thẻ mẫu: 2 chủ đề × 2 cấp × [perLevel] thẻ, id dạng `dc-1-1`, `vd-2-3`.
+List<Challenge> sampleCatalog({int perLevel = 3}) => <Challenge>[
+  for (final topic in ChallengeTopic.values)
+    for (var level = 1; level <= 2; level++)
+      for (var i = 1; i <= perLevel; i++)
+        Challenge(
+          id: '${topic == ChallengeTopic.dungCam ? 'dc' : 'vd'}-$level-$i',
+          topic: topic,
+          level: level,
+          order: i,
+          title: '${topic.label} cấp $level thẻ $i',
+          minutes: level * 2 + i,
+          tip: 'Mẹo $i',
+          script: topic == ChallengeTopic.dungCam ? 'Câu mẫu $i' : '',
+        ),
+];
+
+class FakeChallengeRepository implements ChallengeRepository {
+  FakeChallengeRepository([List<Challenge>? catalog])
+    : cards = catalog ?? sampleCatalog();
+
+  final List<Challenge> cards;
+  final Map<ChallengeTopic, ChallengeProgress> progress =
+      <ChallengeTopic, ChallengeProgress>{};
+  final _changes = StreamController<void>.broadcast();
+  AppException? catalogError;
+
+  @override
+  Future<List<Challenge>> catalog() async {
+    if (catalogError != null) throw catalogError!;
+    return cards;
+  }
+
+  @override
+  Future<Challenge> get(String id) async {
+    for (final card in cards) {
+      if (card.id == id) return card;
+    }
+    throw const AppException(AppErrorKind.notFound);
+  }
+
+  @override
+  Stream<Map<ChallengeTopic, ChallengeProgress>> watchProgress() =>
+      Stream<Map<ChallengeTopic, ChallengeProgress>>.multi((controller) {
+        controller.add(Map.of(progress));
+        final sub = _changes.stream.listen(
+          (_) => controller.add(Map.of(progress)),
+        );
+        controller.onCancel = sub.cancel;
+      });
+
+  @override
+  Future<ChallengeProgress> progressOf(ChallengeTopic topic) async =>
+      progress[topic] ?? const ChallengeProgress();
+
+  @override
+  Future<void> complete(
+    ChallengeTopic topic,
+    String challengeId, {
+    required int level,
+  }) async {
+    final old = progress[topic] ?? const ChallengeProgress();
+    progress[topic] = ChallengeProgress(
+      level: level,
+      completed: <String>{...old.completed, challengeId},
+    );
+    _changes.add(null);
+  }
 }

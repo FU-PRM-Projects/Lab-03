@@ -12,12 +12,23 @@ service cloud.firestore {
     // chars (handout limits, deviation D-02).
     function validNote(note) {
       return note.keys().hasAll(['type', 'title', 'createdAt'])
-        && note.keys().hasOnly(['type', 'title', 'body', 'mood', 'createdAt'])
+        && note.keys().hasOnly(['type', 'title', 'body', 'mood', 'createdAt',
+                                'challengeId', 'subtype', 'outcome', 'anxietyBefore', 'minutes'])
         && note.type in ['chien_thang', 'tu_chu', 'thu_thach', 'nhat_ky']
         && note.title is string && note.title.size() >= 1 && note.title.size() <= 120
         && (!('body' in note) || (note.body is string && note.body.size() <= 2000))
         && (!('mood' in note) || note.mood in ['vui', 'on', 'binh_thuong', 'met', 'roi'])
-        && note.createdAt is timestamp;
+        && note.createdAt is timestamp
+        && (!('subtype' in note) || note.subtype in ['nguoi_la', 'van_dong'])
+        && (!('outcome' in note) || note.outcome in ['suon_se', 'khong_nhu_y'])
+        && (!('anxietyBefore' in note) || (note.anxietyBefore is int && note.anxietyBefore >= 1 && note.anxietyBefore <= 5))
+        && (!('minutes' in note) || (note.minutes is int && note.minutes >= 0 && note.minutes <= 600));
+    }
+
+    // Challenge catalog: read-only for signed-in users; staff manage it from
+    // the admin web (Final Assignment) or the seed script.
+    match /challenges/{id} {
+      allow read: if signedIn();
     }
 
     // Deny by default: only the matches below are reachable.
@@ -45,6 +56,15 @@ service cloud.firestore {
         allow read: if isOwner(uid);
         allow create, update: if isOwner(uid)
                               && request.resource.data.keys().hasOnly(['awakeEnabled', 'awakeStart', 'awakeEnd', 'lockSelfControl']);
+      }
+
+      match /challengeProgress/{topic} {
+        allow read: if isOwner(uid);
+        allow create, update: if isOwner(uid)
+                              && topic in ['dung_cam', 'van_dong']
+                              && request.resource.data.keys().hasOnly(['level', 'completed'])
+                              && request.resource.data.level is int
+                              && request.resource.data.level >= 1;
       }
 
       match /stickers/{month} {

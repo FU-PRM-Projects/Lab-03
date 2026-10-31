@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lab03/app.dart';
 import 'package:lab03/router/app_router.dart';
 import 'package:lab03/services/auth_service.dart';
+import 'package:lab03/services/challenge_repository.dart';
 import 'package:lab03/services/clock.dart';
 import 'package:lab03/services/draft_store.dart';
 import 'package:lab03/services/note_repository.dart';
@@ -40,6 +41,7 @@ class TestServices {
   final FakeSelfControl selfControl = FakeSelfControl();
   final FakeLocalAuth localAuth = FakeLocalAuth();
   final FakeScreenGuard screenGuard = FakeScreenGuard();
+  final FakeChallengeRepository challenges = FakeChallengeRepository();
 
   List<Override> get overrides => <Override>[
     authServiceProvider.overrideWithValue(auth),
@@ -51,6 +53,7 @@ class TestServices {
     settingsRepositoryProvider.overrideWithValue(selfControl.settingsView),
     localAuthServiceProvider.overrideWithValue(localAuth),
     screenGuardProvider.overrideWithValue(screenGuard),
+    challengeRepositoryProvider.overrideWithValue(challenges),
   ];
 }
 

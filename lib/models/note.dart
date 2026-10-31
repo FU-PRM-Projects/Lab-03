@@ -1,3 +1,4 @@
+import 'challenge.dart';
 import 'mood.dart';
 import 'note_type.dart';
 
@@ -11,6 +12,7 @@ class Note {
     this.mood,
     this.body = '',
     this.pendingSync = false,
+    this.challenge,
   });
 
   final String id;
@@ -28,6 +30,9 @@ class Note {
   /// Mới ghi trên máy, chưa đồng bộ lên server (deviation D-08).
   final bool pendingSync;
 
+  /// Kết quả thử thách, chỉ có ở nốt `thu_thach` ghi từ S08.
+  final ChallengeResult? challenge;
+
   @override
   bool operator ==(Object other) =>
       other is Note &&
@@ -37,11 +42,20 @@ class Note {
       other.body == body &&
       other.mood == mood &&
       other.createdAt == createdAt &&
-      other.pendingSync == pendingSync;
+      other.pendingSync == pendingSync &&
+      other.challenge == challenge;
 
   @override
-  int get hashCode =>
-      Object.hash(id, type, title, body, mood, createdAt, pendingSync);
+  int get hashCode => Object.hash(
+    id,
+    type,
+    title,
+    body,
+    mood,
+    createdAt,
+    pendingSync,
+    challenge,
+  );
 }
 
 /// Nội dung một nốt chưa lưu: nháp S03 và dữ liệu gửi cho `NoteRepository`.
@@ -51,12 +65,14 @@ class NoteDraft {
     this.mood,
     this.title = '',
     this.body = '',
+    this.challenge,
   });
 
   final NoteType type;
   final Mood? mood;
   final String title;
   final String body;
+  final ChallengeResult? challenge;
 
   /// Có gì đáng giữ khi người dùng thoát giữa chừng.
   bool get hasInput =>
@@ -72,6 +88,7 @@ class NoteDraft {
     mood: mood ?? this.mood,
     title: title ?? this.title,
     body: body ?? this.body,
+    challenge: challenge,
   );
 
   @override

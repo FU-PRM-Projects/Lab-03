@@ -90,3 +90,22 @@ test('R-11 user keeps private habits and settings; others cannot read them', asy
   await assertFails(setDoc(doc(db, 'users/alice/private/habits'), { selected: [], role: 'admin' }));
   await assertFails(setDoc(doc(db, 'users/alice/private/other'), { a: 1 }));
 });
+test('R-12 challenge catalog is read-only; progress is private', async () => {
+  await env.withSecurityRulesDisabled(async (ctx) => {
+    await setDoc(doc(ctx.firestore(), 'challenges/dc-1-1'), { topic: 'dung_cam', level: 1, order: 1, title: 'Chào bác bảo vệ', minutes: 1 });
+  });
+  const db = env.authenticatedContext('alice').firestore();
+  await assertSucceeds(getDoc(doc(db, 'challenges/dc-1-1')));
+  await assertFails(getDoc(doc(env.unauthenticatedContext().firestore(), 'challenges/dc-1-1')));
+  await assertFails(setDoc(doc(db, 'challenges/dc-9-9'), { title: 'x' }));
+  await assertSucceeds(setDoc(doc(db, 'users/alice/challengeProgress/dung_cam'), { level: 1, completed: ['dc-1-1'] }));
+  await assertFails(setDoc(doc(db, 'users/alice/challengeProgress/other'), { level: 1, completed: [] }));
+  await assertFails(getDoc(doc(env.authenticatedContext('bob').firestore(), 'users/alice/challengeProgress/dung_cam')));
+});
+test('R-13 challenge notes keep their result fields within range', async () => {
+  const db = env.authenticatedContext('alice').firestore();
+  const result = { challengeId: 'dc-1-1', subtype: 'nguoi_la', outcome: 'khong_nhu_y', anxietyBefore: 4 };
+  await assertSucceeds(setDoc(doc(db, 'users/alice/notes/c1'), note({ type: 'thu_thach', ...result })));
+  await assertFails(setDoc(doc(db, 'users/alice/notes/c2'), note({ type: 'thu_thach', ...result, anxietyBefore: 9 })));
+  await assertFails(setDoc(doc(db, 'users/alice/notes/c3'), note({ type: 'thu_thach', ...result, outcome: 'win' })));
+});
