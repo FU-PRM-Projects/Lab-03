@@ -24,7 +24,7 @@ Cột trạng thái được cập nhật ở cuối mỗi stage.
 | S08 | Chi tiết thử thách | `/challenges/:id` | `ChallengeDetailScreen` | `ChallengeDetailViewModel` | Firestore `challenges/{id}`, ghi `users/{uid}/notes` và `challengeProgress` | Done (Stage 4) · Deviation D-17 |
 | S09 | Tự chủ | `/self-control` | `SelfControlScreen` | `SelfControlViewModel` | Firestore `users/{uid}/notes` (đếm tự chủ), `users/{uid}/private/habits`, `users/{uid}/private/settings`; `local_auth`; `FLAG_SECURE` | Done (Stage 4) · Deviation D-16 |
 | S10 | Thở 90 giây | `/breathe` | `BreathingScreen` | `BreathingViewModel` | Không gọi mạng khi mở (tiêu chí < 2 giây); ghi nốt khi "Ghi vào hũ"; giữ màn hình sáng khi thở | Done (Stage 4) · Deviation D-16 |
-| S11 | Hành trình (tab 4: `S11a` Con đường, `S11b` Thống kê, `S11c` Lịch) | `/journey?tab=path\|stats\|calendar` | `JourneyScreen` | `JourneyViewModel`, `WeeklyReportViewModel` | Firestore `users/{uid}/notes`, `challengeProgress`; PDF Thẻ tuần → Cloud Storage `reports/{uid}/` | Skeleton |
+| S11 | Hành trình (tab 4: `S11a` Con đường, `S11b` Thống kê, `S11c` Lịch) | `/journey?tab=path\|stats\|calendar` | `JourneyScreen` | `JourneyViewModel`, `WeeklyReportViewModel` | Firestore `users/{uid}/notes`, `challengeProgress`; PDF Thẻ tuần → Cloud Storage `reports/{uid}/` | Done (Stage 4) · Deviation D-06, D-18 |
 | S12 | Cài đặt (+ khu demo Firebase) | `/settings` | `SettingsScreen` | `SettingsViewModel`, `FirebaseDemoViewModel` | Firestore `users/{uid}` (cài đặt), FCM, Remote Config, Crashlytics, Storage | Một phần: TÀI KHOẢN + Đăng xuất (Stage 3) · Deviation D-01 |
 
 Tab cấp cao giữ đúng Lab 2: Hôm nay, Hũ, Thử thách, Hành trình trong `StatefulShellRoute.indexedStack` (mỗi tab giữ vị trí cuộn). Màn lồng (`S03`, `S04`, `S06`, `S08`, `S09`, `S10`, `S12`) nằm ngoài shell nên không có thanh tab, đúng mục 1.1 của `user-flow.md`.
@@ -40,14 +40,14 @@ Tab cấp cao giữ đúng Lab 2: Hôm nay, Hũ, Thử thách, Hành trình tron
 | Xin quyền thông báo Android 13+ | P1, P8 | `MessagingService.requestPermission()` (dialog hệ thống) | Planned |
 | Banner "Offline · đã lưu trên máy" | S02, S04, S05 | `OfflineBanner` | Done |
 | Empty state "Hũ còn trống" | S05 | `EmptyState` | Done |
-| Loading skeleton "Đang tải lịch năng lượng…" | S05, S11c | `LoadingState.skeleton` | Một phần: S05 ("Đang mở hũ…") |
-| Error state "Chưa tải được hũ" + Thử lại | S05, S07, S11 | `ErrorState` | Một phần: S05 |
+| Loading skeleton "Đang tải lịch năng lượng…" | S05, S11c | `LoadingState.skeleton` | Done |
+| Error state "Chưa tải được hũ" + Thử lại | S05, S07, S11 | `ErrorState` | Done |
 | Sheet "Kết quả?" (Suôn sẻ / Không như ý) | S08 | `showModalBottomSheet` | Done |
 | Sheet "Lúc đó mình đang thấy gì?" | S09 | `showModalBottomSheet` | Done |
 | Sheet "Đổi kiểu thở" (4-6, 4-7-8) | S10 | `showModalBottomSheet` | Done |
-| Sheet các nốt của một ngày | S11c | `showModalBottomSheet` | Planned |
-| Thẻ tuần dạng story + "Lưu thẻ tuần (PDF)" | S11b | route con toàn màn | Planned · Deviation D-06 |
-| Dialog gợi ý hỗ trợ (Mệt/Rối 5 ngày liền) | S11 (P6) | `showAppDialog(kind: confirmation)` | Planned |
+| Sheet các nốt của một ngày | S11c | `showModalBottomSheet` | Done |
+| Thẻ tuần dạng story + "Lưu thẻ tuần (PDF)" | S11b | `WeeklyCardPage` (route toàn màn, `fullscreenDialog`) | Done · Deviation D-06 |
+| Dialog gợi ý hỗ trợ (Mệt/Rối 5 ngày liền) | S11 (P6) | `showAppDialog(kind: confirmation)` | Done |
 
 ---
 
@@ -65,12 +65,12 @@ Mã test case (`TC-xx`) sẽ được gán trong `docs/test-plan.md` ở Stage 6
 | P3 Ghi một lần vận động | S02 → S07 → S08 → S04 | Dừng sớm vẫn lưu số phút | Done (Stage 4) |
 | P4 Viết nhật ký dài | S05 → S06 (sửa) | Bí ý → câu gợi ý; app bị tắt → "Tiếp tục bản nháp?" | Một phần: nút "Gợi ý" (Stage 4); nháp khi app bị tắt chưa làm |
 | P5 Xem, sửa, xoá một nốt | S05 → S06 → S05 | Dialog xoá + Hoàn tác 5 giây | Done (Stage 4) |
-| P6 Ngày tệ: nhìn lại hành trình | S11 → S05 → S06 | Mệt/Rối 5 ngày liền → dialog hỗ trợ | Planned |
+| P6 Ngày tệ: nhìn lại hành trình | S11 → S05 → S06 | Mệt/Rối 5 ngày liền → dialog hỗ trợ | Done (Stage 4) |
 | P7 Thông báo → mở đúng màn | Thông báo → S03 / S02 / S08 | Chưa đăng nhập → S01 rồi mới tới đích (`?next=`) | Một phần: redirect `?next=` (Stage 3); nhận thông báo ở Stage 5 |
 | P8 Hồ sơ & cài đặt | S02 → S12 → (đăng xuất) S01 | Từ chối quyền thông báo → banner "Mở cài đặt" | Một phần: đăng xuất (Stage 3) |
 | T1 Hũ rỗng | S05 → S03 → S04 | Empty state + "Ghi nốt đầu tiên" | Done (Stage 4) |
-| T2 Mất mạng / tải lỗi | S05, S11 | Error state + Thử lại; có dữ liệu cũ → banner | Một phần: S05 (Stage 4); S11 chưa làm |
-| T3 Đang tải → kết quả | S11c | Quá 10 giây → T2 | Planned |
+| T2 Mất mạng / tải lỗi | S05, S11 | Error state + Thử lại; có dữ liệu cũ → banner | Done (Stage 4) |
+| T3 Đang tải → kết quả | S11c | Quá 10 giây → T2 | Done (Stage 4) |
 
 ---
 
@@ -104,7 +104,7 @@ Mỗi component là **một** widget dùng lại trong `lib/widgets/`, variant v
 | Banner offline | — | `OfflineBanner` | `widgets/offline_banner.dart` | Done |
 | Tab con (Con đường / Thống kê / Lịch, Tháng / Năm) | — | `SegmentedButton` + `SegmentedButtonThemeData` (cao 48) | `theme/app_theme.dart` | Done |
 | `Illustration/Hũ chiến thắng`, `Decor/Confetti` | — | `JarIllustration` (vẽ bằng widget); confetti chưa có | `widgets/jar_illustration.dart` | Deviation D-14 |
-| Biểu đồ S11b | Line, Bar | `fl_chart` | Stage 4 | Planned |
+| Biểu đồ S11b | Line, Bar | `fl_chart` `LineChart` (năng lượng); thanh ngang `LinearProgressIndicator` (cân bằng) | `screens/journey/journey_stats_tab.dart` | Done · Deviation D-18 |
 
 ## 4. Token → theme
 
@@ -142,6 +142,7 @@ Mỗi dòng là một chỗ app khác Figma, kèm lý do. Cột "Figma" cho bi�
 | D-15 | S06 chế độ sửa | Chỉ có nút "Lưu" cố định cuối màn; dialog "Bỏ thay đổi?" không ghi tên nút | Thêm nút chữ "Huỷ" dưới "Lưu" để thoát chế độ sửa mà không rời màn; dialog dùng "Bỏ thay đổi" / "Sửa tiếp". S05 có thêm nút "Chưa tải thêm được · Thử lại" cuối lưới khi tải trang sau lỗi | Handout chỉ có Back để thoát chế độ sửa, nên muốn xem lại nốt phải rời màn. Tải trang sau lỗi cần có cách thử lại (Lab 3: mọi lỗi tải có thông báo) | Cần cập nhật |
 | D-16 | S09, S10 | S09: Giờ tỉnh là một `SettingRow` có công tắc, chạm giờ để đổi; trạng thái "Đã lỡ lướt" không vẽ nút mở. S10: sóng thở `CustomPaint` | S09: tách thành 2 dòng (công tắc "Giờ tỉnh" và "Khung giờ 23:00 – 01:00" chạm để chọn giờ); thêm nút chữ "Mình đã lỡ lướt quá đà" dưới các chip thói quen, ghi lại thành một nốt Nhật ký "Nhận ra mình đã lướt quá đà" (không tính là lần tự chủ). S10: vòng tròn có mascot to ra khi hít vào, nhỏ lại khi thở ra, đúng nhịp từng bước; kiểu 4-7-8 có thêm bước "Giữ hơi…" | `SettingRow` chỉ có một kiểu trailing (công tắc hoặc giá trị). Figma không có lối vào nhánh phục hồi. Vòng tròn co giãn đọc được ở cả chế độ giảm chuyển động (đổi kích thước theo bước) | Cần cập nhật |
 | D-17 | S07, S08 | S07: một chủ đề trên đầu màn ("Dũng cảm · cấp 2"), chồng thẻ cùng cấp. S08: "Kết quả?" có Suôn sẻ / Không như ý; P3 "có thêm ô số phút" | S07: chồng thẻ gồm thẻ chưa làm của cả hai chủ đề (Dũng cảm, Vận động), dòng đầu đổi theo thẻ đang xem; hôm qua Mệt / Rối thì Vận động lên trước; có thêm nút mũi tên Thẻ trước / Thẻ sau bên cạnh chấm trang. S08: thẻ Vận động dùng nhãn "Xong trọn" / "Dừng sớm" và ô số phút dạng nút − / +; không còn thẻ dễ hơn thì báo "Đây đã là thẻ nhẹ nhất rồi." | Flow F3 cần gợi ý thẻ "hợp tâm trạng hôm qua" và P3 cần thẻ vận động trên cùng màn. Nút mũi tên là cách đổi thẻ cho người dùng trình đọc màn hình (handout S07, mục Constraints) | Cần cập nhật |
+| D-18 | S11 | S11a: một thẻ chặng. S11b: "Cân bằng 5 điều tốt" là `BarChart` ngang. S11c: lề 16 như mọi màn | S11a hiện chặng của cả hai chủ đề (Dũng cảm, Vận động), mỗi chặng một đường nút. S11b: mỗi loại là một dòng (tên, thanh ngang, số), kèm nút "Mở Thử thách" khi loại ít nhất là Vận động / Người lạ. S11c: lề 12 dp. Dialog P6 gợi ý kể với người tin cậy hoặc phòng tư vấn tâm lý của trường, và gọi 115 khi thấy không an toàn | S11c: 7 ô 48 dp cần 336 dp, vùng nội dung lề 16 ở 360 dp chỉ còn 328 dp; giữ ô 48 dp (vùng chạm tối thiểu) thay vì thu nhỏ. S11b: thanh ngang có nhãn chữ và số đọc được bằng trình đọc màn hình. Figma không ghi số đường dây hỗ trợ; dùng số cấp cứu 115 chắc chắn đúng | Cần cập nhật |
 | D-10 | Kho thẻ thử thách | Không nêu nguồn | Collection Firestore `challenges` chỉ đọc với người dùng; dữ liệu nạp bằng `firebase/scripts/seed-challenges.js` từ `firebase/seed/challenges.json` (20 thẻ: 2 chủ đề × 2 cấp × 5 thẻ). Final: staff quản lý ở web admin | Lab 3 cấm dữ liệu mock; Final cần một thực thể staff quản lý mà app đọc | Không cần |
 
 Thay đổi phát sinh ở các stage sau được thêm vào bảng này cùng commit với code.

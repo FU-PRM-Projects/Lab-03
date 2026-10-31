@@ -123,8 +123,8 @@ Khi Firestore trả lỗi quyền (`permission-denied`) hoặc lỗi khác, `Not
 | `ChallengeDetailViewModel` | S08 | `ChallengeDetailState` (`ViewState<Challenge>` + mức hồi hộp, số phút, đang lưu) | `ChallengeRepository`, `NoteRepository`, `Clock`, `AnalyticsService` |
 | `SelfControlViewModel` | S09 | `SelfControlState` (`ViewState<SelfControlSummary>` + khoá, đang lưu) | `NoteRepository`, `HabitRepository`, `SettingsRepository`, `LocalAuthService`, `ScreenGuard`, `Clock` |
 | `BreathingViewModel` | S10 | `BreathingState` (kiểu thở, giây đã thở, màn sau khi thở) | `NoteRepository` (chỉ sau khi thở), `ScreenGuard`, `Clock` |
-| `JourneyViewModel` | S11a/b/c | `ViewState<JourneyData>` theo tab con | `NoteRepository`, `ChallengeRepository`, `JourneyStats` (hàm thuần) |
-| `WeeklyReportViewModel` | S11b Thẻ tuần | `ReportState` (idle, building, uploading(progress), done(url), failure) | `ReportService`, `StorageService`, `AnalyticsService`, `CrashReporter` |
+| `JourneyViewModel` | S11a/b/c | `JourneyState` (`ViewState<JourneyData>` cho Thống kê / Lịch, `ViewState<List<PathStage>>` cho Con đường, khoảng biểu đồ, tháng đang xem, dialog P6) | `NoteRepository`, `ChallengeRepository`, `Clock`, `JourneyStats` (hàm thuần trong `utils/`) |
+| `WeeklyReportViewModel` | S11b Thẻ tuần | `ReportState` (`ReportPhase`: idle, building, uploading + tiến độ, done + URL, failed) | `ReportService`, `StorageService`, `AnalyticsService`, `CrashReporter` |
 | `SettingsViewModel` | S12 | `ViewState<UserSettings>` | `SettingsRepository`, `MessagingService`, `AuthService`, `AnalyticsService` |
 | `FirebaseDemoViewModel` | S12 khu demo | `FirebaseDemoState` (thông báo đã nhận, giá trị RC) | `NotificationInbox`, `RemoteConfigService`, `CrashReporter` |
 
@@ -136,8 +136,8 @@ Khi Firestore trả lỗi quyền (`permission-denied`) hoặc lỗi khác, `Not
 | `ChallengeRepository` | `FirestoreChallengeRepository` | Đọc kho `challenges` (chỉ đọc); tiến độ `users/{uid}/challengeProgress/{topic}` (`level`, `completed`) |
 | `HabitRepository`, `SettingsRepository` | `FirestoreHabitRepository`, `FirestoreSettingsRepository` | `users/{uid}/private/habits` (thói quen muốn bớt), `users/{uid}/private/settings` (Giờ tỉnh, khoá Tự chủ; S12 thêm giờ nhắc) |
 | `DraftStore` | `PrefsDraftStore` (`shared_preferences`) | Nháp S03 trên máy; xoá khi đăng xuất |
-| `StorageService` | `FirebaseStorageService` | Tải PDF lên `reports/{uid}/…`, phát tiến độ, trả URL |
-| `ReportService` | `PdfReportService` | Dựng PDF Thẻ tuần từ dữ liệu đang xem |
+| `StorageService` | `FirebaseStorageService` | Tải PDF lên `reports/{uid}/weekly-<tuần ISO>.pdf`, phát tiến độ, trả URL; `storage.rules` chỉ cho chủ thư mục, PDF dưới 5 MB |
+| `ReportService` | `PdfReportService` (`pdf`, `printing`) | Dựng PDF Thẻ tuần (font Be Vietnam Pro qua `PdfGoogleFonts`), mở hộp chia sẻ |
 | `AnalyticsService` | `FirebaseAnalyticsService` | Sự kiện theo `analytics-plan.md`, `setUserId` sau đăng nhập |
 | `CrashReporter` | `FirebaseCrashReporter` | Lỗi non-fatal, crash thử, user ID, custom key |
 | `RemoteConfigService` | `InAppRemoteConfig` (Stage 4, giá trị mặc định) → `FirebaseRemoteConfigService` (Stage 5) | Giá trị mặc định trong app, fetch + activate, lắng nghe cập nhật realtime |
@@ -146,7 +146,7 @@ Khi Firestore trả lỗi quyền (`permission-denied`) hoặc lỗi khác, `Not
 | `ScreenGuard` | `MethodChannelScreenGuard` (kênh `lab03/window` trong `MainActivity.kt`) | `FLAG_SECURE` ở S09, giữ màn hình sáng ở S10 |
 | `Clock` | `SystemClock` | Giờ hiện tại (test dùng giờ cố định) |
 
-Đã có: `AuthService`, `UserRepository`, `AuthViewModel` (Stage 3); `NoteRepository`, `DraftStore`, `Clock`, `RemoteConfigService` (giá trị mặc định), `TodayViewModel`, `NoteComposerViewModel`, `NoteSavedViewModel` (Stage 4, F1); `JarViewModel`, `NoteDetailViewModel`, `NoteDeleter` (Stage 4, P4/P5); `HabitRepository`, `SettingsRepository`, `LocalAuthService`, `ScreenGuard`, `SelfControlViewModel`, `BreathingViewModel` (Stage 4, F2); `ChallengeRepository`, `ChallengesViewModel`, `ChallengeDetailViewModel` (Stage 4, F3). Các dòng còn lại được dựng ở Stage 4–5.
+Đã có: `AuthService`, `UserRepository`, `AuthViewModel` (Stage 3); `NoteRepository`, `DraftStore`, `Clock`, `RemoteConfigService` (giá trị mặc định), `TodayViewModel`, `NoteComposerViewModel`, `NoteSavedViewModel` (Stage 4, F1); `JarViewModel`, `NoteDetailViewModel`, `NoteDeleter` (Stage 4, P4/P5); `HabitRepository`, `SettingsRepository`, `LocalAuthService`, `ScreenGuard`, `SelfControlViewModel`, `BreathingViewModel` (Stage 4, F2); `ChallengeRepository`, `ChallengesViewModel`, `ChallengeDetailViewModel` (Stage 4, F3); `ReportService`, `StorageService`, `JourneyViewModel`, `WeeklyReportViewModel` (Stage 4, S11). Các dòng còn lại được dựng ở Stage 4–5.
 
 `PrefsDraftStore` nằm trong `firebase/` dù không dùng Firebase: thư mục này là nơi duy nhất được gọi SDK bên ngoài (Firebase, `shared_preferences`), nên quy tắc import ở mục 2 vẫn giữ nguyên.
 

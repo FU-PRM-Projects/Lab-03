@@ -16,7 +16,7 @@
 | 1 | Design traceability | Xong | [`docs/design-traceability.md`](docs/design-traceability.md) |
 | 2 | Kiến trúc và theme | Xong | [`docs/architecture.md`](docs/architecture.md), `lib/theme/`, `lib/widgets/`, khung route 12 màn |
 | 3 | Firebase và đăng nhập | Đang làm: code xong, chờ project Firebase thật | `lib/services/`, `lib/firebase/`, S01, đăng xuất ở S12 |
-| 4 | Tính năng | Đang làm: F1 (S02, S03, S04), Hũ và Chi tiết nốt (S05, S06), F2 (S09, S10), F3 (S07, S08) xong | Đủ 12 màn với mọi trạng thái, xuất và tải PDF |
+| 4 | Tính năng | Đang làm: F1 (S02, S03, S04), Hũ và Chi tiết nốt (S05, S06), F2 (S09, S10), F3 (S07, S08), S11 Hành trình + PDF Thẻ tuần lên Storage xong | Đủ 12 màn với mọi trạng thái, xuất và tải PDF |
 | 5 | Analytics, Crashlytics, Remote Config, FCM | Chưa làm | `docs/analytics-plan.md` |
 | 6 | Test plan và ARTEMIS | Chưa làm | `docs/test-plan.md`, `e2e_test/` |
 | 7 | AI code review | Chưa làm | `docs/code-review.md` |
@@ -45,7 +45,7 @@ Kho thẻ thử thách (`challenges`, chỉ đọc với người dùng) nạp t
 `lib/firebase_options.dart` hiện là cấu hình **tạm** cho project giả `demo-prm393`, chỉ chạy được với Emulator:
 
 ```sh
-cd firebase && npm run emulators          # cửa sổ 1: Auth 9099, Firestore 8080, UI 4000
+cd firebase && npm run emulators          # cửa sổ 1: Auth 9099, Firestore 8080, Storage 9199, UI 4000
 flutter run --dart-define=USE_FIREBASE_EMULATOR=true   # cửa sổ 2, Android emulator
 ```
 
@@ -70,6 +70,9 @@ Nối project thật (một lần, khi đã tạo project trên Firebase Console
 | flutter_svg | ^2.3.0 |
 | firebase_core · firebase_auth · cloud_firestore | ^5.1.0 · ^7.0.1 · ^7.1.0 |
 | google_sign_in | ^7.2.0 |
+| firebase_storage | ^14.0.1 |
+| fl_chart | ^1.3.0 |
+| pdf · printing | ^3.13.1 · ^5.15.1 |
 | shared_preferences | ^2.5.6 |
 | local_auth | ^3.0.2 |
 | fake_async (dev) | ^1.3.3 |
