@@ -82,14 +82,12 @@ class FirestoreNoteRepository implements NoteRepository {
     }
   }
 
-  @override
-  Stream<List<Note>> watchSince(DateTime since) {
+  /// Theo dõi [query] (gồm cả thay đổi `hasPendingWrites`), đổi lỗi SDK
+  /// sang `AppException`.
+  Stream<List<Note>> _watch(Query<Map<String, Object?>> Function() query) {
     final Stream<QuerySnapshot<Map<String, Object?>>> snapshots;
     try {
-      snapshots = _notes()
-          .where('createdAt', isGreaterThanOrEqualTo: Timestamp.fromDate(since))
-          .orderBy('createdAt', descending: true)
-          .snapshots(includeMetadataChanges: true);
+      snapshots = query().snapshots(includeMetadataChanges: true);
     } on AppException catch (e, stack) {
       return Stream<List<Note>>.error(e, stack);
     }
@@ -104,6 +102,18 @@ class FirestoreNoteRepository implements NoteRepository {
           ),
         );
   }
+
+  @override
+  Stream<List<Note>> watchSince(DateTime since) => _watch(
+    () => _notes()
+        .where('createdAt', isGreaterThanOrEqualTo: Timestamp.fromDate(since))
+        .orderBy('createdAt', descending: true),
+  );
+
+  @override
+  Stream<List<Note>> watchRecent({int limit = 30}) => _watch(
+    () => _notes().orderBy('createdAt', descending: true).limit(limit),
+  );
 
   @override
   Future<List<Note>> list({DateTime? before, int limit = 30}) =>
@@ -171,6 +181,36 @@ class FirestoreNoteRepository implements NoteRepository {
       });
 
   @override
+  Future<Note> update(
+    String id, {
+    required String title,
+    required String body,
+  }) => _guard(() async {
+    final doc = _notes().doc(id);
+    final before = await get(id);
+    final trimmed = body.trim();
+    final pending = await _write(
+      doc.update(<String, Object?>{
+        'title': title.trim(),
+        'body': trimmed.isEmpty ? FieldValue.delete() : trimmed,
+      }),
+    );
+    return Note(
+      id: id,
+      type: before.type,
+      title: title.trim(),
+      body: trimmed,
+      mood: before.mood,
+      createdAt: before.createdAt,
+      pendingSync: pending,
+    );
+  });
+
+  @override
+  Future<void> delete(String id) =>
+      _guard(() async => _write(_notes().doc(id).delete()));
+
+  @override
   Future<void> saveMonthSticker(DateTime month) => _guard(() async {
     final id = '${month.year}-${month.month.toString().padLeft(2, '0')}';
     await _write(
@@ -179,5 +219,12 @@ class FirestoreNoteRepository implements NoteRepository {
         'createdAt': FieldValue.serverTimestamp(),
       }),
     );
+  });
+
+  @override
+  Future<List<String>> listStickers() => _guard(() async {
+    final snapshot = await _user().collection('stickers').get();
+    return snapshot.docs.map((doc) => doc.id).toList()
+      ..sort((a, b) => b.compareTo(a));
   });
 }

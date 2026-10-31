@@ -11,6 +11,9 @@ abstract interface class NoteRepository {
   /// hoặc khi một nốt đồng bộ xong.
   Stream<List<Note>> watchSince(DateTime since);
 
+  /// [limit] nốt mới nhất (trang đầu của S05), phát lại như [watchSince].
+  Stream<List<Note>> watchRecent({int limit = 30});
+
   /// Tối đa [limit] nốt tạo trước [before] (mặc định: mọi nốt), mới nhất trước.
   Future<List<Note>> list({DateTime? before, int limit = 30});
 
@@ -23,8 +26,17 @@ abstract interface class NoteRepository {
   /// Lưu [draft] với giờ tạo [createdAt]; trả nốt vừa lưu.
   Future<Note> add(NoteDraft draft, {required DateTime createdAt});
 
+  /// Sửa tiêu đề và nhật ký của nốt [id] (S06); trả nốt sau khi sửa.
+  Future<Note> update(String id, {required String title, required String body});
+
+  /// Xoá hẳn nốt [id]. Hoàn tác 5 giây do ViewModel giữ trước khi gọi.
+  Future<void> delete(String id);
+
   /// Gắn nhãn dán mốc của tháng chứa [month] vào hũ (S04).
   Future<void> saveMonthSticker(DateTime month);
+
+  /// Các tháng đã có nhãn dán, dạng `yyyy-MM`, mới nhất trước.
+  Future<List<String>> listStickers();
 }
 
 final noteRepositoryProvider = Provider<NoteRepository>(

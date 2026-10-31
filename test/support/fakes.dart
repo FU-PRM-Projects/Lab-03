@@ -158,6 +158,20 @@ class FakeNoteRepository implements NoteRepository {
       });
 
   @override
+  Stream<List<Note>> watchRecent({int limit = 30}) =>
+      Stream<List<Note>>.multi((controller) {
+        if (watchError != null) {
+          controller.addError(watchError!);
+          return;
+        }
+        controller.add(_sorted.take(limit).toList());
+        final sub = _changes.stream.listen(
+          (_) => controller.add(_sorted.take(limit).toList()),
+        );
+        controller.onCancel = sub.cancel;
+      });
+
+  @override
   Future<List<Note>> list({DateTime? before, int limit = 30}) async {
     _throwIfError();
     return _sorted
@@ -202,9 +216,53 @@ class FakeNoteRepository implements NoteRepository {
   }
 
   @override
+  Future<Note> update(
+    String id, {
+    required String title,
+    required String body,
+  }) async {
+    _throwIfError();
+    final i = notes.indexWhere((n) => n.id == id);
+    if (i < 0) throw const AppException(AppErrorKind.notFound);
+    final old = notes[i];
+    final note = Note(
+      id: id,
+      type: old.type,
+      title: title.trim(),
+      body: body.trim(),
+      mood: old.mood,
+      createdAt: old.createdAt,
+      pendingSync: offline,
+    );
+    notes[i] = note;
+    _changes.add(null);
+    return note;
+  }
+
+  final List<String> deleted = <String>[];
+
+  @override
+  Future<void> delete(String id) async {
+    _throwIfError();
+    notes.removeWhere((n) => n.id == id);
+    deleted.add(id);
+    _changes.add(null);
+  }
+
+  @override
   Future<void> saveMonthSticker(DateTime month) async {
     _throwIfError();
     stickers.add(month);
+  }
+
+  @override
+  Future<List<String>> listStickers() async {
+    _throwIfError();
+    return stickers
+        .map((m) => '${m.year}-${m.month.toString().padLeft(2, '0')}')
+        .toSet()
+        .toList()
+      ..sort((a, b) => b.compareTo(a));
   }
 }
 
