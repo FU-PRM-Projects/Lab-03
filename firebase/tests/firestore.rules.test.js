@@ -82,3 +82,11 @@ test('R-10 user saves own month sticker only under its own id', async () => {
   await assertFails(setDoc(doc(db, 'users/alice/stickers/2026-11'), { month: '2026-10' }));
   await assertFails(setDoc(doc(env.authenticatedContext('bob').firestore(), 'users/alice/stickers/2026-12'), { month: '2026-12' }));
 });
+test('R-11 user keeps private habits and settings; others cannot read them', async () => {
+  const db = env.authenticatedContext('alice').firestore();
+  await assertSucceeds(setDoc(doc(db, 'users/alice/private/habits'), { selected: ['Video ngắn'], custom: [] }));
+  await assertSucceeds(setDoc(doc(db, 'users/alice/private/settings'), { awakeEnabled: true, awakeStart: 1380, awakeEnd: 60, lockSelfControl: false }));
+  await assertFails(getDoc(doc(env.authenticatedContext('bob').firestore(), 'users/alice/private/habits')));
+  await assertFails(setDoc(doc(db, 'users/alice/private/habits'), { selected: [], role: 'admin' }));
+  await assertFails(setDoc(doc(db, 'users/alice/private/other'), { a: 1 }));
+});

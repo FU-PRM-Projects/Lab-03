@@ -33,6 +33,20 @@ service cloud.firestore {
         allow create, update: if isOwner(uid) && validNote(request.resource.data);
       }
 
+      // Self-control habits and settings: private to the owner, small docs.
+      match /private/habits {
+        allow read: if isOwner(uid);
+        allow create, update: if isOwner(uid)
+                              && request.resource.data.keys().hasOnly(['selected', 'custom'])
+                              && (!('selected' in request.resource.data) || request.resource.data.selected.size() <= 20)
+                              && (!('custom' in request.resource.data) || request.resource.data.custom.size() <= 8);
+      }
+      match /private/settings {
+        allow read: if isOwner(uid);
+        allow create, update: if isOwner(uid)
+                              && request.resource.data.keys().hasOnly(['awakeEnabled', 'awakeStart', 'awakeEnd', 'lockSelfControl']);
+      }
+
       match /stickers/{month} {
         allow read: if isOwner(uid);
         allow create, update: if isOwner(uid)

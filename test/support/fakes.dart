@@ -4,11 +4,13 @@ import 'package:lab03/models/app_user.dart';
 import 'package:lab03/models/mood.dart';
 import 'package:lab03/models/note.dart';
 import 'package:lab03/models/note_type.dart';
+import 'package:lab03/models/self_control.dart';
 import 'package:lab03/services/app_exception.dart';
 import 'package:lab03/services/auth_service.dart';
 import 'package:lab03/services/clock.dart';
 import 'package:lab03/services/draft_store.dart';
 import 'package:lab03/services/note_repository.dart';
+import 'package:lab03/services/self_control_services.dart';
 import 'package:lab03/services/user_repository.dart';
 
 const AppUser testUser = AppUser(
@@ -297,3 +299,87 @@ Note sampleNote(
   createdAt: createdAt,
   pendingSync: pendingSync,
 );
+
+/// Thói quen và cài đặt trong bộ nhớ. Là [HabitRepository]; dùng
+/// [settingsView] làm [SettingsRepository] (hai interface cùng có `watch`).
+class FakeSelfControl implements HabitRepository {
+  HabitList habits = const HabitList();
+  UserSettings settings = const UserSettings();
+  final _habitChanges = StreamController<HabitList>.broadcast();
+  final _settingChanges = StreamController<UserSettings>.broadcast();
+
+  @override
+  Stream<HabitList> watch() => Stream<HabitList>.multi((controller) {
+    controller.add(habits);
+    final sub = _habitChanges.stream.listen(controller.add);
+    controller.onCancel = sub.cancel;
+  });
+
+  Stream<UserSettings> watchSettings() =>
+      Stream<UserSettings>.multi((controller) {
+        controller.add(settings);
+        final sub = _settingChanges.stream.listen(controller.add);
+        controller.onCancel = sub.cancel;
+      });
+
+  @override
+  Future<void> setSelected(String habit, {required bool selected}) async {
+    habits = HabitList(
+      selected: selected
+          ? <String>{...habits.selected, habit}
+          : (Set<String>.of(habits.selected)..remove(habit)),
+      custom: habits.custom,
+    );
+    _habitChanges.add(habits);
+  }
+
+  @override
+  Future<void> addCustom(String habit) async {
+    habits = HabitList(
+      selected: <String>{...habits.selected, habit},
+      custom: <String>[...habits.custom, habit],
+    );
+    _habitChanges.add(habits);
+  }
+
+  late final SettingsRepository settingsView = FakeSettingsView(this);
+
+  Future<void> save(UserSettings value) async {
+    settings = value;
+    _settingChanges.add(settings);
+  }
+}
+
+class FakeSettingsView implements SettingsRepository {
+  FakeSettingsView(this.source);
+
+  final FakeSelfControl source;
+
+  @override
+  Stream<UserSettings> watch() => source.watchSettings();
+
+  @override
+  Future<void> save(UserSettings settings) => source.save(settings);
+}
+
+class FakeLocalAuth implements LocalAuthService {
+  bool result = true;
+  int calls = 0;
+
+  @override
+  Future<bool> authenticate(String reason) async {
+    calls++;
+    return result;
+  }
+}
+
+class FakeScreenGuard implements ScreenGuard {
+  bool secure = false;
+  bool keepScreenOn = false;
+
+  @override
+  Future<void> setSecure(bool enabled) async => secure = enabled;
+
+  @override
+  Future<void> setKeepScreenOn(bool enabled) async => keepScreenOn = enabled;
+}
