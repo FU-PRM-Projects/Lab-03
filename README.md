@@ -16,7 +16,7 @@
 | 1 | Design traceability | Xong | [`docs/design-traceability.md`](docs/design-traceability.md) |
 | 2 | Kiến trúc và theme | Xong | [`docs/architecture.md`](docs/architecture.md), `lib/theme/`, `lib/widgets/`, khung route 12 màn |
 | 3 | Firebase và đăng nhập | Đang làm: code xong, chờ project Firebase thật | `lib/services/`, `lib/firebase/`, S01, đăng xuất ở S12 |
-| 4 | Tính năng | Đang làm: F1 (S02, S03, S04), Hũ và Chi tiết nốt (S05, S06), F2 (S09, S10) xong | Đủ 12 màn với mọi trạng thái, xuất và tải PDF |
+| 4 | Tính năng | Đang làm: F1 (S02, S03, S04), Hũ và Chi tiết nốt (S05, S06), F2 (S09, S10), F3 (S07, S08) xong | Đủ 12 màn với mọi trạng thái, xuất và tải PDF |
 | 5 | Analytics, Crashlytics, Remote Config, FCM | Chưa làm | `docs/analytics-plan.md` |
 | 6 | Test plan và ARTEMIS | Chưa làm | `docs/test-plan.md`, `e2e_test/` |
 | 7 | AI code review | Chưa làm | `docs/code-review.md` |
@@ -34,6 +34,11 @@ flutter analyze
 Ở bản debug và profile, **Cài đặt → Thư viện component (dev)** mở trang `/dev/components` để đối chiếu component với Figma page `05 Components`. Bản release không có route này.
 
 Test Security Rules trên Firebase Emulator: chạy `npm run test:rules` trong `firebase/` (cần Java và Firebase CLI).
+
+Kho thẻ thử thách (`challenges`, chỉ đọc với người dùng) nạp từ `firebase/seed/challenges.json`:
+
+- Emulator: `npm run seed:emulator` trong `firebase/` khi `npm run emulators` đang chạy.
+- Project thật: đặt `GOOGLE_APPLICATION_CREDENTIALS` trỏ tới file khoá service account để **ngoài** repo, rồi `npm run seed -- <project-id>`.
 
 ### Firebase
 
