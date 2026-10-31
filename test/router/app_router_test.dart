@@ -61,13 +61,19 @@ void main() {
     expect(find.byType(TodayScreen), findsOneWidget);
   });
 
-  testWidgets('F1 khung: Ghi nốt → S03 → S04 → Về Hôm nay', (tester) async {
+  testWidgets('F1: Ghi nốt → S03 → S04 → Về Hôm nay', (tester) async {
     await enterApp(tester);
     await tester.tap(find.text('Ghi nốt'));
     await tester.pumpAndSettle();
     expect(find.byType(NoteComposerScreen), findsOneWidget);
 
-    await tester.tap(find.text('Lưu vào hũ (tạm)'));
+    await tester.tap(find.bySemanticsLabel('Tâm trạng Ổn'));
+    await tester.pump();
+    await tester.tap(find.text('Tiếp'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Đi bộ'));
+    await tester.pump();
+    await tester.tap(find.text('Bỏ qua nhật ký'));
     await tester.pumpAndSettle();
     expect(find.byType(NoteSavedScreen), findsOneWidget);
 

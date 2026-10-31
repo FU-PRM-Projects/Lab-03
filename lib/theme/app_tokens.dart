@@ -72,6 +72,9 @@ abstract final class AppSize {
   static const double shortcut = 56;
   static const double avatar = 40;
   static const double noteCardHeight = 72;
+
+  /// Ô lưới tờ nốt ở S04, S05 (deviation D-11).
+  static const Size noteTile = Size(158, 137);
   static const double settingRowMinHeight = 56;
   static const Size moodOption = Size(96, 116);
   static const Size moodDayCell = Size(48, 56);

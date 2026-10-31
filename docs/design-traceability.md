@@ -15,9 +15,9 @@ Cột trạng thái được cập nhật ở cuối mỗi stage.
 | Mã | Màn hình (Lab 2) | Route | Screen widget | ViewModel | Nguồn dữ liệu | Trạng thái |
 |---|---|---|---|---|---|---|
 | S01 | Chào mừng & Đăng nhập | `/welcome?next=` | `WelcomeScreen` | `AuthViewModel` | Firebase Auth (Google, email/mật khẩu), tạo `users/{uid}` lần đầu | Done (Stage 3; Google Sign-In cần project thật để chạy trên máy) |
-| S02 | Hôm nay (tab 1) | `/today` | `TodayScreen` | `TodayViewModel` | Firestore `users/{uid}/notes` (nốt hôm nay, nốt cũ ngày tệ), nháp trên máy | Skeleton |
-| S03 | Ghi nốt (3 bước `S03a`/`b`/`c`) | `/note/new?step=1..3` | `NoteComposerScreen` | `NoteComposerViewModel` | Firestore `users/{uid}/notes` (ghi), Remote Config `quick_win_chips`, nháp trên máy | Skeleton |
-| S04 | Nốt đã vào hũ | `/note/saved/:id` | `NoteSavedScreen` | `NoteSavedViewModel` | Firestore (nốt vừa lưu, số nốt tháng), Remote Config `monthly_milestone` | Skeleton |
+| S02 | Hôm nay (tab 1) | `/today` | `TodayScreen` | `TodayViewModel` | Firestore `users/{uid}/notes` (nốt hôm nay, nốt cũ ngày tệ), nháp trên máy | Done (Stage 4) · Deviation D-14 |
+| S03 | Ghi nốt (3 bước `S03a`/`b`/`c`) | `/note/new?step=1..3` | `NoteComposerScreen` | `NoteComposerViewModel` | Firestore `users/{uid}/notes` (ghi), Remote Config `quick_win_chips`, nháp trên máy | Done (Stage 4; Remote Config dùng giá trị mặc định tới Stage 5) |
+| S04 | Nốt đã vào hũ | `/note/saved/:id` | `NoteSavedScreen` | `NoteSavedViewModel` | Firestore (nốt vừa lưu, số nốt tháng), `users/{uid}/stickers`, Remote Config `monthly_milestone` | Done (Stage 4) · Deviation D-14 |
 | S05 | Hũ & Nhật ký (tab 2) | `/jar` | `JarScreen` | `JarViewModel` | Firestore `users/{uid}/notes` (phân trang 30) | Skeleton |
 | S06 | Chi tiết nốt | `/jar/:noteId` | `NoteDetailScreen` | `NoteDetailViewModel` | Firestore `users/{uid}/notes/{id}` | Skeleton |
 | S07 | Thử thách (tab 3) | `/challenges` | `ChallengesScreen` | `ChallengesViewModel` | Firestore `challenges` (kho thẻ), `users/{uid}/challengeProgress` | Skeleton |
@@ -33,12 +33,12 @@ Tab cấp cao giữ đúng Lab 2: Hôm nay, Hũ, Thử thách, Hành trình tron
 
 | Lab 2 | Ở màn | Flutter | Trạng thái |
 |---|---|---|---|
-| Dialog "Giữ nốt đang ghi?" — Bỏ / Giữ nháp | S03 | `showAppDialog(kind: confirmation)` | Planned |
+| Dialog "Giữ nốt đang ghi?" — Bỏ / Giữ nháp | S03 | `showAppDialog(kind: confirmation)` | Done |
 | Dialog "Xoá nốt này?" + snackbar Hoàn tác 5 giây | S06 → S05 | `showAppDialog(kind: destructive)` + `showUndoSnackBar` | Planned |
 | Dialog "Đăng xuất khỏi Nốt?" | S12 | `showAppDialog(kind: confirmation)` | Done |
 | Dialog "Bỏ thay đổi?" | S06 (sửa) | `showAppDialog(kind: confirmation)` | Planned |
 | Xin quyền thông báo Android 13+ | P1, P8 | `MessagingService.requestPermission()` (dialog hệ thống) | Planned |
-| Banner "Offline · đã lưu trên máy" | S02, S04, S05 | `OfflineBanner` | Planned |
+| Banner "Offline · đã lưu trên máy" | S02, S04, S05 | `OfflineBanner` | Một phần: S02, S04 |
 | Empty state "Hũ còn trống" | S05 | `EmptyState` | Planned |
 | Loading skeleton "Đang tải lịch năng lượng…" | S05, S11c | `LoadingState.skeleton` | Planned |
 | Error state "Chưa tải được hũ" + Thử lại | S05, S07, S11 | `ErrorState` | Planned |
@@ -57,7 +57,7 @@ Mã test case (`TC-xx`) sẽ được gán trong `docs/test-plan.md` ở Stage 6
 
 | Flow | Màn hình theo thứ tự | Nhánh thay thế / lỗi phải chạy được | Trạng thái |
 |---|---|---|---|
-| F1 Ghi nốt buổi tối | S02 → S03a → S03b → S03c → S04 → S02 (hoặc thông báo 21:30 → S03a) | Bỏ qua nhật ký; tâm trạng Rối → "Sơ cứu 1 phút"; thoát giữa chừng → dialog Giữ nháp; mất mạng → lưu trên máy + banner | Planned |
+| F1 Ghi nốt buổi tối | S02 → S03a → S03b → S03c → S04 → S02 (hoặc thông báo 21:30 → S03a) | Bỏ qua nhật ký; tâm trạng Rối → "Sơ cứu 1 phút"; thoát giữa chừng → dialog Giữ nháp; mất mạng → lưu trên máy + banner | Done (Stage 4) |
 | F2 Tự chủ | S02 → S09 → S04 → S02; khó dừng: S09 → S10 → S04 | Đã lỡ lướt → sheet + "Nhận ra cũng là bắt đầu tự chủ"; phần thói quen khoá bằng `local_auth` | Planned |
 | F3 Thử thách | S07 → S08 → S04 → S07 | Đổi thẻ dễ hơn; để mai (Back, không trừ gì); Không như ý → "Mình đã mở lời" | Planned |
 | P1 Làm quen lần đầu | S01 → (xin quyền thông báo) → S02 | Đăng nhập thất bại / huỷ → SnackBar + Thử lại | Một phần: đăng nhập, huỷ, mất mạng (Stage 3); xin quyền thông báo ở Stage 5 |
@@ -103,7 +103,7 @@ Mỗi component là **một** widget dùng lại trong `lib/widgets/`, variant v
 | Nút nổi + | — | `AddNoteFab` | `widgets/add_note_fab.dart` | Done |
 | Banner offline | — | `OfflineBanner` | `widgets/offline_banner.dart` | Done |
 | Tab con (Con đường / Thống kê / Lịch, Tháng / Năm) | — | `SegmentedButton` + `SegmentedButtonThemeData` (cao 48) | `theme/app_theme.dart` | Done |
-| `Illustration/Hũ chiến thắng`, `Decor/Confetti` | — | `SvgPicture` | Stage 4 (cần export SVG từ Figma) | Planned |
+| `Illustration/Hũ chiến thắng`, `Decor/Confetti` | — | `JarIllustration` (vẽ bằng widget); confetti chưa có | `widgets/jar_illustration.dart` | Deviation D-14 |
 | Biểu đồ S11b | Line, Bar | `fl_chart` | Stage 4 | Planned |
 
 ## 4. Token → theme
@@ -138,6 +138,7 @@ Mỗi dòng là một chỗ app khác Figma, kèm lý do. Cột "Figma" cho bi�
 | D-11 | `Note/Tờ nốt` (S04, S05) | `DESIGN.md` mục 10: tiêu đề tối đa 2 dòng; `flutter-handoff.md` (component, S05): tối đa 3 dòng | Tối đa **2 dòng** rồi "…" | Hai tài liệu Lab 2 mâu thuẫn. Ô lưới 158 × 137 dp chỉ chứa vừa nhãn loại + 2 dòng tiêu đề + ngày; dòng thứ 3 bị cắt ngang khi chạy thật ở 360 dp | Không cần (Figma vẽ 2 dòng); sửa handout |
 | D-12 | Mở app | Không có màn chờ | Màn chờ `/splash` (vòng xoay trên nền `surface`) trong lúc Firebase cho biết đã đăng nhập chưa, rồi chuyển tới S01 hoặc đích ban đầu | Tránh hiện S01 chớp nhoáng với người đã đăng nhập; giữ đích khi mở từ thông báo (P7) | Không cần (màn kỹ thuật, không có nội dung thiết kế) |
 | D-13 | S01 form email | Handoff: "Email / Đăng ký mở form email", không vẽ form | Form email là bottom sheet trên S01 (Email, Mật khẩu, nút chính, "Quên mật khẩu?"), lỗi hiện dưới ô | Figma không có frame cho form này; dùng component `Text field` và `Button` có sẵn | Cần cập nhật |
+| D-14 | S02 hình hũ, S04 confetti | `Illustration/Hũ chiến thắng` và `Decor/Confetti` là hình vẽ trong Figma | Hũ vẽ bằng widget (`JarIllustration`: thân hũ màu `tint/lavender`, tờ nốt nhỏ màu theo loại của các nốt mới nhất tháng này, mascot Xong); S04 dùng mascot Xong cỡ lớn, chưa có confetti | Chưa export được SVG hai hình này từ Figma. Hũ vẽ bằng widget còn cho thấy đúng các nốt thật của người dùng | Cần cập nhật (hoặc thay bằng SVG trước khi nộp) |
 | D-10 | Kho thẻ thử thách | Không nêu nguồn | Collection Firestore `challenges` chỉ đọc với người dùng; dữ liệu nạp bằng script trong `firebase/`. Final: staff quản lý ở web admin | Lab 3 cấm dữ liệu mock; Final cần một thực thể staff quản lý mà app đọc | Không cần |
 
 Thay đổi phát sinh ở các stage sau được thêm vào bảng này cùng commit với code.

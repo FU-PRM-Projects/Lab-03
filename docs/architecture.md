@@ -131,20 +131,24 @@ Khi Firestore trả lỗi quyền (`permission-denied`) hoặc lỗi khác, `Not
 |---|---|---|
 | `AuthService` | `FirebaseAuthService` | Google Sign-In, email/mật khẩu, đăng xuất, luồng trạng thái đăng nhập |
 | `UserRepository` | `FirestoreUserRepository` | `users/{uid}` (tạo lần đầu với `role = user`, cài đặt) |
-| `NoteRepository` | `FirestoreNoteRepository` | CRUD `users/{uid}/notes`, đếm theo tháng/loại, truy vấn theo khoảng ngày |
+| `NoteRepository` | `FirestoreNoteRepository` | `users/{uid}/notes`: theo dõi nốt từ một ngày, đọc theo trang, đếm theo khoảng ngày, thêm nốt; nhãn dán tháng `users/{uid}/stickers` |
 | `ChallengeRepository` | `FirestoreChallengeRepository` | Đọc `challenges`, tiến độ `users/{uid}/challengeProgress` |
 | `HabitRepository`, `SettingsRepository` | Firestore | Thói quen muốn bớt, giờ nhắc, Giờ tỉnh, công tắc riêng tư |
-| `DraftStore` | `SharedPrefsDraftStore` | Nháp S03 trên máy |
+| `DraftStore` | `PrefsDraftStore` (`shared_preferences`) | Nháp S03 trên máy; xoá khi đăng xuất |
 | `StorageService` | `FirebaseStorageService` | Tải PDF lên `reports/{uid}/…`, phát tiến độ, trả URL |
 | `ReportService` | `PdfReportService` | Dựng PDF Thẻ tuần từ dữ liệu đang xem |
 | `AnalyticsService` | `FirebaseAnalyticsService` | Sự kiện theo `analytics-plan.md`, `setUserId` sau đăng nhập |
 | `CrashReporter` | `FirebaseCrashReporter` | Lỗi non-fatal, crash thử, user ID, custom key |
-| `RemoteConfigService` | `FirebaseRemoteConfigService` | Giá trị mặc định trong app, fetch + activate, lắng nghe cập nhật realtime |
+| `RemoteConfigService` | `InAppRemoteConfig` (Stage 4, giá trị mặc định) → `FirebaseRemoteConfigService` (Stage 5) | Giá trị mặc định trong app, fetch + activate, lắng nghe cập nhật realtime |
 | `MessagingService`, `NotificationInbox` | FCM + `flutter_local_notifications` | Xin quyền, nhận ở 3 trạng thái app, lưu danh sách, điều hướng khi chạm |
 | `LocalAuthService` | `local_auth` | Mở khoá phần Tự chủ |
 | `Clock` | `SystemClock` | Giờ hiện tại (test dùng giờ cố định) |
 
-Đã có (Stage 3): `AuthService`/`FirebaseAuthService`, `UserRepository`/`FirestoreUserRepository`, `AuthViewModel`. Các dòng còn lại được dựng ở Stage 4–5.
+Đã có: `AuthService`, `UserRepository`, `AuthViewModel` (Stage 3); `NoteRepository`, `DraftStore`, `Clock`, `RemoteConfigService` (giá trị mặc định), `TodayViewModel`, `NoteComposerViewModel`, `NoteSavedViewModel` (Stage 4, F1). Các dòng còn lại được dựng ở Stage 4–5.
+
+`PrefsDraftStore` nằm trong `firebase/` dù không dùng Firebase: thư mục này là nơi duy nhất được gọi SDK bên ngoài (Firebase, `shared_preferences`), nên quy tắc import ở mục 2 vẫn giữ nguyên.
+
+**Ghi khi offline:** `FirestoreNoteRepository.add` gửi lệnh ghi rồi chờ server tối đa 2 giây. Quá thời gian thì trả nốt với `pendingSync = true` (lệnh ghi đã nằm trong bộ nhớ đệm, Firestore tự gửi lại khi có mạng), để S03 không treo khi mất mạng. Ngày tạo nốt là giờ trên máy, không dùng `serverTimestamp`, vì giá trị server là `null` cho tới khi đồng bộ và nốt offline sẽ không hiện trong truy vấn theo ngày.
 
 **Khởi tạo Firebase** (`firebase/firebase_bootstrap.dart`): `main.dart` gọi `initFirebase()` trước `runApp`. Chạy với `--dart-define=USE_FIREBASE_EMULATOR=true` thì Auth và Firestore trỏ vào Emulator của `firebase/` (máy `10.0.2.2`, đổi bằng `FIREBASE_EMULATOR_HOST`). Cấu hình project nằm ở `lib/firebase_options.dart`, do `flutterfire configure` sinh ra.
 
