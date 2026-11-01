@@ -81,7 +81,7 @@ void main() {
   ) async {
     final services = await pumpApp(tester);
     await openSelfControl(tester);
-    await tester.tap(find.text('Stress? Thở 90 giây để thả lỏng'));
+    await tester.tap(find.text('Khó dừng? Thở 90 giây'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
     expect(find.byType(BreathingScreen), findsOneWidget);
