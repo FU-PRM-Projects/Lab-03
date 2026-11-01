@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
@@ -13,7 +14,10 @@ import '../../widgets/state_views.dart';
 /// S11a · Con đường: chặng hiện tại của từng chủ đề thử thách.
 ///
 /// Final UI: banner chặng màu primary, rồi các nút tròn đi zig-zag (đã xong,
-/// đang làm có bong bóng tên thử thách, chưa mở) như một con đường.
+/// đang làm có bong bóng tên thử thách, chưa mở) như một con đường. Khác
+/// Figma (D-18): hàng chip chọn chủ đề ở trên, mỗi lần chỉ hiện đường của một
+/// chủ đề (nhiều chủ đề thì chip cuộn ngang); mỗi nút ghi tên thử thách bên
+/// cạnh; chặng sau là một thẻ.
 class JourneyPathTab extends StatelessWidget {
   const JourneyPathTab({required this.state, required this.onRetry, super.key});
 
@@ -42,34 +46,123 @@ class JourneyPathTab extends StatelessWidget {
           message: 'Thẻ thử thách sẽ sớm có. Ghé lại sau nhé.',
         ),
       ),
-      Data<List<PathStage>>(:final value) => ListView(
-        padding: const EdgeInsets.fromLTRB(
-          AppSpace.screen,
-          AppSpace.s16,
-          AppSpace.screen,
-          AppSpace.tabContentBottom,
-        ),
-        children: <Widget>[
-          for (final stage in value) ...<Widget>[
-            _StageBanner(stage: stage),
-            const SizedBox(height: AppSpace.s16),
-            for (final (i, node) in stage.nodes.indexed)
-              _PathNodeRow(node: node, dx: _zigzag(i)),
-            if (stage.hasNextLevel)
-              _LockedNext(
-                label: 'Chặng ${stage.level + 1}',
-                dx: _zigzag(stage.nodes.length),
-              ),
-            const SizedBox(height: AppSpace.s24),
-          ],
-        ],
-      ),
+      Data<List<PathStage>>(:final value) => _TopicPaths(stages: value),
     };
+  }
+}
+
+/// Chủ đề đang xem trên S11a (trạng thái giao diện, giữ qua lần đổi tab con);
+/// `null` là mặc định.
+final selectedPathTopicProvider = NotifierProvider<SelectedPathTopic, String?>(
+  SelectedPathTopic.new,
+);
+
+class SelectedPathTopic extends Notifier<String?> {
+  @override
+  String? build() => null;
+
+  void select(String topicId) => state = topicId;
+}
+
+/// Chip chủ đề + đường của chủ đề đang chọn.
+class _TopicPaths extends ConsumerWidget {
+  const _TopicPaths({required this.stages});
+
+  final List<PathStage> stages;
+
+  /// Chủ đề đã chọn, mặc định là chủ đề đầu tiên còn thẻ đang làm.
+  PathStage _selected(String? topicId) {
+    for (final stage in stages) {
+      if (stage.topic.id == topicId) return stage;
+    }
+    return stages.firstWhere(
+      (s) => s.current != null,
+      orElse: () => stages.first,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final stage = _selected(ref.watch(selectedPathTopicProvider));
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(
+        0,
+        AppSpace.s16,
+        0,
+        AppSpace.tabContentBottom,
+      ),
+      children: <Widget>[
+        if (stages.length > 1) ...<Widget>[
+          _TopicChips(
+            stages: stages,
+            selected: stage,
+            onSelected: (s) =>
+                ref.read(selectedPathTopicProvider.notifier).select(s.topic.id),
+          ),
+          const SizedBox(height: AppSpace.s16),
+        ],
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpace.screen),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              _StageBanner(stage: stage),
+              const SizedBox(height: AppSpace.s16),
+              for (final (i, node) in stage.nodes.indexed)
+                _PathNodeRow(node: node, dx: _zigzag(i)),
+              if (stage.hasNextLevel)
+                _NextStage(level: stage.level + 1, cards: stage.nodes.length),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 
   /// Độ lệch ngang của nút thứ [i] so với giữa màn (Figma: 0, +56, +28…).
   static double _zigzag(int i) =>
       const <double>[0, 56, 28, -28, -56, -28, 28][i % 7];
+}
+
+/// Hàng chip "Dũng cảm · 1/5", "Vận động · 0/5": cuộn ngang khi có nhiều chủ
+/// đề, chip đang chọn nền primary.
+class _TopicChips extends StatelessWidget {
+  const _TopicChips({
+    required this.stages,
+    required this.selected,
+    required this.onSelected,
+  });
+
+  final List<PathStage> stages;
+  final PathStage selected;
+  final ValueChanged<PathStage> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: AppSpace.screen),
+      child: Row(
+        spacing: AppSpace.s8,
+        children: <Widget>[
+          for (final stage in stages)
+            ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: AppSize.minTouch),
+              child: ChoiceChip(
+                label: Text(
+                  '${stage.topic.label} · '
+                  '${stage.done}/${stage.nodes.length}',
+                ),
+                selected: stage.topic == selected.topic,
+                onSelected: (_) => onSelected(stage),
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
 }
 
 /// Màu đổ bóng đặc dưới banner và nút (primary đậm, xám cho nút khoá).
@@ -258,59 +351,110 @@ class _PathNodeRow extends StatelessWidget {
       PathNodeStatus.current => _CurrentNode(node: node, dx: dx),
       PathNodeStatus.done => _Placed(
         dx: dx,
-        child: Semantics(
-          label: '${challenge.title}, đã xong',
-          excludeSemantics: true,
-          child: _PathDot(
-            color: scheme.primary,
-            edge: _primaryEdge,
-            child: SvgPicture.asset(
-              'assets/icons/check-bold.svg',
-              width: 26,
-              height: 26,
-            ),
+        label: challenge.title,
+        labelColor: scheme.onSurface,
+        semantics: '${challenge.title}, đã xong',
+        child: _PathDot(
+          color: scheme.primary,
+          edge: _primaryEdge,
+          child: SvgPicture.asset(
+            'assets/icons/check-bold.svg',
+            width: 26,
+            height: 26,
           ),
         ),
       ),
       PathNodeStatus.locked => _Placed(
         dx: dx,
-        child: Semantics(
-          label: '${challenge.title}, chưa mở',
-          excludeSemantics: true,
-          child: _PathDot(
-            color: scheme.surfaceContainerHighest,
-            edge: _lockedEdge,
-            child: Icon(Icons.lock, size: 22, color: scheme.onSurfaceVariant),
-          ),
+        label: challenge.title,
+        labelColor: scheme.onSurfaceVariant,
+        semantics: '${challenge.title}, chưa mở',
+        child: _PathDot(
+          color: scheme.surfaceContainerHighest,
+          edge: _lockedEdge,
+          child: Icon(Icons.lock, size: 22, color: scheme.onSurfaceVariant),
         ),
       ),
     };
   }
 }
 
-/// Đặt nút lệch [dx] so với giữa, mỗi nút một hàng cao 64.
+/// Đặt nút 56 lệch [dx] so với giữa (mỗi nút một hàng cao 64) và ghi tên thử
+/// thách ở phía còn nhiều chỗ: nút lệch trái thì chữ bên phải và ngược lại.
 class _Placed extends StatelessWidget {
-  const _Placed({required this.dx, required this.child});
+  const _Placed({
+    required this.dx,
+    required this.label,
+    required this.labelColor,
+    required this.semantics,
+    required this.child,
+  });
 
   final double dx;
+  final String label;
+  final Color labelColor;
+  final String semantics;
   final Widget child;
 
+  static const double _dot = AppSize.shortcut;
+  static const double _gap = AppSpace.s8;
+
   @override
-  Widget build(BuildContext context) => SizedBox(
-    height: 64,
-    child: Center(
-      child: Transform.translate(offset: Offset(dx, 0), child: child),
-    ),
-  );
+  Widget build(BuildContext context) {
+    final style = Theme.of(context).textTheme.labelMedium
+        ?.copyWith(fontWeight: FontWeight.w400, color: labelColor);
+
+    return Semantics(
+      label: semantics,
+      excludeSemantics: true,
+      child: SizedBox(
+        height: 64,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final width = constraints.maxWidth;
+            final left = width / 2 + dx - _dot / 2;
+            final labelOnRight = dx <= 0;
+            return Stack(
+              children: <Widget>[
+                Positioned(left: left, top: 0, child: child),
+                Positioned(
+                  left: labelOnRight ? left + _dot + _gap : 0,
+                  right: labelOnRight ? 0 : width - left + _gap,
+                  top: 0,
+                  height: _dot,
+                  child: Align(
+                    alignment: labelOnRight
+                        ? Alignment.centerLeft
+                        : Alignment.centerRight,
+                    child: Text(
+                      label,
+                      style: style,
+                      textAlign: labelOnRight ? TextAlign.start : TextAlign.end,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
 }
 
 /// Nút đang làm: vòng 84 primary-container quanh nút 64 có icon lấp lánh,
-/// bong bóng "tên · N phút" phía trên và Nốt Đợi đứng cạnh. Chạm để mở S08.
+/// bong bóng "tên · N phút" phía trên và Nốt Đợi đứng sát bên nút. Chạm để
+/// mở S08.
 class _CurrentNode extends StatelessWidget {
   const _CurrentNode({required this.node, required this.dx});
 
   final PathNode node;
   final double dx;
+
+  static const double _ring = 84;
+  static const double _mascot = 63;
 
   @override
   Widget build(BuildContext context) {
@@ -319,99 +463,101 @@ class _CurrentNode extends StatelessWidget {
     final challenge = node.challenge;
     void open() => context.push(AppRoutes.challengeDetail(challenge.id));
 
+    final bubble = DecoratedBox(
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(AppRadius.r12),
+        border: Border.all(color: scheme.outlineVariant, width: 2),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpace.s14,
+          vertical: AppSpace.s8,
+        ),
+        child: Text(
+          '${challenge.title} · ${challenge.minutes} phút',
+          style: theme.textTheme.labelLarge?.copyWith(
+            fontWeight: FontWeight.w700,
+            color: scheme.primary,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+
+    final ring = SizedBox.square(
+      dimension: _ring,
+      child: Stack(
+        alignment: Alignment.center,
+        children: <Widget>[
+          SvgPicture.asset(
+            'assets/illustrations/path-current-ring.svg',
+            width: _ring,
+            height: _ring,
+          ),
+          _PathDot(
+            color: scheme.primary,
+            edge: _primaryEdge,
+            size: 64,
+            child: SvgPicture.asset(
+              'assets/icons/sparkle.svg',
+              width: 28,
+              height: 28,
+            ),
+          ),
+        ],
+      ),
+    );
+
     return Semantics(
       button: true,
       label: '${challenge.title}, đang làm',
       excludeSemantics: true,
       onTap: open,
-      child: SizedBox(
-        height: 150,
-        child: Stack(
-          clipBehavior: Clip.none,
+      child: GestureDetector(
+        onTap: open,
+        behavior: HitTestBehavior.opaque,
+        child: Column(
           children: <Widget>[
-            // Mascot đứng phía đối diện với hướng lệch của nút.
-            Positioned(
-              left: dx >= 0 ? AppSpace.s8 : null,
-              right: dx < 0 ? AppSpace.s8 : null,
-              // Dưới bong bóng, ngang với nút, để không che tên thử thách.
-              bottom: 0,
-              child: const IgnorePointer(
-                child: Mascot(state: MascotState.doi, size: 94.5),
-              ),
-            ),
-            Positioned.fill(
-              child: Transform.translate(
-                offset: Offset(dx, 0),
-                child: GestureDetector(
-                  onTap: open,
-                  behavior: HitTestBehavior.opaque,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: scheme.surfaceContainerLow,
-                          borderRadius: BorderRadius.circular(AppRadius.r12),
-                          border: Border.all(
-                            color: scheme.outlineVariant,
-                            width: 2,
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpace.s14,
-                            vertical: AppSpace.s8,
-                          ),
-                          child: Text(
-                            '${challenge.title} · ${challenge.minutes} phút',
-                            style: theme.textTheme.labelLarge?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: scheme.primary,
-                            ),
-                          ),
-                        ),
-                      ),
-                      RotatedBox(
-                        quarterTurns: 2,
-                        child: SvgPicture.asset(
-                          'assets/icons/tooltip-arrow.svg',
-                          width: 12.12,
-                          height: 6,
-                          colorFilter: ColorFilter.mode(
-                            scheme.surfaceContainerLow,
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: AppSpace.s4),
-                      SizedBox.square(
-                        dimension: 84,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: <Widget>[
-                            SvgPicture.asset(
-                              'assets/illustrations/path-current-ring.svg',
-                              width: 84,
-                              height: 84,
-                            ),
-                            _PathDot(
-                              color: scheme.primary,
-                              edge: _primaryEdge,
-                              size: 64,
-                              child: SvgPicture.asset(
-                                'assets/icons/sparkle.svg',
-                                width: 28,
-                                height: 28,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+            bubble,
+            RotatedBox(
+              quarterTurns: 2,
+              child: SvgPicture.asset(
+                'assets/icons/tooltip-arrow.svg',
+                width: 12.12,
+                height: 6,
+                colorFilter: ColorFilter.mode(
+                  scheme.surfaceContainerLow,
+                  BlendMode.srcIn,
                 ),
               ),
             ),
+            const SizedBox(height: AppSpace.s4),
+            // Vòng nút lệch [dx]; mascot đứng sát phía còn nhiều chỗ.
+            SizedBox(
+              height: _ring,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final left = constraints.maxWidth / 2 + dx - _ring / 2;
+                  final mascotRight = dx <= 0;
+                  return Stack(
+                    children: <Widget>[
+                      Positioned(left: left, top: 0, child: ring),
+                      Positioned(
+                        left: mascotRight
+                            ? left + _ring + AppSpace.s8
+                            : left - AppSpace.s8 - _mascot * 0.89,
+                        bottom: 0,
+                        child: const IgnorePointer(
+                          child: Mascot(state: MascotState.doi, size: _mascot),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: AppSpace.s8),
           ],
         ),
       ),
@@ -419,38 +565,80 @@ class _CurrentNode extends StatelessWidget {
   }
 }
 
-/// Figma `mốc · chưa mở`: huy hiệu 50 viền outline cho chặng kế tiếp.
-class _LockedNext extends StatelessWidget {
-  const _LockedNext({required this.label, required this.dx});
+/// Chặng kế tiếp: thẻ viền đứt "Chặng 2 · mở khi xong 5 thẻ" thay cho dấu "?"
+/// khó hiểu.
+class _NextStage extends StatelessWidget {
+  const _NextStage({required this.level, required this.cards});
 
-  final String label;
-  final double dx;
+  final int level;
+  final int cards;
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final text = 'Chặng $level · mở khi xong $cards thẻ';
 
-    return _Placed(
-      dx: dx,
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpace.s8),
       child: Semantics(
-        label: '$label, chưa mở',
+        label: '$text, chưa mở',
         excludeSemantics: true,
-        child: Container(
-          width: 50,
-          height: 50,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: scheme.surfaceContainerHighest,
-            border: Border.all(color: scheme.outline, width: 1.2),
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            '?',
-            style: Theme.of(context).textTheme.titleMedium
-                ?.copyWith(color: scheme.onSurfaceVariant),
+        child: CustomPaint(
+          foregroundPainter: _DashedBorder(color: scheme.outline),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpace.s14,
+              vertical: AppSpace.s12,
+            ),
+            child: Row(
+              spacing: AppSpace.s8,
+              children: <Widget>[
+                Icon(Icons.lock, size: 18, color: scheme.onSurfaceVariant),
+                Expanded(
+                  child: Text(
+                    text,
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w400,
+                      color: scheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
+}
+
+/// Viền đứt 1 dp bo 12 quanh thẻ chặng kế tiếp.
+class _DashedBorder extends CustomPainter {
+  const _DashedBorder({required this.color});
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
+    final path = Path()
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          (Offset.zero & size).deflate(0.5),
+          const Radius.circular(AppRadius.r12),
+        ),
+      );
+    for (final metric in path.computeMetrics()) {
+      for (var d = 0.0; d < metric.length; d += 9) {
+        canvas.drawPath(metric.extractPath(d, d + 5), paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_DashedBorder old) => old.color != color;
 }

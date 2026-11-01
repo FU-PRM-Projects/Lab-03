@@ -83,6 +83,35 @@ void main() {
     expect(find.byType(ChallengeDetailScreen), findsOneWidget);
   });
 
+  testWidgets('Con đường: chip chủ đề, mỗi lần chỉ hiện một đường', (
+    tester,
+  ) async {
+    final services = TestServices();
+    services.challenges.progress[ChallengeTopic.dungCam] =
+        const ChallengeProgress(completed: <String>{'dc-1-1'});
+    await pumpApp(tester, services: services);
+    await tester.tap(findTab('Hành trình'));
+    await tester.pumpAndSettle();
+    expect(find.text('CHẶNG 1 · DŨNG CẢM'), findsOneWidget);
+    expect(find.text('CHẶNG 1 · VẬN ĐỘNG'), findsNothing);
+    expect(find.textContaining('Dũng cảm · 1/'), findsOneWidget);
+
+    // Hàng chip cuộn ngang: chip sau có thể nằm ngoài mép phải.
+    await tester.ensureVisible(find.textContaining('Vận động · 0/'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.textContaining('Vận động · 0/'));
+    await tester.pumpAndSettle();
+    expect(find.text('CHẶNG 1 · VẬN ĐỘNG'), findsOneWidget);
+    expect(find.text('CHẶNG 1 · DŨNG CẢM'), findsNothing);
+
+    // Đổi tab rồi quay lại: vẫn ở chủ đề vừa chọn.
+    await tester.tap(find.text('Thống kê'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Con đường'));
+    await tester.pumpAndSettle();
+    expect(find.text('CHẶNG 1 · VẬN ĐỘNG'), findsOneWidget);
+  });
+
   testWidgets('ít dữ liệu: biểu đồ thay bằng lời nhắc', (tester) async {
     await openJourney(
       tester,
