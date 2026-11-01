@@ -144,7 +144,9 @@ void main() {
     await tester.tap(find.text('Dừng lướt TikTok lúc 0h15'));
     await tester.pumpAndSettle();
 
-    await tester.tap(findTab('Xoá'));
+    await tester.tap(findTab('Tuỳ chọn'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Xoá nốt'));
     await tester.pumpAndSettle();
     expect(find.text('Xoá nốt này?'), findsOneWidget);
     await tester.tap(find.text('Xoá'));
@@ -167,7 +169,9 @@ void main() {
     await openJar(tester);
     await tester.tap(find.text('Dừng lướt TikTok lúc 0h15'));
     await tester.pumpAndSettle();
-    await tester.tap(findTab('Xoá'));
+    await tester.tap(findTab('Tuỳ chọn'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Xoá nốt'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Xoá'));
     await tester.pumpAndSettle();

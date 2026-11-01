@@ -159,9 +159,8 @@ class _Hero extends StatelessWidget {
             const SizedBox(height: AppSpace.s8),
             Text(
               'Mỗi ngày một nốt tích cực.',
-              style: AppTextStyles.of(context).body17.copyWith(
-                color: onPrimary,
-              ),
+              style: AppTextStyles.of(context).body17
+                  .copyWith(color: onPrimary),
               textAlign: TextAlign.center,
             ),
           ],

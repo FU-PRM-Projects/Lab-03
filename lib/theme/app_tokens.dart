@@ -65,7 +65,7 @@ abstract final class AppSize {
 
   static const double buttonHeight = 48;
   static const double buttonMinWidth = 64;
-  static const double appBarHeight = 48;
+  static const double appBarHeight = 56;
   static const double navBarHeight = 64;
   static const double navBarBottomGap = 18;
   static const double fab = 56;

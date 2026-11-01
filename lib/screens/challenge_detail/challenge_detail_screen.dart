@@ -3,10 +3,10 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../models/challenge.dart';
+import '../../models/note_type.dart';
 import '../../router/app_routes.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_tokens.dart';
-import '../../theme/app_typography.dart';
 import '../../viewmodels/challenge_detail_view_model.dart';
 import '../../viewmodels/view_state.dart';
 import '../../widgets/app_button.dart';
@@ -113,169 +113,260 @@ class _Detail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colors = AppColors.of(context);
     final minutes = state.minutes ?? challenge.minutes;
+
+    // Figma S08: thẻ thử thách, lời dặn, thang hồi hộp, câu mở lời; hai nút
+    // dính đáy (spacer co giãn), màn thấp thì cuộn.
+    return CustomScrollView(
+      slivers: <Widget>[
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpace.screen,
+              AppSpace.s16,
+              AppSpace.screen,
+              AppSpace.s24,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              spacing: AppSpace.s16,
+              children: <Widget>[
+                _ChallengeHeader(challenge: challenge),
+                if (challenge.tip.isNotEmpty)
+                  Text(challenge.tip, style: theme.textTheme.bodyLarge),
+                _AnxietyScale(
+                  value: state.anxiety,
+                  onChanged: viewModel.setAnxiety,
+                ),
+                if (challenge.script.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: AppSpace.s12),
+                    child: Semantics(
+                      label: 'Câu mở lời gợi ý',
+                      child: Text(
+                        '“${challenge.script}”',
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                    ),
+                  ),
+                if (state.isMovement)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      Text(
+                        'Bạn đã vận động',
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Row(
+                        children: <Widget>[
+                          IconButton(
+                            onPressed: minutes > 0
+                                ? () => viewModel.setMinutes(minutes - 1)
+                                : null,
+                            icon: const Icon(Icons.remove),
+                            tooltip: 'Bớt 1 phút',
+                          ),
+                          Expanded(
+                            child: Semantics(
+                              liveRegion: true,
+                              child: Text(
+                                '$minutes phút',
+                                style: theme.textTheme.titleLarge,
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            onPressed:
+                                minutes < ChallengeDetailViewModel.maxMinutes
+                                ? () => viewModel.setMinutes(minutes + 1)
+                                : null,
+                            icon: const Icon(Icons.add),
+                            tooltip: 'Thêm 1 phút',
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                const Spacer(),
+                // Chấm hồi hộp không bắt buộc: "Xong rồi" luôn bật.
+                AppButton(label: 'Xong rồi', expand: true, onPressed: onDone),
+                AppButton(
+                  label: 'Đổi thẻ dễ hơn',
+                  variant: AppButtonVariant.text,
+                  expand: true,
+                  onPressed: onEasier,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Figma `Card/thử thách`: nền tint xanh lá, bo 24, mascot Tập Trung, nhãn
+/// chủ đề Caption/12 Bold màu success và tên thử thách Headline/22.
+class _ChallengeHeader extends StatelessWidget {
+  const _ChallengeHeader({required this.challenge});
+
+  final Challenge challenge;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = AppColors.of(context);
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colors.noteTint(NoteType.thuThach),
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpace.s20,
+          vertical: AppSpace.s24,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: AppSpace.s12,
+          children: <Widget>[
+            const Mascot(state: MascotState.tapTrung, size: 120.96),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              spacing: AppSpace.s8,
+              children: <Widget>[
+                Text(
+                  challenge.label,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: colors.success,
+                  ),
+                ),
+                Semantics(
+                  header: true,
+                  child: Text(
+                    challenge.title,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      letterSpacing: -0.44,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Figma `hồi hộp`: 5 nút tròn 48 trải đều, nút chọn nền primary; hai nhãn
+/// đầu thang Label/13 bên dưới. Chạm lại nút đang chọn để bỏ chọn (ViewModel).
+class _AnxietyScale extends StatelessWidget {
+  const _AnxietyScale({required this.value, required this.onChanged});
+
+  final int? value;
+  final ValueChanged<int> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final caption = theme.textTheme.labelMedium?.copyWith(
+      fontWeight: FontWeight.w400,
+      color: scheme.onSurfaceVariant,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: AppSpace.s12,
       children: <Widget>[
-        Expanded(
-          child: ListView(
-            padding: const EdgeInsets.all(AppSpace.screen),
-            children: <Widget>[
-              Text(
-                challenge.label,
-                style: AppTextStyles.of(context).overline
-                    .copyWith(color: colors.onSurfaceMuted),
-              ),
-              const SizedBox(height: AppSpace.s8),
-              Semantics(
-                header: true,
-                child: Text(
-                  challenge.title,
-                  style: theme.textTheme.headlineSmall,
-                ),
-              ),
-              if (challenge.tip.isNotEmpty) ...<Widget>[
-                const SizedBox(height: AppSpace.s12),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Icon(
-                      Icons.lightbulb_outline,
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                    const SizedBox(width: AppSpace.s8),
-                    Expanded(
-                      child: Text(
-                        challenge.tip,
-                        style: theme.textTheme.bodyLarge,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-              const SizedBox(height: AppSpace.s24),
-              Text('Bạn hồi hộp cỡ nào?', style: theme.textTheme.titleMedium),
-              const SizedBox(height: AppSpace.s8),
-              SegmentedButton<int>(
-                segments: <ButtonSegment<int>>[
-                  for (var level = 1; level <= 5; level++)
-                    ButtonSegment<int>(
-                      value: level,
-                      label: Text('$level'),
-                      tooltip: switch (level) {
-                        1 => 'Hồi hộp 1: Bình tĩnh',
-                        5 => 'Hồi hộp 5: Run lắm',
-                        _ => 'Hồi hộp $level',
-                      },
-                    ),
-                ],
-                selected: <int>{?state.anxiety},
-                emptySelectionAllowed: true,
-                showSelectedIcon: false,
-                onSelectionChanged: (selection) => selection.isEmpty
-                    ? viewModel.setAnxiety(state.anxiety ?? 0)
-                    : viewModel.setAnxiety(selection.first),
-              ),
-              const SizedBox(height: AppSpace.s4),
-              Row(
-                children: <Widget>[
-                  Text('Bình tĩnh', style: theme.textTheme.bodySmall),
-                  const Spacer(),
-                  Text('Run lắm', style: theme.textTheme.bodySmall),
-                ],
-              ),
-              if (challenge.script.isNotEmpty) ...<Widget>[
-                const SizedBox(height: AppSpace.s24),
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: colors.tintLavender,
-                    borderRadius: BorderRadius.circular(AppRadius.r12),
-                    border: Border(
-                      left: BorderSide(
-                        color: theme.colorScheme.primary,
-                        width: AppSpace.s4,
-                      ),
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppSpace.s16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text('Câu mẫu', style: theme.textTheme.labelLarge),
-                        const SizedBox(height: AppSpace.s4),
-                        Text(
-                          '“${challenge.script}”',
-                          style: AppTextStyles.of(context).body17,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-              if (state.isMovement) ...<Widget>[
-                const SizedBox(height: AppSpace.s24),
-                Text('Bạn đã vận động', style: theme.textTheme.titleMedium),
-                Row(
-                  children: <Widget>[
-                    IconButton(
-                      onPressed: minutes > 0
-                          ? () => viewModel.setMinutes(minutes - 1)
-                          : null,
-                      icon: const Icon(Icons.remove),
-                      tooltip: 'Bớt 1 phút',
-                    ),
-                    Expanded(
-                      child: Semantics(
-                        liveRegion: true,
-                        child: Text(
-                          '$minutes phút',
-                          style: theme.textTheme.headlineSmall,
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: minutes < ChallengeDetailViewModel.maxMinutes
-                          ? () => viewModel.setMinutes(minutes + 1)
-                          : null,
-                      icon: const Icon(Icons.add),
-                      tooltip: 'Thêm 1 phút',
-                    ),
-                  ],
-                ),
-              ],
-              const SizedBox(height: AppSpace.s24),
-              const Center(child: Mascot(state: MascotState.tapTrung)),
-            ],
+        Text(
+          'Bạn hồi hộp cỡ nào?',
+          style: theme.textTheme.bodyLarge?.copyWith(
+            fontWeight: FontWeight.w600,
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpace.screen,
-            AppSpace.s8,
-            AppSpace.screen,
-            AppSpace.screen,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              // Chấm hồi hộp không bắt buộc: "Xong rồi" luôn bật.
-              AppButton(label: 'Xong rồi', expand: true, onPressed: onDone),
-              const SizedBox(height: AppSpace.s8),
-              AppButton(
-                label: 'Đổi thẻ dễ hơn',
-                variant: AppButtonVariant.text,
-                expand: true,
-                onPressed: onEasier,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            for (var level = 1; level <= 5; level++)
+              _AnxietyDot(
+                level: level,
+                selected: value == level,
+                onTap: () => onChanged(level),
               ),
+          ],
+        ),
+        ExcludeSemantics(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Text('Bình tĩnh', style: caption),
+              Text('Run lắm', style: caption),
             ],
           ),
         ),
       ],
+    );
+  }
+}
+
+class _AnxietyDot extends StatelessWidget {
+  const _AnxietyDot({
+    required this.level,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final int level;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: switch (level) {
+        1 => 'Hồi hộp 1: Bình tĩnh',
+        5 => 'Hồi hộp 5: Run lắm',
+        _ => 'Hồi hộp $level',
+      },
+      excludeSemantics: true,
+      child: Material(
+        color: selected ? scheme.primary : scheme.surfaceContainerLow,
+        shape: CircleBorder(
+          side: selected
+              ? BorderSide.none
+              : BorderSide(color: scheme.outlineVariant),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          customBorder: const CircleBorder(),
+          child: SizedBox.square(
+            dimension: AppSize.minTouch,
+            child: Center(
+              child: Text(
+                '$level',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: selected ? scheme.onPrimary : scheme.onSurface,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

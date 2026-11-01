@@ -33,9 +33,8 @@ class ShortcutButton extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppRadius.card),
         child: ConstrainedBox(
-          constraints: const BoxConstraints.tightFor(width: 96).copyWith(
-            minHeight: 72,
-          ),
+          constraints: const BoxConstraints.tightFor(width: 96)
+              .copyWith(minHeight: 72),
           child: Padding(
             padding: const EdgeInsets.all(AppSpace.s4),
             child: Column(

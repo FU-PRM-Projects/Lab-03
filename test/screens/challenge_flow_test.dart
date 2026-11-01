@@ -28,7 +28,7 @@ void main() {
       expect(find.text('Dũng cảm cấp 1 thẻ 1'), findsOneWidget);
       expect(find.text('DŨNG CẢM · 3 PHÚT'), findsOneWidget);
 
-      await tester.tap(findTab('Thẻ sau'));
+      await tester.tap(find.text('Vuốt để đổi thẻ'));
       await tester.pumpAndSettle();
       expect(find.text('Dũng cảm cấp 1 thẻ 2'), findsOneWidget);
       expect(tester.takeException(), isNull);
@@ -109,7 +109,7 @@ void main() {
     await openChallenges(tester);
     // Ba thẻ Dũng cảm đứng trước; sang thẻ Vận động đầu tiên.
     for (var i = 0; i < 3; i++) {
-      await tester.tap(findTab('Thẻ sau'));
+      await tester.tap(find.text('Vuốt để đổi thẻ'));
       await tester.pumpAndSettle();
     }
     expect(find.text('Vận động · cấp 1'), findsOneWidget);

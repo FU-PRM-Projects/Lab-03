@@ -176,7 +176,11 @@ class _SavedContent extends StatelessWidget {
                 const Spacer(),
                 const SizedBox(height: AppSpace.s16),
                 if (milestone) ...<Widget>[
-                  AppButton(label: 'Gắn vào hũ', expand: true, onPressed: onPin),
+                  AppButton(
+                    label: 'Gắn vào hũ',
+                    expand: true,
+                    onPressed: onPin,
+                  ),
                   const SizedBox(height: AppSpace.s16),
                   AppButton(
                     label: 'Để sau',

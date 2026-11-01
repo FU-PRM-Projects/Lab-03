@@ -40,7 +40,7 @@ class MoodOption extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: radius,
             side: BorderSide(
-              color: selected ? scheme.primary : const Color(0x00000000),
+              color: selected ? scheme.primary : scheme.surfaceContainerLow,
               width: 2,
             ),
           ),
@@ -50,12 +50,12 @@ class MoodOption extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Mascot(state: mood.mascot, size: 48),
+                // Figma: mascot 53.76 × 60.48, cách nhãn 8.
+                Mascot(state: mood.mascot, size: 60.48),
                 const SizedBox(height: AppSpace.s8),
                 Text(
                   mood.label,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
+                  style: theme.textTheme.labelLarge?.copyWith(
                     color: selected
                         ? scheme.onPrimaryContainer
                         : scheme.onSurface,

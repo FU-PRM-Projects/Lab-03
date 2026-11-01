@@ -78,7 +78,7 @@ void main() {
     await tester.tap(find.text('Đăng nhập bằng email'));
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.widgetWithText(TextField, 'Email'), 'minh@');
+    await tester.enterText(findField('Email'), 'minh@');
     await tester.tap(find.widgetWithText(FilledButton, 'Đăng nhập'));
     await tester.pumpAndSettle();
     expect(
@@ -86,14 +86,8 @@ void main() {
       findsOneWidget,
     );
 
-    await tester.enterText(
-      find.widgetWithText(TextField, 'Email'),
-      'minh@example.com',
-    );
-    await tester.enterText(
-      find.widgetWithText(TextField, 'Mật khẩu'),
-      'matkhau123',
-    );
+    await tester.enterText(findField('Email'), 'minh@example.com');
+    await tester.enterText(findField('Mật khẩu'), 'matkhau123');
     await tester.tap(find.widgetWithText(FilledButton, 'Đăng nhập'));
     await tester.pumpAndSettle();
     expect(find.byType(TodayScreen), findsOneWidget);

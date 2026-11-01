@@ -5,7 +5,6 @@ import 'package:material_ui/material_ui.dart';
 import '../../models/mood.dart';
 import '../../models/note.dart';
 import '../../router/app_routes.dart';
-import '../../theme/app_colors.dart';
 import '../../theme/app_tokens.dart';
 import '../../theme/app_typography.dart';
 import '../../utils/vi_date_format.dart';
@@ -86,8 +85,6 @@ class _NoteComposerScreenState extends ConsumerState<NoteComposerScreen> {
   Widget build(BuildContext context) {
     final provider = noteComposerViewModelProvider(widget.step);
     final state = ref.watch(provider);
-    final textStyles = AppTextStyles.of(context);
-    final scheme = Theme.of(context).colorScheme;
 
     ref.listen(provider, (previous, next) {
       _sync(_title, next.draft.title);
@@ -110,7 +107,12 @@ class _NoteComposerScreenState extends ConsumerState<NoteComposerScreen> {
         if (!didPop) _onBack();
       },
       child: Scaffold(
-        appBar: const AppTopBar(title: 'Ghi nốt'),
+        appBar: AppTopBar(
+          title: 'Ghi nốt',
+          // Bước 1 là "đóng form"; bước 2–3 lùi về bước trước.
+          leading: state.step == 1 ? AppBarLeading.close : AppBarLeading.back,
+          onLeading: _onBack,
+        ),
         body: SafeArea(
           top: false,
           child: Center(
@@ -118,54 +120,55 @@ class _NoteComposerScreenState extends ConsumerState<NoteComposerScreen> {
               constraints: const BoxConstraints(
                 maxWidth: AppSize.narrowContentMaxWidth,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      AppSpace.screen,
-                      AppSpace.s8,
-                      AppSpace.screen,
-                      0,
-                    ),
-                    child: Text(
-                      'Bước ${state.step}/3',
-                      style: textStyles.overline.copyWith(
-                        color: scheme.onSurfaceVariant,
+              // Figma `content`: lề 16, các khối cách 16, nút dính đáy (spacer
+              // co giãn); bàn phím hoặc chữ lớn thì cuộn.
+              child: CustomScrollView(
+                slivers: <Widget>[
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpace.screen,
+                        AppSpace.s16,
+                        AppSpace.screen,
+                        AppSpace.s24,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        spacing: AppSpace.s16,
+                        children: <Widget>[
+                          _StepProgress(step: state.step),
+                          AnimatedSwitcher(
+                            duration: MediaQuery.disableAnimationsOf(context)
+                                ? Duration.zero
+                                : const Duration(milliseconds: 200),
+                            child: KeyedSubtree(
+                              key: ValueKey<int>(state.step),
+                              child: switch (state.step) {
+                                1 => _MoodStep(
+                                  state: state,
+                                  onSelect: _viewModel.selectMood,
+                                ),
+                                2 => _WinStep(
+                                  state: state,
+                                  controller: _title,
+                                  onChanged: _viewModel.setTitle,
+                                  onPick: _viewModel.pickQuickWin,
+                                  onSubmitted: _viewModel.next,
+                                ),
+                                _ => _JournalStep(
+                                  controller: _body,
+                                  onChanged: _viewModel.setBody,
+                                ),
+                              },
+                            ),
+                          ),
+                          const Spacer(),
+                          ..._actions(state),
+                        ],
                       ),
                     ),
                   ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(AppSpace.screen),
-                      child: AnimatedSwitcher(
-                        duration: MediaQuery.disableAnimationsOf(context)
-                            ? Duration.zero
-                            : const Duration(milliseconds: 200),
-                        child: KeyedSubtree(
-                          key: ValueKey<int>(state.step),
-                          child: switch (state.step) {
-                            1 => _MoodStep(
-                              state: state,
-                              onSelect: _viewModel.selectMood,
-                            ),
-                            2 => _WinStep(
-                              state: state,
-                              controller: _title,
-                              onChanged: _viewModel.setTitle,
-                              onPick: _viewModel.pickQuickWin,
-                              onSubmitted: _viewModel.next,
-                            ),
-                            _ => _JournalStep(
-                              controller: _body,
-                              onChanged: _viewModel.setBody,
-                            ),
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-                  _Actions(state: state, viewModel: _viewModel),
                 ],
               ),
             ),
@@ -174,6 +177,108 @@ class _NoteComposerScreenState extends ConsumerState<NoteComposerScreen> {
       ),
     );
   }
+
+  /// Nút cuối màn theo từng bước: nút chính, rồi nút chữ "Bỏ qua" (cách 16).
+  List<Widget> _actions(NoteComposerState state) {
+    final saving = state.saving;
+    final viewModel = _viewModel;
+
+    return <Widget>[
+      if (state.step == 3)
+        AppButton(
+          label: 'Lưu vào hũ',
+          expand: true,
+          loading: saving,
+          onPressed: saving ? null : viewModel.save,
+        )
+      else
+        AppButton(
+          label: 'Tiếp',
+          expand: true,
+          onPressed: state.canContinue && !saving ? viewModel.next : null,
+        ),
+      if (state.step == 2)
+        AppButton(
+          label: 'Bỏ qua nhật ký',
+          variant: AppButtonVariant.text,
+          expand: true,
+          loading: saving,
+          onPressed: state.canContinue && !saving
+              ? () => viewModel.save(skipJournal: true)
+              : null,
+        ),
+      if (state.step == 3)
+        AppButton(
+          label: 'Bỏ qua',
+          variant: AppButtonVariant.text,
+          expand: true,
+          onPressed: saving ? null : () => viewModel.save(skipJournal: true),
+        ),
+    ];
+  }
+}
+
+/// Figma `progress`: "Bước n/3" (Label/13) và 3 vạch 6 dp bo 3, cách 6.
+class _StepProgress extends StatelessWidget {
+  const _StepProgress({required this.step});
+
+  final int step;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: AppSpace.s8,
+      children: <Widget>[
+        Text(
+          'Bước $step/3',
+          style: theme.textTheme.labelMedium?.copyWith(
+            fontWeight: FontWeight.w400,
+            color: scheme.onSurfaceVariant,
+          ),
+        ),
+        ExcludeSemantics(
+          child: Row(
+            spacing: AppSpace.s6,
+            children: <Widget>[
+              for (var i = 1; i <= 3; i++)
+                Expanded(
+                  child: Container(
+                    height: AppSpace.s6,
+                    decoration: BoxDecoration(
+                      color: i <= step
+                          ? scheme.primary
+                          : scheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Tiêu đề bước: Headline/22 Bold.
+class _StepTitle extends StatelessWidget {
+  const _StepTitle(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    header: true,
+    child: Text(
+      text,
+      style: Theme.of(context).textTheme.titleLarge
+          ?.copyWith(letterSpacing: -0.44),
+    ),
+  );
 }
 
 class _MoodStep extends StatelessWidget {
@@ -188,14 +293,23 @@ class _MoodStep extends StatelessWidget {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: AppSpace.s16,
       children: <Widget>[
-        Text(
-          'Hôm nay bạn thấy thế nào?',
-          style: theme.textTheme.headlineMedium,
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: AppSpace.s8,
+          children: <Widget>[
+            const _StepTitle('Hôm nay bạn thấy thế nào?'),
+            if (state.isRoughDay)
+              Text(
+                'Ngày rối: 1 chip là đủ.',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+          ],
         ),
-        const SizedBox(height: AppSpace.s24),
         Wrap(
-          alignment: WrapAlignment.center,
           spacing: AppSpace.s12,
           runSpacing: AppSpace.s12,
           children: <Widget>[
@@ -207,18 +321,14 @@ class _MoodStep extends StatelessWidget {
               ),
           ],
         ),
-        if (state.isRoughDay) ...<Widget>[
-          const SizedBox(height: AppSpace.s24),
-          Text('Ngày rối: 1 chip là đủ.', style: theme.textTheme.bodyLarge),
-          const SizedBox(height: AppSpace.s12),
-          const _FirstAidCard(),
-        ],
+        if (state.isRoughDay) const _FirstAidCard(),
       ],
     );
   }
 }
 
-/// Thẻ "Sơ cứu 1 phút: 5-4-3-2-1" cho ngày Rối.
+/// Figma `Card/sơ cứu` cho ngày Rối: nền surface-variant, tiêu đề Title/17
+/// Bold và nút tonal mở màn Thở cùng Nốt.
 class _FirstAidCard extends StatelessWidget {
   const _FirstAidCard();
 
@@ -228,28 +338,27 @@ class _FirstAidCard extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: AppColors.of(context).tintLavender,
+        color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(AppRadius.card),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(AppSpace.s16),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpace.s16,
+          vertical: AppSpace.s12,
+        ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: AppSpace.s8,
           children: <Widget>[
             Text(
               'Sơ cứu 1 phút: 5-4-3-2-1',
-              style: theme.textTheme.titleMedium,
+              style: AppTextStyles.of(context).title17Bold
+                  .copyWith(letterSpacing: -0.17),
             ),
-            const SizedBox(height: AppSpace.s4),
-            Text(
-              'Gọi tên 5 thứ bạn thấy, 4 thứ chạm được, 3 âm thanh, '
-              '2 mùi và 1 vị.',
-              style: theme.textTheme.bodyMedium,
-            ),
-            const SizedBox(height: AppSpace.s12),
             AppButton(
               label: 'Làm cùng Nốt',
               variant: AppButtonVariant.tonal,
+              expand: true,
               onPressed: () => context.push(AppRoutes.breathe),
             ),
           ],
@@ -281,9 +390,9 @@ class _WinStep extends StatelessWidget {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: AppSpace.s16,
       children: <Widget>[
-        Text('Hôm nay bạn làm được gì?', style: theme.textTheme.headlineMedium),
-        const SizedBox(height: AppSpace.s24),
+        const _StepTitle('Hôm nay bạn làm được gì?'),
         AppTextField(
           label: 'Chiến thắng nhỏ',
           controller: controller,
@@ -294,39 +403,46 @@ class _WinStep extends StatelessWidget {
           onChanged: onChanged,
           onSubmitted: (_) => onSubmitted(),
         ),
-        const SizedBox(height: AppSpace.s16),
-        Text('Hoặc chọn nhanh', style: theme.textTheme.titleSmall),
-        const SizedBox(height: AppSpace.s8),
-        Wrap(
-          spacing: AppSpace.s8,
-          runSpacing: AppSpace.s8,
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: AppSpace.s12,
           children: <Widget>[
-            for (final label in state.quickWins)
-              QuickWinChip(
-                label: label,
-                selected: title == label,
-                onSelected: (_) => onPick(label),
-              ),
+            Text('Hoặc chọn nhanh', style: theme.textTheme.labelLarge),
+            Wrap(
+              spacing: AppSpace.s8,
+              runSpacing: AppSpace.s8,
+              children: <Widget>[
+                for (final label in state.quickWins)
+                  QuickWinChip(
+                    label: label,
+                    selected: title == label,
+                    onSelected: (_) => onPick(label),
+                  ),
+              ],
+            ),
           ],
         ),
-        if (state.oldNote case final Note note) ...<Widget>[
-          const SizedBox(height: AppSpace.s24),
-          Text(
-            'Một chiến thắng cũ của bạn:',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
+        if (state.oldNote case final Note note)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: AppSpace.s8,
+            children: <Widget>[
+              Text(
+                'Một chiến thắng cũ của bạn:',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              SizedBox(
+                height: AppSize.noteTile.height,
+                child: NoteTile(
+                  type: note.type,
+                  title: note.title,
+                  dateLabel: ViDateFormat.shortDate(note.createdAt),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: AppSpace.s8),
-          SizedBox(
-            height: AppSize.noteTile.height,
-            child: NoteTile(
-              type: note.type,
-              title: note.title,
-              dateLabel: ViDateFormat.shortDate(note.createdAt),
-            ),
-          ),
-        ],
       ],
     );
   }
@@ -344,91 +460,27 @@ class _JournalStep extends StatelessWidget {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: AppSpace.s16,
       children: <Widget>[
-        Text('Viết thêm vài dòng?', style: theme.textTheme.headlineMedium),
-        const SizedBox(height: AppSpace.s24),
+        const _StepTitle('Viết thêm vài dòng?'),
         AppTextField(
           label: 'Nhật ký hôm nay',
           helper: 'Không bắt buộc',
           controller: controller,
-          minLines: 3,
+          minLines: 2,
           maxLines: 8,
           maxLength: NoteLimits.body,
           keyboardType: TextInputType.multiline,
           onChanged: onChanged,
         ),
-        const SizedBox(height: AppSpace.s8),
         Text(
           'Bí ý? Thử trả lời: điều gì làm bạn thấy nhẹ hơn hôm nay?',
-          style: theme.textTheme.bodySmall?.copyWith(
+          style: theme.textTheme.labelLarge?.copyWith(
+            fontWeight: FontWeight.w400,
             color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
       ],
-    );
-  }
-}
-
-/// Vùng nút cố định cuối màn, theo từng bước.
-class _Actions extends StatelessWidget {
-  const _Actions({required this.state, required this.viewModel});
-
-  final NoteComposerState state;
-  final NoteComposerViewModel viewModel;
-
-  @override
-  Widget build(BuildContext context) {
-    final saving = state.saving;
-    final primary = switch (state.step) {
-      3 => AppButton(
-        label: 'Lưu vào hũ',
-        expand: true,
-        loading: saving,
-        onPressed: saving ? null : viewModel.save,
-      ),
-      _ => AppButton(
-        label: 'Tiếp',
-        expand: true,
-        onPressed: state.canContinue && !saving ? viewModel.next : null,
-      ),
-    };
-    final skip = switch (state.step) {
-      2 => AppButton(
-        label: 'Bỏ qua nhật ký',
-        variant: AppButtonVariant.text,
-        expand: true,
-        loading: saving,
-        onPressed: state.canContinue && !saving
-            ? () => viewModel.save(skipJournal: true)
-            : null,
-      ),
-      3 => AppButton(
-        label: 'Bỏ qua',
-        variant: AppButtonVariant.text,
-        expand: true,
-        onPressed: saving ? null : () => viewModel.save(skipJournal: true),
-      ),
-      _ => null,
-    };
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpace.screen,
-        AppSpace.s8,
-        AppSpace.screen,
-        AppSpace.screen,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          primary,
-          if (skip != null) ...<Widget>[
-            const SizedBox(height: AppSpace.s8),
-            skip,
-          ],
-        ],
-      ),
     );
   }
 }

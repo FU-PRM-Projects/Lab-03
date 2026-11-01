@@ -144,8 +144,8 @@ void main() {
       }
     });
 
-    test('app bar 48, thanh tab 64, vùng chạm padded', () {
-      expect(theme.appBarTheme.toolbarHeight, 48);
+    test('app bar 56, thanh tab 64, vùng chạm padded', () {
+      expect(theme.appBarTheme.toolbarHeight, 56);
       expect(theme.navigationBarTheme.height, 64);
       expect(theme.materialTapTargetSize, MaterialTapTargetSize.padded);
     });

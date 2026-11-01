@@ -196,9 +196,7 @@ class _JarGrid extends StatelessWidget {
                               foregroundColor:
                                   theme.colorScheme.onPrimaryContainer,
                             ),
-                            child: Text(
-                              '${data.stickers.length} nhãn dán  ›',
-                            ),
+                            child: Text('${data.stickers.length} nhãn dán  ›'),
                           ),
                       ],
                     ),
@@ -214,8 +212,7 @@ class _JarGrid extends StatelessWidget {
           // cao theo tiêu đề (tối đa 3 dòng); tờ cùng hàng cao bằng nhau.
           sliver: SliverList.separated(
             itemCount: (data.notes.length + columns - 1) ~/ columns,
-            separatorBuilder: (_, _) =>
-                const SizedBox(height: AppSpace.grid),
+            separatorBuilder: (_, _) => const SizedBox(height: AppSpace.grid),
             itemBuilder: (context, row) => IntrinsicHeight(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
