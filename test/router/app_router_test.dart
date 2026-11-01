@@ -93,7 +93,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(SelfControlScreen), findsOneWidget);
 
-    await tester.tap(find.text('Khó dừng? Thở 90 giây'));
+    await tester.tap(find.text('Stress? Thở 90 giây để thả lỏng'));
     // S10 thở ngay khi mở nên không bao giờ "settle"; chỉ chờ chuyển màn.
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));

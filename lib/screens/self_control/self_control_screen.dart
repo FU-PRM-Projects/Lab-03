@@ -184,7 +184,7 @@ class _SelfControlScreenState extends ConsumerState<SelfControlScreen> {
                 ),
                 const SizedBox(height: AppSpace.s16),
                 AppButton(
-                  label: 'Khó dừng? Thở 90 giây',
+                  label: 'Stress? Thở 90 giây để thả lỏng',
                   variant: AppButtonVariant.tonal,
                   expand: true,
                   onPressed: () => context.push(AppRoutes.breathe),
