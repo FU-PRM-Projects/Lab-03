@@ -12,7 +12,7 @@ import '../support/pump.dart';
 /// Flow F2 Tự chủ trên cả app: S02 → S09 → S04, nhánh S10, nhánh phục hồi.
 void main() {
   Future<void> openSelfControl(WidgetTester tester) async {
-    await tester.tap(find.bySemanticsLabel('Dừng lại'));
+    await tester.tap(find.bySemanticsLabel('Dừng lại, ghi 1 lần tự chủ'));
     await tester.pumpAndSettle();
     expect(find.byType(SelfControlScreen), findsOneWidget);
   }
@@ -35,6 +35,46 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+
+  testWidgets('theo dõi 1 thói quen: ghi luôn kèm tên thói quen', (
+    tester,
+  ) async {
+    final services = TestServices();
+    services.selfControl.habits = const HabitList(
+      selected: <String>{'Video ngắn'},
+    );
+    await pumpApp(tester, services: services);
+    await openSelfControl(tester);
+    await tester.tap(find.text('Mình vừa dừng lại'));
+    await tester.pumpAndSettle();
+    expect(find.byType(NoteSavedScreen), findsOneWidget);
+    expect(services.notes.notes.single.title, 'Dừng Video ngắn lúc 21:30');
+  });
+
+  testWidgets('theo dõi nhiều thói quen: "Bạn vừa dừng gì?" rồi ghi', (
+    tester,
+  ) async {
+    final services = TestServices();
+    services.selfControl.habits = const HabitList(
+      selected: <String>{'Lướt mạng xã hội', 'Video ngắn'},
+    );
+    await pumpApp(tester, services: services);
+    await openSelfControl(tester);
+    await tester.tap(find.text('Mình vừa dừng lại'));
+    await tester.pumpAndSettle();
+    expect(find.text('Bạn vừa dừng gì?'), findsOneWidget);
+    expect(services.notes.notes, isEmpty);
+
+    await tester.tap(
+      find.descendant(
+        of: find.byType(BottomSheet),
+        matching: find.text('Video ngắn'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byType(NoteSavedScreen), findsOneWidget);
+    expect(services.notes.notes.single.title, 'Dừng Video ngắn lúc 21:30');
+  });
 
   testWidgets('khó dừng: S10 thở → Cơn sóng đã hạ → Ghi vào hũ → S04', (
     tester,
@@ -75,12 +115,16 @@ void main() {
     await openSelfControl(tester);
 
     expect(find.text('Lướt mạng xã hội'), findsNothing);
+    await tester.ensureVisible(find.text('Mở khoá'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Mở khoá'));
     await tester.pumpAndSettle();
     expect(find.text('Chưa mở được phần này.'), findsOneWidget);
     expect(find.text('Lướt mạng xã hội'), findsNothing);
 
     services.localAuth.result = true;
+    await tester.ensureVisible(find.text('Mở khoá'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Mở khoá'));
     await tester.pumpAndSettle();
     expect(find.text('Lướt mạng xã hội'), findsOneWidget);
@@ -91,8 +135,7 @@ void main() {
   ) async {
     final services = await pumpApp(tester);
     await openSelfControl(tester);
-    await tester.scrollUntilVisible(find.text('Mình đã lỡ lướt quá đà'), 100);
-    await tester.tap(find.text('Mình đã lỡ lướt quá đà'));
+    await tester.tap(find.text('Lỡ lướt quá đà?'));
     await tester.pumpAndSettle();
     expect(find.text('Lúc đó mình đang thấy gì?'), findsOneWidget);
 
@@ -101,6 +144,8 @@ void main() {
     await tester.tap(find.text('Ghi lại'));
     await tester.pumpAndSettle();
     expect(find.text('Nhận ra cũng là bắt đầu tự chủ.'), findsOneWidget);
+    expect(find.text('Đã lưu vào Nhật ký trong hũ của bạn.'), findsOneWidget);
+    expect(find.text('Xem trong hũ'), findsOneWidget);
     expect(services.notes.notes.single.type, NoteType.nhatKy);
 
     await tester.tap(find.text('Về Hôm nay'));
@@ -112,6 +157,8 @@ void main() {
     final services = await pumpApp(tester);
     await openSelfControl(tester);
     await tester.scrollUntilVisible(find.text('+ Thêm'), 100);
+    await tester.ensureVisible(find.text('+ Thêm'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('+ Thêm'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), 'Đọc truyện tới 2h');

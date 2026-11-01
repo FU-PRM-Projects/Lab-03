@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../models/note_type.dart';
 import '../../models/self_control.dart';
 import '../../router/app_routes.dart';
 import '../../theme/app_colors.dart';
@@ -14,6 +15,7 @@ import '../../widgets/app_button.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/app_top_bar.dart';
 import '../../widgets/mascot.dart';
+import '../../widgets/note_tile.dart';
 import '../../widgets/quick_win_chip.dart';
 import '../../widgets/setting_row.dart';
 import '../../widgets/state_views.dart';
@@ -44,6 +46,36 @@ class _SelfControlScreenState extends ConsumerState<SelfControlScreen> {
     _lifecycle.dispose();
     super.dispose();
   }
+
+  /// Thói quen đang theo dõi: 0–1 thì ghi luôn (vẫn 2 chạm từ S02), từ 2 thì
+  /// hỏi "Bạn vừa dừng gì?" và chạm một chip là ghi. Đang khoá thì không lộ
+  /// tên thói quen.
+  Future<void> _recordStop(SelfControlSummary? summary, bool locked) async {
+    final habits = locked || summary == null
+        ? const <String>[]
+        : <String>[
+            for (final habit in summary.habits.all)
+              if (summary.habits.selected.contains(habit)) habit,
+          ];
+    if (habits.length <= 1) {
+      await _viewModel.recordStop(habit: habits.firstOrNull);
+      return;
+    }
+    final habit = await showModalBottomSheet<String>(
+      context: context,
+      builder: (_) => _StopSheet(habits: habits),
+    );
+    if (habit != null && mounted) {
+      await _viewModel.recordStop(habit: habit);
+    }
+  }
+
+  void _openSlipSheet() => showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    showDragHandle: true,
+    builder: (_) => _SlipSheet(onSave: _viewModel.recordSlip),
+  );
 
   Future<void> _pickAwakeTimes(UserSettings settings) async {
     TimeOfDay toTime(int minutes) =>
@@ -146,7 +178,9 @@ class _SelfControlScreenState extends ConsumerState<SelfControlScreen> {
                   label: 'Mình vừa dừng lại',
                   expand: true,
                   loading: state.saving,
-                  onPressed: state.saving ? null : _viewModel.recordStop,
+                  onPressed: state.saving
+                      ? null
+                      : () => _recordStop(summary, state.habitsLocked),
                 ),
                 const SizedBox(height: AppSpace.s16),
                 AppButton(
@@ -155,12 +189,23 @@ class _SelfControlScreenState extends ConsumerState<SelfControlScreen> {
                   expand: true,
                   onPressed: () => context.push(AppRoutes.breathe),
                 ),
+                const SizedBox(height: AppSpace.s8),
+                _SlipCard(onTap: _openSlipSheet),
                 const SizedBox(height: AppSpace.s16),
                 Text(
                   'THÓI QUEN MUỐN BỚT',
                   style: AppTextStyles.of(context).overline.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                     letterSpacing: 0.72,
+                  ),
+                ),
+                const SizedBox(height: AppSpace.s2),
+                Text(
+                  'Chọn thói quen bạn đang muốn bớt. Khi dừng được, Nốt '
+                  'hỏi bạn vừa dừng thói quen nào.',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.w400,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
                 const SizedBox(height: AppSpace.s8),
@@ -295,18 +340,143 @@ class _Habits extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: AppSpace.s8),
-        AppButton(
-          label: 'Mình đã lỡ lướt quá đà',
-          variant: AppButtonVariant.text,
-          onPressed: () => showModalBottomSheet<void>(
-            context: context,
-            isScrollControlled: true,
-            showDragHandle: true,
-            builder: (_) => _SlipSheet(onSave: viewModel.recordSlip),
+      ],
+    );
+  }
+}
+
+/// Thẻ "Lỡ lướt quá đà?" (nhánh phục hồi F2): ngang hàng hai nút chính, nói
+/// rõ là không bị trừ gì.
+class _SlipCard extends StatelessWidget {
+  const _SlipCard({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final colors = AppColors.of(context);
+    final radius = BorderRadius.circular(AppRadius.card);
+
+    return Semantics(
+      button: true,
+      label: 'Lỡ lướt quá đà? Ghi lại cảm giác để lần sau nhận ra sớm hơn',
+      excludeSemantics: true,
+      child: Material(
+        color: scheme.surfaceContainerLow,
+        borderRadius: radius,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: radius,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpace.s12,
+              AppSpace.s12,
+              AppSpace.s8,
+              AppSpace.s12,
+            ),
+            child: Row(
+              spacing: AppSpace.s12,
+              children: <Widget>[
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: colors.noteTint(NoteType.nhatKy),
+                  ),
+                  alignment: Alignment.center,
+                  child: Icon(
+                    Icons.edit_outlined,
+                    size: 20,
+                    color: scheme.onPrimaryContainer,
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: AppSpace.s2,
+                    children: <Widget>[
+                      Text(
+                        'Lỡ lướt quá đà?',
+                        style: theme.textTheme.labelLarge,
+                      ),
+                      Text(
+                        'Không sao. Ghi lại cảm giác để lần sau nhận ra sớm '
+                        'hơn.',
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          fontWeight: FontWeight.w400,
+                          color: scheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(Icons.chevron_right, color: scheme.onSurfaceVariant),
+              ],
+            ),
           ),
         ),
-      ],
+      ),
+    );
+  }
+}
+
+/// "Bạn vừa dừng gì?": các thói quen đang theo dõi, chạm một chip là ghi.
+class _StopSheet extends StatelessWidget {
+  const _StopSheet({required this.habits});
+
+  final List<String> habits;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpace.screen,
+          0,
+          AppSpace.screen,
+          AppSpace.s24,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: AppSpace.s12,
+          children: <Widget>[
+            Semantics(
+              header: true,
+              child: Text(
+                'Bạn vừa dừng gì?',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontSize: 20,
+                  letterSpacing: -0.4,
+                ),
+              ),
+            ),
+            Text(
+              'Chạm một thói quen để ghi lần tự chủ này vào hũ.',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            Wrap(
+              spacing: AppSpace.s8,
+              runSpacing: AppSpace.s8,
+              children: <Widget>[
+                for (final habit in habits)
+                  QuickWinChip(
+                    label: habit,
+                    selected: false,
+                    onSelected: (_) => Navigator.of(context).pop(habit),
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -429,13 +599,39 @@ class _SlipSheetState extends State<_SlipSheet> {
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  const SizedBox(height: AppSpace.s24),
+                  const SizedBox(height: AppSpace.s16),
+                  IntrinsicHeight(
+                    child: NoteTile(
+                      type: NoteType.nhatKy,
+                      title: SelfControlViewModel.slipTitle,
+                      dateLabel: SelfControlViewModel.slipBody(_feeling!),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpace.s12),
+                  Text(
+                    'Đã lưu vào Nhật ký trong hũ của bạn.',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: AppSpace.s16),
                   AppButton(
                     label: 'Về Hôm nay',
                     expand: true,
                     onPressed: () {
                       Navigator.of(context).pop();
                       context.go(AppRoutes.today);
+                    },
+                  ),
+                  const SizedBox(height: AppSpace.s8),
+                  AppButton(
+                    label: 'Xem trong hũ',
+                    variant: AppButtonVariant.text,
+                    expand: true,
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      context.go(AppRoutes.jar);
                     },
                   ),
                 ],

@@ -14,6 +14,8 @@ class NoteTile extends StatelessWidget {
     required this.type,
     required this.title,
     required this.dateLabel,
+    this.tagSuffix,
+    this.excerpt,
     this.onTap,
     super.key,
   });
@@ -23,6 +25,12 @@ class NoteTile extends StatelessWidget {
 
   /// Ví dụ "Hôm nay · Ổn", "24/10"; rỗng thì không có dòng này.
   final String dateLabel;
+
+  /// Thêm sau nhãn loại, ví dụ "Chiến thắng · Lần đầu".
+  final String? tagSuffix;
+
+  /// Trích nhật ký, tối đa 2 dòng (thẻ "Nhớ lại lần này nhé" ở S02).
+  final String? excerpt;
   final VoidCallback? onTap;
 
   @override
@@ -31,12 +39,15 @@ class NoteTile extends StatelessWidget {
     final colors = AppColors.of(context);
     final radius = BorderRadius.circular(AppRadius.note);
     final tagColor = type.tagColor(theme.colorScheme, colors);
+    final tag = tagSuffix == null ? type.label : '${type.label} · $tagSuffix';
 
     return Semantics(
       button: onTap != null,
-      label: dateLabel.isEmpty
-          ? '${type.label}: $title'
-          : '${type.label}: $title, $dateLabel',
+      label: <String>[
+        '$tag: $title',
+        ?excerpt,
+        if (dateLabel.isNotEmpty) dateLabel,
+      ].join(', '),
       onTap: onTap,
       excludeSemantics: true,
       child: Material(
@@ -64,7 +75,7 @@ class NoteTile extends StatelessWidget {
                     ),
                     Flexible(
                       child: Text(
-                        type.label,
+                        tag,
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: tagColor,
                           fontWeight: FontWeight.w700,
@@ -86,6 +97,15 @@ class NoteTile extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
+                if (excerpt case final excerpt?)
+                  Text(
+                    excerpt,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 if (dateLabel.isNotEmpty)
                   Text(
                     dateLabel,
