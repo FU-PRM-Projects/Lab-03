@@ -29,6 +29,8 @@ class JourneyData {
     required this.energy7,
     required this.energy30,
     required this.balance,
+    this.previousEnergy7,
+    this.previousEnergy30,
     required this.byWeekday,
     required this.dayMoods,
   });
@@ -47,6 +49,11 @@ class JourneyData {
   final int weekGoalDays;
   final List<EnergyPoint> energy7;
   final List<EnergyPoint> energy30;
+
+  /// Năng lượng trung bình của 7 / 30 ngày ngay trước khoảng đang xem, cho
+  /// dòng "↑ Tăng 0,4 điểm so với 30 ngày trước"; `null` khi không có dữ liệu.
+  final double? previousEnergy7;
+  final double? previousEnergy30;
 
   /// "Cân bằng 5 điều tốt" của tháng này.
   final Map<GoodThing, int> balance;
@@ -216,6 +223,20 @@ class JourneyViewModel extends Notifier<JourneyState> {
       weekGoalDays: JourneyStats.daysWithNotesThisWeek(notes, now),
       energy7: JourneyStats.energy(notes, now, 7),
       energy30: JourneyStats.energy(notes, now, 30),
+      previousEnergy7: JourneyStats.average(
+        JourneyStats.energy(
+          notes,
+          DateTime(now.year, now.month, now.day - 7),
+          7,
+        ),
+      ),
+      previousEnergy30: JourneyStats.average(
+        JourneyStats.energy(
+          notes,
+          DateTime(now.year, now.month, now.day - 30),
+          30,
+        ),
+      ),
       balance: JourneyStats.balance(
         JourneyStats.between(
           notes,

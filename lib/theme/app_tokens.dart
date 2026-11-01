@@ -19,8 +19,10 @@ abstract final class AppSpace {
   /// Khoảng cách giữa các tờ nốt trong lưới.
   static const double grid = s12;
 
-  /// Khoảng trống cuối nội dung màn tab để thanh tab nổi không che.
-  static const double tabContentBottom = 96;
+  /// Khoảng trống cuối nội dung màn tab: thanh tab nổi (cách đáy 18, cao
+  /// 64) cộng nút "+" (cách thanh tab 12, cao 56) và 16 dư, để cuộn hết thì
+  /// thẻ cuối nằm trên cả hai, không bị nút "+" che.
+  static const double tabContentBottom = 18 + 64 + 12 + 56 + 16;
 }
 
 /// Bo góc (`radius/*` và các giá trị Lab 2 chưa có Variable, DESIGN.md 5.2).

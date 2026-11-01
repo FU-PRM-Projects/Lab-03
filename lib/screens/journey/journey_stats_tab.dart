@@ -347,7 +347,10 @@ class _Number extends StatelessWidget {
   }
 }
 
-class _EnergyCard extends StatelessWidget {
+/// Figma `Chart card · Năng lượng mỗi ngày`: vùng tô dưới đường cong, lưới
+/// đứt, tooltip luôn hiện ở một ngày (mặc định ngày gần nhất có tâm trạng,
+/// chạm để đổi) và dòng so sánh với khoảng trước.
+class _EnergyCard extends StatefulWidget {
   const _EnergyCard({
     required this.data,
     required this.days,
@@ -358,18 +361,58 @@ class _EnergyCard extends StatelessWidget {
   final int days;
   final ValueChanged<int> onDays;
 
+  @override
+  State<_EnergyCard> createState() => _EnergyCardState();
+}
+
+class _EnergyCardState extends State<_EnergyCard> {
   static const double _chartHeight = 124;
+
+  /// Ngày đang mở tooltip (chỉ số trong danh sách ngày); `null` là mặc định.
+  int? _selected;
+
+  @override
+  void didUpdateWidget(_EnergyCard old) {
+    super.didUpdateWidget(old);
+    if (old.days != widget.days) _selected = null;
+  }
+
+  List<EnergyPoint> get _points =>
+      widget.days == 7 ? widget.data.energy7 : widget.data.energy30;
+
+  /// "↑ Tăng 0,4 điểm so với 30 ngày trước", hoặc trung bình khi khoảng trước
+  /// chưa có tâm trạng nào.
+  String _summary(double? average) {
+    final days = widget.days;
+    if (average == null) return 'Chưa có tâm trạng nào trong $days ngày qua.';
+    final previous = days == 7
+        ? widget.data.previousEnergy7
+        : widget.data.previousEnergy30;
+    if (previous == null) {
+      return 'Trung bình ${ViDateFormat.decimal(average)} / 5 '
+          'trong $days ngày qua.';
+    }
+    // Làm tròn 1 chữ số trước khi so để "0,0" không thành tăng / giảm.
+    final diff = ((average - previous) * 10).round() / 10;
+    if (diff == 0) return 'Giữ nguyên so với $days ngày trước';
+    return diff > 0
+        ? '↑ Tăng ${ViDateFormat.decimal(diff)} điểm so với $days ngày trước'
+        : '↓ Giảm ${ViDateFormat.decimal(-diff)} điểm so với $days ngày '
+              'trước';
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final points = days == 7 ? data.energy7 : data.energy30;
-    final withEnergy = points.where((p) => p.energy != null).length;
+    final days = widget.days;
+    final points = _points;
+    final withEnergy = <int>[
+      for (final (i, p) in points.indexed)
+        if (p.energy != null) i,
+    ];
     final average = JourneyStats.average(points);
-    final summary = average == null
-        ? 'Chưa có tâm trạng nào trong $days ngày qua.'
-        : 'Trung bình ${ViDateFormat.decimal(average)} / 5 trong $days ngày qua.';
+    final summary = _summary(average);
     final axisStyle = theme.textTheme.labelSmall?.copyWith(
       fontWeight: FontWeight.w400,
       color: scheme.onSurfaceVariant,
@@ -387,9 +430,9 @@ class _EnergyCard extends StatelessWidget {
           _CardHeader(
             title: 'Năng lượng mỗi ngày',
             subtitle: '$days ngày qua · thang 1–5',
-            trailing: _RangeSelect(days: days, onDays: onDays),
+            trailing: _RangeSelect(days: days, onDays: widget.onDays),
           ),
-          if (withEnergy < JourneyData.minEnergyDays)
+          if (withEnergy.length < JourneyData.minEnergyDays)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: AppSpace.s24),
               child: Text(
@@ -401,10 +444,19 @@ class _EnergyCard extends StatelessWidget {
           else ...<Widget>[
             Semantics(
               container: true,
-              label: 'Năng lượng $days ngày. $summary',
+              label:
+                  'Năng lượng $days ngày. Trung bình '
+                  '${ViDateFormat.decimal(average!)} / 5. $summary',
               child: SizedBox(
                 height: _chartHeight,
-                child: LineChart(_chart(context, points)),
+                child: LineChart(
+                  _chart(
+                    context,
+                    points,
+                    withEnergy,
+                    _selected ?? withEnergy.last,
+                  ),
+                ),
               ),
             ),
             ExcludeSemantics(
@@ -429,28 +481,84 @@ class _EnergyCard extends StatelessWidget {
     );
   }
 
-  LineChartData _chart(BuildContext context, List<EnergyPoint> points) {
+  /// [withEnergy] là các ngày có tâm trạng; ngày không ghi bị bỏ qua để
+  /// đường nối liền như Figma. [selected] là ngày đang mở tooltip.
+  LineChartData _chart(
+    BuildContext context,
+    List<EnergyPoint> points,
+    List<int> withEnergy,
+    int selected,
+  ) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final tooltipStyle = theme.textTheme.labelSmall!;
+    final spotIndex = withEnergy.indexOf(selected);
+
+    final bar = LineChartBarData(
+      spots: <FlSpot>[
+        for (final i in withEnergy) FlSpot(i.toDouble(), points[i].energy!),
+      ],
+      // Đường mềm như sóng (Figma); khung đã chừa 0,4 nên vượt nhẹ không bị
+      // cắt.
+      isCurved: true,
+      curveSmoothness: 0.3,
+      color: scheme.primary,
+      barWidth: 2.5,
+      dotData: const FlDotData(show: false),
+      showingIndicators: <int>[if (spotIndex >= 0) spotIndex],
+      // Figma `area`: vùng dưới đường tô primary nhạt dần.
+      belowBarData: BarAreaData(
+        show: true,
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: <Color>[
+            scheme.primary.withValues(alpha: 0.28),
+            scheme.primary.withValues(alpha: 0.02),
+          ],
+        ),
+      ),
+    );
+
+    // Tooltip nằm phía còn chỗ của ngày đang chọn để không che chấm tròn.
+    final tooltipOnLeft = selected > (points.length - 1) / 2;
 
     return LineChartData(
-      minY: 1,
-      maxY: 5,
+      // Chừa 0,4 trên dưới để đường ở mức 1 hoặc 5 không dính mép khung.
+      minY: 0.6,
+      maxY: 5.4,
       minX: 0,
       maxX: (points.length - 1).toDouble(),
-      gridData: FlGridData(
-        drawVerticalLine: false,
-        horizontalInterval: 2,
-        getDrawingHorizontalLine: (_) => FlLine(
-          color: scheme.outlineVariant,
-          strokeWidth: 1,
-          dashArray: const <int>[4, 4],
-        ),
+      // Figma `grid`: 3 vạch đứt ở mức 1, 3, 5.
+      gridData: const FlGridData(show: false),
+      extraLinesData: ExtraLinesData(
+        horizontalLines: <HorizontalLine>[
+          for (final y in <double>[1, 3, 5])
+            HorizontalLine(
+              y: y,
+              color: scheme.outlineVariant,
+              strokeWidth: 1,
+              dashArray: const <int>[4, 4],
+            ),
+        ],
       ),
       borderData: FlBorderData(show: false),
       titlesData: const FlTitlesData(show: false),
+      showingTooltipIndicators: <ShowingTooltipIndicators>[
+        if (spotIndex >= 0)
+          ShowingTooltipIndicators(<LineBarSpot>[
+            LineBarSpot(bar, 0, bar.spots[spotIndex]),
+          ]),
+      ],
       lineTouchData: LineTouchData(
+        // Tooltip luôn hiện; chạm hoặc kéo trên biểu đồ để đổi ngày.
+        handleBuiltInTouches: false,
+        touchCallback: (event, response) {
+          final spot = response?.lineBarSpots?.firstOrNull;
+          if (spot == null || !event.isInterestedForInteractions) return;
+          final day = spot.x.toInt();
+          if (day != _selected) setState(() => _selected = day);
+        },
         getTouchedSpotIndicator: (bar, indexes) => <TouchedSpotIndicatorData>[
           for (final _ in indexes)
             TouchedSpotIndicatorData(
@@ -471,6 +579,12 @@ class _EnergyCard extends StatelessWidget {
             ),
         ],
         touchTooltipData: LineTouchTooltipData(
+          tooltipHorizontalAlignment: tooltipOnLeft
+              ? FLHorizontalAlignment.left
+              : FLHorizontalAlignment.right,
+          tooltipHorizontalOffset: tooltipOnLeft ? -12 : 12,
+          fitInsideHorizontally: true,
+          fitInsideVertically: true,
           getTooltipColor: (_) => scheme.surfaceContainerLow,
           tooltipBorder: BorderSide(color: scheme.outlineVariant),
           tooltipBorderRadius: BorderRadius.circular(10),
@@ -481,7 +595,7 @@ class _EnergyCard extends StatelessWidget {
           getTooltipItems: (spots) => <LineTooltipItem>[
             for (final spot in spots)
               LineTooltipItem(
-                '${ViDateFormat.shortDate(points[spot.x.toInt()].day)}\n',
+                '${ViDateFormat.dayHeader(points[spot.x.toInt()].day)}\n',
                 tooltipStyle.copyWith(fontWeight: FontWeight.w700),
                 textAlign: TextAlign.start,
                 children: <TextSpan>[
@@ -520,33 +634,7 @@ class _EnergyCard extends StatelessWidget {
           ],
         ),
       ),
-      lineBarsData: <LineChartBarData>[
-        LineChartBarData(
-          spots: <FlSpot>[
-            for (final (i, p) in points.indexed)
-              p.energy == null
-                  ? FlSpot.nullSpot
-                  : FlSpot(i.toDouble(), p.energy!),
-          ],
-          isCurved: true,
-          preventCurveOverShooting: true,
-          color: scheme.primary,
-          barWidth: 2.5,
-          dotData: const FlDotData(show: false),
-          // Figma `area`: vùng dưới đường tô primary nhạt dần.
-          belowBarData: BarAreaData(
-            show: true,
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: <Color>[
-                scheme.primary.withValues(alpha: 0.28),
-                scheme.primary.withValues(alpha: 0.02),
-              ],
-            ),
-          ),
-        ),
-      ],
+      lineBarsData: <LineChartBarData>[bar],
     );
   }
 }
@@ -689,7 +777,10 @@ class _Balance extends StatelessWidget {
 
   final JourneyData data;
 
-  static const double _chartHeight = 200;
+  static const double _chartHeight = 170;
+
+  /// Chỗ cho nhãn 2 dòng (Caption/12) quanh biểu đồ radar.
+  static const double _labelRoom = 36;
 
   @override
   Widget build(BuildContext context) {
@@ -713,39 +804,50 @@ class _Balance extends StatelessWidget {
                 .map((e) => '${e.key.label}: ${e.value} nốt')
                 .join(', '),
             excludeSemantics: true,
-            child: SizedBox(
-              height: _chartHeight,
-              child: RadarChart(
-                RadarChartData(
-                  radarShape: RadarShape.polygon,
-                  tickCount: 3,
-                  ticksTextStyle: const TextStyle(
-                    color: Color(0x00000000),
-                    fontSize: 1,
-                  ),
-                  radarBorderData: BorderSide(color: scheme.outlineVariant),
-                  gridBorderData: BorderSide(color: scheme.outlineVariant),
-                  tickBorderData: BorderSide(color: scheme.outlineVariant),
-                  titlePositionPercentageOffset: 0.18,
-                  titleTextStyle: theme.textTheme.labelSmall?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                  ),
-                  getTitle: (index, angle) => RadarChartTitle(
-                    text:
-                        '${entries[index].key.label}\n${entries[index].value}',
-                  ),
-                  dataSets: <RadarDataSet>[
-                    RadarDataSet(
-                      dataEntries: <RadarEntry>[
-                        for (final e in entries)
-                          RadarEntry(value: e.value.toDouble()),
-                      ],
-                      fillColor: scheme.primary.withValues(alpha: 0.22),
-                      borderColor: scheme.primary,
-                      borderWidth: 2,
-                      entryRadius: 3.5,
+            // fl_chart vẽ nhãn đỉnh ra ngoài khung biểu đồ: chừa lề để nhãn
+            // trên cùng ("Chiến thắng" + số, 2 dòng) không đè lên tiêu đề thẻ
+            // và nhãn hai đỉnh dưới không đè lên dòng kết luận.
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                _labelRoom,
+                _labelRoom,
+                _labelRoom,
+                AppSpace.s24,
+              ),
+              child: SizedBox(
+                height: _chartHeight,
+                child: RadarChart(
+                  RadarChartData(
+                    radarShape: RadarShape.polygon,
+                    tickCount: 3,
+                    ticksTextStyle: const TextStyle(
+                      color: Color(0x00000000),
+                      fontSize: 1,
                     ),
-                  ],
+                    radarBorderData: BorderSide(color: scheme.outlineVariant),
+                    gridBorderData: BorderSide(color: scheme.outlineVariant),
+                    tickBorderData: BorderSide(color: scheme.outlineVariant),
+                    titlePositionPercentageOffset: 0.18,
+                    titleTextStyle: theme.textTheme.labelSmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
+                    getTitle: (index, angle) => RadarChartTitle(
+                      text:
+                          '${entries[index].key.label}\n${entries[index].value}',
+                    ),
+                    dataSets: <RadarDataSet>[
+                      RadarDataSet(
+                        dataEntries: <RadarEntry>[
+                          for (final e in entries)
+                            RadarEntry(value: e.value.toDouble()),
+                        ],
+                        fillColor: scheme.primary.withValues(alpha: 0.22),
+                        borderColor: scheme.primary,
+                        borderWidth: 2,
+                        entryRadius: 3.5,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -810,9 +912,11 @@ class _Weekdays extends StatelessWidget {
                         Container(
                           width: 24,
                           height: AppSpace.s4 + _barMax * counts[i] / max,
-                          decoration: BoxDecoration(
-                            color: scheme.primary,
-                            borderRadius: const BorderRadius.vertical(
+                          // Tím nhạt mono/3: khác hẳn nút "+" primary nổi
+                          // phía trên.
+                          decoration: const BoxDecoration(
+                            color: AppPalette.mono3,
+                            borderRadius: BorderRadius.vertical(
                               top: Radius.circular(6),
                             ),
                           ),
