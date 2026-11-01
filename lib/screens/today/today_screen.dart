@@ -87,8 +87,9 @@ class TodayScreen extends ConsumerWidget {
               ),
               ShortcutButton(
                 iconAsset: 'assets/icons/wind.svg',
-                label: 'Thở 90 giây',
-                caption: 'khi bồn chồn',
+                // Đọc liền thành câu: "Stress? Thở 90 giây để thả lỏng".
+                label: 'Stress?',
+                caption: 'Thở 90 giây để thả lỏng',
                 onTap: () => context.push(AppRoutes.breathe),
               ),
               ShortcutButton(
