@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:material_ui/material_ui.dart';
 
 import '../theme/app_tokens.dart';
@@ -11,15 +13,33 @@ class AddNoteFab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    // Thanh tab cách đáy max(vùng cử chỉ, 18) (SafeArea `minimum`); nút nằm
+    // trên thanh tab 12 như Figma. Scaffold đã đặt nút cách đáy 16. Đọc vùng
+    // cử chỉ từ View vì màn tab nhận MediaQuery đã bỏ phần đệm đáy.
+    final view = View.of(context);
+    final navBottom = math.max(
+      view.viewPadding.bottom / view.devicePixelRatio,
+      AppSize.navBarBottomGap,
+    );
 
     return Padding(
-      padding: const EdgeInsets.only(
-        bottom: AppSize.navBarHeight + AppSize.navBarBottomGap,
+      padding: EdgeInsets.only(
+        bottom:
+            navBottom +
+            AppSize.navBarHeight +
+            AppSpace.s12 -
+            kFloatingActionButtonMargin,
       ),
       child: DecoratedBox(
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          boxShadow: AppElevation.fab(scheme.shadow),
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: scheme.primary.withValues(alpha: 0.35),
+              offset: const Offset(0, 8),
+              blurRadius: 10,
+            ),
+          ],
         ),
         child: FloatingActionButton(
           onPressed: onPressed,

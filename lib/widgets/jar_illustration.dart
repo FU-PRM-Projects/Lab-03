@@ -6,17 +6,17 @@ import 'package:material_ui/material_ui.dart';
 import '../models/note_type.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_tokens.dart';
-import 'mascot.dart';
 
 /// `Illustration/Hũ chiến thắng`: thân hũ là SVG export từ Figma, các tờ nốt
 /// đặt vào đúng 8 ô của Figma nhưng tô màu theo loại các nốt thật của người
-/// dùng (deviation D-14). Mascot Xong đứng cạnh.
+/// dùng (deviation D-14). Chỉ vẽ hũ; mỗi màn tự đặt mascot, nền tròn quanh
+/// hũ theo Figma (S02 cảnh có nền tròn, S04 mascot bên trái, S05 hũ nhỏ).
 class JarIllustration extends StatelessWidget {
   const JarIllustration({
     required this.notes,
     required this.semanticLabel,
     this.onTap,
-    this.height = 240,
+    this.height = 203,
     super.key,
   });
 
@@ -68,38 +68,27 @@ class JarIllustration extends StatelessWidget {
       label: semanticLabel,
       onTap: onTap,
       excludeSemantics: true,
-      child: SizedBox(
-        height: height,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: <Widget>[
-            Material(
-              type: MaterialType.transparency,
-              child: InkWell(
-                onTap: onTap,
-                borderRadius: BorderRadius.circular(AppRadius.nav),
-                child: SizedBox(
-                  width: _frame.width * scale,
-                  height: height,
-                  child: Stack(
-                    children: <Widget>[
-                      Positioned.fill(
-                        child: SvgPicture.asset(
-                          _shellAsset,
-                          excludeFromSemantics: true,
-                        ),
-                      ),
-                      for (final (i, type) in shown.indexed)
-                        _slipAt(_slots[i], scale, _slipColors[type]!),
-                    ],
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppRadius.nav),
+          child: SizedBox(
+            width: _frame.width * scale,
+            height: height,
+            child: Stack(
+              children: <Widget>[
+                Positioned.fill(
+                  child: SvgPicture.asset(
+                    _shellAsset,
+                    excludeFromSemantics: true,
                   ),
                 ),
-              ),
+                for (final (i, type) in shown.indexed)
+                  _slipAt(_slots[i], scale, _slipColors[type]!),
+              ],
             ),
-            const SizedBox(width: AppSpace.s8),
-            const Mascot(state: MascotState.xong, size: 72),
-          ],
+          ),
         ),
       ),
     );

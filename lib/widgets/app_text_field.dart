@@ -1,9 +1,12 @@
 import 'package:material_ui/material_ui.dart';
 
-/// Component `Text field` Lab 2: Default, Focused, Filled, Error, Disabled.
+import '../theme/app_tokens.dart';
+
+/// Component `Text field`: Default, Focused, Filled, Error, Disabled.
 ///
-/// Lỗi hiện dưới ô, màu `error`, kèm chữ nguyên nhân ([errorText]). Khi có
-/// [maxLength], bộ đếm hiện dạng "n/max".
+/// Final UI: nhãn Label/14 SemiBold nằm trên ô, cách 6. Lỗi hiện dưới ô, màu
+/// `error`, kèm chữ nguyên nhân ([errorText]). Khi có [maxLength], bộ đếm hiện
+/// dạng "n/max".
 class AppTextField extends StatelessWidget {
   const AppTextField({
     required this.label,
@@ -42,27 +45,48 @@ class AppTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      enabled: enabled,
-      autofocus: autofocus,
-      obscureText: obscureText,
-      keyboardType: keyboardType,
-      textInputAction: textInputAction,
-      minLines: minLines,
-      maxLines: obscureText ? 1 : maxLines,
-      maxLength: maxLength,
-      onChanged: onChanged,
-      onSubmitted: onSubmitted,
-      style: Theme.of(context).textTheme.bodyLarge,
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-        helperText: helper,
-        helperMaxLines: 2,
-        errorText: errorText,
-        errorMaxLines: 2,
-      ),
+    final theme = Theme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      spacing: AppSpace.s6,
+      children: <Widget>[
+        ExcludeSemantics(
+          child: Text(
+            label,
+            style: theme.textTheme.labelLarge?.copyWith(
+              color: enabled
+                  ? theme.colorScheme.onSurface
+                  : theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+        Semantics(
+          label: label,
+          child: TextField(
+            controller: controller,
+            enabled: enabled,
+            autofocus: autofocus,
+            obscureText: obscureText,
+            keyboardType: keyboardType,
+            textInputAction: textInputAction,
+            minLines: minLines,
+            maxLines: obscureText ? 1 : maxLines,
+            maxLength: maxLength,
+            onChanged: onChanged,
+            onSubmitted: onSubmitted,
+            style: theme.textTheme.bodyLarge,
+            decoration: InputDecoration(
+              hintText: hint,
+              helperText: helper,
+              helperMaxLines: 2,
+              errorText: errorText,
+              errorMaxLines: 2,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

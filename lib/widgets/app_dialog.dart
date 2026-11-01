@@ -54,6 +54,8 @@ class AppDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+      contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
       title: Text(title),
       content: Text(message),
       actions: <Widget>[

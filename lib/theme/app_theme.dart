@@ -1,3 +1,4 @@
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'app_colors.dart';
@@ -11,15 +12,18 @@ abstract final class AppTheme {
     const colors = AppColors.light;
     final text = AppTypography.textTheme(color: scheme.onSurface, font: font);
 
+    // Final UI: mọi nút dùng `radius/8`, nhãn Body/16 SemiBold.
     final buttonShape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(AppRadius.card),
+      borderRadius: BorderRadius.circular(AppRadius.r8),
     );
+    final buttonText = text.bodyLarge?.copyWith(fontWeight: FontWeight.w600);
     const buttonMinSize = Size(AppSize.buttonMinWidth, AppSize.buttonHeight);
-    const buttonPadding = EdgeInsets.symmetric(horizontal: AppSpace.s20);
+    const buttonPadding = EdgeInsets.symmetric(horizontal: AppSpace.s24);
 
-    OutlineInputBorder inputBorder(Color color, [double width = 1]) =>
+    // Final UI `Text field`: nền surface-card, viền outline 1.5, bo 6.
+    OutlineInputBorder inputBorder(Color color, [double width = 1.5]) =>
         OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.r12),
+          borderRadius: BorderRadius.circular(AppRadius.r6),
           borderSide: BorderSide(color: color, width: width),
         );
 
@@ -40,14 +44,22 @@ abstract final class AppTheme {
         elevation: AppElevation.flat,
         scrolledUnderElevation: AppElevation.flat,
         centerTitle: false,
-        titleTextStyle: text.headlineSmall,
+        titleTextStyle: text.titleLarge?.copyWith(
+          fontSize: 20,
+          letterSpacing: -0.4,
+        ),
+      ),
+      // Icon/Back, Icon/Close 24 dp nét 2 của Figma.
+      actionIconTheme: ActionIconThemeData(
+        backButtonIconBuilder: (context) => _icon(context, 'back'),
+        closeButtonIconBuilder: (context) => _icon(context, 'close'),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           minimumSize: buttonMinSize,
           padding: buttonPadding,
           shape: buttonShape,
-          textStyle: text.labelLarge,
+          textStyle: buttonText,
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -55,8 +67,8 @@ abstract final class AppTheme {
           minimumSize: buttonMinSize,
           padding: buttonPadding,
           shape: buttonShape,
-          textStyle: text.labelLarge,
-          foregroundColor: scheme.onPrimaryContainer,
+          textStyle: buttonText,
+          foregroundColor: scheme.primary,
           side: BorderSide(color: scheme.outline),
         ),
       ),
@@ -65,8 +77,8 @@ abstract final class AppTheme {
           minimumSize: buttonMinSize,
           padding: buttonPadding,
           shape: buttonShape,
-          textStyle: text.labelLarge,
-          foregroundColor: scheme.onPrimaryContainer,
+          textStyle: buttonText,
+          foregroundColor: scheme.primary,
         ),
       ),
       iconButtonTheme: IconButtonThemeData(
@@ -95,15 +107,24 @@ abstract final class AppTheme {
       ),
       inputDecorationTheme: InputDecorationThemeData(
         filled: true,
-        fillColor: scheme.surface,
+        fillColor: scheme.surfaceContainerLow,
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: AppSpace.s16,
+          horizontal: AppSpace.s14,
           vertical: AppSpace.s14,
         ),
-        labelStyle: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
         hintStyle: text.bodyLarge?.copyWith(color: scheme.onSurfaceVariant),
-        helperStyle: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-        errorStyle: text.bodySmall?.copyWith(color: scheme.error),
+        helperStyle: text.labelLarge?.copyWith(
+          fontWeight: FontWeight.w400,
+          color: scheme.onSurfaceVariant,
+        ),
+        counterStyle: text.labelLarge?.copyWith(
+          fontWeight: FontWeight.w400,
+          color: scheme.onSurfaceVariant,
+        ),
+        errorStyle: text.labelLarge?.copyWith(
+          fontWeight: FontWeight.w400,
+          color: scheme.error,
+        ),
         border: inputBorder(scheme.outline),
         enabledBorder: inputBorder(scheme.outline),
         focusedBorder: inputBorder(scheme.primary, 2),
@@ -132,18 +153,25 @@ abstract final class AppTheme {
           ),
         ),
       ),
+      // Final UI `Chip/Chiến thắng nhanh`: nền surface-card, viền
+      // outline-variant, nhãn Label/14 Medium, lề 14 × 10.
       chipTheme: ChipThemeData(
         shape: const StadiumBorder(),
-        side: BorderSide.none,
+        side: WidgetStateBorderSide.resolveWith(
+          (states) => states.contains(WidgetState.selected)
+              ? BorderSide(color: scheme.primary)
+              : BorderSide(color: scheme.outlineVariant),
+        ),
         backgroundColor: scheme.surfaceContainerLow,
         selectedColor: scheme.primary,
         disabledColor: scheme.surfaceContainerHighest,
-        labelStyle: text.bodyMedium,
-        secondaryLabelStyle: text.bodyMedium?.copyWith(color: scheme.onPrimary),
+        labelStyle: text.labelLarge?.copyWith(fontWeight: FontWeight.w500),
+        secondaryLabelStyle: text.labelLarge?.copyWith(color: scheme.onPrimary),
         padding: const EdgeInsets.symmetric(
-          horizontal: AppSpace.s12,
+          horizontal: AppSpace.s14,
           vertical: AppSpace.s10,
         ),
+        labelPadding: EdgeInsets.zero,
         showCheckmark: false,
       ),
       switchTheme: SwitchThemeData(
@@ -164,14 +192,25 @@ abstract final class AppTheme {
           side: BorderSide(color: scheme.outlineVariant),
         ),
       ),
+      // Final UI `Dialog`: nền surface-card, bo 12, rộng 304 trên màn 360,
+      // tiêu đề Title/20 Bold, nội dung Body/15; scrim on-surface 40%.
       dialogTheme: DialogThemeData(
-        backgroundColor: scheme.surface,
-        elevation: AppElevation.flat,
+        backgroundColor: scheme.surfaceContainerLow,
+        elevation: 6,
+        shadowColor: scheme.shadow,
+        barrierColor: scheme.onSurface.withValues(alpha: 0.4),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.card),
+          borderRadius: BorderRadius.circular(AppRadius.r12),
         ),
-        titleTextStyle: text.titleLarge,
-        contentTextStyle: text.bodyLarge,
+        titleTextStyle: text.titleLarge?.copyWith(
+          fontSize: 20,
+          letterSpacing: -0.4,
+        ),
+        contentTextStyle: text.bodyMedium?.copyWith(
+          color: scheme.onSurfaceVariant,
+        ),
+        actionsPadding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
       ),
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: scheme.surface,
@@ -209,4 +248,14 @@ abstract final class AppTheme {
       ),
     );
   }
+
+  static Widget _icon(BuildContext context, String name) => SvgPicture.asset(
+    'assets/icons/$name.svg',
+    width: 24,
+    height: 24,
+    colorFilter: ColorFilter.mode(
+      IconTheme.of(context).color ?? appColorScheme.onSurface,
+      BlendMode.srcIn,
+    ),
+  );
 }

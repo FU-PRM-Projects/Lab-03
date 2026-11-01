@@ -31,7 +31,7 @@ void main() {
   }) async {
     final services = TestServices()..notes.notes.addAll(notes);
     await pumpApp(tester, services: services, size: size);
-    await tester.tap(find.text('Hành trình'));
+    await tester.tap(findTab('Hành trình'));
     await tester.pumpAndSettle();
     expect(find.byType(JourneyScreen), findsOneWidget);
     return services;
@@ -75,7 +75,7 @@ void main() {
     services.challenges.progress[ChallengeTopic.dungCam] =
         const ChallengeProgress(completed: <String>{'dc-1-1'});
     await pumpApp(tester, services: services);
-    await tester.tap(find.text('Hành trình'));
+    await tester.tap(findTab('Hành trình'));
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Dũng cảm cấp 1 thẻ 2 · 4 phút'));
@@ -107,6 +107,9 @@ void main() {
     final services = await openJourney(tester, notes: monthOfNotes());
     await openTab(tester, 'Thống kê');
     await tester.scrollUntilVisible(find.text('Mục tiêu tuần'), 200);
+    // Đưa thẻ lên đầu vùng cuộn, khỏi bị thanh tab nổi che.
+    await tester.ensureVisible(find.text('Mục tiêu tuần'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Mục tiêu tuần'));
     await tester.pumpAndSettle();
     expect(find.byType(WeeklyCardPage), findsOneWidget);

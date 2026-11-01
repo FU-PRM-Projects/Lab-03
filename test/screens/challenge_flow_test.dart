@@ -12,7 +12,7 @@ import '../support/pump.dart';
 /// Flow F3 Thử thách trên cả app: S07 → S08 → S04, đổi thẻ dễ hơn, để mai.
 void main() {
   Future<void> openChallenges(WidgetTester tester) async {
-    await tester.tap(find.text('Thử thách').last);
+    await tester.tap(findTab('Thử thách'));
     await tester.pumpAndSettle();
     expect(find.byType(ChallengesScreen), findsOneWidget);
   }
@@ -28,7 +28,7 @@ void main() {
       expect(find.text('Dũng cảm cấp 1 thẻ 1'), findsOneWidget);
       expect(find.text('DŨNG CẢM · 3 PHÚT'), findsOneWidget);
 
-      await tester.tap(find.byTooltip('Thẻ sau'));
+      await tester.tap(find.text('Vuốt để đổi thẻ'));
       await tester.pumpAndSettle();
       expect(find.text('Dũng cảm cấp 1 thẻ 2'), findsOneWidget);
       expect(tester.takeException(), isNull);
@@ -109,15 +109,15 @@ void main() {
     await openChallenges(tester);
     // Ba thẻ Dũng cảm đứng trước; sang thẻ Vận động đầu tiên.
     for (var i = 0; i < 3; i++) {
-      await tester.tap(find.byTooltip('Thẻ sau'));
+      await tester.tap(find.text('Vuốt để đổi thẻ'));
       await tester.pumpAndSettle();
     }
     expect(find.text('Vận động · cấp 1'), findsOneWidget);
     await tester.tap(find.text('Nhận thử thách').last);
     await tester.pumpAndSettle();
 
-    await tester.scrollUntilVisible(find.byTooltip('Bớt 1 phút'), 100);
-    await tester.tap(find.byTooltip('Bớt 1 phút'));
+    await tester.scrollUntilVisible(findTab('Bớt 1 phút'), 100);
+    await tester.tap(findTab('Bớt 1 phút'));
     await tester.pump();
     expect(find.text('2 phút'), findsOneWidget);
     await tester.tap(find.text('Xong rồi'));

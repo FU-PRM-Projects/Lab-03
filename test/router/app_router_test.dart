@@ -24,14 +24,16 @@ void main() {
 
     expect(find.byType(TodayScreen), findsOneWidget);
     expect(find.byType(AppBottomNav), findsOneWidget);
-    for (final label in <String>['Hôm nay', 'Hũ', 'Thử thách', 'Hành trình']) {
-      expect(
-        find.descendant(
-          of: find.byType(NavigationBar),
-          matching: find.text(label),
-        ),
-        findsOneWidget,
-      );
+    // Tab đang chọn hiện nhãn; tab khác chỉ có icon, nhãn qua tooltip.
+    expect(
+      find.descendant(
+        of: find.byType(AppBottomNav),
+        matching: find.text('Hôm nay'),
+      ),
+      findsOneWidget,
+    );
+    for (final label in <String>['Hũ', 'Thử thách', 'Hành trình']) {
+      expect(findTab(label), findsOneWidget);
     }
   });
 
@@ -39,7 +41,7 @@ void main() {
     final services = TestServices();
     services.notes.notes.add(sampleNote('n1', DateTime(2026, 10, 24)));
     await pumpApp(tester, services: services);
-    await tester.tap(find.text('Hũ'));
+    await tester.tap(findTab('Hũ'));
     await tester.pumpAndSettle();
     expect(find.byType(JarScreen), findsOneWidget);
 
@@ -55,7 +57,7 @@ void main() {
 
   testWidgets('Back hệ thống ở tab khác về Hôm nay', (tester) async {
     await enterApp(tester);
-    await tester.tap(find.text('Hành trình'));
+    await tester.tap(findTab('Hành trình'));
     await tester.pumpAndSettle();
     expect(find.byType(JourneyScreen), findsOneWidget);
 
@@ -100,22 +102,22 @@ void main() {
 
   testWidgets('avatar ở màn tab mở S12; nút + mở S03', (tester) async {
     await enterApp(tester);
-    await tester.tap(find.byTooltip('Cài đặt'));
+    await tester.tap(findTab('Cài đặt'));
     await tester.pumpAndSettle();
     expect(find.byType(SettingsScreen), findsOneWidget);
 
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Thử thách').last);
+    await tester.tap(findTab('Thử thách'));
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Ghi nốt'));
+    await tester.tap(findTab('Ghi nốt'));
     await tester.pumpAndSettle();
     expect(find.byType(NoteComposerScreen), findsOneWidget);
   });
 
   testWidgets('tab con của S11 đổi theo ?tab=', (tester) async {
     await enterApp(tester);
-    await tester.tap(find.text('Hành trình'));
+    await tester.tap(findTab('Hành trình'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Lịch'));
     await tester.pumpAndSettle();

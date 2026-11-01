@@ -211,7 +211,7 @@ class _ComponentGalleryScreenState extends State<ComponentGalleryScreen> {
                 const MilestoneSticker(label: 'Th9', unlocked: true),
                 const MilestoneSticker(label: 'Th10', unlocked: false),
                 ShortcutButton(
-                  icon: Icons.pan_tool_outlined,
+                  iconAsset: 'assets/icons/clock.svg',
                   label: 'Dừng lại',
                   onTap: () {},
                 ),

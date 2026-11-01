@@ -6,7 +6,6 @@ import '../../models/note_type.dart';
 import '../../router/app_routes.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_tokens.dart';
-import '../../theme/app_typography.dart';
 import '../../viewmodels/challenges_view_model.dart';
 import '../../viewmodels/view_state.dart';
 import '../../widgets/app_button.dart';
@@ -108,131 +107,164 @@ class _Deck extends StatelessWidget {
   final ValueChanged<int> onPageChanged;
   final ValueChanged<int> onGoTo;
 
-  /// Thẻ cao tối đa 60% màn (handout S07), trong khoảng này.
+  /// Figma: thẻ 400 trên màn 800 (một nửa màn), trong khoảng này.
   static const double _minCardHeight = 320;
   static const double _maxCardHeight = 460;
+
+  /// Hai thẻ sau lộ ra dưới thẻ chính 16 và 30.
+  static const double _stackPeek = 40;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final current = cards[page];
-    final cardHeight = MediaQuery.sizeOf(context).height * 0.6;
+    final cardHeight = (MediaQuery.sizeOf(context).height * 0.5).clamp(
+      _minCardHeight,
+      _maxCardHeight,
+    );
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(
-        0,
-        AppSpace.s8,
-        0,
+        AppSpace.screen,
+        AppSpace.s16,
+        AppSpace.screen,
         AppSpace.tabContentBottom,
       ),
       children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpace.screen),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Text(
-                      current.header,
-                      style: theme.textTheme.titleMedium,
-                    ),
-                  ),
-                  Text(
-                    '${current.levelDone}/${current.levelTotal}',
-                    style: theme.textTheme.titleMedium,
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpace.s8),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(AppRadius.full),
+        // Figma `cấp`: chủ đề · cấp, thanh 100 × 6, số thẻ đã làm.
+        Row(
+          spacing: AppSpace.s12,
+          children: <Widget>[
+            Flexible(
+              child: Text(current.header, style: theme.textTheme.labelLarge),
+            ),
+            SizedBox(
+              width: 100,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(3),
                 child: LinearProgressIndicator(
                   value: current.levelTotal == 0
                       ? 0
                       : current.levelDone / current.levelTotal,
-                  minHeight: AppSpace.s8,
+                  minHeight: AppSpace.s6,
+                  backgroundColor: scheme.surfaceContainerHighest,
                   semanticsLabel:
                       '${current.header}, đã làm ${current.levelDone} '
                       'trên ${current.levelTotal} thẻ',
+                ),
+              ),
+            ),
+            Text(
+              '${current.levelDone}/${current.levelTotal}',
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: scheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpace.s16),
+        // Figma `chồng thẻ`: hai thẻ sau (mono/1, surface-variant) lùi vào 12
+        // và 24 mỗi bên, thẻ chính vuốt ngang được.
+        SizedBox(
+          height: cardHeight + _stackPeek,
+          child: Stack(
+            children: <Widget>[
+              _BackCard(
+                inset: 24,
+                top: 30,
+                height: cardHeight,
+                color: scheme.surfaceContainerHighest,
+              ),
+              _BackCard(
+                inset: 12,
+                top: 16,
+                height: cardHeight,
+                color: AppPalette.mono1,
+              ),
+              SizedBox(
+                height: cardHeight,
+                child: Semantics(
+                  // Người dùng trình đọc màn hình đổi thẻ bằng thao tác cuộn.
+                  onScrollLeft: page < cards.length - 1
+                      ? () => onGoTo(page + 1)
+                      : null,
+                  onScrollRight: page > 0 ? () => onGoTo(page - 1) : null,
+                  child: PageView.builder(
+                    controller: controller,
+                    itemCount: cards.length,
+                    onPageChanged: onPageChanged,
+                    itemBuilder: (context, i) => _ChallengeCard(card: cards[i]),
+                  ),
                 ),
               ),
             ],
           ),
         ),
         const SizedBox(height: AppSpace.s16),
-        SizedBox(
-          height: cardHeight.clamp(_minCardHeight, _maxCardHeight),
-          child: Semantics(
-            // Người dùng trình đọc màn hình đổi thẻ bằng thao tác cuộn.
-            onScrollLeft: page < cards.length - 1
-                ? () => onGoTo(page + 1)
-                : null,
-            onScrollRight: page > 0 ? () => onGoTo(page - 1) : null,
-            child: PageView.builder(
-              controller: controller,
-              itemCount: cards.length,
-              onPageChanged: onPageChanged,
-              itemBuilder: (context, i) => Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpace.screen,
-                ),
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(
-                      maxWidth: AppSize.narrowContentMaxWidth,
-                    ),
-                    child: _ChallengeCard(card: cards[i]),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: AppSpace.s12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            IconButton(
-              onPressed: page > 0 ? () => onGoTo(page - 1) : null,
-              icon: const Icon(Icons.chevron_left),
-              tooltip: 'Thẻ trước',
-            ),
-            for (var i = 0; i < cards.length; i++)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpace.s2),
-                child: DecoratedBox(
+        ExcludeSemantics(
+          child: Row(
+            spacing: AppSpace.s8,
+            children: <Widget>[
+              for (var i = 0; i < cards.length; i++)
+                Container(
+                  width: i == page ? 20 : AppSpace.s8,
+                  height: AppSpace.s8,
                   decoration: BoxDecoration(
-                    shape: BoxShape.circle,
                     color: i == page
-                        ? theme.colorScheme.primary
-                        : theme.colorScheme.outlineVariant,
+                        ? scheme.primary
+                        : scheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(AppRadius.r4),
                   ),
-                  child: const SizedBox.square(dimension: AppSpace.s8),
                 ),
-              ),
-            IconButton(
-              onPressed: page < cards.length - 1
-                  ? () => onGoTo(page + 1)
-                  : null,
-              icon: const Icon(Icons.chevron_right),
-              tooltip: 'Thẻ sau',
-            ),
-          ],
-        ),
-        Text(
-          'Vuốt để đổi thẻ',
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
+            ],
           ),
-          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: AppSpace.s16),
+        // Nút chữ: chạm cũng đổi thẻ (thẻ cuối thì quay về thẻ đầu).
+        AppButton(
+          label: 'Vuốt để đổi thẻ',
+          variant: AppButtonVariant.text,
+          expand: true,
+          onPressed: cards.length < 2
+              ? null
+              : () => onGoTo((page + 1) % cards.length),
         ),
       ],
     );
   }
 }
 
+class _BackCard extends StatelessWidget {
+  const _BackCard({
+    required this.inset,
+    required this.top,
+    required this.height,
+    required this.color,
+  });
+
+  final double inset;
+  final double top;
+  final double height;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) => Positioned(
+    left: inset,
+    right: inset,
+    top: top,
+    height: height,
+    child: DecoratedBox(
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(24),
+      ),
+    ),
+  );
+}
+
+/// Figma `thẻ chính`: nền tint xanh lá, bo 24, lề 24, nội dung căn giữa cách
+/// nhau 12 (mascot, nhãn chủ đề, tên thử thách, nút).
 class _ChallengeCard extends StatelessWidget {
   const _ChallengeCard({required this.card});
 
@@ -243,40 +275,42 @@ class _ChallengeCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = AppColors.of(context);
     final challenge = card.challenge;
+    final caption = theme.textTheme.labelSmall?.copyWith(
+      fontWeight: FontWeight.w700,
+    );
 
     return DecoratedBox(
       decoration: BoxDecoration(
         color: colors.noteTint(NoteType.thuThach),
-        borderRadius: BorderRadius.circular(AppRadius.card),
+        borderRadius: BorderRadius.circular(24),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(AppSpace.s20),
+        padding: const EdgeInsets.all(AppSpace.s24),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          spacing: AppSpace.s12,
           children: <Widget>[
-            if (card.easier) ...<Widget>[
+            const Flexible(
+              child: FittedBox(
+                child: Mascot(state: MascotState.tapTrung, size: 145.8),
+              ),
+            ),
+            if (card.easier)
               Text(
                 'THẺ DỄ HƠN',
-                style: AppTextStyles.of(context).overline
-                    .copyWith(color: theme.colorScheme.primary),
+                style: caption?.copyWith(color: theme.colorScheme.primary),
               ),
-              const SizedBox(height: AppSpace.s4),
-            ],
             Text(
               challenge.label,
-              style: AppTextStyles.of(context).overline
-                  .copyWith(color: colors.onSurfaceMuted),
+              style: caption?.copyWith(color: colors.success),
             ),
-            const SizedBox(height: AppSpace.s8),
             Text(
               challenge.title,
-              style: theme.textTheme.headlineSmall,
+              style: theme.textTheme.titleLarge?.copyWith(letterSpacing: -0.44),
+              textAlign: TextAlign.center,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
             ),
-            const Spacer(),
-            const Center(child: Mascot(state: MascotState.tapTrung)),
-            const Spacer(),
             AppButton(
               label: 'Nhận thử thách',
               expand: true,

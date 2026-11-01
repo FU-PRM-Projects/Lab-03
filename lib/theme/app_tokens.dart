@@ -65,12 +65,11 @@ abstract final class AppSize {
 
   static const double buttonHeight = 48;
   static const double buttonMinWidth = 64;
-  static const double appBarHeight = 48;
+  static const double appBarHeight = 56;
   static const double navBarHeight = 64;
-  static const double navBarBottomGap = 12;
+  static const double navBarBottomGap = 18;
   static const double fab = 56;
   static const double shortcut = 56;
-  static const double avatar = 40;
   static const double noteCardHeight = 72;
 
   /// Ô lưới tờ nốt ở S04, S05 (deviation D-11).

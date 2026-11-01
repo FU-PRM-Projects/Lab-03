@@ -13,6 +13,7 @@ import 'package:lab03/services/report_services.dart';
 import 'package:lab03/services/self_control_services.dart';
 import 'package:lab03/services/user_repository.dart';
 import 'package:lab03/theme/app_theme.dart';
+import 'package:lab03/widgets/app_text_field.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'fakes.dart';
@@ -96,3 +97,15 @@ Future<void> pumpThemed(
     ),
   );
 }
+
+/// Ô nhập của `AppTextField` theo nhãn (nhãn nằm trên ô, ngoài TextField).
+Finder findField(String label) => find.descendant(
+  of: find.widgetWithText(AppTextField, label),
+  matching: find.byType(TextField),
+);
+
+/// Tab chưa chọn trên thanh tab: chỉ có icon, nhãn nằm trong tooltip
+/// (`Tooltip` của `material_ui`, nên `find.byTooltip` không thấy).
+Finder findTab(String label) => find.byWidgetPredicate(
+  (widget) => widget is Tooltip && widget.message == label,
+);

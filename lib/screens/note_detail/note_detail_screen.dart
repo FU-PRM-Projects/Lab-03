@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -126,13 +127,20 @@ class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen> {
               : <Widget>[
                   IconButton(
                     onPressed: _viewModel.startEdit,
-                    icon: const Icon(Icons.edit_outlined),
+                    icon: const _BarIcon('edit'),
                     tooltip: 'Sửa',
                   ),
-                  IconButton(
-                    onPressed: _confirmDelete,
-                    icon: const Icon(Icons.delete_outline),
-                    tooltip: 'Xoá',
+                  // Figma: action thứ hai là "⋯", Xoá nằm trong menu.
+                  PopupMenuButton<VoidCallback>(
+                    tooltip: 'Tuỳ chọn',
+                    icon: const _BarIcon('more'),
+                    onSelected: (action) => action(),
+                    itemBuilder: (context) => <PopupMenuEntry<VoidCallback>>[
+                      PopupMenuItem<VoidCallback>(
+                        value: _confirmDelete,
+                        child: const Text('Xoá nốt'),
+                      ),
+                    ],
                   ),
                 ],
         ),
@@ -196,88 +204,114 @@ class _ReadView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final colors = AppColors.of(context);
     final mood = note.mood;
+    final tagColor = note.type.tagColor(scheme, colors);
 
+    // Figma S06: mascot tâm trạng + chú thích, thẻ `Note/lớn` (nền tint theo
+    // loại, bo 24, lề 24), rồi nhật ký Body/16 màu on-surface-variant.
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpace.screen),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpace.screen,
+        AppSpace.s16,
+        AppSpace.screen,
+        AppSpace.s24,
+      ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        spacing: AppSpace.s16,
         children: <Widget>[
-          if (mood != null) ...<Widget>[
-            Semantics(
-              label: 'Tâm trạng hôm đó: ${mood.label}',
-              excludeSemantics: true,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: colors.mood(mood),
-                  borderRadius: BorderRadius.circular(AppRadius.full),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    AppSpace.s6,
-                    AppSpace.s4,
-                    AppSpace.s14,
-                    AppSpace.s4,
+          Column(
+            spacing: AppSpace.s8,
+            children: <Widget>[
+              Mascot(state: mood?.mascot ?? MascotState.thongTha, size: 124.2),
+              if (mood != null)
+                Text(
+                  'Tâm trạng hôm đó: ${mood.label}',
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    fontWeight: FontWeight.w400,
+                    color: scheme.onSurfaceVariant,
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
+                  textAlign: TextAlign.center,
+                ),
+            ],
+          ),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: colors.noteTint(note.type),
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpace.s24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: AppSpace.s12,
+                children: <Widget>[
+                  Row(
+                    spacing: AppSpace.s6,
                     children: <Widget>[
-                      Mascot(state: mood.mascot, size: 32),
-                      const SizedBox(width: AppSpace.s8),
+                      SvgPicture.asset(
+                        note.type.tagIconAsset,
+                        width: 14,
+                        height: 14,
+                        colorFilter: ColorFilter.mode(
+                          tagColor,
+                          BlendMode.srcIn,
+                        ),
+                      ),
                       Flexible(
                         child: Text(
-                          'Tâm trạng hôm đó: ${mood.label}',
-                          style: theme.textTheme.labelLarge,
+                          '${note.type.label.toUpperCase()} · '
+                          '${ViDateFormat.shortDate(note.createdAt)}',
+                          style: AppTextStyles.of(context).overline
+                              .copyWith(color: tagColor, letterSpacing: 0.72),
                         ),
                       ),
                     ],
                   ),
-                ),
-              ),
-            ),
-            const SizedBox(height: AppSpace.s16),
-          ],
-          DecoratedBox(
-            decoration: BoxDecoration(
-              color: colors.noteTint(note.type),
-              borderRadius: BorderRadius.circular(AppRadius.r8),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpace.s8,
-                vertical: AppSpace.s4,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Icon(note.type.icon, size: 18, color: colors.onSurfaceMuted),
-                  const SizedBox(width: AppSpace.s6),
-                  Text(
-                    '${note.type.label.toUpperCase()} · '
-                    '${ViDateFormat.shortDate(note.createdAt)}',
-                    style: AppTextStyles.of(context).overline
-                        .copyWith(color: colors.onSurfaceMuted),
+                  Semantics(
+                    header: true,
+                    child: Text(
+                      note.title,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        letterSpacing: -0.18,
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
           ),
-          const SizedBox(height: AppSpace.s12),
-          Semantics(
-            header: true,
-            child: Text(note.title, style: theme.textTheme.headlineSmall),
-          ),
-          if (note.body.isNotEmpty) ...<Widget>[
-            const SizedBox(height: AppSpace.s16),
-            Text(note.body, style: AppTextStyles.of(context).body17),
-          ],
-          const SizedBox(height: AppSpace.s24),
-          const Center(child: Mascot(state: MascotState.thongTha)),
+          if (note.body.isNotEmpty)
+            Text(
+              note.body,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: scheme.onSurfaceVariant,
+              ),
+            ),
         ],
       ),
     );
   }
+}
+
+/// Icon 24 dp nét 2 trên app bar (`Icon/Pencil`, "⋯").
+class _BarIcon extends StatelessWidget {
+  const _BarIcon(this.name);
+
+  final String name;
+
+  @override
+  Widget build(BuildContext context) => SvgPicture.asset(
+    'assets/icons/$name.svg',
+    width: 24,
+    height: 24,
+    colorFilter: ColorFilter.mode(
+      Theme.of(context).colorScheme.onSurface,
+      BlendMode.srcIn,
+    ),
+  );
 }
 
 class _EditView extends StatelessWidget {
@@ -342,7 +376,7 @@ class _EditView extends StatelessWidget {
             AppSpace.screen,
             AppSpace.s8,
             AppSpace.screen,
-            AppSpace.screen,
+            AppSpace.s24,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -354,7 +388,7 @@ class _EditView extends StatelessWidget {
                 loading: state.saving,
                 onPressed: state.canSave ? viewModel.save : null,
               ),
-              const SizedBox(height: AppSpace.s8),
+              const SizedBox(height: AppSpace.s16),
               AppButton(
                 label: 'Huỷ',
                 variant: AppButtonVariant.text,

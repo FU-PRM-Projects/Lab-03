@@ -6,6 +6,7 @@ import '../../router/app_routes.dart';
 import '../../theme/app_tokens.dart';
 import '../../viewmodels/journey_view_model.dart';
 import '../../widgets/app_dialog.dart';
+import '../../widgets/pill_tabs.dart';
 import '../common/screen_skeleton.dart';
 import 'journey_calendar_tab.dart';
 import 'journey_path_tab.dart';
@@ -64,22 +65,16 @@ class JourneyScreen extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(
               AppSpace.screen,
-              0,
+              AppSpace.s16,
               AppSpace.screen,
-              AppSpace.s8,
+              0,
             ),
-            child: SegmentedButton<JourneyTab>(
-              segments: <ButtonSegment<JourneyTab>>[
-                for (final value in JourneyTab.values)
-                  ButtonSegment<JourneyTab>(
-                    value: value,
-                    label: Text(value.label),
-                  ),
+            child: PillTabs<JourneyTab>(
+              items: <(JourneyTab, String)>[
+                for (final value in JourneyTab.values) (value, value.label),
               ],
-              selected: <JourneyTab>{tab},
-              showSelectedIcon: false,
-              onSelectionChanged: (selection) =>
-                  context.go(AppRoutes.journeyTab(selection.single.id)),
+              selected: tab,
+              onSelected: (value) => context.go(AppRoutes.journeyTab(value.id)),
             ),
           ),
           Expanded(
