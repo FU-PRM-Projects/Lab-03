@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
@@ -14,7 +15,9 @@ import '../../widgets/state_views.dart';
 ///
 /// Final UI: banner chặng màu primary, rồi các nút tròn đi zig-zag (đã xong,
 /// đang làm có bong bóng tên thử thách, chưa mở) như một con đường. Khác
-/// Figma (D-18): mỗi nút ghi tên thử thách bên cạnh, chặng sau là một thẻ.
+/// Figma (D-18): hàng chip chọn chủ đề ở trên, mỗi lần chỉ hiện đường của một
+/// chủ đề (nhiều chủ đề thì chip cuộn ngang); mỗi nút ghi tên thử thách bên
+/// cạnh; chặng sau là một thẻ.
 class JourneyPathTab extends StatelessWidget {
   const JourneyPathTab({required this.state, required this.onRetry, super.key});
 
@@ -43,31 +46,123 @@ class JourneyPathTab extends StatelessWidget {
           message: 'Thẻ thử thách sẽ sớm có. Ghé lại sau nhé.',
         ),
       ),
-      Data<List<PathStage>>(:final value) => ListView(
-        padding: const EdgeInsets.fromLTRB(
-          AppSpace.screen,
-          AppSpace.s16,
-          AppSpace.screen,
-          AppSpace.tabContentBottom,
-        ),
-        children: <Widget>[
-          for (final stage in value) ...<Widget>[
-            _StageBanner(stage: stage),
-            const SizedBox(height: AppSpace.s16),
-            for (final (i, node) in stage.nodes.indexed)
-              _PathNodeRow(node: node, dx: _zigzag(i)),
-            if (stage.hasNextLevel)
-              _NextStage(level: stage.level + 1, cards: stage.nodes.length),
-            const SizedBox(height: AppSpace.s24),
-          ],
-        ],
-      ),
+      Data<List<PathStage>>(:final value) => _TopicPaths(stages: value),
     };
+  }
+}
+
+/// Chủ đề đang xem trên S11a (trạng thái giao diện, giữ qua lần đổi tab con);
+/// `null` là mặc định.
+final selectedPathTopicProvider = NotifierProvider<SelectedPathTopic, String?>(
+  SelectedPathTopic.new,
+);
+
+class SelectedPathTopic extends Notifier<String?> {
+  @override
+  String? build() => null;
+
+  void select(String topicId) => state = topicId;
+}
+
+/// Chip chủ đề + đường của chủ đề đang chọn.
+class _TopicPaths extends ConsumerWidget {
+  const _TopicPaths({required this.stages});
+
+  final List<PathStage> stages;
+
+  /// Chủ đề đã chọn, mặc định là chủ đề đầu tiên còn thẻ đang làm.
+  PathStage _selected(String? topicId) {
+    for (final stage in stages) {
+      if (stage.topic.id == topicId) return stage;
+    }
+    return stages.firstWhere(
+      (s) => s.current != null,
+      orElse: () => stages.first,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final stage = _selected(ref.watch(selectedPathTopicProvider));
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(
+        0,
+        AppSpace.s16,
+        0,
+        AppSpace.tabContentBottom,
+      ),
+      children: <Widget>[
+        if (stages.length > 1) ...<Widget>[
+          _TopicChips(
+            stages: stages,
+            selected: stage,
+            onSelected: (s) =>
+                ref.read(selectedPathTopicProvider.notifier).select(s.topic.id),
+          ),
+          const SizedBox(height: AppSpace.s16),
+        ],
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpace.screen),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              _StageBanner(stage: stage),
+              const SizedBox(height: AppSpace.s16),
+              for (final (i, node) in stage.nodes.indexed)
+                _PathNodeRow(node: node, dx: _zigzag(i)),
+              if (stage.hasNextLevel)
+                _NextStage(level: stage.level + 1, cards: stage.nodes.length),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 
   /// Độ lệch ngang của nút thứ [i] so với giữa màn (Figma: 0, +56, +28…).
   static double _zigzag(int i) =>
       const <double>[0, 56, 28, -28, -56, -28, 28][i % 7];
+}
+
+/// Hàng chip "Dũng cảm · 1/5", "Vận động · 0/5": cuộn ngang khi có nhiều chủ
+/// đề, chip đang chọn nền primary.
+class _TopicChips extends StatelessWidget {
+  const _TopicChips({
+    required this.stages,
+    required this.selected,
+    required this.onSelected,
+  });
+
+  final List<PathStage> stages;
+  final PathStage selected;
+  final ValueChanged<PathStage> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: AppSpace.screen),
+      child: Row(
+        spacing: AppSpace.s8,
+        children: <Widget>[
+          for (final stage in stages)
+            ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: AppSize.minTouch),
+              child: ChoiceChip(
+                label: Text(
+                  '${stage.topic.label} · '
+                  '${stage.done}/${stage.nodes.length}',
+                ),
+                selected: stage.topic == selected.topic,
+                onSelected: (_) => onSelected(stage),
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
 }
 
 /// Màu đổ bóng đặc dưới banner và nút (primary đậm, xám cho nút khoá).
