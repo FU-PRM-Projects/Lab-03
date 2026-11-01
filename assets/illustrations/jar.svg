@@ -1,0 +1,16 @@
+<svg width="120" height="140" viewBox="0 0 120 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g>
+<rect id="glass" x="7.5" y="29.5" width="105" height="105" rx="28.5" fill="#EEF0FE" stroke="#C0C8F8" stroke-width="3"/>
+<rect id="note" x="18" y="96" width="24" height="24" rx="4" transform="rotate(-8 18 96)" fill="#FFD24A"/>
+<rect id="note_2" x="44" y="102" width="24" height="24" rx="4" transform="rotate(10 44 102)" fill="#7FD9B3"/>
+<rect id="note_3" x="70" y="96" width="24" height="24" rx="4" transform="rotate(-12 70 96)" fill="#A9DCF5"/>
+<rect id="note_4" x="28" y="74" width="24" height="24" rx="4" transform="rotate(6 28 74)" fill="#FF9A3D"/>
+<rect id="note_5" x="56" y="76" width="24" height="24" rx="4" transform="rotate(-9 56 76)" fill="#F0524B"/>
+<rect id="note_6" x="80" y="72" width="24" height="24" rx="4" transform="rotate(12 80 72)" fill="#ECEBFC"/>
+<rect id="note_7" x="40" y="52" width="24" height="24" rx="4" transform="rotate(-4 40 52)" fill="#7FD9B3"/>
+<rect id="note_8" x="66" y="52" width="24" height="24" rx="4" transform="rotate(8 66 52)" fill="#FFD24A"/>
+<rect id="neck" x="27.5" y="19.5" width="65" height="11" rx="4.5" fill="#E7E9F3" stroke="#C0C8F8" stroke-width="3"/>
+<rect id="lid" x="20" y="4" width="80" height="16" rx="8" fill="#3D4FD6"/>
+<rect id="shine" opacity="0.7" x="18" y="46" width="6" height="48" rx="3" fill="white"/>
+</g>
+</svg>

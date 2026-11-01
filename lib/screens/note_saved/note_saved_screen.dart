@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -109,7 +110,20 @@ class _SavedContent extends StatelessWidget {
                 const OfflineBanner(),
                 const SizedBox(height: AppSpace.s16),
               ],
-              const Center(child: Mascot(state: MascotState.xong, size: 120)),
+              // `Decor/Confetti` (240 × 140) phía sau mascot Xong.
+              Center(
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: <Widget>[
+                    SvgPicture.asset(
+                      'assets/illustrations/confetti.svg',
+                      width: 240,
+                      excludeFromSemantics: true,
+                    ),
+                    const Mascot(state: MascotState.xong, size: 120),
+                  ],
+                ),
+              ),
               const SizedBox(height: AppSpace.s16),
               Semantics(
                 header: true,

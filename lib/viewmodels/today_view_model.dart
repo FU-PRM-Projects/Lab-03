@@ -56,8 +56,8 @@ class TodayViewModel extends Notifier<ViewState<TodaySummary>> {
   /// Chưa có dữ liệu sau chừng này thì chuyển sang Error state (T3 → T2).
   static const Duration loadTimeout = Duration(seconds: 10);
 
-  /// Số tờ nốt tối đa vẽ trong hũ.
-  static const int jarCapacity = 12;
+  /// Số tờ nốt tối đa vẽ trong hũ (8 ô của `Illustration/Hũ chiến thắng`).
+  static const int jarCapacity = 8;
 
   Note? _fallenNote;
   bool _fallenLoaded = false;
