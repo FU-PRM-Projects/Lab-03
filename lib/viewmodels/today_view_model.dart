@@ -119,22 +119,36 @@ class TodayViewModel extends Notifier<ViewState<TodaySummary>> {
     );
   }
 
-  /// Một chiến thắng cũ, đổi theo ngày để mỗi ngày tệ thấy một nốt khác.
-  /// Không có thì thôi: đây là phần thêm, không phải lỗi.
+  /// Một chiến thắng cũ đáng nhớ, đổi theo ngày để mỗi ngày tệ thấy một nốt
+  /// khác. Không có thì thôi: đây là phần thêm, không phải lỗi.
   Future<Note?> _pickFallenNote({
     required DateTime before,
     required DateTime now,
   }) async {
     try {
-      final old = (await _notes.list(
-        before: before,
-        limit: 20,
-      )).where((n) => n.type == NoteType.chienThang).toList();
-      return old.isEmpty ? null : old[now.day % old.length];
+      final old = (await _notes.list(before: before, limit: 40))
+          .where(
+            (n) =>
+                n.type == NoteType.chienThang ||
+                (n.type == NoteType.thuThach && n.challenge != null),
+          )
+          .toList();
+      if (old.isEmpty) return null;
+      // Chỉ chọn trong nhóm đáng nhớ nhất có mặt.
+      final best = old.map(memorability).reduce((a, b) => a > b ? a : b);
+      final top = old.where((n) => memorability(n) == best).toList();
+      return top[now.day % top.length];
     } on Object {
       return null;
     }
   }
+
+  /// Độ đáng nhớ của một chiến thắng cho thẻ "Nhớ lại lần này nhé": lần đầu
+  /// của một nhóm > thử thách đã làm > có viết nhật ký > chiến thắng thường.
+  static int memorability(Note note) =>
+      (note.isFirst ? 4 : 0) +
+      (note.challenge != null ? 2 : 0) +
+      (note.body.trim().isNotEmpty ? 1 : 0);
 
   void retry() => ref.invalidateSelf();
 }

@@ -5,18 +5,23 @@ import '../theme/app_tokens.dart';
 
 /// `lối tắt` trên S02 ("Dừng lại", "Thở 90 giây", "Thử thách"): vòng 56 nền
 /// `surface-variant` + icon 24 màu on-surface, nhãn Label/14 SemiBold bên dưới,
-/// rộng 96.
+/// rộng 96. [caption] là dòng phụ nói mục đích ("khi bồn chồn"), vì icon một
+/// mình chưa đủ rõ (deviation D-25).
 class ShortcutButton extends StatelessWidget {
   const ShortcutButton({
     required this.iconAsset,
     required this.label,
     required this.onTap,
+    this.caption,
     super.key,
   });
 
   /// Icon 24 dp của Figma (`assets/icons/`).
   final String iconAsset;
   final String label;
+
+  /// Dòng phụ Caption/12 dưới nhãn, ví dụ "ghi 1 lần tự chủ".
+  final String? caption;
   final VoidCallback onTap;
 
   @override
@@ -26,7 +31,7 @@ class ShortcutButton extends StatelessWidget {
 
     return Semantics(
       button: true,
-      label: label,
+      label: caption == null ? label : '$label, $caption',
       onTap: onTap,
       excludeSemantics: true,
       child: InkWell(
@@ -69,6 +74,17 @@ class ShortcutButton extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
+                if (caption case final caption?)
+                  Text(
+                    caption,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      fontWeight: FontWeight.w400,
+                      color: scheme.onSurfaceVariant,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
               ],
             ),
           ),

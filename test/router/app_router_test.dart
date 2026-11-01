@@ -89,7 +89,7 @@ void main() {
 
   testWidgets('F2: Dừng lại → S09 → Thở 90 giây → S10', (tester) async {
     await enterApp(tester);
-    await tester.tap(find.bySemanticsLabel('Dừng lại'));
+    await tester.tap(find.bySemanticsLabel('Dừng lại, ghi 1 lần tự chủ'));
     await tester.pumpAndSettle();
     expect(find.byType(SelfControlScreen), findsOneWidget);
 

@@ -82,6 +82,43 @@ void main() {
       expect(s.fallenNote?.id, 'old');
     });
 
+    test('chọn chiến thắng đáng nhớ: lần đầu > có nhật ký > thường', () async {
+      notes.notes.addAll(<Note>[
+        sampleNote('plain', DateTime(2026, 10, 12), title: 'Uống đủ nước'),
+        Note(
+          id: 'journal',
+          type: NoteType.chienThang,
+          title: 'Dọn xong góc học tập',
+          body: 'Nhìn gọn gàng thấy dễ chịu hẳn.',
+          createdAt: DateTime(2026, 10, 11),
+        ),
+        Note(
+          id: 'first',
+          type: NoteType.chienThang,
+          title: 'Thuyết trình trước lớp dù run',
+          createdAt: DateTime(2026, 10, 10),
+          groupId: 'len-tieng-trong-nhom',
+          isFirst: true,
+        ),
+        sampleNote('y', DateTime(2026, 10, 23, 22), mood: Mood.roi),
+      ]);
+      final s = await summary(makeContainer());
+      expect(s.fallenNote?.id, 'first');
+    });
+
+    test('độ đáng nhớ cộng dồn theo lần đầu, thử thách, nhật ký', () {
+      final plain = sampleNote('p', DateTime(2026, 10, 2));
+      final journal = Note(
+        id: 'j',
+        type: NoteType.chienThang,
+        title: 'x',
+        body: 'Có viết vài dòng',
+        createdAt: DateTime(2026, 10, 2),
+      );
+      expect(TodayViewModel.memorability(plain), 0);
+      expect(TodayViewModel.memorability(journal), 1);
+    });
+
     test('hũ cập nhật khi lưu nốt mới; nốt offline bật banner', () async {
       final c = makeContainer();
       expect((await summary(c)).monthCount, 0);

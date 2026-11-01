@@ -111,7 +111,7 @@ void main() {
 
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
-    await tester.tap(find.bySemanticsLabel('Dừng lại'));
+    await tester.tap(find.bySemanticsLabel('Dừng lại, ghi 1 lần tự chủ'));
     await tester.pumpAndSettle();
     expect(find.text('Lướt mạng xã hội'), findsNothing);
     expect(find.text('Mở khoá'), findsOneWidget);
