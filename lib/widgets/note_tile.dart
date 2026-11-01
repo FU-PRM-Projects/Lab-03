@@ -21,7 +21,7 @@ class NoteTile extends StatelessWidget {
   final NoteType type;
   final String title;
 
-  /// Ví dụ "Hôm nay · Ổn", "24/10".
+  /// Ví dụ "Hôm nay · Ổn", "24/10"; rỗng thì không có dòng này.
   final String dateLabel;
   final VoidCallback? onTap;
 
@@ -34,7 +34,9 @@ class NoteTile extends StatelessWidget {
 
     return Semantics(
       button: onTap != null,
-      label: '${type.label}: $title, $dateLabel',
+      label: dateLabel.isEmpty
+          ? '${type.label}: $title'
+          : '${type.label}: $title, $dateLabel',
       onTap: onTap,
       excludeSemantics: true,
       child: Material(
@@ -84,13 +86,14 @@ class NoteTile extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                Text(
-                  dateLabel,
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    fontWeight: FontWeight.w400,
-                    color: theme.colorScheme.onSurfaceVariant,
+                if (dateLabel.isNotEmpty)
+                  Text(
+                    dateLabel,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      fontWeight: FontWeight.w400,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
                   ),
-                ),
               ],
             ),
           ),

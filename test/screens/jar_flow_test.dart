@@ -6,6 +6,8 @@ import 'package:lab03/screens/jar/jar_screen.dart';
 import 'package:lab03/screens/note_composer/note_composer_screen.dart';
 import 'package:lab03/screens/note_detail/note_detail_screen.dart';
 import 'package:lab03/services/app_exception.dart';
+import 'package:lab03/widgets/note_card.dart';
+import 'package:lab03/widgets/note_tile.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../support/fakes.dart';
@@ -34,6 +36,24 @@ void main() {
     ),
   ];
 
+  /// Cuộn lưới dọc của S05 (không phải kệ hay chip cuộn ngang) tới [finder].
+  /// Về đầu S05 (tới kệ "Nhóm lần đầu") rồi cuộn xuống tới [finder], vì
+  /// [finder] có thể đã bị cuộn qua. Không fling: kéo quá đầu sẽ làm mới hũ.
+  Future<void> scrollJarTo(WidgetTester tester, Finder finder) async {
+    final vertical = find
+        .byWidgetPredicate(
+          (w) => w is Scrollable && w.axisDirection == AxisDirection.down,
+        )
+        .first;
+    await tester.scrollUntilVisible(
+      find.text('Nhóm lần đầu'),
+      -200,
+      scrollable: vertical,
+    );
+    await tester.scrollUntilVisible(finder, 200, scrollable: vertical);
+    await tester.pumpAndSettle();
+  }
+
   Future<void> openJar(WidgetTester tester) async {
     await tester.tap(findTab('Hũ'));
     await tester.pumpAndSettle();
@@ -51,16 +71,19 @@ void main() {
       expect(find.text('nốt tháng 10'), findsOneWidget);
       expect(
         find.bySemanticsLabel(
-          'Chiến thắng: Dọn bàn học, gửi email hỏi thầy, Hôm nay · Ổn',
+          'Chiến thắng: Dọn bàn học, gửi email hỏi thầy, Ổn',
         ),
         findsOneWidget,
       );
       expect(
-        find.bySemanticsLabel(
-          'Tự chủ: Dừng lướt TikTok lúc 0h15, Hôm qua · Mệt',
-        ),
+        find.bySemanticsLabel('Tự chủ: Dừng lướt TikTok lúc 0h15, Mệt'),
         findsOneWidget,
       );
+      // Nhóm theo mốc thời gian, mỗi nhóm có số nốt.
+      expect(find.bySemanticsLabel('Hôm nay, 1 nốt'), findsOneWidget);
+      expect(find.bySemanticsLabel('Hôm qua, 1 nốt'), findsOneWidget);
+      await scrollJarTo(tester, find.text('Vì sao tuần này mình mệt'));
+      expect(find.bySemanticsLabel('Tuần này, 1 nốt'), findsOneWidget);
       expect(
         find.bySemanticsLabel('Nhật ký: Vì sao tuần này mình mệt, 21/10'),
         findsOneWidget,
@@ -68,6 +91,39 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+
+  testWidgets('chip lọc loại và nút đổi sang danh sách gọn', (tester) async {
+    await pumpApp(tester, services: withNotes(sample));
+    await openJar(tester);
+    await tester.ensureVisible(find.text('Tự chủ').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ChoiceChip, 'Tự chủ'));
+    await tester.pumpAndSettle();
+    expect(find.text('Dừng lướt TikTok lúc 0h15'), findsOneWidget);
+    expect(find.text('Dọn bàn học, gửi email hỏi thầy'), findsNothing);
+
+    // Hàng chip cuộn ngang: đưa "Tất cả" vào khung trước khi chạm.
+    await tester.ensureVisible(find.widgetWithText(ChoiceChip, 'Tất cả'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ChoiceChip, 'Tất cả'));
+    await tester.pumpAndSettle();
+    await tester.tap(findTab('Xem dạng danh sách'));
+    await tester.pumpAndSettle();
+    expect(find.byType(NoteTile), findsNothing);
+    await scrollJarTo(tester, find.text('Dừng lướt TikTok lúc 0h15'));
+    expect(
+      find.bySemanticsLabel('Dừng lướt TikTok lúc 0h15, Tự chủ · Mệt'),
+      findsOneWidget,
+    );
+    await scrollJarTo(tester, find.text('Vì sao tuần này mình mệt'));
+    expect(find.byType(NoteTile), findsNothing);
+    expect(find.byType(NoteCard), findsWidgets);
+
+    await tester.tap(findTab('Xem dạng lưới'));
+    await tester.pumpAndSettle();
+    expect(find.byType(NoteCard), findsNothing);
+    expect(find.byType(NoteTile), findsWidgets);
+  });
 
   testWidgets('hũ rỗng: "Ghi nốt đầu tiên" mở S03 (T1)', (tester) async {
     await pumpApp(tester);
@@ -179,6 +235,13 @@ void main() {
     await tester.pump(const Duration(seconds: 6));
     await tester.pumpAndSettle();
     expect(services.notes.deleted, <String>['self']);
+    // Về đầu hũ để thấy số đếm.
+    await tester.fling(
+      find.byType(CustomScrollView).first,
+      const Offset(0, 2000),
+      2000,
+    );
+    await tester.pumpAndSettle();
     expect(find.text('2'), findsOneWidget);
     expect(find.text('nốt tháng 10'), findsOneWidget);
   });
