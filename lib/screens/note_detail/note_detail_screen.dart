@@ -211,86 +211,93 @@ class _ReadView extends StatelessWidget {
 
     // Figma S06: mascot tâm trạng + chú thích, thẻ `Note/lớn` (nền tint theo
     // loại, bo 24, lề 24), rồi nhật ký Body/16 màu on-surface-variant.
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpace.screen,
-        AppSpace.s16,
-        AppSpace.screen,
-        AppSpace.s24,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        spacing: AppSpace.s16,
-        children: <Widget>[
-          Column(
-            spacing: AppSpace.s8,
-            children: <Widget>[
-              Mascot(state: mood?.mascot ?? MascotState.thongTha, size: 124.2),
-              if (mood != null)
-                Text(
-                  'Tâm trạng hôm đó: ${mood.label}',
-                  style: theme.textTheme.labelLarge?.copyWith(
-                    fontWeight: FontWeight.w400,
-                    color: scheme.onSurfaceVariant,
-                  ),
-                  textAlign: TextAlign.center,
+    // Cao hết vùng nội dung để bắt đầu từ trên, không bị `Center` đẩy xuống.
+    return SizedBox(
+      height: double.infinity,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpace.screen,
+          AppSpace.s16,
+          AppSpace.screen,
+          AppSpace.s24,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: AppSpace.s16,
+          children: <Widget>[
+            Column(
+              spacing: AppSpace.s8,
+              children: <Widget>[
+                Mascot(
+                  state: mood?.mascot ?? MascotState.thongTha,
+                  size: 124.2,
                 ),
-            ],
-          ),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              color: colors.noteTint(note.type),
-              borderRadius: BorderRadius.circular(24),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpace.s24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: AppSpace.s12,
-                children: <Widget>[
-                  Row(
-                    spacing: AppSpace.s6,
-                    children: <Widget>[
-                      SvgPicture.asset(
-                        note.type.tagIconAsset,
-                        width: 14,
-                        height: 14,
-                        colorFilter: ColorFilter.mode(
-                          tagColor,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                      Flexible(
-                        child: Text(
-                          '${note.type.label.toUpperCase()} · '
-                          '${ViDateFormat.shortDate(note.createdAt)}',
-                          style: AppTextStyles.of(context).overline
-                              .copyWith(color: tagColor, letterSpacing: 0.72),
-                        ),
-                      ),
-                    ],
+                if (mood != null)
+                  Text(
+                    'Tâm trạng hôm đó: ${mood.label}',
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w400,
+                      color: scheme.onSurfaceVariant,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  Semantics(
-                    header: true,
-                    child: Text(
-                      note.title,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        letterSpacing: -0.18,
+              ],
+            ),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: colors.noteTint(note.type),
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpace.s24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: AppSpace.s12,
+                  children: <Widget>[
+                    Row(
+                      spacing: AppSpace.s6,
+                      children: <Widget>[
+                        SvgPicture.asset(
+                          note.type.tagIconAsset,
+                          width: 14,
+                          height: 14,
+                          colorFilter: ColorFilter.mode(
+                            tagColor,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        Flexible(
+                          child: Text(
+                            '${note.type.label.toUpperCase()} · '
+                            '${ViDateFormat.shortDate(note.createdAt)}',
+                            style: AppTextStyles.of(context).overline
+                                .copyWith(color: tagColor, letterSpacing: 0.72),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Semantics(
+                      header: true,
+                      child: Text(
+                        note.title,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          letterSpacing: -0.18,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-          if (note.body.isNotEmpty)
-            Text(
-              note.body,
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: scheme.onSurfaceVariant,
+            if (note.body.isNotEmpty)
+              Text(
+                note.body,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }

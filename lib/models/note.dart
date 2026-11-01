@@ -13,6 +13,8 @@ class Note {
     this.body = '',
     this.pendingSync = false,
     this.challenge,
+    this.groupId,
+    this.isFirst = false,
   });
 
   final String id;
@@ -33,6 +35,12 @@ class Note {
   /// Kết quả thử thách, chỉ có ở nốt `thu_thach` ghi từ S08.
   final ChallengeResult? challenge;
 
+  /// Nhóm lần đầu chứa nốt (`users/{uid}/groups/{groupId}`), nếu có.
+  final String? groupId;
+
+  /// Nốt đầu tiên của nhóm [groupId]: S04 hiện "Lần đầu tiên!".
+  final bool isFirst;
+
   @override
   bool operator ==(Object other) =>
       other is Note &&
@@ -43,7 +51,9 @@ class Note {
       other.mood == mood &&
       other.createdAt == createdAt &&
       other.pendingSync == pendingSync &&
-      other.challenge == challenge;
+      other.challenge == challenge &&
+      other.groupId == groupId &&
+      other.isFirst == isFirst;
 
   @override
   int get hashCode => Object.hash(
@@ -55,6 +65,8 @@ class Note {
     createdAt,
     pendingSync,
     challenge,
+    groupId,
+    isFirst,
   );
 }
 
@@ -66,6 +78,8 @@ class NoteDraft {
     this.title = '',
     this.body = '',
     this.challenge,
+    this.groupId,
+    this.isFirst = false,
   });
 
   final NoteType type;
@@ -73,6 +87,10 @@ class NoteDraft {
   final String title;
   final String body;
   final ChallengeResult? challenge;
+
+  /// Xếp nốt vào nhóm lần đầu này khi lưu.
+  final String? groupId;
+  final bool isFirst;
 
   /// Có gì đáng giữ khi người dùng thoát giữa chừng.
   bool get hasInput =>
@@ -89,6 +107,8 @@ class NoteDraft {
     title: title ?? this.title,
     body: body ?? this.body,
     challenge: challenge,
+    groupId: groupId,
+    isFirst: isFirst,
   );
 
   @override

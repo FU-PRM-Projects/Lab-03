@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../models/first_group.dart';
 import '../models/note.dart';
 import '../models/note_type.dart';
 import '../services/clock.dart';
+import '../services/group_repository.dart';
 import '../services/note_repository.dart';
 import '../services/remote_config_service.dart';
 import '../utils/dates.dart';
@@ -20,6 +22,7 @@ class SavedNoteSummary {
     required this.milestone,
     this.savedToday = true,
     this.jarNotes = const <NoteType>[],
+    this.group,
   });
 
   final Note note;
@@ -35,6 +38,19 @@ class SavedNoteSummary {
 
   /// Loại các nốt mới nhất của tháng (gồm nốt này), để vẽ tờ nốt trong hũ.
   final List<NoteType> jarNotes;
+
+  /// Nhóm lần đầu chứa nốt, nếu có.
+  final FirstGroup? group;
+
+  /// Nốt đầu tiên của một nhóm: biến thể "Lần đầu tiên!" (khi không trùng
+  /// với mốc tháng, vì mốc tháng cần bấm "Gắn vào hũ").
+  bool get firstInGroup => note.isFirst && group != null && !reachedMilestone;
+
+  /// Số nốt của nhóm, tính cả nốt này.
+  int get groupCount {
+    final count = group?.noteCount ?? 0;
+    return count < 1 ? 1 : count;
+  }
 
   /// Nốt vừa lưu đúng là nốt chạm mốc: hiện biến thể "Mốc 25 nốt!".
   bool get reachedMilestone => monthCount == milestone;
@@ -71,6 +87,16 @@ class NoteSavedViewModel extends Notifier<ViewState<SavedNoteSummary>> {
         Dates.startOfNextMonth(note.createdAt),
       );
       final monthStart = Dates.startOfMonth(note.createdAt);
+      FirstGroup? group;
+      if (note.groupId case final id?) {
+        try {
+          group =
+              await ref.read(groupRepositoryProvider).get(id) ??
+              FirstGroups.systemById(id);
+        } on Object {
+          group = FirstGroups.systemById(id);
+        }
+      }
       final recent = await _notes.list(
         before: Dates.startOfNextMonth(note.createdAt),
         limit: TodayViewModel.jarCapacity,
@@ -90,6 +116,7 @@ class NoteSavedViewModel extends Notifier<ViewState<SavedNoteSummary>> {
             for (final n in recent)
               if (!n.createdAt.isBefore(monthStart)) n.type,
           ],
+          group: group,
         ),
       );
     } on Object catch (error) {

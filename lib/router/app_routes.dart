@@ -18,8 +18,16 @@ abstract final class AppRoutes {
   /// Đường dẫn của 4 tab, theo thứ tự trên thanh tab.
   static const List<String> tabs = <String>[today, jar, challenges, journey];
 
-  /// S03 ở bước [step] (1–3).
-  static String newNote({int step = 1}) => '$noteNew?step=$step';
+  /// S03 ở bước [step] (1–3); [groupId] xếp nốt vào nhóm lần đầu đó.
+  static String newNote({int step = 1, String? groupId}) => groupId == null
+      ? '$noteNew?step=$step'
+      : '$noteNew?step=$step&group=${Uri.encodeQueryComponent(groupId)}';
+
+  /// "Xem tất cả" nhóm lần đầu.
+  static const String groups = '$jar/groups';
+
+  /// S05e · Chi tiết nhóm.
+  static String groupDetail(String id) => '$groups/$id';
 
   /// S04 cho nốt [id] vừa lưu.
   static String noteSaved(String id) => '/note/saved/$id';

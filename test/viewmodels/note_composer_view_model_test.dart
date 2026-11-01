@@ -21,7 +21,7 @@ void main() {
   late FixedClock clock;
   late ProviderContainer container;
 
-  final provider = noteComposerViewModelProvider(1);
+  final provider = noteComposerViewModelProvider((step: 1, groupId: null));
   NoteComposerViewModel vm() => container.read(provider.notifier);
   NoteComposerState state() => container.read(provider);
 

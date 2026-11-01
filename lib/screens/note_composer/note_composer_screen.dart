@@ -19,10 +19,13 @@ import '../../widgets/quick_win_chip.dart';
 
 /// S03 · Ghi nốt (3 bước: tâm trạng → chiến thắng → vài dòng).
 class NoteComposerScreen extends ConsumerStatefulWidget {
-  const NoteComposerScreen({this.step = 1, super.key});
+  const NoteComposerScreen({this.step = 1, this.groupId, super.key});
 
   /// Bước mở đầu 1–3 (`?step=`).
   final int step;
+
+  /// Xếp nốt vào nhóm lần đầu này (`?group=`, "Thử lần nữa" ở S05e).
+  final String? groupId;
 
   @override
   ConsumerState<NoteComposerScreen> createState() => _NoteComposerScreenState();
@@ -32,8 +35,10 @@ class _NoteComposerScreenState extends ConsumerState<NoteComposerScreen> {
   final _title = TextEditingController();
   final _body = TextEditingController();
 
+  ComposerArgs get _args => (step: widget.step, groupId: widget.groupId);
+
   NoteComposerViewModel get _viewModel =>
-      ref.read(noteComposerViewModelProvider(widget.step).notifier);
+      ref.read(noteComposerViewModelProvider(_args).notifier);
 
   @override
   void dispose() {
@@ -83,7 +88,7 @@ class _NoteComposerScreenState extends ConsumerState<NoteComposerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = noteComposerViewModelProvider(widget.step);
+    final provider = noteComposerViewModelProvider(_args);
     final state = ref.watch(provider);
 
     ref.listen(provider, (previous, next) {
@@ -155,6 +160,7 @@ class _NoteComposerScreenState extends ConsumerState<NoteComposerScreen> {
                                   onChanged: _viewModel.setTitle,
                                   onPick: _viewModel.pickQuickWin,
                                   onSubmitted: _viewModel.next,
+                                  onClearGroup: _viewModel.clearGroup,
                                 ),
                                 _ => _JournalStep(
                                   controller: _body,
@@ -375,6 +381,7 @@ class _WinStep extends StatelessWidget {
     required this.onChanged,
     required this.onPick,
     required this.onSubmitted,
+    required this.onClearGroup,
   });
 
   final NoteComposerState state;
@@ -382,6 +389,7 @@ class _WinStep extends StatelessWidget {
   final ValueChanged<String> onChanged;
   final ValueChanged<String> onPick;
   final VoidCallback onSubmitted;
+  final VoidCallback onClearGroup;
 
   @override
   Widget build(BuildContext context) {
@@ -393,6 +401,12 @@ class _WinStep extends StatelessWidget {
       spacing: AppSpace.s16,
       children: <Widget>[
         const _StepTitle('Hôm nay bạn làm được gì?'),
+        if (state.group case final group?)
+          _GroupBadge(
+            name: group.name,
+            first: group.noteCount == 0,
+            onClear: onClearGroup,
+          ),
         AppTextField(
           label: 'Chiến thắng nhỏ',
           controller: controller,
@@ -444,6 +458,52 @@ class _WinStep extends StatelessWidget {
             ],
           ),
       ],
+    );
+  }
+}
+
+/// "Xếp vào nhóm “Bắt chuyện”" ở bước 2 khi mở từ S05e; bỏ được bằng ✕.
+class _GroupBadge extends StatelessWidget {
+  const _GroupBadge({
+    required this.name,
+    required this.first,
+    required this.onClear,
+  });
+
+  final String name;
+  final bool first;
+  final VoidCallback onClear;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: scheme.primaryContainer,
+        borderRadius: BorderRadius.circular(AppRadius.r12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.only(left: AppSpace.s14),
+        child: Row(
+          children: <Widget>[
+            Expanded(
+              child: Text(
+                first ? 'Lần đầu cho nhóm “$name”' : 'Xếp vào nhóm “$name”',
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: scheme.onPrimaryContainer,
+                ),
+              ),
+            ),
+            IconButton(
+              onPressed: onClear,
+              tooltip: 'Không xếp vào nhóm',
+              icon: const CloseButtonIcon(),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

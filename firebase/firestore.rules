@@ -13,7 +13,8 @@ service cloud.firestore {
     function validNote(note) {
       return note.keys().hasAll(['type', 'title', 'createdAt'])
         && note.keys().hasOnly(['type', 'title', 'body', 'mood', 'createdAt',
-                                'challengeId', 'subtype', 'outcome', 'anxietyBefore', 'minutes'])
+                                'challengeId', 'subtype', 'outcome', 'anxietyBefore', 'minutes',
+                                'groupId', 'isFirst'])
         && note.type in ['chien_thang', 'tu_chu', 'thu_thach', 'nhat_ky']
         && note.title is string && note.title.size() >= 1 && note.title.size() <= 120
         && (!('body' in note) || (note.body is string && note.body.size() <= 2000))
@@ -22,7 +23,22 @@ service cloud.firestore {
         && (!('subtype' in note) || note.subtype in ['nguoi_la', 'van_dong'])
         && (!('outcome' in note) || note.outcome in ['suon_se', 'khong_nhu_y'])
         && (!('anxietyBefore' in note) || (note.anxietyBefore is int && note.anxietyBefore >= 1 && note.anxietyBefore <= 5))
-        && (!('minutes' in note) || (note.minutes is int && note.minutes >= 0 && note.minutes <= 600));
+        && (!('minutes' in note) || (note.minutes is int && note.minutes >= 0 && note.minutes <= 600))
+        && (!('groupId' in note) || (note.groupId is string && note.groupId.size() >= 1 && note.groupId.size() <= 64))
+        && (!('isFirst' in note) || note.isFirst is bool);
+    }
+
+    // A "first time" group: name 1-24 chars, one of Not's five ideas, a
+    // non-negative note count (Figma `Spec · Nhóm lần đầu`).
+    function validGroup(group) {
+      return group.keys().hasAll(['name', 'idea', 'source', 'noteCount'])
+        && group.keys().hasOnly(['name', 'idea', 'source', 'noteCount', 'firstNoteId',
+                                 'firstNoteTitle', 'firstAt', 'lastAt', 'createdAt'])
+        && group.name is string && group.name.size() >= 1 && group.name.size() <= 24
+        && group.idea in ['chien_thang', 'nhat_ky', 'tu_chu', 'nguoi_la', 'van_dong']
+        && group.source in ['system', 'user', 'ai_suggested']
+        && group.noteCount is int && group.noteCount >= 0
+        && (!('firstNoteTitle' in group) || (group.firstNoteTitle is string && group.firstNoteTitle.size() <= 120));
     }
 
     // Challenge catalog: read-only for signed-in users; staff manage it from
@@ -66,6 +82,11 @@ service cloud.firestore {
                               && request.resource.data.keys().hasOnly(['level', 'completed'])
                               && request.resource.data.level is int
                               && request.resource.data.level >= 1;
+      }
+
+      match /groups/{groupId} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid) && validGroup(request.resource.data);
       }
 
       match /stickers/{month} {

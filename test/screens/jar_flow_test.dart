@@ -95,7 +95,7 @@ void main() {
     final services = withNotes(sample);
     await pumpApp(tester, services: services);
     await openJar(tester);
-    await tester.tap(find.text('Vì sao tuần này mình mệt'));
+    await tapNote(tester, 'Vì sao tuần này mình mệt');
     await tester.pumpAndSettle();
     expect(find.byType(NoteDetailScreen), findsOneWidget);
     expect(find.text('NHẬT KÝ · 21/10'), findsOneWidget);
@@ -119,7 +119,7 @@ void main() {
     final services = withNotes(sample);
     await pumpApp(tester, services: services);
     await openJar(tester);
-    await tester.tap(find.text('Vì sao tuần này mình mệt'));
+    await tapNote(tester, 'Vì sao tuần này mình mệt');
     await tester.pumpAndSettle();
     await tester.tap(findTab('Sửa'));
     await tester.pumpAndSettle();
@@ -141,7 +141,7 @@ void main() {
     final services = withNotes(sample);
     await pumpApp(tester, services: services);
     await openJar(tester);
-    await tester.tap(find.text('Dừng lướt TikTok lúc 0h15'));
+    await tapNote(tester, 'Dừng lướt TikTok lúc 0h15');
     await tester.pumpAndSettle();
 
     await tester.tap(findTab('Tuỳ chọn'));
@@ -167,7 +167,7 @@ void main() {
     final services = withNotes(sample);
     await pumpApp(tester, services: services);
     await openJar(tester);
-    await tester.tap(find.text('Dừng lướt TikTok lúc 0h15'));
+    await tapNote(tester, 'Dừng lướt TikTok lúc 0h15');
     await tester.pumpAndSettle();
     await tester.tap(findTab('Tuỳ chọn'));
     await tester.pumpAndSettle();
