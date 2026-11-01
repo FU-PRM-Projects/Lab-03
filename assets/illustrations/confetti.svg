@@ -1,0 +1,18 @@
+<svg width="240" height="141" viewBox="0 0 240 141" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g>
+<rect id="bit" x="12" y="20.3247" width="8" height="14" rx="2" transform="rotate(-20 12 20.3247)" fill="#A9DCF5"/>
+<rect id="bit_2" x="40" y="8.32471" width="10" height="6" rx="2" transform="rotate(30 40 8.32471)" fill="#FFD24A"/>
+<circle id="bit_3" cx="73" cy="33.3247" r="3" fill="#F0524B"/>
+<rect id="bit_4" x="100" y="4.32471" width="8" height="14" rx="2" transform="rotate(-40 100 4.32471)" fill="#7FD9B3"/>
+<circle id="bit_5" cx="143" cy="21.3247" r="3" fill="#3D4FD6"/>
+<rect id="bit_6" x="170" y="6.32471" width="10" height="6" rx="2" transform="rotate(-15 170 6.32471)" fill="#FF9A3D"/>
+<rect id="bit_7" x="200" y="28.3247" width="8" height="14" rx="2" transform="rotate(20 200 28.3247)" fill="#A9DCF5"/>
+<circle id="bit_8" cx="229" cy="63.3247" r="3" fill="#FFD24A"/>
+<rect id="bit_9" x="20" y="70.3247" width="10" height="6" rx="2" transform="rotate(45 20 70.3247)" fill="#FF9A3D"/>
+<circle id="bit_10" cx="9" cy="113.325" r="3" fill="#7FD9B3"/>
+<rect id="bit_11" x="214" y="100.325" width="8" height="14" rx="2" transform="rotate(-30 214 100.325)" fill="#F0524B"/>
+<rect id="bit_12" x="190" y="128.325" width="10" height="6" rx="2" transform="rotate(10 190 128.325)" fill="#3D4FD6"/>
+<rect id="bit_13" x="52" y="124.325" width="8" height="14" rx="2" transform="rotate(-60 52 124.325)" fill="#FFD24A"/>
+<circle id="bit_14" cx="123" cy="3.32471" r="3" fill="#FF9A3D"/>
+</g>
+</svg>
