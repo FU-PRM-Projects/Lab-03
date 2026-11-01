@@ -96,3 +96,9 @@ Future<void> pumpThemed(
     ),
   );
 }
+
+/// Tab chưa chọn trên thanh tab: chỉ có icon, nhãn nằm trong tooltip
+/// (`Tooltip` của `material_ui`, nên `find.byTooltip` không thấy).
+Finder findTab(String label) => find.byWidgetPredicate(
+  (widget) => widget is Tooltip && widget.message == label,
+);

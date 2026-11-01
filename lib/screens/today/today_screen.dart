@@ -1,16 +1,19 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../models/note.dart';
 import '../../models/note_type.dart';
 import '../../router/app_routes.dart';
+import '../../theme/app_colors.dart';
 import '../../theme/app_tokens.dart';
 import '../../utils/vi_date_format.dart';
 import '../../viewmodels/today_view_model.dart';
 import '../../viewmodels/view_state.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/jar_illustration.dart';
+import '../../widgets/mascot.dart';
 import '../../widgets/note_tile.dart';
 import '../../widgets/offline_banner.dart';
 import '../../widgets/shortcut_button.dart';
@@ -37,7 +40,7 @@ class TodayScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(
           AppSpace.screen,
-          AppSpace.s8,
+          AppSpace.s16,
           AppSpace.screen,
           AppSpace.tabContentBottom,
         ),
@@ -55,10 +58,10 @@ class TodayScreen extends ConsumerWidget {
             const SizedBox(height: AppSpace.s16),
             _FallenNote(note: note),
           ],
-          const SizedBox(height: AppSpace.s24),
+          const SizedBox(height: AppSpace.s16),
           Text(
             'Hôm nay bạn làm được gì?',
-            style: theme.textTheme.titleLarge,
+            style: theme.textTheme.titleLarge?.copyWith(letterSpacing: -0.44),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: AppSpace.s16),
@@ -68,33 +71,26 @@ class TodayScreen extends ConsumerWidget {
             expand: true,
             onPressed: () => context.push(AppRoutes.newNote()),
           ),
-          const SizedBox(height: AppSpace.s16),
-          // Ba lối tắt chia đều chiều ngang; nhãn xuống dòng khi chật.
+          // Figma: khoảng đệm 16 + 2 khoảng cách 16 giữa nút và lối tắt.
+          const SizedBox(height: AppSpace.s16 * 3),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Expanded(
-                child: ShortcutButton(
-                  icon: Icons.pan_tool_outlined,
-                  label: 'Dừng lại',
-                  onTap: () => context.push(AppRoutes.selfControl),
-                ),
+              ShortcutButton(
+                iconAsset: 'assets/icons/clock.svg',
+                label: 'Dừng lại',
+                onTap: () => context.push(AppRoutes.selfControl),
               ),
-              const SizedBox(width: AppSpace.s12),
-              Expanded(
-                child: ShortcutButton(
-                  icon: Icons.air,
-                  label: 'Thở 90 giây',
-                  onTap: () => context.push(AppRoutes.breathe),
-                ),
+              ShortcutButton(
+                iconAsset: 'assets/icons/refresh.svg',
+                label: 'Thở 90 giây',
+                onTap: () => context.push(AppRoutes.breathe),
               ),
-              const SizedBox(width: AppSpace.s12),
-              Expanded(
-                child: ShortcutButton(
-                  icon: Icons.flag_outlined,
-                  label: 'Thử thách',
-                  onTap: () => context.go(AppRoutes.challenges),
-                ),
+              ShortcutButton(
+                iconAsset: 'assets/icons/phase.svg',
+                label: 'Thử thách',
+                onTap: () => context.go(AppRoutes.challenges),
               ),
             ],
           ),
@@ -117,14 +113,15 @@ class _Jar extends StatelessWidget {
   final VoidCallback onOpenJar;
   final VoidCallback onRetry;
 
-  static const double _height = 240;
+  /// Khung `scene` của Figma: 328 × 250.
+  static const Size _scene = Size(328, 250);
 
   @override
   Widget build(BuildContext context) {
     return switch (state) {
-      Loading<TodaySummary>() => const SizedBox(
-        height: _height,
-        child: LoadingState.spinner(message: 'Đang mở hũ…'),
+      Loading<TodaySummary>() => SizedBox(
+        height: _scene.height,
+        child: const LoadingState.spinner(message: 'Đang mở hũ…'),
       ),
       Failure<TodaySummary>(:final message, :final offline) => ErrorState(
         title: 'Chưa tải được hũ',
@@ -140,12 +137,58 @@ class _Jar extends StatelessWidget {
     };
   }
 
-  Widget _jar(List<NoteType> notes, int monthCount) => JarIllustration(
-    notes: notes,
-    semanticLabel: monthCount == 0
-        ? 'Hũ chiến thắng, chưa có nốt tháng này. Mở hũ'
-        : 'Hũ chiến thắng, $monthCount nốt tháng này. Mở hũ',
-    onTap: onOpenJar,
+  /// Figma `scene`: nền tròn 230 `primary-container`, hũ cao 203 lệch phải,
+  /// mascot Xong đứng trước hũ ở góc dưới trái.
+  Widget _jar(List<NoteType> notes, int monthCount) => SizedBox(
+    height: _scene.height,
+    child: Center(
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: SizedBox.fromSize(
+          size: _scene,
+          child: Stack(
+            children: <Widget>[
+              const Positioned(
+                left: 49,
+                top: 10,
+                child: SizedBox.square(
+                  dimension: 230,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppPalette.primaryContainer,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 101,
+                top: 18,
+                child: JarIllustration(
+                  notes: notes,
+                  semanticLabel: monthCount == 0
+                      ? 'Hũ chiến thắng, chưa có nốt tháng này. Mở hũ'
+                      : 'Hũ chiến thắng, $monthCount nốt tháng này. Mở hũ',
+                  onTap: onOpenJar,
+                ),
+              ),
+              Positioned(
+                left: 40,
+                top: 120,
+                child: IgnorePointer(
+                  child: SvgPicture.asset(
+                    MascotState.xong.asset,
+                    width: 100.8,
+                    height: 113.4,
+                    excludeFromSemantics: true,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
   );
 }
 

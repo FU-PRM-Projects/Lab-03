@@ -1,3 +1,4 @@
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../theme/app_tokens.dart';
@@ -37,37 +38,66 @@ class TabHeader extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
 
+    // Figma `header`: cao 56, lề 16, tiêu đề Headline/28 Bold; chuông trong
+    // vòng 48 nền `surface-variant`, avatar 48, cách nhau 8.
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppSpace.screen,
-        AppSpace.s12,
-        AppSpace.s8,
-        AppSpace.s12,
+        AppSpace.s16,
+        AppSpace.screen,
+        0,
       ),
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            child: Semantics(
-              header: true,
-              child: Text(title, style: theme.textTheme.headlineMedium),
+      child: SizedBox(
+        height: 56,
+        child: Row(
+          spacing: AppSpace.s8,
+          children: <Widget>[
+            Expanded(
+              child: Semantics(
+                header: true,
+                child: Text(
+                  title,
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    letterSpacing: -0.56,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ),
-          ),
-          IconButton(
-            onPressed: onNotifications,
-            icon: const Icon(Icons.notifications_outlined),
-            tooltip: 'Nhắc nhở',
-          ),
-          IconButton(
-            onPressed: onProfile,
-            tooltip: 'Cài đặt',
-            icon: CircleAvatar(
-              radius: AppSize.avatar / 2,
-              backgroundColor: scheme.primaryContainer,
-              foregroundColor: scheme.onPrimaryContainer,
-              child: const Icon(Icons.person_outline),
+            IconButton(
+              onPressed: onNotifications,
+              tooltip: 'Nhắc nhở',
+              style: IconButton.styleFrom(
+                backgroundColor: scheme.surfaceContainerHighest,
+                fixedSize: const Size.square(AppSize.minTouch),
+              ),
+              icon: SvgPicture.asset(
+                'assets/icons/bell.svg',
+                width: 22,
+                height: 22,
+                colorFilter: ColorFilter.mode(scheme.onSurface, BlendMode.srcIn),
+              ),
             ),
-          ),
-        ],
+            Tooltip(
+              message: 'Cài đặt',
+              child: Semantics(
+                button: true,
+                label: 'Cài đặt',
+                excludeSemantics: true,
+                child: InkWell(
+                  onTap: onProfile,
+                  customBorder: const CircleBorder(),
+                  child: SvgPicture.asset(
+                    'assets/icons/avatar.svg',
+                    width: AppSize.minTouch,
+                    height: AppSize.minTouch,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

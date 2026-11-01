@@ -114,7 +114,10 @@ class _JarGrid extends StatelessWidget {
   final VoidCallback onRetryMore;
 
   /// Hũ nhỏ trên đầu lưới (S02 dùng hũ lớn 240).
-  static const double _jarHeight = 140;
+  /// `Illustration/Hũ chiến thắng` cỡ vừa của S05 (126 × 147).
+  static const double _jarHeight = 147;
+
+  static const double _tileMinHeight = 120;
 
   /// 2 cột trên điện thoại, 3 cột từ 600 dp, 4 cột từ 840 dp (handout S05).
   static int _columns(double width) => width >= 840
@@ -140,7 +143,7 @@ class _JarGrid extends StatelessWidget {
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(
             AppSpace.screen,
-            AppSpace.s8,
+            AppSpace.s16,
             AppSpace.screen,
             AppSpace.s16,
           ),
@@ -150,27 +153,56 @@ class _JarGrid extends StatelessWidget {
                 const OfflineBanner(),
                 const SizedBox(height: AppSpace.s16),
               ],
-              JarIllustration(
-                notes: data.jarTypes,
-                height: _jarHeight,
-                semanticLabel: 'Hũ chiến thắng',
-              ),
-              const SizedBox(height: AppSpace.s12),
+              // Figma `hũ`: hũ 126 × 147, bên phải là số nốt (Display/44
+              // Bold), "nốt tháng 10" và lối mở nhãn dán, cách nhau 16.
               Row(
+                spacing: AppSpace.s16,
                 children: <Widget>[
+                  JarIllustration(
+                    notes: data.jarTypes,
+                    height: _jarHeight,
+                    semanticLabel: 'Hũ chiến thắng',
+                  ),
                   Expanded(
-                    child: Text(
-                      count == null
-                          ? 'Tháng ${data.month}'
-                          : '$count nốt tháng ${data.month}',
-                      style: theme.textTheme.titleMedium,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: AppSpace.s4,
+                      children: <Widget>[
+                        if (count != null)
+                          Text(
+                            '$count',
+                            style: theme.textTheme.displayMedium?.copyWith(
+                              letterSpacing: -0.88,
+                            ),
+                          ),
+                        Text(
+                          count == null
+                              ? 'Tháng ${data.month}'
+                              : 'nốt tháng ${data.month}',
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            fontWeight: FontWeight.w400,
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        if (data.stickers.isNotEmpty)
+                          TextButton(
+                            onPressed: () =>
+                                _showStickers(context, data.stickers),
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                              minimumSize: const Size(0, AppSize.minTouch),
+                              alignment: Alignment.centerLeft,
+                              textStyle: theme.textTheme.labelLarge,
+                              foregroundColor:
+                                  theme.colorScheme.onPrimaryContainer,
+                            ),
+                            child: Text(
+                              '${data.stickers.length} nhãn dán  ›',
+                            ),
+                          ),
+                      ],
                     ),
                   ),
-                  if (data.stickers.isNotEmpty)
-                    TextButton(
-                      onPressed: () => _showStickers(context, data.stickers),
-                      child: Text('${data.stickers.length} nhãn dán ›'),
-                    ),
                 ],
               ),
             ],
@@ -178,24 +210,39 @@ class _JarGrid extends StatelessWidget {
         ),
         SliverPadding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpace.screen),
-          sliver: SliverGrid.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: columns,
-              mainAxisSpacing: AppSpace.grid,
-              crossAxisSpacing: AppSpace.grid,
-              childAspectRatio: AppSize.noteTile.aspectRatio,
+          // Figma `lưới nốt`: tờ nốt rộng bằng nhau, cao tối thiểu 120 và
+          // cao theo tiêu đề (tối đa 3 dòng); tờ cùng hàng cao bằng nhau.
+          sliver: SliverList.separated(
+            itemCount: (data.notes.length + columns - 1) ~/ columns,
+            separatorBuilder: (_, _) =>
+                const SizedBox(height: AppSpace.grid),
+            itemBuilder: (context, row) => IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: AppSpace.grid,
+                children: <Widget>[
+                  for (var i = row * columns; i < (row + 1) * columns; i++)
+                    Expanded(
+                      child: i < data.notes.length
+                          ? ConstrainedBox(
+                              constraints: const BoxConstraints(
+                                minHeight: _tileMinHeight,
+                              ),
+                              child: NoteTile(
+                                key: ValueKey<String>(data.notes[i].id),
+                                type: data.notes[i].type,
+                                title: data.notes[i].title,
+                                dateLabel: _dateLabel(data.notes[i]),
+                                onTap: () => context.push(
+                                  AppRoutes.noteDetail(data.notes[i].id),
+                                ),
+                              ),
+                            )
+                          : const SizedBox.shrink(),
+                    ),
+                ],
+              ),
             ),
-            itemCount: data.notes.length,
-            itemBuilder: (context, i) {
-              final note = data.notes[i];
-              return NoteTile(
-                key: ValueKey<String>(note.id),
-                type: note.type,
-                title: note.title,
-                dateLabel: _dateLabel(note),
-                onTap: () => context.push(AppRoutes.noteDetail(note.id)),
-              );
-            },
           ),
         ),
         SliverPadding(

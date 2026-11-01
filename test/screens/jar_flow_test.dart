@@ -35,7 +35,7 @@ void main() {
   ];
 
   Future<void> openJar(WidgetTester tester) async {
-    await tester.tap(find.text('Hũ'));
+    await tester.tap(findTab('Hũ'));
     await tester.pumpAndSettle();
     expect(find.byType(JarScreen), findsOneWidget);
   }
@@ -47,7 +47,8 @@ void main() {
       await pumpApp(tester, size: size, services: withNotes(sample));
       await openJar(tester);
 
-      expect(find.text('3 nốt tháng 10'), findsOneWidget);
+      expect(find.text('3'), findsOneWidget);
+      expect(find.text('nốt tháng 10'), findsOneWidget);
       expect(
         find.bySemanticsLabel(
           'Chiến thắng: Dọn bàn học, gửi email hỏi thầy, Hôm nay · Ổn',
@@ -99,7 +100,7 @@ void main() {
     expect(find.byType(NoteDetailScreen), findsOneWidget);
     expect(find.text('NHẬT KÝ · 21/10'), findsOneWidget);
 
-    await tester.tap(find.byTooltip('Sửa'));
+    await tester.tap(findTab('Sửa'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField).last, 'Ngủ ít quá.');
     await tester.pump();
@@ -108,7 +109,7 @@ void main() {
     await tester.tap(find.text('Lưu'));
     await tester.pumpAndSettle();
 
-    expect(find.byTooltip('Sửa'), findsOneWidget);
+    expect(findTab('Sửa'), findsOneWidget);
     final saved = services.notes.notes.firstWhere((n) => n.id == 'journal');
     expect(saved.body, startsWith('Ngủ ít quá.'));
     expect(saved.body, contains('Điều gì làm bạn thấy nhẹ hơn hôm nay?'));
@@ -120,7 +121,7 @@ void main() {
     await openJar(tester);
     await tester.tap(find.text('Vì sao tuần này mình mệt'));
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Sửa'));
+    await tester.tap(findTab('Sửa'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField).first, 'Tiêu đề mới');
     await tester.pump();
@@ -143,7 +144,7 @@ void main() {
     await tester.tap(find.text('Dừng lướt TikTok lúc 0h15'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byTooltip('Xoá'));
+    await tester.tap(findTab('Xoá'));
     await tester.pumpAndSettle();
     expect(find.text('Xoá nốt này?'), findsOneWidget);
     await tester.tap(find.text('Xoá'));
@@ -166,7 +167,7 @@ void main() {
     await openJar(tester);
     await tester.tap(find.text('Dừng lướt TikTok lúc 0h15'));
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Xoá'));
+    await tester.tap(findTab('Xoá'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Xoá'));
     await tester.pumpAndSettle();
@@ -174,6 +175,7 @@ void main() {
     await tester.pump(const Duration(seconds: 6));
     await tester.pumpAndSettle();
     expect(services.notes.deleted, <String>['self']);
-    expect(find.text('2 nốt tháng 10'), findsOneWidget);
+    expect(find.text('2'), findsOneWidget);
+    expect(find.text('nốt tháng 10'), findsOneWidget);
   });
 }

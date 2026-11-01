@@ -1,3 +1,4 @@
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../models/note_type.dart';
@@ -29,6 +30,7 @@ class NoteTile extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = AppColors.of(context);
     final radius = BorderRadius.circular(AppRadius.note);
+    final tagColor = type.tagColor(theme.colorScheme, colors);
 
     return Semantics(
       button: onTap != null,
@@ -45,38 +47,48 @@ class NoteTile extends StatelessWidget {
             padding: const EdgeInsets.all(AppSpace.s12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: AppSpace.s6,
               children: <Widget>[
+                // Nhãn loại: icon 14 + Caption/12 Bold màu theo loại.
                 Row(
+                  spacing: AppSpace.s4,
                   children: <Widget>[
-                    Icon(type.icon, size: 18, color: colors.onSurfaceMuted),
-                    const SizedBox(width: AppSpace.s6),
+                    SvgPicture.asset(
+                      type.tagIconAsset,
+                      width: 14,
+                      height: 14,
+                      colorFilter: ColorFilter.mode(tagColor, BlendMode.srcIn),
+                      excludeFromSemantics: true,
+                    ),
                     Flexible(
                       child: Text(
                         type.label,
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          color: colors.onSurfaceMuted,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: tagColor,
+                          fontWeight: FontWeight.w700,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: AppSpace.s8),
-                // Tối đa 2 dòng rồi "…" (DESIGN.md mục 10, deviation D-11);
-                // Flexible giữ tờ nốt không tràn khi người dùng phóng to chữ.
+                // Tối đa 3 dòng rồi "…" (Figma `Note/Tờ nốt`); Flexible thu
+                // còn ít dòng hơn khi ô có chiều cao cố định hoặc chữ phóng to.
                 Flexible(
                   child: Text(
                     title,
-                    style: theme.textTheme.titleSmall,
-                    maxLines: 2,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const SizedBox(height: AppSpace.s8),
                 Text(
                   dateLabel,
                   style: theme.textTheme.labelMedium?.copyWith(
-                    color: colors.onSurfaceMuted,
+                    fontWeight: FontWeight.w400,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],

@@ -50,7 +50,8 @@ void main() {
         expect(find.byType(NoteSavedScreen), findsOneWidget);
         expect(find.text('Đã vào hũ!'), findsOneWidget);
         expect(find.text('Nốt thứ 1 tháng này.'), findsOneWidget);
-        expect(find.text('Mốc tháng 10 · 1/25 nốt'), findsOneWidget);
+        expect(find.text('Mốc tháng 10'), findsOneWidget);
+        expect(find.text('1/25 nốt'), findsOneWidget);
         expect(tester.takeException(), isNull);
 
         final saved = services.notes.notes.single;

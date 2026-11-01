@@ -11,11 +11,13 @@ abstract final class AppTheme {
     const colors = AppColors.light;
     final text = AppTypography.textTheme(color: scheme.onSurface, font: font);
 
+    // Final UI: mọi nút dùng `radius/8`, nhãn Body/16 SemiBold.
     final buttonShape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(AppRadius.card),
+      borderRadius: BorderRadius.circular(AppRadius.r8),
     );
+    final buttonText = text.bodyLarge?.copyWith(fontWeight: FontWeight.w600);
     const buttonMinSize = Size(AppSize.buttonMinWidth, AppSize.buttonHeight);
-    const buttonPadding = EdgeInsets.symmetric(horizontal: AppSpace.s20);
+    const buttonPadding = EdgeInsets.symmetric(horizontal: AppSpace.s24);
 
     OutlineInputBorder inputBorder(Color color, [double width = 1]) =>
         OutlineInputBorder(
@@ -47,7 +49,7 @@ abstract final class AppTheme {
           minimumSize: buttonMinSize,
           padding: buttonPadding,
           shape: buttonShape,
-          textStyle: text.labelLarge,
+          textStyle: buttonText,
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -55,7 +57,7 @@ abstract final class AppTheme {
           minimumSize: buttonMinSize,
           padding: buttonPadding,
           shape: buttonShape,
-          textStyle: text.labelLarge,
+          textStyle: buttonText,
           foregroundColor: scheme.onPrimaryContainer,
           side: BorderSide(color: scheme.outline),
         ),
@@ -65,8 +67,8 @@ abstract final class AppTheme {
           minimumSize: buttonMinSize,
           padding: buttonPadding,
           shape: buttonShape,
-          textStyle: text.labelLarge,
-          foregroundColor: scheme.onPrimaryContainer,
+          textStyle: buttonText,
+          foregroundColor: scheme.primary,
         ),
       ),
       iconButtonTheme: IconButtonThemeData(

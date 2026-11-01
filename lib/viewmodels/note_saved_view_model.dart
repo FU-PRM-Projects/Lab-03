@@ -3,11 +3,13 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/note.dart';
+import '../models/note_type.dart';
 import '../services/clock.dart';
 import '../services/note_repository.dart';
 import '../services/remote_config_service.dart';
 import '../utils/dates.dart';
 import 'error_messages.dart';
+import 'today_view_model.dart';
 import 'view_state.dart';
 
 /// Nội dung S04 · Nốt đã vào hũ.
@@ -17,6 +19,7 @@ class SavedNoteSummary {
     required this.monthCount,
     required this.milestone,
     this.savedToday = true,
+    this.jarNotes = const <NoteType>[],
   });
 
   final Note note;
@@ -29,6 +32,9 @@ class SavedNoteSummary {
 
   /// Nốt ghi hôm nay: nhãn ngày là "Hôm nay" thay cho "24/10".
   final bool savedToday;
+
+  /// Loại các nốt mới nhất của tháng (gồm nốt này), để vẽ tờ nốt trong hũ.
+  final List<NoteType> jarNotes;
 
   /// Nốt vừa lưu đúng là nốt chạm mốc: hiện biến thể "Mốc 25 nốt!".
   bool get reachedMilestone => monthCount == milestone;
@@ -64,6 +70,11 @@ class NoteSavedViewModel extends Notifier<ViewState<SavedNoteSummary>> {
         Dates.startOfMonth(note.createdAt),
         Dates.startOfNextMonth(note.createdAt),
       );
+      final monthStart = Dates.startOfMonth(note.createdAt);
+      final recent = await _notes.list(
+        before: Dates.startOfNextMonth(note.createdAt),
+        limit: TodayViewModel.jarCapacity,
+      );
       if (!ref.mounted) return;
       state = Data<SavedNoteSummary>(
         SavedNoteSummary(
@@ -75,6 +86,10 @@ class NoteSavedViewModel extends Notifier<ViewState<SavedNoteSummary>> {
             note.createdAt,
             ref.read(clockProvider).now(),
           ),
+          jarNotes: <NoteType>[
+            for (final n in recent)
+              if (!n.createdAt.isBefore(monthStart)) n.type,
+          ],
         ),
       );
     } on Object catch (error) {
