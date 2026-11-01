@@ -689,7 +689,10 @@ class _Balance extends StatelessWidget {
 
   final JourneyData data;
 
-  static const double _chartHeight = 200;
+  static const double _chartHeight = 170;
+
+  /// Chỗ cho nhãn 2 dòng (Caption/12) quanh biểu đồ radar.
+  static const double _labelRoom = 36;
 
   @override
   Widget build(BuildContext context) {
@@ -713,39 +716,50 @@ class _Balance extends StatelessWidget {
                 .map((e) => '${e.key.label}: ${e.value} nốt')
                 .join(', '),
             excludeSemantics: true,
-            child: SizedBox(
-              height: _chartHeight,
-              child: RadarChart(
-                RadarChartData(
-                  radarShape: RadarShape.polygon,
-                  tickCount: 3,
-                  ticksTextStyle: const TextStyle(
-                    color: Color(0x00000000),
-                    fontSize: 1,
-                  ),
-                  radarBorderData: BorderSide(color: scheme.outlineVariant),
-                  gridBorderData: BorderSide(color: scheme.outlineVariant),
-                  tickBorderData: BorderSide(color: scheme.outlineVariant),
-                  titlePositionPercentageOffset: 0.18,
-                  titleTextStyle: theme.textTheme.labelSmall?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                  ),
-                  getTitle: (index, angle) => RadarChartTitle(
-                    text:
-                        '${entries[index].key.label}\n${entries[index].value}',
-                  ),
-                  dataSets: <RadarDataSet>[
-                    RadarDataSet(
-                      dataEntries: <RadarEntry>[
-                        for (final e in entries)
-                          RadarEntry(value: e.value.toDouble()),
-                      ],
-                      fillColor: scheme.primary.withValues(alpha: 0.22),
-                      borderColor: scheme.primary,
-                      borderWidth: 2,
-                      entryRadius: 3.5,
+            // fl_chart vẽ nhãn đỉnh ra ngoài khung biểu đồ: chừa lề để nhãn
+            // trên cùng ("Chiến thắng" + số, 2 dòng) không đè lên tiêu đề thẻ
+            // và nhãn hai đỉnh dưới không đè lên dòng kết luận.
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                _labelRoom,
+                _labelRoom,
+                _labelRoom,
+                AppSpace.s24,
+              ),
+              child: SizedBox(
+                height: _chartHeight,
+                child: RadarChart(
+                  RadarChartData(
+                    radarShape: RadarShape.polygon,
+                    tickCount: 3,
+                    ticksTextStyle: const TextStyle(
+                      color: Color(0x00000000),
+                      fontSize: 1,
                     ),
-                  ],
+                    radarBorderData: BorderSide(color: scheme.outlineVariant),
+                    gridBorderData: BorderSide(color: scheme.outlineVariant),
+                    tickBorderData: BorderSide(color: scheme.outlineVariant),
+                    titlePositionPercentageOffset: 0.18,
+                    titleTextStyle: theme.textTheme.labelSmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
+                    getTitle: (index, angle) => RadarChartTitle(
+                      text:
+                          '${entries[index].key.label}\n${entries[index].value}',
+                    ),
+                    dataSets: <RadarDataSet>[
+                      RadarDataSet(
+                        dataEntries: <RadarEntry>[
+                          for (final e in entries)
+                            RadarEntry(value: e.value.toDouble()),
+                        ],
+                        fillColor: scheme.primary.withValues(alpha: 0.22),
+                        borderColor: scheme.primary,
+                        borderWidth: 2,
+                        entryRadius: 3.5,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -810,9 +824,11 @@ class _Weekdays extends StatelessWidget {
                         Container(
                           width: 24,
                           height: AppSpace.s4 + _barMax * counts[i] / max,
-                          decoration: BoxDecoration(
-                            color: scheme.primary,
-                            borderRadius: const BorderRadius.vertical(
+                          // Tím nhạt mono/3: khác hẳn nút "+" primary nổi
+                          // phía trên.
+                          decoration: const BoxDecoration(
+                            color: AppPalette.mono3,
+                            borderRadius: BorderRadius.vertical(
                               top: Radius.circular(6),
                             ),
                           ),
