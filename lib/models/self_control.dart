@@ -33,11 +33,17 @@ class HabitList {
 /// phút kể từ 0h để model không phụ thuộc Flutter.
 class UserSettings {
   const UserSettings({
+    this.eveningReminder = 21 * 60 + 30,
     this.awakeEnabled = true,
     this.awakeStart = 23 * 60,
     this.awakeEnd = 60,
     this.lockSelfControl = false,
+    this.aiEnabled = false,
+    this.hideNotificationContent = false,
   });
+
+  /// "Nhắc ghi nốt buổi tối" (mặc định 21:30, flow F1 bắt đầu từ đây).
+  final int eveningReminder;
 
   /// "Giờ tỉnh": nhắc nhẹ trong khung giờ dễ lướt vô thức (mặc định 23:00 – 01:00).
   final bool awakeEnabled;
@@ -47,27 +53,50 @@ class UserSettings {
   /// "Khoá phần Tự chủ" (S12): che mục thói quen ở S09 tới khi mở khoá.
   final bool lockSelfControl;
 
+  /// "Nốt AI sắp xếp giúp" (tính năng của Final Assignment).
+  final bool aiEnabled;
+
+  /// "Ẩn nội dung thông báo" trên màn khoá.
+  final bool hideNotificationContent;
+
   UserSettings copyWith({
+    int? eveningReminder,
     bool? awakeEnabled,
     int? awakeStart,
     int? awakeEnd,
     bool? lockSelfControl,
+    bool? aiEnabled,
+    bool? hideNotificationContent,
   }) => UserSettings(
+    eveningReminder: eveningReminder ?? this.eveningReminder,
     awakeEnabled: awakeEnabled ?? this.awakeEnabled,
     awakeStart: awakeStart ?? this.awakeStart,
     awakeEnd: awakeEnd ?? this.awakeEnd,
     lockSelfControl: lockSelfControl ?? this.lockSelfControl,
+    aiEnabled: aiEnabled ?? this.aiEnabled,
+    hideNotificationContent:
+        hideNotificationContent ?? this.hideNotificationContent,
   );
 
   @override
   bool operator ==(Object other) =>
       other is UserSettings &&
+      other.eveningReminder == eveningReminder &&
       other.awakeEnabled == awakeEnabled &&
       other.awakeStart == awakeStart &&
       other.awakeEnd == awakeEnd &&
-      other.lockSelfControl == lockSelfControl;
+      other.lockSelfControl == lockSelfControl &&
+      other.aiEnabled == aiEnabled &&
+      other.hideNotificationContent == hideNotificationContent;
 
   @override
-  int get hashCode =>
-      Object.hash(awakeEnabled, awakeStart, awakeEnd, lockSelfControl);
+  int get hashCode => Object.hash(
+    eveningReminder,
+    awakeEnabled,
+    awakeStart,
+    awakeEnd,
+    lockSelfControl,
+    aiEnabled,
+    hideNotificationContent,
+  );
 }

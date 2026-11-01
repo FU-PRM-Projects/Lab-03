@@ -120,20 +120,29 @@ class FirestoreSettingsRepository implements SettingsRepository {
     const defaults = UserSettings();
     return _doc.watch(
       (data) => UserSettings(
+        eveningReminder:
+            data['eveningReminder'] as int? ?? defaults.eveningReminder,
         awakeEnabled: data['awakeEnabled'] as bool? ?? defaults.awakeEnabled,
         awakeStart: data['awakeStart'] as int? ?? defaults.awakeStart,
         awakeEnd: data['awakeEnd'] as int? ?? defaults.awakeEnd,
         lockSelfControl:
             data['lockSelfControl'] as bool? ?? defaults.lockSelfControl,
+        aiEnabled: data['aiEnabled'] as bool? ?? defaults.aiEnabled,
+        hideNotificationContent:
+            data['hideNotificationContent'] as bool? ??
+            defaults.hideNotificationContent,
       ),
     );
   }
 
   @override
   Future<void> save(UserSettings settings) => _doc.merge(<String, Object?>{
+    'eveningReminder': settings.eveningReminder,
     'awakeEnabled': settings.awakeEnabled,
     'awakeStart': settings.awakeStart,
     'awakeEnd': settings.awakeEnd,
     'lockSelfControl': settings.lockSelfControl,
+    'aiEnabled': settings.aiEnabled,
+    'hideNotificationContent': settings.hideNotificationContent,
   });
 }
