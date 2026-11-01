@@ -382,28 +382,53 @@ class _JarControls extends StatelessWidget {
       ),
     );
 
+    final scheme = Theme.of(context).colorScheme;
+
     return Row(
       children: <Widget>[
         Expanded(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.only(left: AppSpace.screen),
-            child: Row(
-              spacing: AppSpace.s8,
-              children: <Widget>[
-                chip('Tất cả', null),
-                for (final type in NoteType.values) chip(type.label, type),
-              ],
+          // Mép phải hàng chip mờ dần thay vì bị nút đổi kiểu cắt ngang, để
+          // thấy rõ hàng chip còn cuộn tiếp được.
+          child: ShaderMask(
+            blendMode: BlendMode.dstIn,
+            shaderCallback: (bounds) => const LinearGradient(
+              colors: <Color>[Color(0xFF000000), Color(0x00000000)],
+              stops: <double>[0.82, 1],
+            ).createShader(bounds),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.fromLTRB(
+                AppSpace.screen,
+                0,
+                AppSpace.s24,
+                0,
+              ),
+              child: Row(
+                spacing: AppSpace.s8,
+                children: <Widget>[
+                  chip('Tất cả', null),
+                  for (final type in NoteType.values) chip(type.label, type),
+                ],
+              ),
             ),
           ),
         ),
+        // Nút tròn có viền, tách hẳn khỏi hàng chip.
         Padding(
-          padding: const EdgeInsets.only(right: AppSpace.s8),
+          padding: const EdgeInsets.only(
+            left: AppSpace.s4,
+            right: AppSpace.s12,
+          ),
           child: IconButton(
             onPressed: () => onListMode(!listMode),
             tooltip: listMode ? 'Xem dạng lưới' : 'Xem dạng danh sách',
+            style: IconButton.styleFrom(
+              backgroundColor: scheme.surfaceContainerLow,
+              side: BorderSide(color: scheme.outlineVariant),
+            ),
             icon: Icon(
               listMode ? Icons.grid_view_rounded : Icons.view_agenda_outlined,
+              size: 20,
             ),
           ),
         ),
