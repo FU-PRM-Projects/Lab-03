@@ -127,6 +127,8 @@ void main() {
       find.text('Xuất & tải lên Thẻ tuần (PDF)'),
       200,
     );
+    await tester.ensureVisible(find.text('Xuất & tải lên Thẻ tuần (PDF)'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Xuất & tải lên Thẻ tuần (PDF)'));
     await tester.pumpAndSettle();
     expect(find.byType(JourneyScreen), findsOneWidget);

@@ -68,7 +68,7 @@ abstract final class AppTheme {
           padding: buttonPadding,
           shape: buttonShape,
           textStyle: buttonText,
-          foregroundColor: scheme.onPrimaryContainer,
+          foregroundColor: scheme.primary,
           side: BorderSide(color: scheme.outline),
         ),
       ),
@@ -166,10 +166,7 @@ abstract final class AppTheme {
         selectedColor: scheme.primary,
         disabledColor: scheme.surfaceContainerHighest,
         labelStyle: text.labelLarge?.copyWith(fontWeight: FontWeight.w500),
-        secondaryLabelStyle: text.labelLarge?.copyWith(
-          fontWeight: FontWeight.w500,
-          color: scheme.onPrimary,
-        ),
+        secondaryLabelStyle: text.labelLarge?.copyWith(color: scheme.onPrimary),
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpace.s14,
           vertical: AppSpace.s10,

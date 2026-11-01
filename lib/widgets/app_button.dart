@@ -1,3 +1,4 @@
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Kiểu của component `Button` Lab 2.
@@ -13,6 +14,7 @@ class AppButton extends StatelessWidget {
     required this.onPressed,
     this.variant = AppButtonVariant.filled,
     this.icon,
+    this.iconAsset,
     this.loading = false,
     this.expand = false,
     super.key,
@@ -22,6 +24,9 @@ class AppButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final AppButtonVariant variant;
   final IconData? icon;
+
+  /// Icon SVG 20 dp của Figma, tô theo màu chữ của nút.
+  final String? iconAsset;
   final bool loading;
 
   /// Kéo nút rộng hết chiều ngang (nút chính cuối màn).
@@ -38,6 +43,20 @@ class AppButton extends StatelessWidget {
       children: <Widget>[
         if (icon != null) ...<Widget>[
           Icon(icon, size: 20),
+          const SizedBox(width: 8),
+        ],
+        if (iconAsset != null) ...<Widget>[
+          Builder(
+            builder: (context) => SvgPicture.asset(
+              iconAsset!,
+              width: 20,
+              height: 20,
+              colorFilter: ColorFilter.mode(
+                IconTheme.of(context).color ?? scheme.primary,
+                BlendMode.srcIn,
+              ),
+            ),
+          ),
           const SizedBox(width: 8),
         ],
         Flexible(child: Text(label, overflow: TextOverflow.ellipsis)),

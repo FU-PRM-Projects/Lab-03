@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../router/app_routes.dart';
+import '../../theme/app_colors.dart';
 import '../../theme/app_tokens.dart';
+import '../../theme/app_typography.dart';
 import '../../utils/vi_date_format.dart';
 import '../../viewmodels/breathing_view_model.dart';
 import '../../widgets/app_button.dart';
@@ -41,7 +43,10 @@ class BreathingScreen extends ConsumerWidget {
     });
 
     return Scaffold(
-      appBar: const AppTopBar(title: 'Thở cùng Nốt'),
+      appBar: const AppTopBar(
+        title: 'Thở cùng Nốt',
+        leading: AppBarLeading.close,
+      ),
       body: SafeArea(
         top: false,
         child: Center(
@@ -65,7 +70,9 @@ class _Breathing extends StatelessWidget {
   final BreathingState state;
   final BreathingViewModel viewModel;
 
-  /// Vòng tròn to khi hít vào / giữ hơi, nhỏ khi thở ra.
+  /// Figma `vòng thở`: vòng ngoài 240 (mono/1), vòng trong primary-container
+  /// to khi hít vào / giữ hơi, nhỏ khi thở ra.
+  static const double _ring = 240;
   static const double _big = 220;
   static const double _small = 140;
 
@@ -99,99 +106,108 @@ class _Breathing extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final noMotion = MediaQuery.disableAnimationsOf(context);
     final big = state.phase != BreathPhase.exhale;
     final status = state.roundDone
         ? 'Xong một vòng'
         : 'Còn ${ViDateFormat.countdown(state.remaining)}';
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        Expanded(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(AppSpace.screen),
-            child: Column(
-              children: <Widget>[
-                SizedBox(
-                  height: _big + AppSpace.s16,
-                  child: Center(
-                    child: AnimatedContainer(
-                      // Không có chuyển động: đổi kích thước theo bước.
-                      duration: noMotion || state.roundDone
-                          ? Duration.zero
-                          : Duration(seconds: state.phaseSeconds),
-                      curve: Curves.easeInOut,
-                      width: big ? _big : _small,
-                      height: big ? _big : _small,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: theme.colorScheme.primaryContainer,
-                      ),
-                      alignment: Alignment.center,
-                      child: const Mascot(
-                        state: MascotState.thongTha,
-                        size: 72,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: AppSpace.s16),
-                Semantics(
-                  liveRegion: true,
-                  child: Text(
-                    state.roundDone ? 'Bạn làm tốt lắm' : state.phase.label,
-                    style: theme.textTheme.headlineMedium,
-                  ),
-                ),
-                const SizedBox(height: AppSpace.s8),
-                Text(
-                  state.pattern.description,
-                  style: theme.textTheme.bodyLarge,
-                ),
-                const SizedBox(height: AppSpace.s4),
-                Text(
-                  status,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
+    return _SpacedBody(
+      top: <Widget>[
+        Container(
+          width: _ring,
+          height: _ring,
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppPalette.mono1,
+          ),
+          alignment: Alignment.center,
+          child: AnimatedContainer(
+            // Không có chuyển động: đổi kích thước theo bước.
+            duration: noMotion || state.roundDone
+                ? Duration.zero
+                : Duration(seconds: state.phaseSeconds),
+            curve: Curves.easeInOut,
+            width: big ? _big : _small,
+            height: big ? _big : _small,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: scheme.primaryContainer,
             ),
+            alignment: Alignment.center,
+            child: const Mascot(state: MascotState.thongTha, size: 102.6),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpace.screen,
-            AppSpace.s8,
-            AppSpace.screen,
-            AppSpace.screen,
+        Column(
+          spacing: AppSpace.s8,
+          children: <Widget>[
+            Semantics(
+              liveRegion: true,
+              child: Text(
+                state.roundDone ? 'Bạn làm tốt lắm' : state.phase.label,
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  letterSpacing: -0.56,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            Text(
+              state.pattern.description,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: scheme.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+        // Figma `thời gian`: thanh 6 dp chạy theo vòng 90 giây.
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: AppSpace.s8,
+          children: <Widget>[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(3),
+              child: LinearProgressIndicator(
+                value: 1 - state.remaining / BreathingState.roundSeconds,
+                minHeight: AppSpace.s6,
+                backgroundColor: scheme.surfaceContainerHighest,
+              ),
+            ),
+            Text(
+              status,
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: scheme.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+        Center(
+          child: TextButton(
+            onPressed: () => _choosePattern(context),
+            style: TextButton.styleFrom(
+              foregroundColor: scheme.onPrimaryContainer,
+              textStyle: theme.textTheme.labelLarge,
+              minimumSize: const Size(AppSize.minTouch, AppSize.minTouch),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpace.s12),
+            ),
+            child: const Text('Đổi kiểu thở'),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              AppButton(
-                label: 'Đổi kiểu thở',
-                variant: AppButtonVariant.tonal,
-                expand: true,
-                onPressed: () => _choosePattern(context),
-              ),
-              const SizedBox(height: AppSpace.s8),
-              AppButton(
-                label: 'Cơn sóng đã hạ',
-                expand: true,
-                onPressed: viewModel.finish,
-              ),
-              const SizedBox(height: AppSpace.s8),
-              AppButton(
-                label: 'Thở thêm 1 vòng',
-                variant: AppButtonVariant.text,
-                expand: true,
-                onPressed: viewModel.restart,
-              ),
-            ],
-          ),
+        ),
+      ],
+      bottom: <Widget>[
+        AppButton(
+          label: 'Cơn sóng đã hạ',
+          variant: AppButtonVariant.tonal,
+          expand: true,
+          onPressed: viewModel.finish,
+        ),
+        AppButton(
+          label: 'Thở thêm 1 vòng',
+          variant: AppButtonVariant.text,
+          expand: true,
+          onPressed: viewModel.restart,
         ),
       ],
     );
@@ -207,78 +223,151 @@ class _After extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final stops = state.todayStops;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        Expanded(
-          child: ListView(
-            padding: const EdgeInsets.all(AppSpace.screen),
-            children: <Widget>[
-              const Center(child: Mascot(state: MascotState.xong, size: 120)),
-              const SizedBox(height: AppSpace.s16),
-              Semantics(
-                header: true,
-                liveRegion: true,
-                child: Text(
-                  'Bạn đã vượt qua!',
-                  style: theme.textTheme.displaySmall,
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              if (stops != null && stops > 0) ...<Widget>[
-                const SizedBox(height: AppSpace.s8),
-                Text(
-                  '$stops lần dừng lại hôm nay',
-                  style: theme.textTheme.bodyLarge,
-                  textAlign: TextAlign.center,
-                ),
-              ],
-              const SizedBox(height: AppSpace.s24),
-              Text('Làm gì tiếp?', style: theme.textTheme.titleMedium),
-              const SizedBox(height: AppSpace.s8),
-              Wrap(
-                spacing: AppSpace.s8,
-                runSpacing: AppSpace.s8,
-                children: <Widget>[
-                  for (final alternative in BreathingState.alternatives)
-                    QuickWinChip(
-                      label: alternative,
-                      selected: state.alternative == alternative,
-                      onSelected: (_) =>
-                          viewModel.chooseAlternative(alternative),
-                    ),
-                ],
-              ),
-            ],
+    return _SpacedBody(
+      top: <Widget>[
+        Container(
+          width: 170,
+          height: 170,
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppPalette.mono1,
+          ),
+          alignment: Alignment.center,
+          child: Container(
+            width: 124,
+            height: 124,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: scheme.primaryContainer,
+            ),
+            alignment: Alignment.center,
+            child: const OverflowBox(
+              maxWidth: 140,
+              maxHeight: 140,
+              child: Mascot(state: MascotState.xong, size: 102.6),
+            ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpace.screen,
-            AppSpace.s8,
-            AppSpace.screen,
-            AppSpace.screen,
+        Semantics(
+          header: true,
+          liveRegion: true,
+          child: Text(
+            'Bạn đã vượt qua!',
+            style: theme.textTheme.headlineMedium?.copyWith(
+              letterSpacing: -0.56,
+            ),
+            textAlign: TextAlign.center,
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              AppButton(
-                label: 'Ghi vào hũ',
-                expand: true,
-                loading: state.saving,
-                onPressed: state.saving ? null : viewModel.saveToJar,
+        ),
+        // Figma `Lần dừng hôm nay`: số Headline/28 + chú thích trên nền
+        // primary-container.
+        if (stops != null && stops > 0)
+          Semantics(
+            label: '$stops lần dừng lại hôm nay',
+            excludeSemantics: true,
+            child: Container(
+              padding: const EdgeInsets.all(AppSpace.s16),
+              decoration: BoxDecoration(
+                color: scheme.primaryContainer,
+                borderRadius: BorderRadius.circular(AppRadius.card),
               ),
-              const SizedBox(height: AppSpace.s8),
-              AppButton(
-                label: 'Về Hôm nay',
-                variant: AppButtonVariant.text,
-                expand: true,
-                onPressed: () => context.go(AppRoutes.today),
+              child: Row(
+                spacing: AppSpace.s12,
+                children: <Widget>[
+                  Text(
+                    '$stops',
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      letterSpacing: -0.56,
+                      color: scheme.onPrimaryContainer,
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      'lần dừng lại hôm nay',
+                      style: theme.textTheme.labelLarge,
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
+          ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: AppSpace.s8,
+          children: <Widget>[
+            Text(
+              'Làm gì tiếp?',
+              style: AppTextStyles.of(context).title17Bold
+                  .copyWith(letterSpacing: -0.17),
+            ),
+            Wrap(
+              spacing: AppSpace.s8,
+              runSpacing: AppSpace.s8,
+              children: <Widget>[
+                for (final alternative in BreathingState.alternatives)
+                  QuickWinChip(
+                    label: alternative,
+                    selected: state.alternative == alternative,
+                    onSelected: (_) => viewModel.chooseAlternative(alternative),
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ],
+      bottom: <Widget>[
+        AppButton(
+          label: 'Ghi vào hũ',
+          expand: true,
+          loading: state.saving,
+          onPressed: state.saving ? null : viewModel.saveToJar,
+        ),
+        AppButton(
+          label: 'Về Hôm nay',
+          variant: AppButtonVariant.text,
+          expand: true,
+          onPressed: () => context.go(AppRoutes.today),
+        ),
+      ],
+    );
+  }
+}
+
+/// Bố cục S10: nội dung căn giữa giữa hai khoảng co giãn, nút dính đáy, các
+/// khối cách nhau 16; màn thấp hoặc chữ lớn thì cuộn.
+class _SpacedBody extends StatelessWidget {
+  const _SpacedBody({required this.top, required this.bottom});
+
+  final List<Widget> top;
+  final List<Widget> bottom;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomScrollView(
+      slivers: <Widget>[
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpace.screen,
+              AppSpace.s16,
+              AppSpace.screen,
+              AppSpace.s24,
+            ),
+            // Căn giữa để vòng thở giữ đúng kích thước; khối nào cần rộng hết
+            // (thanh thời gian, chip, nút) tự kéo giãn.
+            child: Column(
+              spacing: AppSpace.s16,
+              children: <Widget>[
+                const Spacer(),
+                ...top,
+                const Spacer(),
+                ...bottom,
+              ],
+            ),
           ),
         ),
       ],

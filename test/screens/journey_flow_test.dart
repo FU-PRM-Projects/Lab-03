@@ -107,6 +107,9 @@ void main() {
     final services = await openJourney(tester, notes: monthOfNotes());
     await openTab(tester, 'Thống kê');
     await tester.scrollUntilVisible(find.text('Mục tiêu tuần'), 200);
+    // Đưa thẻ lên đầu vùng cuộn, khỏi bị thanh tab nổi che.
+    await tester.ensureVisible(find.text('Mục tiêu tuần'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Mục tiêu tuần'));
     await tester.pumpAndSettle();
     expect(find.byType(WeeklyCardPage), findsOneWidget);

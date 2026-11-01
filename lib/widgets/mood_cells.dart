@@ -1,20 +1,21 @@
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../models/mood.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_tokens.dart';
-import 'mascot.dart';
 
-/// Component `Cell/Ngày năng lượng`: ô 48 × 56 của lịch tháng S11c.
-///
-/// [mood] `null` là "Chưa ghi"; [inMonth] `false` là ngày khác tháng (không
-/// nền, chữ mờ).
+/// Component `Cell/Ngày năng lượng` (Final UI): ô 48 × 56, bên trong là tờ
+/// nốt 42 × 50 (bo 12, góc trên phải 3) tô màu tâm trạng `heat/1…5`, số ngày
+/// và khuôn mặt theo tâm trạng, nên không chỉ báo bằng màu. Hôm nay có viền
+/// on-surface 3.
 class MoodDayCell extends StatelessWidget {
   const MoodDayCell({
     required this.day,
     required this.semanticDate,
     this.mood,
     this.inMonth = true,
+    this.today = false,
     this.onTap,
     super.key,
   });
@@ -25,7 +26,15 @@ class MoodDayCell extends StatelessWidget {
   final String semanticDate;
   final Mood? mood;
   final bool inMonth;
+  final bool today;
   final VoidCallback? onTap;
+
+  static const BorderRadius _noteRadius = BorderRadius.only(
+    topLeft: Radius.circular(AppRadius.r12),
+    topRight: Radius.circular(3),
+    bottomLeft: Radius.circular(AppRadius.r12),
+    bottomRight: Radius.circular(AppRadius.r12),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -33,45 +42,73 @@ class MoodDayCell extends StatelessWidget {
     final scheme = theme.colorScheme;
     final colors = AppColors.of(context);
 
-    final Color? background = !inMonth
-        ? null
+    final Color background = !inMonth
+        ? const Color(0x00000000)
         : mood == null
         ? scheme.surfaceContainerHighest
         : colors.mood(mood!);
 
     return Semantics(
       button: onTap != null,
-      label: '$semanticDate, ${mood?.label ?? 'chưa ghi'}',
+      label:
+          '$semanticDate, ${mood?.label ?? 'chưa ghi'}'
+          '${today ? ', hôm nay' : ''}',
       onTap: onTap,
       excludeSemantics: true,
       child: SizedBox.fromSize(
         size: AppSize.moodDayCell,
-        child: Material(
-          color: background ?? const Color(0x00000000),
-          borderRadius: BorderRadius.circular(AppRadius.r12),
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(AppRadius.r12),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  '$day',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: inMonth ? scheme.onSurface : scheme.onSurfaceVariant,
+        child: Padding(
+          padding: const EdgeInsets.all(3),
+          child: Material(
+            color: background,
+            shape: RoundedRectangleBorder(
+              borderRadius: _noteRadius,
+              side: today
+                  ? BorderSide(color: scheme.onSurface, width: 3)
+                  : BorderSide.none,
+            ),
+            child: InkWell(
+              onTap: onTap,
+              customBorder: const RoundedRectangleBorder(
+                borderRadius: _noteRadius,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                spacing: AppSpace.s4,
+                children: <Widget>[
+                  Text(
+                    '$day',
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      color: inMonth
+                          ? scheme.onSurface
+                          : scheme.onSurfaceVariant,
+                    ),
                   ),
-                ),
-                if (inMonth && mood != null) ...<Widget>[
-                  const SizedBox(height: AppSpace.s2),
-                  Mascot(state: mood!.mascot, size: 20),
+                  if (inMonth && mood != null)
+                    SvgPicture.asset(
+                      mood!.faceAsset,
+                      width: 20,
+                      height: 10,
+                      excludeFromSemantics: true,
+                    ),
                 ],
-              ],
+              ),
             ),
           ),
         ),
       ),
     );
   }
+}
+
+/// Khuôn mặt nhỏ trong ô lịch (Vui và Ổn dùng chung mặt cười).
+extension MoodFace on Mood {
+  String get faceAsset => switch (this) {
+    Mood.vui || Mood.on => 'assets/faces/face-vui.svg',
+    Mood.binhThuong => 'assets/faces/face-binh-thuong.svg',
+    Mood.met => 'assets/faces/face-met.svg',
+    Mood.roi => 'assets/faces/face-roi.svg',
+  };
 }
 
 /// Component `Cell/Pixel năm`: ô nhỏ chế độ Năm, chỉ trang trí (có chú giải

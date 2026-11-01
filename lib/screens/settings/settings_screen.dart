@@ -6,7 +6,6 @@ import 'package:material_ui/material_ui.dart';
 import '../../models/self_control.dart';
 import '../../router/app_routes.dart';
 import '../../theme/app_tokens.dart';
-import '../../theme/app_typography.dart';
 import '../../utils/vi_date_format.dart';
 import '../../viewmodels/auth_view_model.dart';
 import '../../viewmodels/settings_view_model.dart';
@@ -106,44 +105,52 @@ class SettingsScreen extends ConsumerWidget {
         ),
       ],
       Data<UserSettings>(:final value) => <Widget>[
-        const _Section('NHẮC NHỞ'),
-        SettingRow.value(
-          title: 'Nhắc ghi nốt buổi tối',
-          value: ViDateFormat.clock(value.eveningReminder),
-          onTap: () => pickReminder(value),
+        SettingGroup(
+          label: 'NHẮC NHỞ',
+          children: <Widget>[
+            SettingRow.value(
+              title: 'Nhắc ghi nốt buổi tối',
+              value: ViDateFormat.clock(value.eveningReminder),
+              onTap: () => pickReminder(value),
+            ),
+            // Figma: dòng "Giờ tỉnh" hiện luôn khung giờ đang đặt.
+            SettingRow.toggle(
+              title: 'Giờ tỉnh',
+              subtitle:
+                  '${ViDateFormat.clock(value.awakeStart)} – '
+                  '${ViDateFormat.clock(value.awakeEnd)}',
+              value: value.awakeEnabled,
+              onChanged: viewModel.setAwakeEnabled,
+            ),
+            SettingRow.value(
+              title: 'Đổi khung giờ tỉnh',
+              value: '',
+              onTap: () => pickAwake(value),
+            ),
+          ],
         ),
-        SettingRow.toggle(
-          title: 'Giờ tỉnh',
-          subtitle: 'Nhắc nhẹ khi dễ lướt vô thức',
-          value: value.awakeEnabled,
-          onChanged: viewModel.setAwakeEnabled,
-        ),
-        SettingRow.value(
-          title: 'Khung giờ tỉnh',
-          value:
-              '${ViDateFormat.clock(value.awakeStart)} – '
-              '${ViDateFormat.clock(value.awakeEnd)}',
-          onTap: () => pickAwake(value),
-        ),
-        const SizedBox(height: AppSpace.s16),
-        const _Section('QUYỀN RIÊNG TƯ'),
-        SettingRow.toggle(
-          title: 'Nốt AI sắp xếp giúp',
-          subtitle: 'Không gửi tên, email, ảnh',
-          value: value.aiEnabled,
-          onChanged: viewModel.setAiEnabled,
-        ),
-        SettingRow.toggle(
-          title: 'Khoá phần Tự chủ',
-          subtitle: 'Mở bằng vân tay hoặc mã máy',
-          value: value.lockSelfControl,
-          onChanged: state.authenticating ? null : viewModel.setLockSelfControl,
-        ),
-        SettingRow.toggle(
-          title: 'Ẩn nội dung thông báo',
-          subtitle: 'Màn khoá chỉ hiện "Nốt có lời nhắc"',
-          value: value.hideNotificationContent,
-          onChanged: viewModel.setHideNotificationContent,
+        SettingGroup(
+          label: 'QUYỀN RIÊNG TƯ',
+          children: <Widget>[
+            SettingRow.toggle(
+              title: 'Nốt AI sắp xếp giúp',
+              subtitle: 'Không gửi tên, email, ảnh',
+              value: value.aiEnabled,
+              onChanged: viewModel.setAiEnabled,
+            ),
+            SettingRow.toggle(
+              title: 'Khoá phần Tự chủ',
+              value: value.lockSelfControl,
+              onChanged: state.authenticating
+                  ? null
+                  : viewModel.setLockSelfControl,
+            ),
+            SettingRow.toggle(
+              title: 'Ẩn nội dung thông báo',
+              value: value.hideNotificationContent,
+              onChanged: viewModel.setHideNotificationContent,
+            ),
+          ],
         ),
       ],
     };
@@ -153,75 +160,60 @@ class SettingsScreen extends ConsumerWidget {
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: AppSize.contentMaxWidth),
+          // Figma S12: nhóm cách nhau 16, nút Đăng xuất (Outlined, icon
+          // Logout 20) dưới cùng.
           child: ListView(
             padding: const EdgeInsets.fromLTRB(
               AppSpace.screen,
-              AppSpace.s8,
+              AppSpace.s16,
               AppSpace.screen,
               AppSpace.s24,
             ),
             children: <Widget>[
-              ...settingsSection,
-              const SizedBox(height: AppSpace.s16),
-              const _Section('TÀI KHOẢN'),
-              // Email dài: 1 dòng rồi "…" (handout S12).
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                minTileHeight: AppSize.settingRowMinHeight,
-                title: const Text('Email'),
-                subtitle: Text(
-                  user?.email ?? 'Không có email',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+              for (final section in settingsSection) ...<Widget>[
+                section,
+                const SizedBox(height: AppSpace.s16),
+              ],
+              SettingGroup(
+                label: 'TÀI KHOẢN',
+                children: <Widget>[
+                  // Email dài: 1 dòng rồi "…" (handout S12).
+                  SettingRow.value(
+                    title: 'Email',
+                    value: user?.email ?? 'Không có email',
+                  ),
+                ],
               ),
-              const SizedBox(height: AppSpace.s8),
+              const SizedBox(height: AppSpace.s16),
+              // Khu demo Firebase (Lab 3 mục 3, deviation D-01).
+              SettingGroup(
+                label: 'KHU DEMO FIREBASE',
+                children: <Widget>[
+                  SettingRow.value(
+                    title: 'Xuất & tải lên Thẻ tuần (PDF)',
+                    subtitle: 'Cloud Storage · reports/{uid}/',
+                    value: '',
+                    onTap: () => context.go(AppRoutes.journeyTab('stats')),
+                  ),
+                  if (!kReleaseMode)
+                    SettingRow.value(
+                      title: 'Thư viện component (dev)',
+                      value: '',
+                      onTap: () => context.push(AppRoutes.componentGallery),
+                    ),
+                ],
+              ),
+              const SizedBox(height: AppSpace.s24),
               AppButton(
                 label: 'Đăng xuất',
                 variant: AppButtonVariant.outlined,
-                icon: Icons.logout,
+                iconAsset: 'assets/icons/logout.svg',
                 expand: true,
                 loading: auth.busy == AuthAction.signOut,
                 onPressed: auth.isBusy ? null : confirmSignOut,
               ),
-              const SizedBox(height: AppSpace.s24),
-              // Khu demo Firebase (Lab 3 mục 3, deviation D-01).
-              const _Section('KHU DEMO FIREBASE'),
-              SettingRow.value(
-                title: 'Xuất & tải lên Thẻ tuần (PDF)',
-                subtitle: 'Cloud Storage · reports/{uid}/',
-                value: '',
-                onTap: () => context.go(AppRoutes.journeyTab('stats')),
-              ),
-              if (!kReleaseMode)
-                SettingRow.value(
-                  title: 'Thư viện component (dev)',
-                  value: '',
-                  onTap: () => context.push(AppRoutes.componentGallery),
-                ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _Section extends StatelessWidget {
-  const _Section(this.label);
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpace.s4),
-      child: Semantics(
-        header: true,
-        child: Text(
-          label,
-          style: AppTextStyles.of(context).overline
-              .copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
         ),
       ),
     );
