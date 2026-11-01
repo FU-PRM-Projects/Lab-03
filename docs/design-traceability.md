@@ -49,6 +49,35 @@ Tab cấp cao giữ đúng Lab 2: Hôm nay, Hũ, Thử thách, Hành trình tron
 | Thẻ tuần dạng story + "Lưu thẻ tuần (PDF)" | S11b | `WeeklyCardPage` (route toàn màn, `fullscreenDialog`) | Done · Deviation D-06 |
 | Dialog gợi ý hỗ trợ (Mệt/Rối 5 ngày liền) | S11 (P6) | `showAppDialog(kind: confirmation)` | Done |
 
+### 1.2 Phần thêm trên Figma (section 24/10 – 01/11)
+
+Các section `AI · Nốt sắp xếp giúp (Gemini)`, `Làm quen & Tụi Nốt AI`, `Nhóm lần đầu`, `Kết nối Discord` trên page `03 Final UI`. Mỗi section có một frame `Spec` ghi dữ liệu, Remote Config và Analytics (tóm tắt ở mục 6). Section `A11y · kiểm tra 360 dp / 412 dp` không thêm màn, chỉ là tiêu chí kiểm thử bố cục (mục 2, T4).
+
+| Mã | Màn hình (Figma) | Route | Screen widget | ViewModel | Nguồn dữ liệu | Trạng thái |
+|---|---|---|---|---|---|---|
+| S03b AI | Ghi nốt bước 2 · Kể tự do, đang đọc, gợi ý để xác nhận, AI nghỉ, lần đầu dùng (quyền riêng tư), gợi ý nhóm & lần đầu | `/note/new?step=2` (tab "Kể tự do") | `NoteComposerScreen` + `FreeTellPanel` | `NoteComposerViewModel`, `AiSortViewModel` | `AiService.sortNotes()` (Gemini qua Firebase AI Logic, App Check), Remote Config `ai_*`; đồng ý lần đầu lưu `users/{uid}/private/settings.aiConsent` | Planned |
+| S04 nhóm | Lần đầu tiên! (nhóm mới) | `/note/saved/:id` | `NoteSavedScreen` (biến thể `isFirst`) | `NoteSavedViewModel` | Nốt có `isFirst`, nhóm `groups/{uid}/items/{groupId}` | Planned |
+| S05 kệ | Hũ & Nhật ký · kệ "Nhóm lần đầu" | `/jar` | `JarScreen` + `GroupShelf` | `JarViewModel`, `GroupsViewModel` | Firestore `groups/{uid}/items` | Planned |
+| S05e | Chi tiết nhóm (Bắt chuyện, lối vào phòng Discord) | `/jar/groups/:groupId` | `GroupDetailScreen` | `GroupDetailViewModel` | `groups/{uid}/items/{groupId}`, nốt có `groupId`; Remote Config `discord_channel_map` | Planned |
+| S08b | Tập nói với Tụi Nốt (AI), vai người trong #chao-hoi | `/challenges/:id/practice?role=` | `PracticeChatScreen` | `PracticeChatViewModel` | `AiService.roleplay()` (tối đa `ai_roleplay_max_turns` lượt, không lưu đoạn chat); lỗi → câu mở lời có sẵn | Planned |
+| S08c | Sau thử thách · lời nhắn Tụi Nốt (AI), cần hỗ trợ | `/challenges/:id/message` | `ChallengeMessageScreen` | `ChallengeMessageViewModel` | `AiService.afterChallenge()` → `{message, needs_support}`; lưu lời nhắn kèm nốt | Planned |
+| S08d | Tụi Nốt viết giúp câu chào (AI), AI nghỉ, đã sao chép / đang mở Discord | `/challenges/:id/greeting` | `GreetingScreen` | `GreetingViewModel` | `AiService.greetings()` → `{lines[3]}`; lỗi → câu có sẵn từ Remote Config; `Clipboard` + `url_launcher` | Planned |
+| S08 Discord | Thử thách cấp 3 · chào trong #chao-hoi; quay lại từ Discord | `/challenges/:id` | `ChallengeDetailScreen` | `ChallengeDetailViewModel` | Thẻ cấp 3 chặng Dũng cảm; `AppLifecycleState.resumed` sau khi mở link → "Bạn vừa ghé phòng chung" | Planned |
+| S11 Hỏi Nốt | Hỏi Nốt (AI, bonus Level 3) | `/journey/ask` | `AskNotScreen` | `AskNotViewModel` | Gemini function calling `countNotes(type, month)` trên Firestore của chính người dùng; Remote Config `ai_ask_enabled` | Planned (bonus) |
+| S12 thêm | Cài đặt · bật/tắt Nốt AI, làm lại khảo sát, Phòng trò chuyện | `/settings` | `SettingsScreen` | `SettingsViewModel` | `users/{uid}/private/settings.aiEnabled` (đã có), mở S13a / S14 | Planned |
+| S13a–d | Làm quen 1/4 người lạ, 2/4 thói quen, 3/4 nhịp sống, 4/4 mục tiêu | `/onboarding?step=1..4` | `OnboardingScreen` | `OnboardingViewModel` | Câu trả lời `users/{uid}/private/onboarding`; điền sẵn thói quen S09 (`private/habits`) | Planned |
+| S13e–g | Tụi Nốt đang đọc; hồ sơ khởi đầu + 3 thẻ (AI); AI nghỉ, thẻ mặc định | `/onboarding/plan` | `OnboardingPlanScreen` | `OnboardingViewModel` | `AiService.starterPlan()` → `StarterPlan`; lỗi / tắt → `StarterPlanRules` (bảng luật trong app); lưu cấp khởi đầu `challengeProgress`, giờ nhắc `private/settings` | Planned |
+| S14 | Phòng trò chuyện (Discord), không mở được Discord | `/rooms` | `DiscordRoomsScreen` | `DiscordRoomsViewModel` | Remote Config `discord_enabled`, `discord_invite_url`, `discord_channel_map`; `url_launcher` (`externalApplication`) | Planned |
+
+| Dialog / sheet mới | Ở màn | Flutter | Trạng thái |
+|---|---|---|---|
+| Sheet "Nốt AI" lần đầu dùng (gửi gì, không gửi gì) | S03b | `showModalBottomSheet` | Planned |
+| Sheet tạo nhóm lần đầu; lỗi trùng tên → "Xếp vào nhóm đó" | S05, S03b | `showCreateGroupSheet` + `GroupNameValidator` (bỏ dấu, không phân biệt hoa thường, 1–24 ký tự) | Planned |
+| Sheet quy tắc trước khi vào Discord (lần đầu) | S14, S05e, S08 | `showDiscordRulesSheet` + cờ `discord_rules_seen` (`shared_preferences`) | Planned |
+| Dialog "Chưa mở được Discord" (Mở bằng web / Sao chép) | S14, S08d | `showAppDialog(kind: confirmation)` + `Clipboard` + snackbar "Đã sao chép" | Planned |
+| Thẻ hỗ trợ "Nói với người bạn tin" khi `needs_support` | S03b, S08c | Dùng lại dialog P6 | Planned |
+| Snackbar Hoàn tác 5 giây khi xoá nhóm | S05e | `SnackBar` (nốt giữ lại, `groupId = null`) | Planned |
+
 ---
 
 ## 2. Flow → màn hình → kiểm thử
@@ -71,6 +100,13 @@ Mã test case (`TC-xx`) sẽ được gán trong `docs/test-plan.md` ở Stage 6
 | T1 Hũ rỗng | S05 → S03 → S04 | Empty state + "Ghi nốt đầu tiên" | Done (Stage 4) |
 | T2 Mất mạng / tải lỗi | S05, S11 | Error state + Thử lại; có dữ liệu cũ → banner | Done (Stage 4) |
 | T3 Đang tải → kết quả | S11c | Quá 10 giây → T2 | Done (Stage 4) |
+| T4 Bố cục 360 dp / 412 dp | S02, S03b, S09, S11b | Nội dung giãn theo chiều ngang, bottom nav căn giữa, FAB bám phải, biểu đồ co giãn (D-09) | Planned (golden test 360 × 800 và 412 × 915) |
+| A1 Nốt AI · Kể tự do | S03a → S03b (Kể tự do → đang đọc → gợi ý) → S03c → S04 | Lần đầu → sheet quyền riêng tư; hết lượt / mất mạng / quá 8 giây / `ai_enabled = false` → giữ đoạn viết, chọn tay; `needs_support` → thẻ hỗ trợ; huỷ khi đang đọc | Planned |
+| A2 Làm quen & thẻ khởi đầu | S01 (đăng ký) → S13a → S13b → S13c → S13d → S13e → S13f → S02; làm lại từ S12 | Bỏ qua câu 1 → cấp 1; AI lỗi / tắt → S13g (bảng luật); chọn tối đa 2 mục tiêu | Planned |
+| A3 Tập nói & lời nhắn | S07 → S08 → S08b → S08 → (Kết quả) → S08c → S04 | AI lỗi → ẩn chat, giữ câu mở lời; `needs_support` → thẻ hỗ trợ | Planned |
+| G1 Nhóm lần đầu | S03b (gợi ý nhóm) → S04 "Lần đầu tiên!" → S05 kệ → S05e | Tạo nhóm: tên trùng → "Xếp vào nhóm đó", tên rỗng → nút tắt; xoá nhóm → Hoàn tác | Planned |
+| D1 Phòng Discord | S05e / S12 → S14 → (S14b lần đầu) → Discord → S08 "Bạn vừa ghé phòng chung" → S04 | Mở link thất bại → dialog (Mở bằng web / Sao chép); `discord_enabled = false` → ẩn mọi lối vào | Planned |
+| D2 Thử thách cấp 3 #chao-hoi | S07 → S08 (cấp 3) → S08b (vai #chao-hoi) → S08d → Discord → S08 → S04 | AI nghỉ → câu chào có sẵn; mở thất bại → dialog | Planned |
 
 ---
 
@@ -147,3 +183,18 @@ Mỗi dòng là một chỗ app khác Figma, kèm lý do. Cột "Figma" cho bi�
 | D-10 | Kho thẻ thử thách | Không nêu nguồn | Collection Firestore `challenges` chỉ đọc với người dùng; dữ liệu nạp bằng `firebase/scripts/seed-challenges.js` từ `firebase/seed/challenges.json` (20 thẻ: 2 chủ đề × 2 cấp × 5 thẻ). Final: staff quản lý ở web admin | Lab 3 cấm dữ liệu mock; Final cần một thực thể staff quản lý mà app đọc | Không cần |
 
 Thay đổi phát sinh ở các stage sau được thêm vào bảng này cùng commit với code.
+
+## 6. Remote Config, dữ liệu và Analytics của phần mới (frame `Spec` trên Figma)
+
+| Phần | Remote Config | Dữ liệu Firestore / máy | Analytics |
+|---|---|---|---|
+| Nốt AI (S03b, S11 Hỏi Nốt) | `ai_enabled` (true), `ai_model`, `ai_prompt_sort`, `ai_timeout_ms` (8000), `ai_max_chars` (500), `ai_ask_enabled` (false) | Không lưu đoạn kể; nốt lưu như cũ. JSON `{notes[{type, subtype, title ≤ 40, time_of_day, group, new_group_name, is_first}], mood, needs_support}` → `AiSortResult.fromJson()` | `ai_request {feature, char_count}`, `ai_result_accepted {feature, item_count, edited_count}`, `ai_error {feature, reason: quota \| network \| timeout \| disabled \| parse}` |
+| Làm quen & Tụi Nốt AI (S13, S08b–d) | `ai_onboarding_enabled`, `ai_prompt_onboarding`, `ai_prompt_roleplay`, `ai_roleplay_max_turns` (6), câu chào có sẵn | `users/{uid}/private/onboarding` (câu trả lời, giữ làm giá trị chọn sẵn khi làm lại). IN `{stranger_level, habits, move, free_slot, goals}` → OUT `StarterPlan {profile_label ≤ 30, cards[3], remind_time}` | `onboarding_step {step, skipped}`, `ai_request {feature: onboarding \| roleplay \| note \| greeting}`, `ai_result_accepted`, `ai_error` |
+| Nhóm lần đầu (S05, S05e, S04) | — | `groups/{uid}/items/{groupId}` `{name 1–24, idea, source: system \| user \| ai_suggested, firstNoteId, noteCount, createdAt}`; nốt thêm `groupId` (nullable), `isFirst`. 8 nhóm hệ thống: Bắt chuyện, Hỏi thầy cô, Lên tiếng trong nhóm, Vận động một mình, Dừng lướt đêm, Ngủ trước 1h, Viết nhật ký dài, Tự đi nơi mới. Mốc 1 → 3 → 10 | `group_created {source, idea}`, `note_grouped {source: ai \| user, is_first}`, `first_time_milestone {group_source, level}` |
+| Kết nối Discord (S14, S05e, S08) | `discord_enabled`, `discord_invite_url`, `discord_channel_map` (JSON mã nhóm → link) | Cờ `discord_rules_seen` (`shared_preferences`). App không gửi gì cho Discord, không đọc tin nhắn, không bot (Final cấm Cloud Functions) | `discord_open {channel, source: group \| rooms \| challenge}`, `discord_open_failed {channel, reason}`, `discord_return_note {posted}` |
+
+Việc cần thêm khi làm các phần này:
+
+- Package: `firebase_ai` (Firebase AI Logic), `firebase_app_check`, `url_launcher`. Firebase AI Logic và App Check không có trên Emulator, nên phần AI chỉ chạy được trên project Firebase thật; khi chạy Emulator, `AiService` trả lỗi `disabled` và mọi flow đi nhánh dự phòng.
+- `firestore.rules`: thêm `match /groups/{uid}/items/{groupId}` (chỉ chủ tài khoản), cho phép `groupId`, `isFirst`, `aiMessage` trong `validNote`, thêm `aiConsent` vào `private/settings`, thêm `private/onboarding`.
+- Kho thẻ `challenges` cần thêm thẻ cấp 3 Dũng cảm "Chào trong #chao-hoi" (hiện seed chỉ có cấp 1–2) và thẻ thay thế khi `discord_enabled = false`.
