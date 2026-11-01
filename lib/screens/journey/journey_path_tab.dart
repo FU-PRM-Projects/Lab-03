@@ -333,7 +333,8 @@ class _CurrentNode extends StatelessWidget {
             Positioned(
               left: dx >= 0 ? AppSpace.s8 : null,
               right: dx < 0 ? AppSpace.s8 : null,
-              top: 0,
+              // Dưới bong bóng, ngang với nút, để không che tên thử thách.
+              bottom: 0,
               child: const IgnorePointer(
                 child: Mascot(state: MascotState.doi, size: 94.5),
               ),
