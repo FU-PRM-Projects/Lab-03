@@ -91,6 +91,12 @@ class SelfControlViewModel extends Notifier<SelfControlState> {
 
   static const String _unlockFailed = 'Chưa mở được phần này.';
 
+  /// Nốt Nhật ký của nhánh "Lỡ lướt quá đà?" (cũng hiện ở màn cảm ơn).
+  static const String slipTitle = 'Nhận ra mình đã lướt quá đà';
+
+  static String slipBody(String feeling) =>
+      'Lúc đó mình đang thấy: ${feeling.toLowerCase()}.';
+
   int? _monthCount;
   HabitList? _habits;
   UserSettings? _settings;
@@ -170,7 +176,10 @@ class SelfControlViewModel extends Notifier<SelfControlState> {
   void retry() => ref.invalidateSelf();
 
   /// "Mình vừa dừng lại": ghi ngay một lần tự chủ (không cần mở khoá).
-  Future<void> recordStop() async {
+  /// "Mình vừa dừng lại": lưu một nốt Tự chủ rồi mở S04. [habit] là thói
+  /// quen vừa dừng ("Dừng Video ngắn lúc 23:15"); `null` khi chưa chọn thói
+  /// quen nào hoặc phần thói quen đang khoá.
+  Future<void> recordStop({String? habit}) async {
     if (state.saving) return;
     final now = ref.read(clockProvider).now();
     state = state.copyWith(saving: true, message: () => null);
@@ -178,7 +187,9 @@ class SelfControlViewModel extends Notifier<SelfControlState> {
       final note = await _notes.add(
         NoteDraft(
           type: NoteType.tuChu,
-          title: 'Dừng lại lúc ${ViDateFormat.time(now)}',
+          title: habit == null
+              ? 'Dừng lại lúc ${ViDateFormat.time(now)}'
+              : 'Dừng $habit lúc ${ViDateFormat.time(now)}',
         ),
         createdAt: now,
       );
@@ -202,8 +213,8 @@ class SelfControlViewModel extends Notifier<SelfControlState> {
       await _notes.add(
         NoteDraft(
           type: NoteType.nhatKy,
-          title: 'Nhận ra mình đã lướt quá đà',
-          body: 'Lúc đó mình đang thấy: ${feeling.toLowerCase()}.',
+          title: slipTitle,
+          body: slipBody(feeling),
         ),
         createdAt: now,
       );
