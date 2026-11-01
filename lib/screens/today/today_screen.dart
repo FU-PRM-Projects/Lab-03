@@ -77,19 +77,24 @@ class TodayScreen extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
+              // Icon nói đúng hành động (bàn tay dừng, luồng gió, lá cờ như
+              // tab Thử thách) kèm dòng phụ nói mục đích (deviation D-25).
               ShortcutButton(
-                iconAsset: 'assets/icons/clock.svg',
+                iconAsset: 'assets/icons/hand-stop.svg',
                 label: 'Dừng lại',
+                caption: 'ghi 1 lần tự chủ',
                 onTap: () => context.push(AppRoutes.selfControl),
               ),
               ShortcutButton(
-                iconAsset: 'assets/icons/refresh.svg',
+                iconAsset: 'assets/icons/wind.svg',
                 label: 'Thở 90 giây',
+                caption: 'khi bồn chồn',
                 onTap: () => context.push(AppRoutes.breathe),
               ),
               ShortcutButton(
-                iconAsset: 'assets/icons/phase.svg',
+                iconAsset: 'assets/icons/tab-flag.svg',
                 label: 'Thử thách',
+                caption: 'thẻ hôm nay',
                 onTap: () => context.go(AppRoutes.challenges),
               ),
             ],
@@ -212,12 +217,17 @@ class _FallenNote extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpace.s8),
-        SizedBox(
-          height: AppSize.noteTile.height,
+        // Cao theo nội dung (tiêu đề + trích nhật ký), không chừa khoảng trống.
+        IntrinsicHeight(
           child: NoteTile(
             type: note.type,
             title: note.title,
-            dateLabel: ViDateFormat.shortDate(note.createdAt),
+            tagSuffix: note.isFirst ? 'Lần đầu' : null,
+            excerpt: note.body.isEmpty ? null : '“${note.body}”',
+            dateLabel: <String>[
+              ViDateFormat.shortDate(note.createdAt),
+              ?note.mood?.label,
+            ].join(' · '),
             onTap: () => context.push(AppRoutes.noteDetail(note.id)),
           ),
         ),

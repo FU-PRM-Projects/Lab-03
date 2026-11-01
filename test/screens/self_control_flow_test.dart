@@ -12,7 +12,7 @@ import '../support/pump.dart';
 /// Flow F2 Tự chủ trên cả app: S02 → S09 → S04, nhánh S10, nhánh phục hồi.
 void main() {
   Future<void> openSelfControl(WidgetTester tester) async {
-    await tester.tap(find.bySemanticsLabel('Dừng lại'));
+    await tester.tap(find.bySemanticsLabel('Dừng lại, ghi 1 lần tự chủ'));
     await tester.pumpAndSettle();
     expect(find.byType(SelfControlScreen), findsOneWidget);
   }
