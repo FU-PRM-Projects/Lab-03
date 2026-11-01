@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lab03/models/note.dart';
 import 'package:lab03/services/app_exception.dart';
 import 'package:lab03/services/auth_service.dart';
+import 'package:lab03/services/draft_store.dart';
 import 'package:lab03/services/user_repository.dart';
 import 'package:lab03/viewmodels/auth_view_model.dart';
 
@@ -10,6 +12,7 @@ import '../support/fakes.dart';
 void main() {
   late FakeAuthService auth;
   late FakeUserRepository users;
+  late FakeDraftStore drafts;
   late ProviderContainer container;
 
   AuthViewModel vm() => container.read(authViewModelProvider.notifier);
@@ -18,10 +21,12 @@ void main() {
   setUp(() {
     auth = FakeAuthService();
     users = FakeUserRepository();
+    drafts = FakeDraftStore();
     container = ProviderContainer(
       overrides: [
         authServiceProvider.overrideWithValue(auth),
         userRepositoryProvider.overrideWithValue(users),
+        draftStoreProvider.overrideWithValue(drafts),
       ],
     );
     addTearDown(container.dispose);
@@ -133,11 +138,13 @@ void main() {
     );
   });
 
-  test('đăng xuất xoá dữ liệu trên máy', () async {
+  test('đăng xuất xoá dữ liệu trên máy (kể cả nháp S03)', () async {
     await vm().signInWithGoogle();
+    drafts.draft = const NoteDraft(title: 'Đi bộ');
     await vm().signOut();
     expect(auth.signOutCount, 1);
     expect(users.clearCount, 1);
+    expect(drafts.draft, isNull);
     expect(auth.currentUser, isNull);
   });
 

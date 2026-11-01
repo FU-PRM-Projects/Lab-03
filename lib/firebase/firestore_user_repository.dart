@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../models/app_user.dart';
-import '../services/app_exception.dart';
 import '../services/user_repository.dart';
+import 'firestore_errors.dart';
 
 /// [UserRepository] trên Firestore, collection `users/{uid}`.
 class FirestoreUserRepository implements UserRepository {
@@ -25,15 +25,7 @@ class FirestoreUserRepository implements UserRepository {
         'createdAt': FieldValue.serverTimestamp(),
       });
     } on FirebaseException catch (e) {
-      throw AppException(
-        switch (e.code) {
-          'permission-denied' => AppErrorKind.permissionDenied,
-          'unavailable' => AppErrorKind.network,
-          _ => AppErrorKind.unknown,
-        },
-        code: e.code,
-        detail: e.message,
-      );
+      throw firestoreException(e);
     }
   }
 

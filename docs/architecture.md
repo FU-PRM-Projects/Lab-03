@@ -116,35 +116,45 @@ Khi Firestore trả lỗi quyền (`permission-denied`) hoặc lỗi khác, `Not
 | `TodayViewModel` | S02 | `ViewState<TodaySummary>` | `NoteRepository`, `DraftStore`, `Clock` |
 | `NoteComposerViewModel` | S03 | `NoteComposerState` (bước, tâm trạng, tiêu đề, nhật ký, saving, lỗi) | `NoteRepository`, `DraftStore`, `RemoteConfigService`, `AnalyticsService`, `CrashReporter`, `Clock` |
 | `NoteSavedViewModel` | S04 | `ViewState<SavedNoteSummary>` | `NoteRepository`, `RemoteConfigService` |
-| `JarViewModel` | S05 | `ViewState<List<Note>>` + phân trang + hoàn tác xoá | `NoteRepository`, `AnalyticsService` |
-| `NoteDetailViewModel` | S06 | `ViewState<Note>` + chế độ sửa | `NoteRepository`, `AnalyticsService` |
-| `ChallengesViewModel` | S07 | `ViewState<ChallengeDeck>` | `ChallengeRepository`, `AnalyticsService` |
-| `ChallengeDetailViewModel` | S08 | `ViewState<Challenge>` + kết quả | `ChallengeRepository`, `NoteRepository`, `AnalyticsService` |
-| `SelfControlViewModel` | S09 | `ViewState<SelfControlSummary>` + khoá | `NoteRepository`, `HabitRepository`, `LocalAuthService`, `SettingsRepository` |
-| `BreathingViewModel` | S10 | `BreathingState` (nhịp, thời gian còn lại, xong) | `NoteRepository` (khi ghi vào hũ), `Clock` |
-| `JourneyViewModel` | S11a/b/c | `ViewState<JourneyData>` theo tab con | `NoteRepository`, `ChallengeRepository`, `JourneyStats` (hàm thuần) |
-| `WeeklyReportViewModel` | S11b Thẻ tuần | `ReportState` (idle, building, uploading(progress), done(url), failure) | `ReportService`, `StorageService`, `AnalyticsService`, `CrashReporter` |
-| `SettingsViewModel` | S12 | `ViewState<UserSettings>` | `SettingsRepository`, `MessagingService`, `AuthService`, `AnalyticsService` |
+| `JarViewModel` | S05 | `ViewState<JarData>` (nốt, số nốt tháng, nhãn dán, phân trang) | `NoteRepository`, `Clock`, `AnalyticsService` |
+| `NoteDeleter` | S06 → S05 | `PendingDelete` (nốt chờ xoá, lỗi xoá) | `NoteRepository` |
+| `NoteDetailViewModel` | S06 | `NoteDetailState` (`ViewState<Note>` + chế độ sửa, ô nhập, đang lưu) | `NoteRepository`, `AnalyticsService` |
+| `ChallengesViewModel` | S07 | `ViewState<List<DeckCard>>` (dựng bằng hàm thuần `ChallengeDeck`) | `ChallengeRepository`, `NoteRepository` (tâm trạng hôm qua), `Clock`, `AnalyticsService` |
+| `ChallengeDetailViewModel` | S08 | `ChallengeDetailState` (`ViewState<Challenge>` + mức hồi hộp, số phút, đang lưu) | `ChallengeRepository`, `NoteRepository`, `Clock`, `AnalyticsService` |
+| `SelfControlViewModel` | S09 | `SelfControlState` (`ViewState<SelfControlSummary>` + khoá, đang lưu) | `NoteRepository`, `HabitRepository`, `SettingsRepository`, `LocalAuthService`, `ScreenGuard`, `Clock` |
+| `BreathingViewModel` | S10 | `BreathingState` (kiểu thở, giây đã thở, màn sau khi thở) | `NoteRepository` (chỉ sau khi thở), `ScreenGuard`, `Clock` |
+| `JourneyViewModel` | S11a/b/c | `JourneyState` (`ViewState<JourneyData>` cho Thống kê / Lịch, `ViewState<List<PathStage>>` cho Con đường, khoảng biểu đồ, tháng đang xem, dialog P6) | `NoteRepository`, `ChallengeRepository`, `Clock`, `JourneyStats` (hàm thuần trong `utils/`) |
+| `WeeklyReportViewModel` | S11b Thẻ tuần | `ReportState` (`ReportPhase`: idle, building, uploading + tiến độ, done + URL, failed) | `ReportService`, `StorageService`, `AnalyticsService`, `CrashReporter` |
+| `SettingsViewModel` | S12 | `SettingsState` (`ViewState<UserSettings>` + đang xác thực) | `SettingsRepository`, `LocalAuthService`; Stage 5: `MessagingService`, `AnalyticsService` (đăng xuất ở `AuthViewModel`) |
 | `FirebaseDemoViewModel` | S12 khu demo | `FirebaseDemoState` (thông báo đã nhận, giá trị RC) | `NotificationInbox`, `RemoteConfigService`, `CrashReporter` |
 
 | Service (interface) | Hiện thực | Việc làm |
 |---|---|---|
 | `AuthService` | `FirebaseAuthService` | Google Sign-In, email/mật khẩu, đăng xuất, luồng trạng thái đăng nhập |
 | `UserRepository` | `FirestoreUserRepository` | `users/{uid}` (tạo lần đầu với `role = user`, cài đặt) |
-| `NoteRepository` | `FirestoreNoteRepository` | CRUD `users/{uid}/notes`, đếm theo tháng/loại, truy vấn theo khoảng ngày |
-| `ChallengeRepository` | `FirestoreChallengeRepository` | Đọc `challenges`, tiến độ `users/{uid}/challengeProgress` |
-| `HabitRepository`, `SettingsRepository` | Firestore | Thói quen muốn bớt, giờ nhắc, Giờ tỉnh, công tắc riêng tư |
-| `DraftStore` | `SharedPrefsDraftStore` | Nháp S03 trên máy |
-| `StorageService` | `FirebaseStorageService` | Tải PDF lên `reports/{uid}/…`, phát tiến độ, trả URL |
-| `ReportService` | `PdfReportService` | Dựng PDF Thẻ tuần từ dữ liệu đang xem |
+| `NoteRepository` | `FirestoreNoteRepository` | `users/{uid}/notes`: theo dõi nốt từ một ngày, đọc theo trang, đếm theo khoảng ngày, thêm nốt; nhãn dán tháng `users/{uid}/stickers` |
+| `ChallengeRepository` | `FirestoreChallengeRepository` | Đọc kho `challenges` (chỉ đọc); tiến độ `users/{uid}/challengeProgress/{topic}` (`level`, `completed`) |
+| `HabitRepository`, `SettingsRepository` | `FirestoreHabitRepository`, `FirestoreSettingsRepository` | `users/{uid}/private/habits` (thói quen muốn bớt), `users/{uid}/private/settings` (Giờ tỉnh, khoá Tự chủ; S12 thêm giờ nhắc) |
+| `DraftStore` | `PrefsDraftStore` (`shared_preferences`) | Nháp S03 trên máy; xoá khi đăng xuất |
+| `StorageService` | `FirebaseStorageService` | Tải PDF lên `reports/{uid}/weekly-<tuần ISO>.pdf`, phát tiến độ, trả URL; `storage.rules` chỉ cho chủ thư mục, PDF dưới 5 MB |
+| `ReportService` | `PdfReportService` (`pdf`, `printing`) | Dựng PDF Thẻ tuần (font Be Vietnam Pro qua `PdfGoogleFonts`), mở hộp chia sẻ |
 | `AnalyticsService` | `FirebaseAnalyticsService` | Sự kiện theo `analytics-plan.md`, `setUserId` sau đăng nhập |
 | `CrashReporter` | `FirebaseCrashReporter` | Lỗi non-fatal, crash thử, user ID, custom key |
-| `RemoteConfigService` | `FirebaseRemoteConfigService` | Giá trị mặc định trong app, fetch + activate, lắng nghe cập nhật realtime |
+| `RemoteConfigService` | `InAppRemoteConfig` (Stage 4, giá trị mặc định) → `FirebaseRemoteConfigService` (Stage 5) | Giá trị mặc định trong app, fetch + activate, lắng nghe cập nhật realtime |
 | `MessagingService`, `NotificationInbox` | FCM + `flutter_local_notifications` | Xin quyền, nhận ở 3 trạng thái app, lưu danh sách, điều hướng khi chạm |
-| `LocalAuthService` | `local_auth` | Mở khoá phần Tự chủ |
+| `LocalAuthService` | `DeviceLocalAuthService` (`local_auth`) | Mở khoá phần Tự chủ bằng vân tay, khuôn mặt hoặc mã máy |
+| `ScreenGuard` | `MethodChannelScreenGuard` (kênh `lab03/window` trong `MainActivity.kt`) | `FLAG_SECURE` ở S09, giữ màn hình sáng ở S10 |
 | `Clock` | `SystemClock` | Giờ hiện tại (test dùng giờ cố định) |
 
-Đã có (Stage 3): `AuthService`/`FirebaseAuthService`, `UserRepository`/`FirestoreUserRepository`, `AuthViewModel`. Các dòng còn lại được dựng ở Stage 4–5.
+Đã có: `AuthService`, `UserRepository`, `AuthViewModel` (Stage 3); `NoteRepository`, `DraftStore`, `Clock`, `RemoteConfigService` (giá trị mặc định), `TodayViewModel`, `NoteComposerViewModel`, `NoteSavedViewModel` (Stage 4, F1); `JarViewModel`, `NoteDetailViewModel`, `NoteDeleter` (Stage 4, P4/P5); `HabitRepository`, `SettingsRepository`, `LocalAuthService`, `ScreenGuard`, `SelfControlViewModel`, `BreathingViewModel` (Stage 4, F2); `ChallengeRepository`, `ChallengesViewModel`, `ChallengeDetailViewModel` (Stage 4, F3); `ReportService`, `StorageService`, `JourneyViewModel`, `WeeklyReportViewModel` (Stage 4, S11); `SettingsViewModel` (Stage 4, S12). Các dòng còn lại được dựng ở Stage 4–5.
+
+`PrefsDraftStore` nằm trong `firebase/` dù không dùng Firebase: thư mục này là nơi duy nhất được gọi SDK bên ngoài (Firebase, `shared_preferences`), nên quy tắc import ở mục 2 vẫn giữ nguyên.
+
+**Android:** `MainActivity` kế thừa `FlutterFragmentActivity` vì `local_auth` cần hộp xác thực sinh trắc học. `LaunchTheme` vẫn là theme mặc định của Flutter; tài liệu `local_auth_android` khuyên dùng `Theme.AppCompat` để tránh lỗi trên Android 8 trở xuống, nên trên các máy đó hãy kiểm tra lại nút Mở khoá.
+
+**Xoá có hoàn tác:** `NoteDeleter` (không gắn với màn nào) ẩn nốt ngay, giữ hẹn giờ 5 giây và chỉ gọi `NoteRepository.delete` khi hết giờ mà người dùng không bấm Hoàn tác. Nó nằm ngoài ViewModel của S06 vì S06 đã đóng khi hẹn giờ chạy; `JarViewModel` nghe nó để ẩn và hiện lại nốt trong lưới. Nếu app bị tắt trong 5 giây đó thì nốt không bị xoá.
+
+**Ghi khi offline:** `FirestoreNoteRepository.add` gửi lệnh ghi rồi chờ server tối đa 2 giây. Quá thời gian thì trả nốt với `pendingSync = true` (lệnh ghi đã nằm trong bộ nhớ đệm, Firestore tự gửi lại khi có mạng), để S03 không treo khi mất mạng. Ngày tạo nốt là giờ trên máy, không dùng `serverTimestamp`, vì giá trị server là `null` cho tới khi đồng bộ và nốt offline sẽ không hiện trong truy vấn theo ngày.
 
 **Khởi tạo Firebase** (`firebase/firebase_bootstrap.dart`): `main.dart` gọi `initFirebase()` trước `runApp`. Chạy với `--dart-define=USE_FIREBASE_EMULATOR=true` thì Auth và Firestore trỏ vào Emulator của `firebase/` (máy `10.0.2.2`, đổi bằng `FIREBASE_EMULATOR_HOST`). Cấu hình project nằm ở `lib/firebase_options.dart`, do `flutterfire configure` sinh ra.
 

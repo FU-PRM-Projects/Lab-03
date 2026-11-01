@@ -1,0 +1,22 @@
+[
+  { "id": "dc-1-1", "topic": "dung_cam", "level": 1, "order": 1, "minutes": 1, "title": "Chào bác bảo vệ ở cổng trường", "tip": "Một câu chào và một nụ cười là đủ.", "script": "Cháu chào bác ạ!" },
+  { "id": "dc-1-2", "topic": "dung_cam", "level": 1, "order": 2, "minutes": 2, "title": "Hỏi đường một người lạ", "tip": "Hỏi ngắn, nhớ cảm ơn khi xong.", "script": "Bạn ơi, cho mình hỏi thư viện ở đâu vậy?" },
+  { "id": "dc-1-3", "topic": "dung_cam", "level": 1, "order": 3, "minutes": 1, "title": "Khen một bạn cùng lớp", "tip": "Khen thật lòng, không cần dài.", "script": "Slide của bạn hôm nay dễ hiểu ghê." },
+  { "id": "dc-1-4", "topic": "dung_cam", "level": 1, "order": 4, "minutes": 2, "title": "Hỏi thầy 1 câu sau giờ học", "tip": "Hỏi ngắn thôi, 30 giây là đủ.", "script": "Thầy ơi, em hỏi chút về phần bài hôm nay được không ạ?" },
+  { "id": "dc-1-5", "topic": "dung_cam", "level": 1, "order": 5, "minutes": 2, "title": "Nhờ nhân viên quán gợi ý một món", "tip": "Hỏi xong thì thử món đó luôn.", "script": "Chị ơi, ở đây món nào ngon nhất ạ?" },
+  { "id": "dc-2-1", "topic": "dung_cam", "level": 2, "order": 1, "minutes": 3, "title": "Bắt chuyện với người ngồi cạnh ở thư viện", "tip": "Bắt đầu từ thứ cả hai đang thấy.", "script": "Bạn cũng ôn môn này à? Phần nào khó nhất vậy?" },
+  { "id": "dc-2-2", "topic": "dung_cam", "level": 2, "order": 2, "minutes": 3, "title": "Xin một bạn khác nhóm góp ý bài làm", "tip": "Hỏi một điểm cụ thể, dễ trả lời hơn.", "script": "Bạn xem giúp mình phần mở đầu này có rõ không?" },
+  { "id": "dc-2-3", "topic": "dung_cam", "level": 2, "order": 3, "minutes": 2, "title": "Phát biểu một ý trong giờ học", "tip": "Một câu thôi cũng tính.", "script": "Em nghĩ còn một cách khác là…" },
+  { "id": "dc-2-4", "topic": "dung_cam", "level": 2, "order": 4, "minutes": 3, "title": "Rủ một bạn mới quen đi ăn trưa", "tip": "Bạn ấy bận cũng không sao, mình đã mở lời.", "script": "Trưa nay bạn ăn gì chưa? Đi cùng mình nhé?" },
+  { "id": "dc-2-5", "topic": "dung_cam", "level": 2, "order": 5, "minutes": 5, "title": "Gọi điện thay vì nhắn tin cho một người bạn", "tip": "Gọi 5 phút, hỏi thăm một chuyện thôi.", "script": "Alo, dạo này cậu sao rồi?" },
+  { "id": "vd-1-1", "topic": "van_dong", "level": 1, "order": 1, "minutes": 5, "title": "Đi bộ 5 phút quanh nhà", "tip": "Không cần thay đồ, cứ đi thôi." },
+  { "id": "vd-1-2", "topic": "van_dong", "level": 1, "order": 2, "minutes": 3, "title": "Duỗi người 3 phút", "tip": "Duỗi cổ, vai, lưng; thở chậm." },
+  { "id": "vd-1-3", "topic": "van_dong", "level": 1, "order": 3, "minutes": 2, "title": "Leo cầu thang thay vì đi thang máy", "tip": "Leo chậm cũng được, miễn là leo." },
+  { "id": "vd-1-4", "topic": "van_dong", "level": 1, "order": 4, "minutes": 10, "title": "Đi bộ 10 phút sau bữa tối", "tip": "Để điện thoại ở nhà nếu được." },
+  { "id": "vd-1-5", "topic": "van_dong", "level": 1, "order": 5, "minutes": 5, "title": "Ra ngoài phơi nắng 5 phút", "tip": "Buổi sáng là dễ chịu nhất." },
+  { "id": "vd-2-1", "topic": "van_dong", "level": 2, "order": 1, "minutes": 20, "title": "Đi bộ 20 phút sau giờ học", "tip": "Đi chậm vẫn tính, dừng sớm vẫn được ghi." },
+  { "id": "vd-2-2", "topic": "van_dong", "level": 2, "order": 2, "minutes": 10, "title": "Chạy chậm 10 phút", "tip": "Chạy tới mức vẫn nói chuyện được." },
+  { "id": "vd-2-3", "topic": "van_dong", "level": 2, "order": 3, "minutes": 15, "title": "Tập yoga 15 phút theo video", "tip": "Chọn bài cho người mới bắt đầu." },
+  { "id": "vd-2-4", "topic": "van_dong", "level": 2, "order": 4, "minutes": 20, "title": "Đạp xe 20 phút", "tip": "Đạp quanh khu nhà là đủ." },
+  { "id": "vd-2-5", "topic": "van_dong", "level": 2, "order": 5, "minutes": 15, "title": "Đi bộ tới chỗ hẹn thay vì đi xe", "tip": "Đi sớm 15 phút để không vội." }
+]

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/app_user.dart';
 import '../services/app_exception.dart';
 import '../services/auth_service.dart';
+import '../services/draft_store.dart';
 import '../services/user_repository.dart';
 import '../utils/validators.dart';
 
@@ -108,6 +109,7 @@ class AuthViewModel extends Notifier<AuthState> {
     await _auth.signOut();
     try {
       await _users.clearLocalData();
+      await ref.read(draftStoreProvider).clear();
     } on Object {
       // Không chặn đăng xuất nếu chưa xoá được bộ nhớ đệm; lần sau xoá lại.
     }

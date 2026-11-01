@@ -20,9 +20,41 @@ abstract final class ViDateFormat {
   static String shortDate(DateTime date) =>
       '${_two(date.day)}/${_two(date.month)}';
 
+  /// "3,8": số thập phân kiểu Việt Nam, 1 chữ số sau dấu phẩy.
+  static String decimal(double value) =>
+      value.toStringAsFixed(1).replaceAll('.', ',');
+
+  /// Nhãn ngắn của thứ, chỉ số 0 = Thứ Hai.
+  static const List<String> weekdayShort = <String>[
+    'T2',
+    'T3',
+    'T4',
+    'T5',
+    'T6',
+    'T7',
+    'CN',
+  ];
+
+  /// "Hôm nay", "Hôm qua" hoặc "24/10" so với [now]: nhãn ngày trên tờ nốt.
+  static String relativeDay(DateTime date, DateTime now) {
+    final day = DateTime(date.year, date.month, date.day);
+    final today = DateTime(now.year, now.month, now.day);
+    if (day == today) return 'Hôm nay';
+    if (day == DateTime(now.year, now.month, now.day - 1)) return 'Hôm qua';
+    return shortDate(date);
+  }
+
   /// "21:30".
   static String time(DateTime date) =>
       '${_two(date.hour)}:${_two(date.minute)}';
+
+  /// "23:00" từ số phút kể từ 0h (giờ lưu trong `UserSettings`).
+  static String clock(int minutes) =>
+      '${_two(minutes ~/ 60 % 24)}:${_two(minutes % 60)}';
+
+  /// "1:12" từ số giây còn lại (đồng hồ S10).
+  static String countdown(int seconds) =>
+      '${seconds ~/ 60}:${_two(seconds % 60)}';
 
   /// "24 tháng 10": nhãn đọc cho trình đọc màn hình.
   static String spoken(DateTime date) => '${date.day} tháng ${date.month}';

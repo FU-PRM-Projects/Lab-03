@@ -11,6 +11,7 @@ import 'package:lab03/screens/today/today_screen.dart';
 import 'package:lab03/widgets/app_bottom_nav.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../support/fakes.dart';
 import '../support/pump.dart';
 
 /// Cấu trúc điều hướng Lab 2 (`user-flow.md` mục 1.1, handout mục 3).
@@ -35,12 +36,14 @@ void main() {
   });
 
   testWidgets('màn lồng che thanh tab; Back quay lại tab', (tester) async {
-    await enterApp(tester);
+    final services = TestServices();
+    services.notes.notes.add(sampleNote('n1', DateTime(2026, 10, 24)));
+    await pumpApp(tester, services: services);
     await tester.tap(find.text('Hũ'));
     await tester.pumpAndSettle();
     expect(find.byType(JarScreen), findsOneWidget);
 
-    await tester.tap(find.text('Mở một nốt (S06)'));
+    await tester.tap(find.text('Dọn bàn học, gửi email hỏi thầy'));
     await tester.pumpAndSettle();
     expect(find.byType(NoteDetailScreen), findsOneWidget);
     expect(find.byType(AppBottomNav), findsNothing);
@@ -61,13 +64,19 @@ void main() {
     expect(find.byType(TodayScreen), findsOneWidget);
   });
 
-  testWidgets('F1 khung: Ghi nốt → S03 → S04 → Về Hôm nay', (tester) async {
+  testWidgets('F1: Ghi nốt → S03 → S04 → Về Hôm nay', (tester) async {
     await enterApp(tester);
     await tester.tap(find.text('Ghi nốt'));
     await tester.pumpAndSettle();
     expect(find.byType(NoteComposerScreen), findsOneWidget);
 
-    await tester.tap(find.text('Lưu vào hũ (tạm)'));
+    await tester.tap(find.bySemanticsLabel('Tâm trạng Ổn'));
+    await tester.pump();
+    await tester.tap(find.text('Tiếp'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Đi bộ'));
+    await tester.pump();
+    await tester.tap(find.text('Bỏ qua nhật ký'));
     await tester.pumpAndSettle();
     expect(find.byType(NoteSavedScreen), findsOneWidget);
 
@@ -76,14 +85,16 @@ void main() {
     expect(find.byType(TodayScreen), findsOneWidget);
   });
 
-  testWidgets('F2 khung: Dừng lại → S09 → Thở 90 giây → S10', (tester) async {
+  testWidgets('F2: Dừng lại → S09 → Thở 90 giây → S10', (tester) async {
     await enterApp(tester);
     await tester.tap(find.bySemanticsLabel('Dừng lại'));
     await tester.pumpAndSettle();
     expect(find.byType(SelfControlScreen), findsOneWidget);
 
     await tester.tap(find.text('Khó dừng? Thở 90 giây'));
-    await tester.pumpAndSettle();
+    // S10 thở ngay khi mở nên không bao giờ "settle"; chỉ chờ chuyển màn.
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
     expect(find.byType(BreathingScreen), findsOneWidget);
   });
 

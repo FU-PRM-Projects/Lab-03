@@ -24,8 +24,9 @@ abstract final class AppRoutes {
   /// S04 cho nốt [id] vừa lưu.
   static String noteSaved(String id) => '/note/saved/$id';
 
-  /// S06.
-  static String noteDetail(String id) => '$jar/$id';
+  /// S06; [edit] mở sẵn chế độ sửa ("Viết thêm" ở S04).
+  static String noteDetail(String id, {bool edit = false}) =>
+      edit ? '$jar/$id?edit=1' : '$jar/$id';
 
   /// S08.
   static String challengeDetail(String id) => '$challenges/$id';

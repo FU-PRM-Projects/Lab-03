@@ -5,6 +5,12 @@ import 'package:go_router/go_router.dart';
 import 'package:lab03/app.dart';
 import 'package:lab03/router/app_router.dart';
 import 'package:lab03/services/auth_service.dart';
+import 'package:lab03/services/challenge_repository.dart';
+import 'package:lab03/services/clock.dart';
+import 'package:lab03/services/draft_store.dart';
+import 'package:lab03/services/note_repository.dart';
+import 'package:lab03/services/report_services.dart';
+import 'package:lab03/services/self_control_services.dart';
 import 'package:lab03/services/user_repository.dart';
 import 'package:lab03/theme/app_theme.dart';
 import 'package:material_ui/material_ui.dart';
@@ -30,10 +36,29 @@ class TestServices {
 
   final FakeAuthService auth;
   final FakeUserRepository users = FakeUserRepository();
+  final FakeNoteRepository notes = FakeNoteRepository();
+  final FakeDraftStore drafts = FakeDraftStore();
+  final FixedClock clock = FixedClock();
+  final FakeSelfControl selfControl = FakeSelfControl();
+  final FakeLocalAuth localAuth = FakeLocalAuth();
+  final FakeScreenGuard screenGuard = FakeScreenGuard();
+  final FakeChallengeRepository challenges = FakeChallengeRepository();
+  final FakeReportService reports = FakeReportService();
+  final FakeStorageService storage = FakeStorageService();
 
   List<Override> get overrides => <Override>[
     authServiceProvider.overrideWithValue(auth),
     userRepositoryProvider.overrideWithValue(users),
+    noteRepositoryProvider.overrideWithValue(notes),
+    draftStoreProvider.overrideWithValue(drafts),
+    clockProvider.overrideWithValue(clock),
+    habitRepositoryProvider.overrideWithValue(selfControl),
+    settingsRepositoryProvider.overrideWithValue(selfControl.settingsView),
+    localAuthServiceProvider.overrideWithValue(localAuth),
+    screenGuardProvider.overrideWithValue(screenGuard),
+    challengeRepositoryProvider.overrideWithValue(challenges),
+    reportServiceProvider.overrideWithValue(reports),
+    storageServiceProvider.overrideWithValue(storage),
   ];
 }
 
