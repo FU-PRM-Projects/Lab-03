@@ -8,6 +8,7 @@ import 'package:lab03/services/auth_service.dart';
 import 'package:lab03/services/challenge_repository.dart';
 import 'package:lab03/services/clock.dart';
 import 'package:lab03/services/draft_store.dart';
+import 'package:lab03/services/group_repository.dart';
 import 'package:lab03/services/note_repository.dart';
 import 'package:lab03/services/report_services.dart';
 import 'package:lab03/services/self_control_services.dart';
@@ -38,6 +39,7 @@ class TestServices {
   final FakeAuthService auth;
   final FakeUserRepository users = FakeUserRepository();
   final FakeNoteRepository notes = FakeNoteRepository();
+  final FakeGroupRepository groups = FakeGroupRepository();
   final FakeDraftStore drafts = FakeDraftStore();
   final FixedClock clock = FixedClock();
   final FakeSelfControl selfControl = FakeSelfControl();
@@ -51,6 +53,7 @@ class TestServices {
     authServiceProvider.overrideWithValue(auth),
     userRepositoryProvider.overrideWithValue(users),
     noteRepositoryProvider.overrideWithValue(notes),
+    groupRepositoryProvider.overrideWithValue(groups),
     draftStoreProvider.overrideWithValue(drafts),
     clockProvider.overrideWithValue(clock),
     habitRepositoryProvider.overrideWithValue(selfControl),
@@ -96,6 +99,24 @@ Future<void> pumpThemed(
       home: Scaffold(body: Center(child: child)),
     ),
   );
+}
+
+/// Cuộn tới tờ nốt [title] trên S05 rồi chạm (kệ nhóm đẩy lưới xuống dưới,
+/// có thể nằm sau thanh tab nổi).
+Future<void> tapNote(WidgetTester tester, String title) async {
+  await tester.scrollUntilVisible(
+    find.text(title),
+    200,
+    // Cuộn lưới dọc, không phải kệ nhóm cuộn ngang.
+    scrollable: find
+        .byWidgetPredicate(
+          (w) => w is Scrollable && w.axisDirection == AxisDirection.down,
+        )
+        .first,
+  );
+  await tester.ensureVisible(find.text(title));
+  await tester.pumpAndSettle();
+  await tester.tap(find.text(title));
 }
 
 /// Ô nhập của `AppTextField` theo nhãn (nhãn nằm trên ô, ngoài TextField).

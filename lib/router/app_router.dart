@@ -8,6 +8,8 @@ import '../screens/challenge_detail/challenge_detail_screen.dart';
 import '../screens/challenges/challenges_screen.dart';
 import '../screens/common/screen_skeleton.dart';
 import '../screens/dev/component_gallery_screen.dart';
+import '../screens/groups/group_detail_screen.dart';
+import '../screens/groups/groups_screen.dart';
 import '../screens/jar/jar_screen.dart';
 import '../screens/journey/journey_screen.dart';
 import '../screens/note_composer/note_composer_screen.dart';
@@ -69,6 +71,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: AppRoutes.jar,
                 builder: (context, state) => const JarScreen(),
                 routes: <RouteBase>[
+                  // Trước `:noteId` để `/jar/groups` không bị hiểu là một nốt.
+                  GoRoute(
+                    path: 'groups',
+                    parentNavigatorKey: rootKey,
+                    builder: (context, state) => const GroupsScreen(),
+                    routes: <RouteBase>[
+                      GoRoute(
+                        path: ':groupId',
+                        parentNavigatorKey: rootKey,
+                        builder: (context, state) => GroupDetailScreen(
+                          groupId: state.pathParameters['groupId']!,
+                        ),
+                      ),
+                    ],
+                  ),
                   GoRoute(
                     path: ':noteId',
                     parentNavigatorKey: rootKey,
@@ -118,6 +135,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           child: NoteComposerScreen(
             step: (int.tryParse(state.uri.queryParameters['step'] ?? '') ?? 1)
                 .clamp(1, 3),
+            groupId: state.uri.queryParameters['group'],
           ),
         ),
       ),

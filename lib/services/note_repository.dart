@@ -32,6 +32,12 @@ abstract interface class NoteRepository {
   /// Xoá hẳn nốt [id]. Hoàn tác 5 giây do ViewModel giữ trước khi gọi.
   Future<void> delete(String id);
 
+  /// Tối đa [limit] nốt của nhóm lần đầu [groupId], mới nhất trước (S05e).
+  Future<List<Note>> listByGroup(String groupId, {int limit = 30});
+
+  /// Gỡ mọi nốt khỏi nhóm [groupId] (nhóm vừa bị xoá); nốt vẫn ở trong hũ.
+  Future<void> ungroup(String groupId);
+
   /// Gắn nhãn dán mốc của tháng chứa [month] vào hũ (S04).
   Future<void> saveMonthSticker(DateTime month);
 

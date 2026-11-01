@@ -2,11 +2,13 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../models/first_group.dart';
 import '../models/mood.dart';
 import '../models/note.dart';
 import '../models/note_type.dart';
 import '../services/clock.dart';
 import '../services/draft_store.dart';
+import '../services/group_repository.dart';
 import '../services/note_repository.dart';
 import '../services/remote_config_service.dart';
 import 'error_messages.dart';
@@ -33,6 +35,7 @@ class NoteComposerState {
     this.savedNoteId,
     this.message,
     this.oldNote,
+    this.group,
   });
 
   /// Bước 1–3.
@@ -52,6 +55,9 @@ class NoteComposerState {
   /// Một nốt cũ cho ngày Mệt / Rối, hiện ở bước 2 (nhánh thay thế F1).
   final Note? oldNote;
 
+  /// Nhóm lần đầu sẽ chứa nốt ("Thử lần nữa" ở S05e).
+  final FirstGroup? group;
+
   /// Ngày rối: gợi ý "Sơ cứu 1 phút" và "1 chip là đủ".
   bool get isRoughDay => draft.mood == Mood.roi;
 
@@ -67,6 +73,7 @@ class NoteComposerState {
     String? savedNoteId,
     String? Function()? message,
     Note? Function()? oldNote,
+    FirstGroup? Function()? group,
   }) => NoteComposerState(
     step: step ?? this.step,
     quickWins: quickWins,
@@ -75,29 +82,34 @@ class NoteComposerState {
     savedNoteId: savedNoteId ?? this.savedNoteId,
     message: message == null ? this.message : message(),
     oldNote: oldNote == null ? this.oldNote : oldNote(),
+    group: group == null ? this.group : group(),
   );
 }
 
-/// Tham số là bước mở đầu (`/note/new?step=`).
+/// Tham số của S03: bước mở đầu (`?step=`) và nhóm lần đầu (`?group=`).
+typedef ComposerArgs = ({int step, String? groupId});
+
 final noteComposerViewModelProvider = NotifierProvider.autoDispose
-    .family<NoteComposerViewModel, NoteComposerState, int>(
+    .family<NoteComposerViewModel, NoteComposerState, ComposerArgs>(
       NoteComposerViewModel.new,
     );
 
 /// ViewModel của S03 · Ghi nốt (flow F1).
 class NoteComposerViewModel extends Notifier<NoteComposerState> {
-  NoteComposerViewModel(this.initialStep);
+  NoteComposerViewModel(this.args);
 
-  final int initialStep;
+  final ComposerArgs args;
 
   NoteRepository get _notes => ref.read(noteRepositoryProvider);
+  GroupRepository get _groups => ref.read(groupRepositoryProvider);
   DraftStore get _drafts => ref.read(draftStoreProvider);
 
   @override
   NoteComposerState build() {
     unawaited(_restoreDraft());
+    if (args.groupId case final id?) unawaited(_loadGroup(id));
     return NoteComposerState(
-      step: initialStep.clamp(1, 3),
+      step: args.step.clamp(1, 3),
       quickWins: ref.read(remoteConfigServiceProvider).quickWinChips,
     );
   }
@@ -114,6 +126,22 @@ class NoteComposerViewModel extends Notifier<NoteComposerState> {
     state = state.copyWith(draft: draft);
     unawaited(_loadOldNoteIfLow());
   }
+
+  Future<void> _loadGroup(String id) async {
+    FirstGroup? group;
+    try {
+      group = await _groups.get(id);
+    } on Object {
+      // Không đọc được thì coi như nhóm hệ thống / nhóm chưa có nốt.
+    }
+    group ??= FirstGroups.systemById(id);
+    if (ref.mounted && group != null) {
+      state = state.copyWith(group: () => group);
+    }
+  }
+
+  /// Bỏ "Xếp vào nhóm" ở bước 2: nốt lưu như bình thường.
+  void clearGroup() => state = state.copyWith(group: () => null);
 
   void selectMood(Mood mood) {
     state = state.copyWith(draft: state.draft.copyWith(mood: mood));
@@ -172,10 +200,13 @@ class NoteComposerViewModel extends Notifier<NoteComposerState> {
       return;
     }
 
+    final group = state.group;
     final toSave = NoteDraft(
       mood: state.draft.mood,
       title: title,
       body: skipJournal ? '' : state.draft.body.trim(),
+      groupId: group?.id,
+      isFirst: group != null && group.noteCount == 0,
     );
 
     state = state.copyWith(saving: true, message: () => null);
@@ -184,6 +215,13 @@ class NoteComposerViewModel extends Notifier<NoteComposerState> {
         toSave,
         createdAt: ref.read(clockProvider).now(),
       );
+      if (group != null) {
+        try {
+          await _groups.recordNote(group, note);
+        } on Object {
+          // Nốt đã lưu và mang groupId; số đếm của nhóm chỉ lệch tạm thời.
+        }
+      }
       // Stage 5: logEvent(note_saved) và đo thời gian từ bước 1.
       try {
         await _drafts.clear();

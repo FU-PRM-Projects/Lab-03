@@ -57,6 +57,8 @@ class FirestoreNoteRepository implements NoteRepository {
       createdAt: createdAt.toDate(),
       pendingSync: doc.metadata.hasPendingWrites,
       challenge: _toChallenge(data),
+      groupId: data['groupId'] as String?,
+      isFirst: data['isFirst'] == true,
     );
   }
 
@@ -183,6 +185,8 @@ class FirestoreNoteRepository implements NoteRepository {
             'body': ?(body.isEmpty ? null : body),
             'mood': ?draft.mood?.id,
             'createdAt': Timestamp.fromDate(createdAt),
+            'groupId': ?draft.groupId,
+            if (draft.groupId != null && draft.isFirst) 'isFirst': true,
             if (draft.challenge case final c?) ...<String, Object?>{
               'challengeId': c.challengeId,
               'subtype': c.subtype,
@@ -201,6 +205,8 @@ class FirestoreNoteRepository implements NoteRepository {
           createdAt: createdAt,
           pendingSync: pending,
           challenge: draft.challenge,
+          groupId: draft.groupId,
+          isFirst: draft.groupId != null && draft.isFirst,
         );
       });
 
@@ -228,12 +234,39 @@ class FirestoreNoteRepository implements NoteRepository {
       createdAt: before.createdAt,
       pendingSync: pending,
       challenge: before.challenge,
+      groupId: before.groupId,
+      isFirst: before.isFirst,
     );
   });
 
   @override
   Future<void> delete(String id) =>
       _guard(() async => _write(_notes().doc(id).delete()));
+
+  @override
+  Future<List<Note>> listByGroup(String groupId, {int limit = 30}) =>
+      _guard(() async {
+        final snapshot = await _notes()
+            .where('groupId', isEqualTo: groupId)
+            .orderBy('createdAt', descending: true)
+            .limit(limit)
+            .get();
+        return _toNotes(snapshot);
+      });
+
+  @override
+  Future<void> ungroup(String groupId) => _guard(() async {
+    final snapshot = await _notes().where('groupId', isEqualTo: groupId).get();
+    if (snapshot.docs.isEmpty) return;
+    final batch = _firestore.batch();
+    for (final doc in snapshot.docs) {
+      batch.update(doc.reference, <String, Object?>{
+        'groupId': FieldValue.delete(),
+        'isFirst': FieldValue.delete(),
+      });
+    }
+    await _write(batch.commit());
+  });
 
   @override
   Future<void> saveMonthSticker(DateTime month) => _guard(() async {

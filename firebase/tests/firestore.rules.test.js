@@ -109,3 +109,17 @@ test('R-13 challenge notes keep their result fields within range', async () => {
   await assertFails(setDoc(doc(db, 'users/alice/notes/c2'), note({ type: 'thu_thach', ...result, anxietyBefore: 9 })));
   await assertFails(setDoc(doc(db, 'users/alice/notes/c3'), note({ type: 'thu_thach', ...result, outcome: 'win' })));
 });
+test('R-14 user keeps "first time" groups; names and ideas are checked', async () => {
+  const db = env.authenticatedContext('alice').firestore();
+  const group = (extra = {}) => ({ name: 'Bắt chuyện', idea: 'nguoi_la', source: 'system', noteCount: 0, ...extra });
+  await assertSucceeds(setDoc(doc(db, 'users/alice/groups/bat-chuyen'), group()));
+  await assertSucceeds(updateDoc(doc(db, 'users/alice/groups/bat-chuyen'), { noteCount: 1, firstNoteId: 'n1', firstNoteTitle: 'Hỏi đường', firstAt: Timestamp.now() }));
+  await assertFails(setDoc(doc(db, 'users/alice/groups/g2'), group({ name: '' })));
+  await assertFails(setDoc(doc(db, 'users/alice/groups/g3'), group({ name: 'a'.repeat(25) })));
+  await assertFails(setDoc(doc(db, 'users/alice/groups/g4'), group({ idea: 'spam' })));
+  await assertFails(setDoc(doc(db, 'users/alice/groups/g5'), group({ extra: true })));
+  await assertFails(getDoc(doc(env.authenticatedContext('bob').firestore(), 'users/alice/groups/bat-chuyen')));
+  await assertSucceeds(setDoc(doc(db, 'users/alice/notes/g1'), note({ groupId: 'bat-chuyen', isFirst: true })));
+  await assertFails(setDoc(doc(db, 'users/alice/notes/g2'), note({ groupId: '', isFirst: true })));
+  await assertSucceeds(deleteDoc(doc(db, 'users/alice/groups/bat-chuyen')));
+});

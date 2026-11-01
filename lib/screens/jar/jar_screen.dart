@@ -18,6 +18,7 @@ import '../../widgets/note_tile.dart';
 import '../../widgets/offline_banner.dart';
 import '../../widgets/state_views.dart';
 import '../common/screen_skeleton.dart';
+import '../groups/group_shelf.dart';
 
 /// S05 · Hũ & Nhật ký (tab 2).
 class JarScreen extends ConsumerWidget {
@@ -203,6 +204,8 @@ class _JarGrid extends StatelessWidget {
                   ),
                 ],
               ),
+              const SizedBox(height: AppSpace.s16),
+              const GroupShelf(),
             ],
           ),
         ),

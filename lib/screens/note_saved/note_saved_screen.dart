@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../models/first_group.dart';
 import '../../models/note_type.dart';
 import '../../router/app_routes.dart';
 import '../../theme/app_tokens.dart';
@@ -95,13 +96,23 @@ class _SavedContent extends StatelessWidget {
     final note = summary.note;
     final month = note.createdAt.month;
     final milestone = summary.reachedMilestone;
+    final first = summary.firstInGroup;
+    final group = summary.group;
     final dateLabel = <String>[
       if (summary.savedToday)
         'Hôm nay'
       else
         ViDateFormat.shortDate(note.createdAt),
-      ?note.mood?.label,
+      if (first) 'Lần đầu' else ?note.mood?.label,
     ].join(' · ');
+    final (title, subtitle) = milestone
+        ? (
+            'Mốc ${summary.milestone} nốt!',
+            'Nốt thứ ${summary.monthCount} tháng này.',
+          )
+        : first
+        ? ('Lần đầu tiên!', 'Nhóm “${group!.name}” có thêm một nấc.')
+        : ('Đã vào hũ!', 'Nốt thứ ${summary.monthCount} tháng này.');
 
     // Figma: nội dung căn giữa giữa hai khoảng đệm co giãn, các khối cách
     // nhau 16; màn thấp hoặc chữ phóng to thì cuộn được.
@@ -130,7 +141,7 @@ class _SavedContent extends StatelessWidget {
                   header: true,
                   liveRegion: true,
                   child: Text(
-                    milestone ? 'Mốc ${summary.milestone} nốt!' : 'Đã vào hũ!',
+                    title,
                     style: theme.textTheme.headlineMedium?.copyWith(
                       letterSpacing: -0.56,
                     ),
@@ -139,7 +150,7 @@ class _SavedContent extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpace.s8),
                 Text(
-                  'Nốt thứ ${summary.monthCount} tháng này.',
+                  subtitle,
                   style: theme.textTheme.bodyLarge?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -171,6 +182,8 @@ class _SavedContent extends StatelessWidget {
                   Center(
                     child: MilestoneSticker(label: 'Th$month', unlocked: true),
                   )
+                else if (first)
+                  _GroupProgress(name: group!.name, count: summary.groupCount)
                 else
                   _MilestoneProgress(summary: summary, month: month),
                 const Spacer(),
@@ -184,6 +197,20 @@ class _SavedContent extends StatelessWidget {
                   const SizedBox(height: AppSpace.s16),
                   AppButton(
                     label: 'Để sau',
+                    variant: AppButtonVariant.text,
+                    expand: true,
+                    onPressed: onDone,
+                  ),
+                ] else if (first) ...<Widget>[
+                  AppButton(
+                    label: 'Xem nhóm ${group!.name}',
+                    expand: true,
+                    onPressed: () =>
+                        context.go(AppRoutes.groupDetail(group.id)),
+                  ),
+                  const SizedBox(height: AppSpace.s16),
+                  AppButton(
+                    label: 'Về Hôm nay',
                     variant: AppButtonVariant.text,
                     expand: true,
                     onPressed: onDone,
@@ -259,6 +286,53 @@ class _Celebration extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Figma S04 · Lần đầu tiên!: "Bắt chuyện · tới mốc Lần 3" và "2/3".
+class _GroupProgress extends StatelessWidget {
+  const _GroupProgress({required this.name, required this.count});
+
+  final String name;
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final style = theme.textTheme.labelMedium;
+    final next = FirstGroups.nextMilestone(count);
+    final label = next == null
+        ? '$name · đã qua mốc Lần 10'
+        : '$name · tới mốc ${FirstGroups.milestoneLabel(next)}';
+    final ratio = next == null ? '$count lần' : '$count/$next';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: AppSpace.s8,
+      children: <Widget>[
+        Row(
+          spacing: AppSpace.s8,
+          children: <Widget>[
+            Expanded(child: Text(label, style: style)),
+            Text(
+              ratio,
+              style: style?.copyWith(
+                color: theme.colorScheme.onPrimaryContainer,
+              ),
+            ),
+          ],
+        ),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(AppRadius.r4),
+          child: LinearProgressIndicator(
+            value: next == null ? 1 : count / next,
+            minHeight: AppSpace.s8,
+            backgroundColor: theme.colorScheme.surfaceContainerHighest,
+            semanticsLabel: '$label, $ratio',
+          ),
+        ),
+      ],
     );
   }
 }
