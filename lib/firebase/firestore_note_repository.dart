@@ -72,6 +72,7 @@ class FirestoreNoteRepository implements NoteRepository {
       subtype: subtype,
       outcome: outcome,
       anxietyBefore: data['anxietyBefore'] as int?,
+      anxietyAfter: data['anxietyAfter'] as int?,
       minutes: data['minutes'] as int?,
     );
   }
@@ -192,6 +193,7 @@ class FirestoreNoteRepository implements NoteRepository {
               'subtype': c.subtype,
               'outcome': c.outcome.id,
               'anxietyBefore': ?c.anxietyBefore,
+              'anxietyAfter': ?c.anxietyAfter,
               'minutes': ?c.minutes,
             },
           }),

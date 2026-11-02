@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../models/challenge.dart';
+import '../../models/discord_room.dart';
 import '../../models/note_type.dart';
 import '../../router/app_routes.dart';
 import '../../theme/app_colors.dart';
@@ -86,6 +87,14 @@ class ChallengeDetailScreen extends ConsumerWidget {
                   builder: (_) => _ResultSheet(provider: provider),
                 ),
                 onEasier: easier,
+                // Thẻ Discord: S08d chọn câu chào rồi mở phòng; quay lại
+                // app thì S08 thành "Bạn vừa ghé phòng chung".
+                onOpenRoom: () async {
+                  final visited = await context.push<bool>(
+                    AppRoutes.challengeGreeting(challengeId),
+                  );
+                  if (visited ?? false) viewModel.markVisitedDiscord();
+                },
               ),
             },
           ),
@@ -102,6 +111,7 @@ class _Detail extends StatelessWidget {
     required this.viewModel,
     required this.onDone,
     required this.onEasier,
+    required this.onOpenRoom,
   });
 
   final Challenge challenge;
@@ -109,11 +119,20 @@ class _Detail extends StatelessWidget {
   final ChallengeDetailViewModel viewModel;
   final VoidCallback onDone;
   final VoidCallback onEasier;
+  final VoidCallback onOpenRoom;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final minutes = state.minutes ?? challenge.minutes;
+    if (challenge.onDiscord && state.visitedDiscord) {
+      return _DiscordReturn(
+        challenge: challenge,
+        state: state,
+        viewModel: viewModel,
+      );
+    }
+    final room = DiscordRooms.byKey(challenge.discordRoom ?? '');
 
     // Figma S08: thẻ thử thách, lời dặn, thang hồi hộp, câu mở lời; hai nút
     // dính đáy (spacer co giãn), màn thấp thì cuộn.
@@ -192,13 +211,126 @@ class _Detail extends StatelessWidget {
                     ],
                   ),
                 const Spacer(),
-                // Chấm hồi hộp không bắt buộc: "Xong rồi" luôn bật.
-                AppButton(label: 'Xong rồi', expand: true, onPressed: onDone),
+                if (room != null) ...<Widget>[
+                  AppButton(
+                    label: 'Mở ${room.name}',
+                    expand: true,
+                    onPressed: onOpenRoom,
+                  ),
+                  // "Để mai" như Back: không trừ gì (F3).
+                  AppButton(
+                    label: 'Để mai',
+                    variant: AppButtonVariant.text,
+                    expand: true,
+                    onPressed: () => context.canPop()
+                        ? context.pop()
+                        : context.go(AppRoutes.challenges),
+                  ),
+                ] else ...<Widget>[
+                  // Chấm hồi hộp không bắt buộc: "Xong rồi" luôn bật.
+                  AppButton(label: 'Xong rồi', expand: true, onPressed: onDone),
+                  AppButton(
+                    label: 'Đổi thẻ dễ hơn',
+                    variant: AppButtonVariant.text,
+                    expand: true,
+                    onPressed: onEasier,
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Figma S08 · quay lại từ Discord: "Bạn vừa ghé phòng chung", thang "Sau đó
+/// bạn thấy sao?", một câu kể thêm; "Mình đã chào, ghi nốt" hoặc "Mới ghé
+/// phòng thôi" (vẫn ghi, ghé cũng là một bước).
+class _DiscordReturn extends StatefulWidget {
+  const _DiscordReturn({
+    required this.challenge,
+    required this.state,
+    required this.viewModel,
+  });
+
+  final Challenge challenge;
+  final ChallengeDetailState state;
+  final ChallengeDetailViewModel viewModel;
+
+  @override
+  State<_DiscordReturn> createState() => _DiscordReturnState();
+}
+
+class _DiscordReturnState extends State<_DiscordReturn> {
+  final _feeling = TextEditingController();
+
+  @override
+  void dispose() {
+    _feeling.dispose();
+    super.dispose();
+  }
+
+  void _save(ChallengeOutcome outcome) =>
+      widget.viewModel.save(outcome, _feeling.text);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final saving = widget.state.saving;
+
+    return CustomScrollView(
+      slivers: <Widget>[
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpace.screen,
+              AppSpace.s16,
+              AppSpace.screen,
+              AppSpace.s24,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              spacing: AppSpace.s16,
+              children: <Widget>[
+                _ChallengeHeader(
+                  challenge: widget.challenge,
+                  title: 'Bạn vừa ghé phòng chung',
+                  mascot: MascotState.xong,
+                ),
+                Text(
+                  'Ghé mà chưa chào cũng là một bước.',
+                  style: theme.textTheme.bodyLarge,
+                ),
+                _AnxietyScale(
+                  question: 'Sau đó bạn thấy sao?',
+                  value: widget.state.anxietyAfter,
+                  onChanged: widget.viewModel.setAnxietyAfter,
+                ),
+                AppTextField(
+                  label: 'Kể một câu (không bắt buộc)',
+                  hint: 'Ví dụ: “Mình đã chào, có 2 người chào lại.”',
+                  controller: _feeling,
+                  maxLength: ChallengeDetailViewModel.feelingMaxLength,
+                ),
+                const Spacer(),
                 AppButton(
-                  label: 'Đổi thẻ dễ hơn',
+                  label: 'Mình đã chào, ghi nốt',
+                  expand: true,
+                  loading: saving,
+                  onPressed: saving
+                      ? null
+                      : () => _save(ChallengeOutcome.smooth),
+                ),
+                AppButton(
+                  label: 'Mới ghé phòng thôi',
                   variant: AppButtonVariant.text,
                   expand: true,
-                  onPressed: onEasier,
+                  onPressed: saving
+                      ? null
+                      : () => _save(ChallengeOutcome.notAsHoped),
                 ),
               ],
             ),
@@ -212,9 +344,17 @@ class _Detail extends StatelessWidget {
 /// Figma `Card/thử thách`: nền tint xanh lá, bo 24, mascot Tập Trung, nhãn
 /// chủ đề Caption/12 Bold màu success và tên thử thách Headline/22.
 class _ChallengeHeader extends StatelessWidget {
-  const _ChallengeHeader({required this.challenge});
+  const _ChallengeHeader({
+    required this.challenge,
+    this.title,
+    this.mascot = MascotState.tapTrung,
+  });
 
   final Challenge challenge;
+
+  /// Thay tên thử thách ("Bạn vừa ghé phòng chung").
+  final String? title;
+  final MascotState mascot;
 
   @override
   Widget build(BuildContext context) {
@@ -235,7 +375,7 @@ class _ChallengeHeader extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           spacing: AppSpace.s12,
           children: <Widget>[
-            const Mascot(state: MascotState.tapTrung, size: 120.96),
+            Mascot(state: mascot, size: 120.96),
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               spacing: AppSpace.s8,
@@ -250,7 +390,7 @@ class _ChallengeHeader extends StatelessWidget {
                 Semantics(
                   header: true,
                   child: Text(
-                    challenge.title,
+                    title ?? challenge.title,
                     style: theme.textTheme.titleLarge?.copyWith(
                       letterSpacing: -0.44,
                     ),
@@ -269,10 +409,15 @@ class _ChallengeHeader extends StatelessWidget {
 /// Figma `hồi hộp`: 5 nút tròn 48 trải đều, nút chọn nền primary; hai nhãn
 /// đầu thang Label/13 bên dưới. Chạm lại nút đang chọn để bỏ chọn (ViewModel).
 class _AnxietyScale extends StatelessWidget {
-  const _AnxietyScale({required this.value, required this.onChanged});
+  const _AnxietyScale({
+    required this.value,
+    required this.onChanged,
+    this.question = 'Bạn hồi hộp cỡ nào?',
+  });
 
   final int? value;
   final ValueChanged<int> onChanged;
+  final String question;
 
   @override
   Widget build(BuildContext context) {
@@ -288,7 +433,7 @@ class _AnxietyScale extends StatelessWidget {
       spacing: AppSpace.s12,
       children: <Widget>[
         Text(
-          'Bạn hồi hộp cỡ nào?',
+          question,
           style: theme.textTheme.bodyLarge?.copyWith(
             fontWeight: FontWeight.w600,
           ),

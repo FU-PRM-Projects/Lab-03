@@ -7,6 +7,7 @@ import 'package:lab03/router/app_router.dart';
 import 'package:lab03/services/auth_service.dart';
 import 'package:lab03/services/challenge_repository.dart';
 import 'package:lab03/services/clock.dart';
+import 'package:lab03/services/discord_service.dart';
 import 'package:lab03/services/draft_store.dart';
 import 'package:lab03/services/group_repository.dart';
 import 'package:lab03/services/note_repository.dart';
@@ -47,6 +48,7 @@ class TestServices {
   final FakeLocalAuth localAuth = FakeLocalAuth();
   final FakeScreenGuard screenGuard = FakeScreenGuard();
   final FakeNudgeService nudges = FakeNudgeService();
+  final FakeDiscordService discord = FakeDiscordService();
   final FakeChallengeRepository challenges = FakeChallengeRepository();
   final FakeReportService reports = FakeReportService();
   final FakeStorageService storage = FakeStorageService();
@@ -63,6 +65,7 @@ class TestServices {
     localAuthServiceProvider.overrideWithValue(localAuth),
     screenGuardProvider.overrideWithValue(screenGuard),
     nudgeServiceProvider.overrideWithValue(nudges),
+    discordServiceProvider.overrideWithValue(discord),
     challengeRepositoryProvider.overrideWithValue(challenges),
     reportServiceProvider.overrideWithValue(reports),
     storageServiceProvider.overrideWithValue(storage),

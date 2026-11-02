@@ -8,6 +8,7 @@ import '../models/note_type.dart';
 import '../services/challenge_repository.dart';
 import '../services/clock.dart';
 import '../services/note_repository.dart';
+import '../services/remote_config_service.dart';
 import 'challenges_view_model.dart';
 import 'error_messages.dart';
 import 'view_state.dart';
@@ -16,6 +17,8 @@ class ChallengeDetailState {
   const ChallengeDetailState({
     this.challenge = const Loading<Challenge>(),
     this.anxiety,
+    this.anxietyAfter,
+    this.visitedDiscord = false,
     this.minutes,
     this.saving = false,
     this.savedNoteId,
@@ -26,6 +29,13 @@ class ChallengeDetailState {
 
   /// "Bạn hồi hộp cỡ nào?" 1–5; không bắt buộc.
   final int? anxiety;
+
+  /// "Sau đó bạn thấy sao?" 1–5 sau khi ghé Discord; không bắt buộc.
+  final int? anxietyAfter;
+
+  /// Đã mở phòng Discord và quay lại app: S08 thành "Bạn vừa ghé phòng
+  /// chung".
+  final bool visitedDiscord;
 
   /// Số phút vận động thực tế (P3); mặc định là số phút của thẻ.
   final int? minutes;
@@ -52,6 +62,8 @@ class ChallengeDetailState {
   ChallengeDetailState copyWith({
     ViewState<Challenge>? challenge,
     int? Function()? anxiety,
+    int? Function()? anxietyAfter,
+    bool? visitedDiscord,
     int? minutes,
     bool? saving,
     String? savedNoteId,
@@ -59,6 +71,8 @@ class ChallengeDetailState {
   }) => ChallengeDetailState(
     challenge: challenge ?? this.challenge,
     anxiety: anxiety == null ? this.anxiety : anxiety(),
+    anxietyAfter: anxietyAfter == null ? this.anxietyAfter : anxietyAfter(),
+    visitedDiscord: visitedDiscord ?? this.visitedDiscord,
     minutes: minutes ?? this.minutes,
     saving: saving ?? this.saving,
     savedNoteId: savedNoteId ?? this.savedNoteId,
@@ -116,6 +130,13 @@ class ChallengeDetailViewModel extends Notifier<ChallengeDetailState> {
     anxiety: () => state.anxiety == level ? null : level,
   );
 
+  void setAnxietyAfter(int level) => state = state.copyWith(
+    anxietyAfter: () => state.anxietyAfter == level ? null : level,
+  );
+
+  /// Quay lại từ phòng Discord (S08d mở link rồi người dùng trở về app).
+  void markVisitedDiscord() => state = state.copyWith(visitedDiscord: true);
+
   void setMinutes(int minutes) =>
       state = state.copyWith(minutes: minutes.clamp(0, maxMinutes));
 
@@ -130,6 +151,11 @@ class ChallengeDetailViewModel extends Notifier<ChallengeDetailState> {
     final body = trimmed.isNotEmpty
         ? trimmed
         : switch ((movement, outcome)) {
+            // Thẻ Discord: chào được, hoặc mới ghé phòng (vẫn là một bước).
+            _ when challenge.onDiscord => switch (outcome) {
+              ChallengeOutcome.smooth => 'Mình đã chào ở phòng chung.',
+              ChallengeOutcome.notAsHoped => 'Mình đã ghé phòng chung.',
+            },
             // "Không như ý" vẫn tính là dũng cảm (F3).
             (false, ChallengeOutcome.notAsHoped) => 'Mình đã mở lời.',
             // Dừng sớm vẫn ghi (P3).
@@ -153,6 +179,7 @@ class ChallengeDetailViewModel extends Notifier<ChallengeDetailState> {
                 subtype: challenge.topic.subtype,
                 outcome: outcome,
                 anxietyBefore: state.anxiety,
+                anxietyAfter: state.anxietyAfter,
                 minutes: movement ? minutes : null,
               ),
             ),
@@ -173,7 +200,10 @@ class ChallengeDetailViewModel extends Notifier<ChallengeDetailState> {
 
   Future<void> _markCompleted(Challenge challenge) async {
     try {
-      final catalog = await _challenges.catalog();
+      final catalog = ChallengeDeck.available(
+        await _challenges.catalog(),
+        discord: ref.read(remoteConfigServiceProvider).discordEnabled,
+      );
       final progress = await _challenges.progressOf(challenge.topic);
       await _challenges.complete(
         challenge.topic,

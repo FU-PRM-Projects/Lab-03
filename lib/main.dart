@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'app.dart';
+import 'firebase/device_discord_service.dart';
 import 'firebase/device_services.dart';
 import 'firebase/firebase_auth_service.dart';
 import 'firebase/firebase_bootstrap.dart';
@@ -16,6 +17,7 @@ import 'firebase/prefs_draft_store.dart';
 import 'firebase/report_impl.dart';
 import 'services/auth_service.dart';
 import 'services/challenge_repository.dart';
+import 'services/discord_service.dart';
 import 'services/draft_store.dart';
 import 'services/group_repository.dart';
 import 'services/note_repository.dart';
@@ -70,6 +72,7 @@ Future<void> main() async {
         localAuthServiceProvider.overrideWithValue(DeviceLocalAuthService()),
         screenGuardProvider.overrideWithValue(const MethodChannelScreenGuard()),
         nudgeServiceProvider.overrideWithValue(LocalNudgeService()),
+        discordServiceProvider.overrideWithValue(const DeviceDiscordService()),
       ],
       child: NotApp(
         font: (style) => GoogleFonts.beVietnamPro(textStyle: style),

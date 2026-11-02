@@ -5,9 +5,11 @@ import 'package:material_ui/material_ui.dart';
 
 import '../screens/breathing/breathing_screen.dart';
 import '../screens/challenge_detail/challenge_detail_screen.dart';
+import '../screens/challenge_detail/greeting_screen.dart';
 import '../screens/challenges/challenges_screen.dart';
 import '../screens/common/screen_skeleton.dart';
 import '../screens/dev/component_gallery_screen.dart';
+import '../screens/discord/discord_rooms_screen.dart';
 import '../screens/groups/group_detail_screen.dart';
 import '../screens/groups/groups_screen.dart';
 import '../screens/jar/jar_screen.dart';
@@ -111,6 +113,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                     builder: (context, state) => ChallengeDetailScreen(
                       challengeId: state.pathParameters['id']!,
                     ),
+                    routes: <RouteBase>[
+                      GoRoute(
+                        path: 'greeting',
+                        parentNavigatorKey: rootKey,
+                        builder: (context, state) => GreetingScreen(
+                          challengeId: state.pathParameters['id']!,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -144,6 +155,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/note/saved/:id',
         builder: (context, state) =>
             NoteSavedScreen(noteId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: AppRoutes.rooms,
+        builder: (context, state) => const DiscordRoomsScreen(),
       ),
       GoRoute(
         path: AppRoutes.journal,

@@ -7,6 +7,7 @@ import '../models/note.dart';
 import '../services/challenge_repository.dart';
 import '../services/clock.dart';
 import '../services/note_repository.dart';
+import '../services/remote_config_service.dart';
 import '../utils/dates.dart';
 import 'auth_view_model.dart';
 import 'error_messages.dart';
@@ -37,6 +38,13 @@ class DeckCard {
 /// Dựng chồng thẻ từ kho thẻ, tiến độ và tâm trạng hôm qua (hàm thuần, để
 /// test không cần Firestore).
 abstract final class ChallengeDeck {
+  /// Kho thẻ dùng được: `discord_enabled` tắt thì bỏ thẻ làm trên Discord,
+  /// cấp đó chỉ còn thẻ ngoài đời.
+  static List<Challenge> available(
+    List<Challenge> catalog, {
+    required bool discord,
+  }) => discord ? catalog : catalog.where((c) => !c.onDiscord).toList();
+
   /// Thẻ chưa làm ở cấp hiện tại của từng chủ đề. Làm hết một cấp thì lấy cấp
   /// kế tiếp. Hôm qua tâm trạng thấp thì chủ đề Vận động lên trước (nhẹ hơn
   /// mở lời với người lạ).
@@ -198,7 +206,10 @@ class ChallengesViewModel extends Notifier<ViewState<List<DeckCard>>> {
 
   Future<void> _loadCatalog() async {
     try {
-      final catalog = await _challenges.catalog();
+      final catalog = ChallengeDeck.available(
+        await _challenges.catalog(),
+        discord: ref.read(remoteConfigServiceProvider).discordEnabled,
+      );
       if (!ref.mounted) return;
       _catalog = catalog;
       _emit();

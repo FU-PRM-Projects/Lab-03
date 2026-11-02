@@ -3,10 +3,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../models/discord_room.dart';
 import '../../models/first_group.dart';
 import '../../models/note.dart';
 import '../../router/app_routes.dart';
 import '../../services/clock.dart';
+import '../../services/remote_config_service.dart';
 import '../../theme/app_tokens.dart';
 import '../../theme/app_typography.dart';
 import '../../utils/vi_date_format.dart';
@@ -18,7 +20,9 @@ import '../../widgets/app_text_field.dart';
 import '../../widgets/app_top_bar.dart';
 import '../../widgets/mascot.dart';
 import '../../widgets/note_card.dart';
+import '../../widgets/setting_row.dart';
 import '../../widgets/state_views.dart';
+import '../discord/discord_launcher.dart';
 
 /// S05e · Chi tiết nhóm lần đầu.
 class GroupDetailScreen extends ConsumerWidget {
@@ -129,6 +133,41 @@ class GroupDetailScreen extends ConsumerWidget {
   }
 }
 
+/// Figma S05e · lối vào phòng Discord: "Trò chuyện cùng người đang tập" và
+/// dòng phòng của nhóm. Ẩn khi nhóm không có phòng (nhóm tự tạo) hoặc
+/// `discord_enabled` tắt.
+class _RoomEntry extends ConsumerWidget {
+  const _RoomEntry({required this.groupId, required this.heading});
+
+  final String groupId;
+  final TextStyle heading;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final room = DiscordRooms.forGroup(groupId);
+    if (room == null ||
+        !ref.watch(remoteConfigServiceProvider).discordEnabled) {
+      return const SizedBox.shrink();
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: AppSpace.s16,
+      children: <Widget>[
+        Semantics(
+          header: true,
+          child: Text('Trò chuyện cùng người đang tập', style: heading),
+        ),
+        SettingRow.value(
+          title: room.name,
+          subtitle: 'Phòng trên Discord · ẩn danh',
+          value: 'Mở',
+          onTap: () => openDiscordRoom(context, ref, room),
+        ),
+      ],
+    );
+  }
+}
+
 class _Body extends StatelessWidget {
   const _Body({
     required this.detail,
@@ -191,6 +230,7 @@ class _Body extends StatelessWidget {
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
+                _RoomEntry(groupId: group.id, heading: heading),
                 if (recent.isNotEmpty) ...<Widget>[
                   Semantics(
                     header: true,
