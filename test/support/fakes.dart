@@ -16,6 +16,7 @@ import 'package:lab03/services/clock.dart';
 import 'package:lab03/services/draft_store.dart';
 import 'package:lab03/services/group_repository.dart';
 import 'package:lab03/services/note_repository.dart';
+import 'package:lab03/services/nudge_service.dart';
 import 'package:lab03/services/report_services.dart';
 import 'package:lab03/services/self_control_services.dart';
 import 'package:lab03/services/user_repository.dart';
@@ -508,6 +509,32 @@ class FakeScreenGuard implements ScreenGuard {
 
   @override
   Future<void> setKeepScreenOn(bool enabled) async => keepScreenOn = enabled;
+}
+
+class FakeNudgeService implements NudgeService {
+  /// Giờ (phút kể từ 0h) của lời nhắc "Giờ tỉnh" đang hẹn; `null` là không hẹn.
+  int? awakeAt;
+  int permissionRequests = 0;
+  String? launch;
+  final StreamController<String> opened = StreamController<String>.broadcast();
+
+  @override
+  Future<void> scheduleAwakeNudge(int minutes) async => awakeAt = minutes;
+
+  @override
+  Future<void> cancelAwakeNudge() async => awakeAt = null;
+
+  @override
+  Future<bool> requestPermission() async {
+    permissionRequests++;
+    return true;
+  }
+
+  @override
+  Stream<String> get openedRoutes => opened.stream;
+
+  @override
+  Future<String?> launchRoute() async => launch;
 }
 
 /// Kho thẻ mẫu: 2 chủ đề × 2 cấp × [perLevel] thẻ, id dạng `dc-1-1`, `vd-2-3`.

@@ -146,129 +146,150 @@ class _SelfControlScreenState extends ConsumerState<SelfControlScreen> {
       _ => null,
     };
 
-    return Scaffold(
-      appBar: const AppTopBar(title: 'Tự chủ'),
-      body: SafeArea(
-        top: false,
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxWidth: AppSize.contentMaxWidth,
-            ),
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpace.screen,
-                AppSpace.s16,
-                AppSpace.screen,
-                AppSpace.s24,
+    // Mở thẳng từ lời nhắc "Giờ tỉnh" thì không có màn phía sau: Back về S02.
+    void back() =>
+        context.canPop() ? context.pop() : context.go(AppRoutes.today);
+
+    return PopScope(
+      canPop: context.canPop(),
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) back();
+      },
+      child: Scaffold(
+        appBar: AppTopBar(title: 'Tự chủ', onLeading: back),
+        body: SafeArea(
+          top: false,
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: AppSize.contentMaxWidth,
               ),
-              children: <Widget>[
-                // Figma `Card/tóm tắt tự chủ`: mascot Tập Trung, số lần
-                // Display/44 và chú thích Label/14, căn giữa.
-                Semantics(
-                  label: summary == null
-                      ? 'Đang đếm số lần tự chủ tháng này'
-                      : '${summary.monthCount} lần tự chủ tháng này',
-                  excludeSemantics: true,
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppSpace.s16),
-                    child: Column(
-                      spacing: AppSpace.s8,
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpace.screen,
+                  AppSpace.s16,
+                  AppSpace.screen,
+                  AppSpace.s24,
+                ),
+                children: <Widget>[
+                  // Figma `Card/tóm tắt tự chủ`: mascot Tập Trung, số lần
+                  // Display/44 và chú thích Label/14, căn giữa.
+                  Semantics(
+                    label: summary == null
+                        ? 'Đang đếm số lần tự chủ tháng này'
+                        : '${summary.monthCount} lần tự chủ tháng này',
+                    excludeSemantics: true,
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppSpace.s16),
+                      child: Column(
+                        spacing: AppSpace.s8,
+                        children: <Widget>[
+                          const Mascot(
+                            state: MascotState.tapTrung,
+                            size: 113.4,
+                          ),
+                          Column(
+                            spacing: AppSpace.s4,
+                            children: <Widget>[
+                              Text(
+                                summary == null ? '–' : '${summary.monthCount}',
+                                style: theme.textTheme.displayMedium?.copyWith(
+                                  letterSpacing: -0.88,
+                                ),
+                              ),
+                              Text(
+                                'lần tự chủ tháng này',
+                                style: theme.textTheme.labelLarge?.copyWith(
+                                  fontWeight: FontWeight.w400,
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpace.s16),
+                  // Một nút cho cả hai kết quả (dừng được / lỡ lướt); dùng được
+                  // ngay, kể cả khi đang tải hoặc đang khoá.
+                  AppButton(
+                    label: 'Ghi lại vừa rồi',
+                    expand: true,
+                    loading: state.saving,
+                    onPressed: state.saving
+                        ? null
+                        : () => _recordMoment(summary, state.habitsLocked),
+                  ),
+                  // Thở 90 giây đã có lối tắt "Stress?" ở S02 (deviation D-26).
+                  const SizedBox(height: AppSpace.s16),
+                  Text(
+                    'THÓI QUEN MUỐN BỚT',
+                    style: AppTextStyles.of(context).overline.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                      letterSpacing: 0.72,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpace.s2),
+                  Text(
+                    'Chọn thói quen bạn đang muốn bớt. Khi dừng được, Nốt '
+                    'hỏi bạn vừa dừng thói quen nào.',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      fontWeight: FontWeight.w400,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpace.s8),
+                  switch (state.summary) {
+                    Loading<SelfControlSummary>() ||
+                    Empty<SelfControlSummary>() => const LoadingState.spinner(),
+                    Failure<SelfControlSummary>(
+                      :final message,
+                      :final offline,
+                    ) =>
+                      ErrorState(
+                        title: 'Chưa tải được phần Tự chủ',
+                        cause: message,
+                        kind: offline
+                            ? ErrorKind.offline
+                            : ErrorKind.loadFailed,
+                        onRetry: _viewModel.retry,
+                      ),
+                    Data<SelfControlSummary>(:final value) =>
+                      state.habitsLocked
+                          ? _LockedHabits(
+                              unlocking: state.unlocking,
+                              onUnlock: _viewModel.unlock,
+                            )
+                          : _Habits(
+                              habits: value.habits,
+                              viewModel: _viewModel,
+                            ),
+                  },
+                  if (summary != null) ...<Widget>[
+                    const SizedBox(height: AppSpace.s16),
+                    // Figma: dòng "Giờ tỉnh" hiện luôn khung giờ đang đặt.
+                    SettingGroup(
                       children: <Widget>[
-                        const Mascot(state: MascotState.tapTrung, size: 113.4),
-                        Column(
-                          spacing: AppSpace.s4,
-                          children: <Widget>[
-                            Text(
-                              summary == null ? '–' : '${summary.monthCount}',
-                              style: theme.textTheme.displayMedium?.copyWith(
-                                letterSpacing: -0.88,
-                              ),
-                            ),
-                            Text(
-                              'lần tự chủ tháng này',
-                              style: theme.textTheme.labelLarge?.copyWith(
-                                fontWeight: FontWeight.w400,
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ],
+                        SettingRow.toggle(
+                          title: 'Giờ tỉnh',
+                          subtitle:
+                              '${ViDateFormat.clock(summary.settings.awakeStart)}'
+                              ' – '
+                              '${ViDateFormat.clock(summary.settings.awakeEnd)}',
+                          value: summary.settings.awakeEnabled,
+                          onChanged: _viewModel.setAwakeEnabled,
+                        ),
+                        SettingRow.value(
+                          title: 'Đổi khung giờ',
+                          value: '',
+                          onTap: () => _pickAwakeTimes(summary.settings),
                         ),
                       ],
                     ),
-                  ),
-                ),
-                const SizedBox(height: AppSpace.s16),
-                // Một nút cho cả hai kết quả (dừng được / lỡ lướt); dùng được
-                // ngay, kể cả khi đang tải hoặc đang khoá.
-                AppButton(
-                  label: 'Ghi lại vừa rồi',
-                  expand: true,
-                  loading: state.saving,
-                  onPressed: state.saving
-                      ? null
-                      : () => _recordMoment(summary, state.habitsLocked),
-                ),
-                // Thở 90 giây đã có lối tắt "Stress?" ở S02 (deviation D-26).
-                const SizedBox(height: AppSpace.s16),
-                Text(
-                  'THÓI QUEN MUỐN BỚT',
-                  style: AppTextStyles.of(context).overline.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                    letterSpacing: 0.72,
-                  ),
-                ),
-                const SizedBox(height: AppSpace.s2),
-                Text(
-                  'Chọn thói quen bạn đang muốn bớt. Khi dừng được, Nốt '
-                  'hỏi bạn vừa dừng thói quen nào.',
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    fontWeight: FontWeight.w400,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(height: AppSpace.s8),
-                switch (state.summary) {
-                  Loading<SelfControlSummary>() ||
-                  Empty<SelfControlSummary>() => const LoadingState.spinner(),
-                  Failure<SelfControlSummary>(:final message, :final offline) =>
-                    ErrorState(
-                      title: 'Chưa tải được phần Tự chủ',
-                      cause: message,
-                      kind: offline ? ErrorKind.offline : ErrorKind.loadFailed,
-                      onRetry: _viewModel.retry,
-                    ),
-                  Data<SelfControlSummary>(:final value) =>
-                    state.habitsLocked
-                        ? _LockedHabits(
-                            unlocking: state.unlocking,
-                            onUnlock: _viewModel.unlock,
-                          )
-                        : _Habits(habits: value.habits, viewModel: _viewModel),
-                },
-                if (summary != null) ...<Widget>[
-                  const SizedBox(height: AppSpace.s16),
-                  // Figma: dòng "Giờ tỉnh" hiện luôn khung giờ đang đặt.
-                  SettingGroup(
-                    children: <Widget>[
-                      SettingRow.toggle(
-                        title: 'Giờ tỉnh',
-                        subtitle:
-                            '${ViDateFormat.clock(summary.settings.awakeStart)}'
-                            ' – '
-                            '${ViDateFormat.clock(summary.settings.awakeEnd)}',
-                        value: summary.settings.awakeEnabled,
-                        onChanged: _viewModel.setAwakeEnabled,
-                      ),
-                      SettingRow.value(
-                        title: 'Đổi khung giờ',
-                        value: '',
-                        onTap: () => _pickAwakeTimes(summary.settings),
-                      ),
-                    ],
-                  ),
+                  ],
                 ],
-              ],
+              ),
             ),
           ),
         ),
