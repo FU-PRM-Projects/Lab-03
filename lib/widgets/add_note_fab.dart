@@ -43,6 +43,10 @@ class AddNoteFab extends StatelessWidget {
         ),
         child: FloatingActionButton(
           onPressed: onPressed,
+          // Ba tab giữ sống cùng lúc trong một route (indexedStack), mỗi tab
+          // một nút +: heroTag mặc định dùng chung làm Flutter ném
+          // "multiple heroes that share the same tag" khi chuyển màn.
+          heroTag: null,
           tooltip: 'Ghi nốt',
           elevation: AppElevation.flat,
           highlightElevation: AppElevation.flat,

@@ -409,14 +409,6 @@ Exported 1 account(s) · provider: google.com`}</pre>
         </Page>
 
         <Page
-          title="Cloud Storage"
-          line="Each user reads only their own files."
-          images={[{ src: 'app/weekly-card.png', alt: 'Weekly card with the Save PDF button' }]}
-          todo="Upload not run: the Storage bucket is not provisioned yet (project on the Spark plan)."
-          notes="Weekly card PDFs live in reports/{uid}. Rules allow the owner UID only and PDFs under 5 MB. The upload failure case still needs proof."
-        />
-
-        <Page
           title="Cloud Messaging · Permission"
           line="Permission denied: a prompt to open settings."
           images={[
