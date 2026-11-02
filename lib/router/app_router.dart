@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart' show kReleaseMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -23,6 +25,7 @@ import '../screens/settings/settings_screen.dart';
 import '../screens/splash/splash_screen.dart';
 import '../screens/today/today_screen.dart';
 import '../screens/welcome/welcome_screen.dart';
+import '../services/analytics_service.dart';
 import '../viewmodels/auth_view_model.dart';
 import '../widgets/state_views.dart';
 import 'app_routes.dart';
@@ -39,6 +42,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   ref
     ..listen(authUserProvider, (_, _) => authChanged.value++)
     ..onDispose(authChanged.dispose);
+  var lastScreen = '';
 
   final router = GoRouter(
     navigatorKey: rootKey,
@@ -193,6 +197,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     ),
   );
 
-  ref.onDispose(router.dispose);
+  // screen_view theo mẫu route mỗi khi màn đổi.
+  void logScreen() {
+    // fullPath giữ mẫu route (`/note/saved/:id`), không lộ id cụ thể.
+    final path = router.routerDelegate.currentConfiguration.fullPath;
+    if (path.isEmpty || path == lastScreen) return;
+    lastScreen = path;
+    unawaited(ref.read(analyticsServiceProvider).logScreen(path));
+  }
+
+  router.routerDelegate.addListener(logScreen);
+  ref.onDispose(() {
+    router.routerDelegate.removeListener(logScreen);
+    router.dispose();
+  });
   return router;
 });

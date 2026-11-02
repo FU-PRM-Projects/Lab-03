@@ -1,8 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/app_user.dart';
+import '../services/analytics_events.dart';
+import '../services/analytics_service.dart';
 import '../services/app_exception.dart';
 import '../services/auth_service.dart';
+import '../services/crash_reporter.dart';
 import '../services/draft_store.dart';
 import '../services/user_repository.dart';
 import '../utils/validators.dart';
@@ -57,8 +62,10 @@ class AuthViewModel extends Notifier<AuthState> {
   AuthService get _auth => ref.read(authServiceProvider);
   UserRepository get _users => ref.read(userRepositoryProvider);
 
-  Future<void> signInWithGoogle() =>
-      _run(AuthAction.google, () => _afterSignIn(_auth.signInWithGoogle()));
+  Future<void> signInWithGoogle() => _run(
+    AuthAction.google,
+    () => _afterSignIn(_auth.signInWithGoogle(), 'google'),
+  );
 
   /// Kiểm tra form rồi đăng nhập hoặc đăng ký bằng email (flow P2).
   Future<void> submitEmail(
@@ -77,11 +84,11 @@ class AuthViewModel extends Notifier<AuthState> {
     await switch (mode) {
       EmailFormMode.signIn => _run(
         AuthAction.emailSignIn,
-        () => _afterSignIn(_auth.signInWithEmail(trimmed, password)),
+        () => _afterSignIn(_auth.signInWithEmail(trimmed, password), 'email'),
       ),
       EmailFormMode.register => _run(
         AuthAction.register,
-        () => _afterSignIn(_auth.registerWithEmail(trimmed, password)),
+        () => _afterSignIn(_auth.registerWithEmail(trimmed, password), 'email'),
       ),
     };
   }
@@ -106,6 +113,9 @@ class AuthViewModel extends Notifier<AuthState> {
 
   /// Đăng xuất và xoá dữ liệu của người dùng còn trên máy.
   Future<void> signOut() => _run(AuthAction.signOut, () async {
+    final analytics = ref.read(analyticsServiceProvider);
+    await analytics.track(AnalyticsEvents.logout);
+    await analytics.setUserId(null).onError((_, _) {});
     await _auth.signOut();
     try {
       await _users.clearLocalData();
@@ -122,12 +132,23 @@ class AuthViewModel extends Notifier<AuthState> {
 
   /// Tạo hồ sơ ở lần đăng nhập đầu. Lỗi tạo hồ sơ không làm hỏng đăng nhập:
   /// hồ sơ sẽ được tạo lại ở lần đăng nhập sau.
-  Future<String?> _afterSignIn(Future<AppUser> signIn) async {
+  Future<String?> _afterSignIn(Future<AppUser> signIn, String method) async {
     final user = await signIn;
+    final analytics = ref.read(analyticsServiceProvider);
+    await analytics.setUserId(user.uid).onError((_, _) {});
+    unawaited(
+      analytics.track(AnalyticsEvents.login, <String, Object>{
+        AnalyticsParams.method: method,
+      }),
+    );
     try {
       await _users.ensureProfile(user);
-    } on AppException {
-      // Stage 5: ghi non-fatal qua CrashReporter.
+    } on AppException catch (error, stack) {
+      unawaited(
+        ref
+            .read(crashReporterProvider)
+            .recordError(error, stack, reason: 'ensureProfile'),
+      );
     }
     return null;
   }

@@ -218,14 +218,15 @@ Không để test nào gọi plugin thật.
 4. (Nếu deploy) `.firebaserc` đã trỏ `prm393-not-lab3`; test Security Rules vẫn
    dùng `demo-prm393` trong `firebase/package.json` để không cần đăng nhập.
 
-## 10. Ngoài phạm vi (Stage 5, việc tiếp theo)
+## 10. Remote Config và FCM (đã làm cùng Stage 5)
 
-- **Remote Config**: thêm `firebase_remote_config`, hiện thực
-  `FirebaseRemoteConfigService` cho interface đã có trong
-  `lib/services/remote_config_service.dart` (6 giá trị mặc định đang dùng).
-- **FCM**: `firebase_messaging` + `MessagingService`/`NotificationInbox` như
-  bảng service trong `docs/architecture.md`, dùng lại
-  `flutter_local_notifications`.
+- **Remote Config**: `lib/firebase/firebase_remote_config_service.dart` hiện thực
+  `RemoteConfigService`; mặc định lấy từ `InAppRemoteConfig`, tải thất bại thì dùng
+  mặc định. Mẫu tham số: `firebase/remoteconfig.template.json`, đưa lên bằng
+  `firebase deploy --only remoteconfig`. S12 khu demo có dòng Remote Config (chạm để tải lại).
+- **FCM**: `lib/firebase/firebase_messaging_service.dart`. Xin quyền, nhắc mở cài đặt khi bị
+  từ chối, hộp thư lưu thông báo kèm trạng thái nhận (đang mở / nền / đã tắt). Gửi thử bằng
+  FCM HTTP v1 tới token in ra log (`[fcm] token`).
 
 ## 11. Rủi ro
 

@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/challenge.dart';
 import '../models/note.dart';
 import '../models/note_type.dart';
+import '../services/analytics_events.dart';
+import '../services/analytics_service.dart';
 import '../services/challenge_repository.dart';
 import '../services/clock.dart';
 import '../services/note_repository.dart';
@@ -188,7 +190,15 @@ class ChallengeDetailViewModel extends Notifier<ChallengeDetailState> {
             ),
             createdAt: ref.read(clockProvider).now(),
           );
-      // Stage 5: logEvent(challenge_completed).
+      unawaited(
+        ref.read(analyticsServiceProvider).track(
+          AnalyticsEvents.challengeCompleted,
+          <String, Object>{
+            AnalyticsParams.challengeId: challenge.id,
+            if (movement) AnalyticsParams.minutes: minutes,
+          },
+        ),
+      );
       await _markCompleted(challenge);
       if (!ref.mounted) return;
       state = state.copyWith(saving: false, savedNoteId: note.id);

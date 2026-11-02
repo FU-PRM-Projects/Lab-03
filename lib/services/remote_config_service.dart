@@ -24,6 +24,12 @@ abstract interface class RemoteConfigService {
 
   /// Câu chào có sẵn ở S08d khi Tụi Nốt AI nghỉ (`discord_greetings`).
   List<String> get discordGreetings;
+
+  /// Hiện nhóm "Khu demo Firebase" ở S12 (`firebase_demo_enabled`).
+  bool get firebaseDemoEnabled;
+
+  /// Tải lại cấu hình từ Console; `true` khi có giá trị mới được kích hoạt.
+  Future<bool> refresh();
 }
 
 /// Giá trị mặc định trong app, cũng là giá trị khi tải cấu hình thất bại.
@@ -66,8 +72,26 @@ class InAppRemoteConfig implements RemoteConfigService {
 
   @override
   List<String> get discordGreetings => defaultDiscordGreetings;
+
+  @override
+  bool get firebaseDemoEnabled => true;
+
+  @override
+  Future<bool> refresh() async => false;
 }
 
 final remoteConfigServiceProvider = Provider<RemoteConfigService>(
   (ref) => const InAppRemoteConfig(),
 );
+
+/// Tăng sau mỗi lần [RemoteConfigService.refresh] có giá trị mới, để màn đang
+/// mở đọc lại cấu hình.
+class RemoteConfigRevision extends Notifier<int> {
+  @override
+  int build() => 0;
+
+  void bump() => state++;
+}
+
+final remoteConfigRevisionProvider =
+    NotifierProvider<RemoteConfigRevision, int>(RemoteConfigRevision.new);

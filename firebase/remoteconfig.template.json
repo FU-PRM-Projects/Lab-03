@@ -1,0 +1,53 @@
+{
+  "parameters": {
+    "quick_win_chips": {
+      "defaultValue": {
+        "value": "[\"Dọn phòng\", \"Giúp ai đó\", \"Đi bộ\", \"Ăn đủ bữa\", \"Ngủ trước 12h\", \"Xong 1 việc khó\"]"
+      },
+      "valueType": "JSON",
+      "description": "6 chip 'Hoặc chọn nhanh' ở S03b"
+    },
+    "monthly_milestone": {
+      "defaultValue": {
+        "value": "25"
+      },
+      "valueType": "NUMBER",
+      "description": "Số nốt của mốc tháng ở S04"
+    },
+    "discord_enabled": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "valueType": "BOOLEAN",
+      "description": "Bật phòng Discord"
+    },
+    "discord_invite_url": {
+      "defaultValue": {
+        "value": "https://discord.gg/not-demo"
+      },
+      "valueType": "STRING",
+      "description": "Link mời Discord mặc định"
+    },
+    "discord_channel_map": {
+      "defaultValue": {
+        "value": "{}"
+      },
+      "valueType": "JSON",
+      "description": "Link từng phòng theo mã phòng"
+    },
+    "discord_greetings": {
+      "defaultValue": {
+        "value": "[\"Chào mọi người! Mình mới vào, mong được làm quen.\", \"Hi cả phòng, mình đang tập bắt chuyện.\"]"
+      },
+      "valueType": "JSON",
+      "description": "Câu chào có sẵn ở S08d"
+    },
+    "firebase_demo_enabled": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "valueType": "BOOLEAN",
+      "description": "Hiện khu demo Firebase ở S12"
+    }
+  }
+}

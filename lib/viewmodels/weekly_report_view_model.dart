@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/report.dart';
+import '../services/analytics_events.dart';
+import '../services/analytics_service.dart';
 import '../services/app_exception.dart';
 import '../services/report_services.dart';
 
@@ -61,7 +65,12 @@ class WeeklyReportViewModel extends Notifier<ReportState> {
       }
       if (!ref.mounted) return;
       state = ReportState(phase: ReportPhase.done, progress: 1, url: url);
-      // Stage 5: logEvent(export_report).
+      unawaited(
+        ref.read(analyticsServiceProvider).track(
+          AnalyticsEvents.reportExported,
+          <String, Object>{AnalyticsParams.format: 'pdf'},
+        ),
+      );
       try {
         await ref.read(reportServiceProvider).share(bytes, summary.fileName);
       } on Object {

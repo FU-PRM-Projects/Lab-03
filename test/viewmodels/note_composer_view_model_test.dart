@@ -5,6 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lab03/models/mood.dart';
 import 'package:lab03/models/note.dart';
 import 'package:lab03/models/note_type.dart';
+import 'package:lab03/services/analytics_events.dart';
+import 'package:lab03/services/analytics_service.dart';
 import 'package:lab03/services/app_exception.dart';
 import 'package:lab03/services/clock.dart';
 import 'package:lab03/services/draft_store.dart';
@@ -19,6 +21,7 @@ void main() {
   late FakeNoteRepository notes;
   late FakeDraftStore drafts;
   late FixedClock clock;
+  late FakeAnalyticsService analytics;
   late ProviderContainer container;
 
   final provider = noteComposerViewModelProvider((step: 1, groupId: null));
@@ -31,6 +34,7 @@ void main() {
         noteRepositoryProvider.overrideWithValue(notes),
         draftStoreProvider.overrideWithValue(drafts),
         clockProvider.overrideWithValue(clock),
+        analyticsServiceProvider.overrideWithValue(analytics),
       ],
     );
     addTearDown(c.dispose);
@@ -43,6 +47,7 @@ void main() {
     notes = FakeNoteRepository();
     drafts = FakeDraftStore();
     clock = FixedClock();
+    analytics = FakeAnalyticsService();
     container = makeContainer();
   });
 
@@ -71,6 +76,26 @@ void main() {
 
     vm().setTitle('   ');
     expect(state().canContinue, isFalse);
+  });
+
+  test('lưu xong ghi note_saved với duration_ms, không kèm nội dung', () async {
+    vm().selectMood(Mood.vui);
+    clock.current = clock.current.add(const Duration(seconds: 12));
+    vm()
+      ..next()
+      ..setTitle('Chuyện riêng tư')
+      ..next()
+      ..setBody('Nội dung nhật ký');
+    await vm().save();
+    await Future<void>.delayed(Duration.zero);
+
+    final event = analytics.events.single;
+    expect(event.name, AnalyticsEvents.noteSaved);
+    expect(event.params[AnalyticsParams.durationMs], 12000);
+    expect(event.params[AnalyticsParams.mood], 'vui');
+    expect(event.params[AnalyticsParams.hasJournal], 'true');
+    expect(event.params.values.join(), isNot(contains('riêng tư')));
+    expect(event.params.values.join(), isNot(contains('nhật ký')));
   });
 
   test('happy path: lưu nốt chiến thắng với giờ máy, xoá nháp', () async {
