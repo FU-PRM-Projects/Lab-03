@@ -351,15 +351,15 @@ export default function App() {
 
         <Page
           title="Introduction"
-          line="Minh, 22, final-year student. Goal: log a mood and one win in under 30 seconds."
           notes="Nốt is built for Minh. Lab 2 success criterion: log a mood and one win in under 30 seconds after tapping the evening notification."
         >
           <p className="intro">
-            Tiny Wins (Nốt) is a mobile app for burned-out final-year students: every evening they
+            Tiny Wins (Nốt) is a mobile app for burned-out final-year students like Minh (22): every evening they
             drop one small win into a jar instead of staring at an unfinished to-do list. After a
             rough day, the jar hands back an old win to remember. Small bravery and movement
             challenges, a one-tap self-control log and a guided journal help them rebuild
-            confidence, one note at a time.
+            confidence, one note at a time. Success criterion: log a mood and one win in under 30
+            seconds.
           </p>
         </Page>
 
@@ -445,7 +445,6 @@ export default function App() {
         <Page
           dense
           title="Authentication"
-          line="Google sign-in. Cancel gives a message and a retry; signed-out users go back to Welcome."
           images={[
             { src: 'app/welcome.png', alt: 'Welcome screen with Google and email sign-in' },
             { src: 'app/welcome-cancelled.png', alt: 'Welcome screen after cancelling: Bạn đã huỷ đăng nhập.' },
@@ -463,7 +462,6 @@ Sign out → local data cleared, back to /welcome`}</pre>
         <Page
           dense
           title="Cloud Messaging"
-          line="Android 13 permission · inbox of received messages · tap opens the right screen."
           notes="Row 1: permission denied prompt with Mở cài đặt, the system notification page, the inbox listing the three delivery states, and a tap on a message with data route=/jar landing on the jar. Row 2: foreground (heads-up from flutter_local_notifications), background and terminated (system tray), and a test message sent from the Firebase Console. Sent with the FCM HTTP v1 API and from Console, Messaging, Send test message, to the device token printed in the debug log (the token is not stored in the repo). routeFromData only accepts allow-listed internal routes."
         >
           <Gallery
@@ -491,7 +489,6 @@ Sign out → local data cleared, back to /welcome`}</pre>
         <Page
           dense
           title="Analytics"
-          line="Eight events, no personal data. User ID set after sign-in."
           notes="docs/analytics-plan.md lists each event with its trigger, parameter types, Lab 2 flow and product question. DebugView shows the live stream from the emulator (debug.firebase.analytics.app). The text below is from adb logcat on the same run; every event fired except report_exported, which only fires after a successful upload and the Storage bucket is not provisioned. DebugView lists the top seven names, so login and self_control_logged are only in the log."
         >
           <Gallery
@@ -508,7 +505,6 @@ report_exported {format}  (needs the Storage upload to succeed)`}</pre>
         <Page
           dense
           title="Crashlytics"
-          line="A handled error shows a message and a non-fatal report with user ID and a custom key."
           notes="Report export fails in the real flow because the Storage bucket is not provisioned: the user sees Chưa tạo được thẻ tuần. Thử lại nhé. and WeeklyReportViewModel records a non-fatal (reason report_export). Console: the non-fatal issue FirebaseStorageService.uploadReport, its Keys tab (screen=/journey) and Data tab (User ID). The dashboard also shows the test crash from the dev-only button and a real Hero error found by the dashboard and fixed (heroTag null on the add-note button)."
         >
           <Gallery
@@ -526,7 +522,6 @@ report_exported {format}  (needs the Storage upload to succeed)`}</pre>
         <Page
           dense
           title="Remote Config"
-          line="Change it in the Console, no rebuild. In-app defaults when the fetch fails."
           notes="FirebaseRemoteConfigService sets in-app defaults, then fetchAndActivate on launch; the fetch interval is zero in debug and one hour in release, and activated values stay cached until the next fetch. Before: milestone 25, chips start with Dọn phòng. After publishing: milestone 10, chips start with Uống đủ nước (the Remote Config row refreshes on tap). Broken or empty JSON keeps the defaults; unit tests cover parseStringList, parseStringMap and InAppRemoteConfig."
         >
           <Gallery
@@ -543,7 +538,6 @@ report_exported {format}  (needs the Storage upload to succeed)`}</pre>
         <Page
           dense
           title="Deploy and operate"
-          line="CI deploys Hosting and rules; the Console shows the releases."
           notes="Hosting: the current release and each pr<number> preview channel were deployed by the github-actions-deploy service account from .github/workflows/deploy.yml. Rules: release history of the Firestore rules, source firebase/firestore.rules, tested with the rules emulator suite (R-01 to R-15). Firestore: challenges/dc-1-1 from the 22-card seed (D-10), read-only for users. Storage is not part of the deploy because the bucket is not provisioned."
         >
           <Gallery
@@ -559,7 +553,6 @@ report_exported {format}  (needs the Storage upload to succeed)`}</pre>
 
         <Page
           title="ARTEMIS E2E"
-          line="≥ 10 cases · error path · native step · exploratory · ≥ 3 runs each"
           shots={['Test plan', 'Pass rates', 'Trace']}
           todo="e2e_test/ scaffold and smoke test exist; no run results yet (needs a model API key). Missing: test-plan.md."
           notes="Cover F1, F2, F3, sign-in, 4 tabs, PDF export, sign-out. Compare the values the agent reports, not only SUCCESS. Fill in from real runs only; explain every flaky, failed or skipped test. Link docs/test-plan.md."
@@ -567,7 +560,6 @@ report_exported {format}  (needs the Storage upload to succeed)`}</pre>
 
         <Page
           title="AI code review"
-          line="AI finds. We decide."
           shots={['Finding · Decision · Reason · Commit']}
           todo="Not done yet"
           notes="Needs at least 5 findings across 2 kinds and 3 fix commits. Link docs/code-review.md."
@@ -575,7 +567,6 @@ report_exported {format}  (needs the Storage upload to succeed)`}</pre>
 
         <Page
           title="Lessons learned"
-          line="Record each deviation as it happens."
           notes="Examples: the Emulator has no real Analytics or Crashlytics; D-11, two Lab 2 documents conflicted; D-26 and D-28 changed labels after users misread them. Add challenges from the test stage. AI disclosure: Claude Code for brief analysis and slides; add other tools. Links must open in a private window."
         >
           <p className="foot">Repo · docs/ · evidence/ · Video · AI tools: Claude Code · [add others]</p>
