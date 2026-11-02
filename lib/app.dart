@@ -7,7 +7,7 @@ import 'router/app_router.dart';
 import 'services/nudge_service.dart';
 import 'theme/app_theme.dart';
 import 'theme/app_typography.dart';
-import 'viewmodels/awake_nudge_sync.dart';
+import 'viewmodels/nudge_sync.dart';
 
 /// Widget gốc của Nốt.
 class NotApp extends ConsumerStatefulWidget {
@@ -26,7 +26,7 @@ class _NotAppState extends ConsumerState<NotApp> {
   @override
   void initState() {
     super.initState();
-    // Chạm vào lời nhắc "Giờ tỉnh": mở S09 chồng lên màn đang xem. Thông báo
+    // Chạm vào lời nhắc: mở màn của nó chồng lên màn đang xem. Thông báo
     // mở app thì `go`: router giữ đích qua splash / đăng nhập (flow P7).
     final nudges = ref.read(nudgeServiceProvider);
     _opened = nudges.openedRoutes.listen((route) {
@@ -47,7 +47,7 @@ class _NotAppState extends ConsumerState<NotApp> {
 
   @override
   Widget build(BuildContext context) {
-    ref.watch(awakeNudgeSyncProvider);
+    ref.watch(nudgeSyncProvider);
     return MaterialApp.router(
       title: 'Nốt',
       debugShowCheckedModeBanner: false,
