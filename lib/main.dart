@@ -1,12 +1,15 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'app.dart';
+import 'firebase/crash_handlers.dart';
 import 'firebase/device_discord_service.dart';
 import 'firebase/device_services.dart';
 import 'firebase/firebase_auth_service.dart';
 import 'firebase/firebase_bootstrap.dart';
+import 'firebase/firebase_crash_reporter.dart';
 import 'firebase/firestore_challenge_repository.dart';
 import 'firebase/firestore_group_repository.dart';
 import 'firebase/firestore_note_repository.dart';
@@ -17,6 +20,7 @@ import 'firebase/prefs_draft_store.dart';
 import 'firebase/report_impl.dart';
 import 'services/auth_service.dart';
 import 'services/challenge_repository.dart';
+import 'services/crash_reporter.dart';
 import 'services/discord_service.dart';
 import 'services/draft_store.dart';
 import 'services/group_repository.dart';
@@ -37,6 +41,10 @@ const String _googleServerClientId = String.fromEnvironment(
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initFirebase();
+  // Crashlytics không có emulator và không hỗ trợ web; chỉ gắn khi chạy
+  // Android/iOS với project thật.
+  const crashEnabled = !useFirebaseEmulator && !kIsWeb;
+  installCrashHandlers(enabled: crashEnabled);
   final auth = FirebaseAuthService(
     serverClientId: _googleServerClientId.isEmpty
         ? null
@@ -73,6 +81,11 @@ Future<void> main() async {
         screenGuardProvider.overrideWithValue(const MethodChannelScreenGuard()),
         nudgeServiceProvider.overrideWithValue(LocalNudgeService()),
         discordServiceProvider.overrideWithValue(const DeviceDiscordService()),
+        crashReporterProvider.overrideWithValue(
+          crashEnabled
+              ? const FirebaseCrashReporter()
+              : const NoopCrashReporter(),
+        ),
       ],
       child: NotApp(
         font: (style) => GoogleFonts.beVietnamPro(textStyle: style),

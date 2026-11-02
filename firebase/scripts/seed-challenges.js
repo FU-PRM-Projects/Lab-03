@@ -9,7 +9,7 @@ const path = require('node:path');
 const { initializeApp, applicationDefault } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
 
-const projectId = process.argv[2] || 'demo-prm393';
+const projectId = process.argv[2] || 'prm393-not-lab3';
 const emulator = Boolean(process.env.FIRESTORE_EMULATOR_HOST);
 if (!emulator && projectId.startsWith('demo-')) {
   console.error('demo-* projects only exist on the emulator; set FIRESTORE_EMULATOR_HOST.');

@@ -21,6 +21,9 @@ class DeviceLocalAuthService implements LocalAuthService {
     } on LocalAuthException {
       // Huỷ, sai quá số lần, hoặc máy chưa đặt khoá màn hình.
       return false;
+    } on MissingPluginException {
+      // Web: local_auth không có hiện thực.
+      return false;
     } on PlatformException {
       return false;
     }
