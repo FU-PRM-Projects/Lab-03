@@ -15,3 +15,12 @@ updates:
     open-pull-requests-limit: 5
     commit-message:
       prefix: chore(ci)
+
+  # firebase-tools, firebase-admin và bộ test Security Rules nằm trong firebase/.
+  - package-ecosystem: npm
+    directory: /firebase
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore(firebase)

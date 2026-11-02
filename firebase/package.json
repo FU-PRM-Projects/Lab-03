@@ -2,10 +2,10 @@
   "name": "prm393-firebase",
   "private": true,
   "scripts": {
-    "emulators": "firebase emulators:start --project demo-prm393",
-    "emulators:keep": "firebase emulators:start --project demo-prm393 --import emulator-data --export-on-exit",
+    "emulators": "firebase emulators:start --project prm393-not-lab3",
+    "emulators:keep": "firebase emulators:start --project prm393-not-lab3 --import emulator-data --export-on-exit",
     "test:rules": "firebase emulators:exec --project demo-prm393 --only firestore \"node --test tests/firestore.rules.test.js\"",
-    "seed:emulator": "cross-env FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 node scripts/seed-challenges.js demo-prm393",
+    "seed:emulator": "cross-env FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 node scripts/seed-challenges.js prm393-not-lab3",
     "seed:demo": "cross-env FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 node scripts/seed-demo.js",
     "seed": "node scripts/seed-challenges.js"
   },
