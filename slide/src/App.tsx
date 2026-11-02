@@ -59,6 +59,68 @@ function ShotImages({ images }: { images: ShotImage[] }) {
   );
 }
 
+type GalleryItem = {
+  src: string;
+  alt: string;
+  caption?: string;
+  /** CSS aspect-ratio plus cover crop, for tall phone screenshots cut to a band. */
+  ratio?: string;
+  pos?: string;
+};
+
+/** A small grid of screenshots with one-line captions. */
+function Gallery({ items, cols, height }: { items: GalleryItem[]; cols: number; height: number }) {
+  return (
+    <div className="gallery" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
+      {items.map(({ src, alt, caption, ratio, pos }) => (
+        <figure key={src}>
+          <img
+            src={`${import.meta.env.BASE_URL}${src}`}
+            alt={alt}
+            style={
+              ratio
+                ? { aspectRatio: ratio, objectFit: 'cover', objectPosition: pos ?? '50% 50%' }
+                : { height }
+            }
+          />
+          {caption && <figcaption>{caption}</figcaption>}
+        </figure>
+      ))}
+    </div>
+  );
+}
+
+type Pair = { screen: string; title: string; diffs: string[] };
+
+/** Figma frame and app screen side by side for three screens, with short notes. */
+function CompareTriple({ pairs }: { pairs: Pair[] }) {
+  const base = import.meta.env.BASE_URL;
+  return (
+    <div className="triple">
+      {pairs.map(({ screen, title, diffs }) => (
+        <div key={screen} className="triple-col">
+          <h3>{title}</h3>
+          <div className="triple-imgs">
+            <figure>
+              <img src={`${base}figma/${screen.toLowerCase()}.png`} alt={`${screen} in Figma`} />
+              <figcaption>Figma</figcaption>
+            </figure>
+            <figure>
+              <img src={`${base}app/${screen.toLowerCase()}.png`} alt={`${screen} in the app`} />
+              <figcaption>App</figcaption>
+            </figure>
+          </div>
+          <ul>
+            {diffs.map((d) => (
+              <li key={d}>{d}</li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function Page({
   title,
   line,
@@ -66,6 +128,7 @@ function Page({
   shots,
   images,
   notes,
+  dense,
   children,
 }: {
   title: string;
@@ -74,10 +137,11 @@ function Page({
   shots?: string[];
   images?: ShotImage[];
   notes: string;
+  dense?: boolean;
   children?: ReactNode;
 }) {
   return (
-    <Slide notes={notes}>
+    <Slide notes={notes} className={dense ? 'dense' : undefined}>
       <h2>{title}</h2>
       {line && <p className="line">{line}</p>}
       {images && children ? (
@@ -287,7 +351,8 @@ export default function App() {
 
         <Page
           title="Introduction"
-          notes="The problem and how Nốt answers it: one small win goes into the jar every evening."
+          line="Minh, 22, final-year student. Goal: log a mood and one win in under 30 seconds."
+          notes="Nốt is built for Minh. Lab 2 success criterion: log a mood and one win in under 30 seconds after tapping the evening notification."
         >
           <p className="intro">
             Tiny Wins (Nốt) is a mobile app for burned-out final-year students: every evening they
@@ -299,57 +364,39 @@ export default function App() {
         </Page>
 
         <Page
-          title="Persona"
-          line="Minh, 22, final-year student."
-          notes="Lab 2 success criterion: log a mood and one win in under 30 seconds after tapping the evening notification."
+          dense
+          title="Figma vs app"
+          notes="Three screens, Figma on the left and the running app on the right. D-xx ids are in docs/design-traceability.md, section 5. S03b free-tell with AI is planned and not built. The Stats screenshot comes from a test account with a few notes."
         >
-          <p className="flow">Success criterion: under 30 seconds</p>
-        </Page>
-
-        <Page
-          title="Figma vs app · Today"
-          line="S02, the first tab."
-          notes="Figma on the left, app on the right. D-04 Android status bar, D-25 shortcut icons and captions, D-29 the Ghi nốt sheet, D-14 the jar shows real notes. Full list: docs/design-traceability.md, section 5."
-        >
-          <Compare
-            screen="S02"
-            diffs={[
-              'Android status bar instead of the iPhone one (D-04).',
-              'Shortcuts get new icons and a one-line caption each (D-25).',
-              '"Ghi nốt" first asks: small win or journal (D-29).',
-              'The jar is empty here: notes are coloured from real data (D-14).',
-            ]}
-          />
-        </Page>
-
-        <Page
-          title="Figma vs app · Write a note"
-          line="S03b, step 2 of 3."
-          notes="D-28: the extra writing is not a journal entry, so the label changed after users misread it. The 120 limit is a handoff value (D-02). Free-tell with AI is planned, not built."
-        >
-          <Compare
-            screen="S03b"
-            diffs={[
-              '"Bỏ qua nhật ký" became "Bỏ qua phần kể thêm" (D-28).',
-              'A 0/120 counter under the field (D-02).',
-              'Quick chips fill the field; the Figma example text is not prefilled.',
-              'Free-tell with AI is still planned, so it is not on this screen.',
-            ]}
-          />
-        </Page>
-
-        <Page
-          title="Figma vs app · Stats"
-          line="S11b, the Stats tab."
-          notes="D-18 compares with the previous 30 days instead of a fixed month; D-09 the chart scales with the card; D-06 the weekly card PDF goes to Cloud Storage before sharing. The screenshot comes from a test account with a single note."
-        >
-          <Compare
-            screen="S11b"
-            diffs={[
-              'Trend is compared with the previous 30 days (D-18).',
-              'The chart scales to the card width (D-09).',
-              'The weekly goal opens a full-screen weekly card (D-06).',
-              'Test account has a single note, so the trend needs more days.',
+          <CompareTriple
+            pairs={[
+              {
+                screen: 'S02',
+                title: 'Today',
+                diffs: [
+                  'Android status bar (D-04)',
+                  'New shortcut icons and captions (D-25)',
+                  '"Ghi nốt" asks win or journal first (D-29)',
+                ],
+              },
+              {
+                screen: 'S03b',
+                title: 'Write a note',
+                diffs: [
+                  '"Bỏ qua nhật ký" is now "Bỏ qua phần kể thêm" (D-28)',
+                  '0/120 counter under the field (D-02)',
+                  'AI free-tell is planned, not built',
+                ],
+              },
+              {
+                screen: 'S11b',
+                title: 'Stats',
+                diffs: [
+                  'Compared with the previous 30 days (D-18)',
+                  'Chart scales to the card width (D-09)',
+                  'Weekly goal opens the weekly card (D-06)',
+                ],
+              },
             ]}
           />
         </Page>
@@ -396,122 +443,119 @@ export default function App() {
         </Page>
 
         <Page
+          dense
           title="Authentication"
-          line="Cancelled sign-in: a message and a retry."
+          line="Google sign-in. Cancel gives a message and a retry; signed-out users go back to Welcome."
           images={[
             { src: 'app/welcome.png', alt: 'Welcome screen with Google and email sign-in' },
             { src: 'app/welcome-cancelled.png', alt: 'Welcome screen after cancelling: Bạn đã huỷ đăng nhập.' },
           ]}
-          notes="Google and email sign-in. Signed-out users go to S01 and the destination is kept through next. Cancelling the Google account chooser shows Bạn đã huỷ đăng nhập. and the button is ready again. The account chooser itself is not shown because it displays a real name and email. Console check by CLI: firebase auth:export on prm393-not-lab3 returned 1 account with provider google.com."
+          notes="Google and email sign-in. authStateChanges drives the router: signed-out users go to /welcome and the destination is kept through next. Cancelling the account chooser shows Bạn đã huỷ đăng nhập. The chooser itself is not shown because it displays a real name and email. Sign-out clears local data. Console check by CLI: firebase auth:export returned 1 account with provider google.com."
         >
-          <pre className="log">{`$ firebase auth:export users.json --project prm393-not-lab3
-Exported 1 account(s) · provider: google.com`}</pre>
+          <pre className="log">{`$ firebase auth:export users.json
+Exported 1 account(s) · provider: google.com
+
+Cancel   → "Bạn đã huỷ đăng nhập."
+Offline  → "Không có mạng. Kiểm tra Wi-Fi rồi thử lại."
+Sign out → local data cleared, back to /welcome`}</pre>
         </Page>
 
         <Page
-          title="Cloud Messaging · Permission"
-          line="Permission denied: a prompt to open settings."
-          images={[
-            { src: 'app/fcm-denied.png', alt: 'Prompt asking to open settings', crop: true },
-            { src: 'app/fcm-os-settings.png', alt: 'Android notification settings for the app', crop: true },
-          ]}
-          notes="S12 Khu demo Firebase, row Thông báo đẩy (FCM). First tap asks Android for POST_NOTIFICATIONS. After a refusal the row explains why and offers Mở cài đặt, which opens the system page for this app. FirebaseMessagingService.permission() and requestPermission()."
-        />
+          dense
+          title="Cloud Messaging"
+          line="Android 13 permission · inbox of received messages · tap opens the right screen."
+          notes="Row 1: permission denied prompt with Mở cài đặt, the system notification page, the inbox listing the three delivery states, and a tap on a message with data route=/jar landing on the jar. Row 2: foreground (heads-up from flutter_local_notifications), background and terminated (system tray), and a test message sent from the Firebase Console. Sent with the FCM HTTP v1 API and from Console, Messaging, Send test message, to the device token printed in the debug log (the token is not stored in the repo). routeFromData only accepts allow-listed internal routes."
+        >
+          <Gallery
+            cols={4}
+            height={260}
+            items={[
+              { src: 'app/fcm-denied.png', alt: 'Prompt asking to open settings', caption: 'Denied → open settings', ratio: '0.95', pos: '50% 38%' },
+              { src: 'app/fcm-os-settings.png', alt: 'Android notification settings', caption: 'System settings', ratio: '0.95', pos: '50% 36%' },
+              { src: 'app/fcm-inbox.png', alt: 'Inbox with three notifications', caption: 'Inbox: 3 states', ratio: '0.95', pos: '50% 18%' },
+              { src: 'app/fcm-route.png', alt: 'Jar screen opened from a notification', caption: 'Tap · route=/jar', ratio: '0.95', pos: '50% 20%' },
+            ]}
+          />
+          <Gallery
+            cols={4}
+            height={100}
+            items={[
+              { src: 'app/fcm-foreground.png', alt: 'Foreground heads-up', caption: 'Foreground' },
+              { src: 'app/fcm-background.png', alt: 'Background notification', caption: 'Background' },
+              { src: 'app/fcm-terminated.png', alt: 'Terminated notification', caption: 'Terminated' },
+              { src: 'app/fcm-console.png', alt: 'Message sent from the Firebase Console', caption: 'Sent from Console' },
+            ]}
+          />
+        </Page>
 
         <Page
-          title="Cloud Messaging · Delivery"
-          line="One message, three app states. Sent with the FCM HTTP v1 API."
-          images={[
-            { src: 'app/fcm-foreground.png', alt: 'Heads-up notification while the app is open', wide: true, caption: 'Foreground' },
-            { src: 'app/fcm-background.png', alt: 'Notification in the shade while the app is in the background', wide: true, caption: 'Background' },
-            { src: 'app/fcm-terminated.png', alt: 'Notification in the shade while the app is closed', wide: true, caption: 'Terminated' },
-          ]}
-          notes="Foreground: Android shows nothing on its own, so the app shows a heads-up with flutter_local_notifications. Background and terminated: the system tray shows it; tapping reaches onMessageOpenedApp or getInitialMessage. Sent from the terminal with an access token from gcloud to the device token printed in the debug log."
-        />
-
-        <Page
-          title="Cloud Messaging · Inbox"
-          line="Each message is stored with the state it arrived in."
-          images={[{ src: 'app/fcm-inbox.png', alt: 'Inbox sheet listing three notifications', crop: true }]}
-          notes="Inbox sheet in S12. Newest first: Từ nền, App đã tắt, Đang mở app. Stored locally in shared_preferences (fcm_inbox, last 50)."
-        />
-
-        <Page
+          dense
           title="Analytics"
-          line="Measures the 30-second goal, with no personal data."
-          notes="AnalyticsService is an interface; FirebaseAnalyticsService logs to the real project, DebugAnalyticsService prints on the Emulator. Events: login, logout, note_saved (mood, note_type, has_journal, duration_ms), challenge_completed, report_exported, plus screen_view by route pattern. No titles, bodies, emails or group names. Unit tests assert the parameters. Evidence: adb logcat with debug.firebase.analytics.app set."
+          line="Eight events, no personal data. User ID set after sign-in."
+          notes="docs/analytics-plan.md lists each event with its trigger, parameter types, Lab 2 flow and product question. DebugView shows the live stream from the emulator (debug.firebase.analytics.app). The text below is from adb logcat on the same run; every event fired except report_exported, which only fires after a successful upload and the Storage bucket is not provisioned. DebugView lists the top seven names, so login and self_control_logged are only in the log."
         >
-          <pre className="log">{`$ adb shell setprop debug.firebase.analytics.app com.quanphungg.lab03
-
-FA-SVC  Logging event: name=note_saved
-        params={mood=vui, note_type=chien_thang,
-                has_journal=false, duration_ms=13339}`}</pre>
-          <p className="flow">13.3 s to save · goal under 30 s</p>
+          <Gallery
+            cols={1}
+            height={330}
+            items={[{ src: 'app/console-analytics.png', alt: 'DebugView with screen_view, note_saved and challenge events', caption: 'DebugView · top events of the run' }]}
+          />
+          <pre className="log">{`login {method} · logout · note_saved {mood, note_type, has_journal, duration_ms=7690}
+note_viewed {note_type} · challenge_opened {challenge_id, note_type}
+challenge_completed {challenge_id} · self_control_logged {has_habit}
+report_exported {format}  (needs the Storage upload to succeed)`}</pre>
         </Page>
 
         <Page
-          title="Analytics · DebugView"
-          line="The same event in the Console: note_saved with its parameters."
-          images={[{ src: 'app/console-analytics.png', alt: 'DebugView timeline with note_saved and its parameters', full: true }]}
-          notes="DebugView of the Google Analytics property linked to prm393-not-lab3 (property prm393-not-lab3, streams android and web). The emulator ran in debug mode (debug.firebase.analytics.app). Timeline: session_start, screen_view, note_saved. Opening note_saved lists duration_ms and the other parameters. The user id is hidden in this crop."
-        />
-
-        <Page
+          dense
           title="Crashlytics"
-          line="Errors are recorded, and users still see a message."
-          images={[{ src: 'app/crash-test.png', alt: 'Settings: test crash sent' }]}
-          todo="The non-fatal path (note save failure) is coded but was not triggered on the device."
-          notes="Test crash from S12 Khu demo Firebase (dev builds only). The report is enqueued and sent through Google DataTransport. recordError is also called when saving a note fails and when profile creation fails. Evidence: adb logcat with log.tag.FirebaseCrashlytics set to DEBUG."
+          line="A handled error shows a message and a non-fatal report with user ID and a custom key."
+          notes="Report export fails in the real flow because the Storage bucket is not provisioned: the user sees Chưa tạo được thẻ tuần. Thử lại nhé. and WeeklyReportViewModel records a non-fatal (reason report_export). Console: the non-fatal issue FirebaseStorageService.uploadReport, its Keys tab (screen=/journey) and Data tab (User ID). The dashboard also shows the test crash from the dev-only button and a real Hero error found by the dashboard and fixed (heroTag null on the add-note button)."
         >
-          <pre className="log">{`D/FirebaseCrashlytics: Enqueueing report: 6AE8A8BF...
-D/FirebaseCrashlytics: Crashlytics report successfully
-                       enqueued to DataTransport`}</pre>
+          <Gallery
+            cols={2}
+            height={215}
+            items={[
+              { src: 'app/report-error.png', alt: 'App showing the export error message', caption: 'User still sees a message', ratio: '2.9', pos: '50% 94%' },
+              { src: 'app/console-crash-nonfatal.png', alt: 'Console non-fatal issue', caption: 'Non-fatal in Console' },
+              { src: 'app/console-crash-keys.png', alt: 'Custom key and user ID', caption: 'Key screen · user ID' },
+              { src: 'app/console-crashlytics.png', alt: 'Dashboard with the test crash and the Hero error', caption: 'Test crash + a real Hero error' },
+            ]}
+          />
         </Page>
 
         <Page
-          title="Crashlytics · Console"
-          line="A test crash and a real error, grouped by issue."
-          images={[{ src: 'app/console-crashlytics.png', alt: 'Crashlytics dashboard with two open issues', full: true }]}
-          notes="Crashlytics dashboard of prm393-not-lab3 on 2 Nov: 15 crashes, 1 user. SettingsScreen.build: Crashlytics test crash (2 events) is the test button. Hero._allHeroesFor: multiple heroes share the same tag (13 events) is a real defect found by the dashboard, not triggered on purpose."
-        />
-
-        <Page
-          title="Cloud Firestore"
-          line="challenges/{id}: 22 cards, read-only for users, seeded by script (D-10)."
-          images={[{ src: 'app/console-firestore.png', alt: 'Firestore console showing challenges/dc-1-1', full: true }]}
-          notes="Console view of challenges/dc-1-1: topic dung_cam, level 1, minutes 1, title, script and tip. The collection is seeded with firebase/scripts/seed-challenges.js from firebase/seed/challenges.json; Security Rules allow reads only."
-        />
-
-        <Page
-          title="Deploy · Firebase Hosting"
-          line="GitHub Actions deploys the web build, with one preview channel per pull request."
-          images={[{ src: 'app/console-hosting.png', alt: 'Hosting dashboard with the current release and preview channels', full: true }]}
-          notes="Hosting dashboard of prm393-not-lab3. The current release and every pr<number> preview channel were deployed by the github-actions-deploy service account from .github/workflows/deploy.yml. Domains: prm393-not-lab3.web.app and firebaseapp.com. Storage is not part of the deploy target because the bucket is not provisioned."
-        />
-
-        <Page
-          title="Operate · Security Rules"
-          line="Published rules with a release history, tested by the rules emulator suite."
-          images={[{ src: 'app/console-rules.png', alt: 'Firestore Rules tab with release history and the published rules', full: true }]}
-          notes="Rules tab of Cloud Firestore. The release history shows each publish. The source is firebase/firestore.rules and is covered by node --test in firebase/tests (R-01 to R-15)."
-        />
-
-        <Page
+          dense
           title="Remote Config"
-          line="Change it in the Console, no rebuild. Defaults on failure."
-          images={[
-            { src: 'app/rc-before.png', alt: 'Settings before: milestone 25, first chip Dọn phòng', crop: true },
-            { src: 'app/rc-after.png', alt: 'Settings after: milestone 10, first chip Uống đủ nước', crop: true },
-          ]}
-          notes="FirebaseRemoteConfigService sets in-app defaults, then fetches on launch. Before: milestone 25, chips start with Dọn phòng. After publishing in the Console and tapping the Remote Config row: milestone 10, chips start with Uống đủ nước. A failed fetch keeps the defaults. Parameters: quick_win_chips, monthly_milestone, discord_*, firebase_demo_enabled. Template: firebase/remoteconfig.template.json."
-        />
+          line="Change it in the Console, no rebuild. In-app defaults when the fetch fails."
+          notes="FirebaseRemoteConfigService sets in-app defaults, then fetchAndActivate on launch; the fetch interval is zero in debug and one hour in release, and activated values stay cached until the next fetch. Before: milestone 25, chips start with Dọn phòng. After publishing: milestone 10, chips start with Uống đủ nước (the Remote Config row refreshes on tap). Broken or empty JSON keeps the defaults; unit tests cover parseStringList, parseStringMap and InAppRemoteConfig."
+        >
+          <Gallery
+            cols={3}
+            height={300}
+            items={[
+              { src: 'app/rc-before.png', alt: 'Settings before: milestone 25', caption: 'Before · 25 nốt, Dọn phòng…', ratio: '0.85', pos: '50% 62%' },
+              { src: 'app/rc-after.png', alt: 'Settings after: milestone 10', caption: 'After · 10 nốt, Uống đủ nước…', ratio: '0.85', pos: '50% 62%' },
+              { src: 'app/console-remoteconfig.png', alt: 'Remote Config parameters', caption: 'Console · 7 parameters' },
+            ]}
+          />
+        </Page>
 
         <Page
-          title="Remote Config · Console"
-          line="Seven parameters, 100% fetched, published from the repo template."
-          images={[{ src: 'app/console-remoteconfig.png', alt: 'Remote Config parameters list', full: true }]}
-          notes="Parameters tab, Config version 4. Values come from firebase/remoteconfig.template.json and are published with firebase deploy --only remoteconfig. Fetch % is 100 because the only client is the test emulator."
-        />
+          dense
+          title="Deploy and operate"
+          line="CI deploys Hosting and rules; the Console shows the releases."
+          notes="Hosting: the current release and each pr<number> preview channel were deployed by the github-actions-deploy service account from .github/workflows/deploy.yml. Rules: release history of the Firestore rules, source firebase/firestore.rules, tested with the rules emulator suite (R-01 to R-15). Firestore: challenges/dc-1-1 from the 22-card seed (D-10), read-only for users. Storage is not part of the deploy because the bucket is not provisioned."
+        >
+          <Gallery
+            cols={3}
+            height={340}
+            items={[
+              { src: 'app/console-hosting.png', alt: 'Hosting dashboard', caption: 'Hosting · release + PR previews' },
+              { src: 'app/console-rules.png', alt: 'Firestore rules and release history', caption: 'Firestore rules · releases' },
+              { src: 'app/console-firestore.png', alt: 'Firestore challenges document', caption: 'challenges/dc-1-1 (seeded)' },
+            ]}
+          />
+        </Page>
 
         <Page
           title="ARTEMIS E2E"
