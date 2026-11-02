@@ -212,7 +212,7 @@ void main() {
     });
 
     test('mốc đầu tiên: bộ sưu tập chỉ có tháng này', () async {
-      notes.notes.add(sampleNote('n1', DateTime(2026, 12, 1)));
+      notes.notes.add(sampleNote('n1', DateTime(2026, 12)));
       final s =
           ((await load(makeContainer(), 'n1')) as Data<SavedNoteSummary>).value;
       expect(s.stickerMonths, <DateTime>[DateTime(2026, 12)]);
