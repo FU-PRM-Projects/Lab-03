@@ -33,15 +33,22 @@ function Compare({ screen, diffs }: { screen: string; diffs: string[] }) {
   );
 }
 
-type ShotImage = { src: string; alt: string; crop?: boolean; wide?: boolean; caption?: string };
+type ShotImage = {
+  src: string;
+  alt: string;
+  crop?: boolean;
+  wide?: boolean;
+  full?: boolean;
+  caption?: string;
+};
 
 function ShotImages({ images }: { images: ShotImage[] }) {
   return (
     <div className="shots">
-      {images.map(({ src, alt, crop, wide, caption }) => (
+      {images.map(({ src, alt, crop, wide, full, caption }) => (
         <figure key={src}>
           <img
-            className={crop ? 'crop' : wide ? 'wide' : undefined}
+            className={crop ? 'crop' : wide ? 'wide' : full ? 'full' : undefined}
             src={`${import.meta.env.BASE_URL}${src}`}
             alt={alt}
           />
@@ -455,13 +462,27 @@ FA-SVC  Logging event: name=note_saved
           title="Crashlytics"
           line="Errors are recorded, and users still see a message."
           images={[{ src: 'app/crash-test.png', alt: 'Settings: test crash sent' }]}
-          todo="Dashboard not captured yet. The non-fatal path (note save failure) is coded but was not triggered on the device."
+          todo="The non-fatal path (note save failure) is coded but was not triggered on the device."
           notes="Test crash from S12 Khu demo Firebase (dev builds only). The report is enqueued and sent through Google DataTransport. recordError is also called when saving a note fails and when profile creation fails. Evidence: adb logcat with log.tag.FirebaseCrashlytics set to DEBUG."
         >
           <pre className="log">{`D/FirebaseCrashlytics: Enqueueing report: 6AE8A8BF...
 D/FirebaseCrashlytics: Crashlytics report successfully
                        enqueued to DataTransport`}</pre>
         </Page>
+
+        <Page
+          title="Crashlytics · Console"
+          line="A test crash and a real error, grouped by issue."
+          images={[{ src: 'app/console-crashlytics.png', alt: 'Crashlytics dashboard with two open issues', full: true }]}
+          notes="Crashlytics dashboard of prm393-not-lab3 on 2 Nov: 15 crashes, 1 user. SettingsScreen.build: Crashlytics test crash (2 events) is the test button. Hero._allHeroesFor: multiple heroes share the same tag (13 events) is a real defect found by the dashboard, not triggered on purpose."
+        />
+
+        <Page
+          title="Cloud Firestore"
+          line="challenges/{id}: 22 cards, read-only for users, seeded by script (D-10)."
+          images={[{ src: 'app/console-firestore.png', alt: 'Firestore console showing challenges/dc-1-1', full: true }]}
+          notes="Console view of challenges/dc-1-1: topic dung_cam, level 1, minutes 1, title, script and tip. The collection is seeded with firebase/scripts/seed-challenges.js from firebase/seed/challenges.json; Security Rules allow reads only."
+        />
 
         <Page
           title="Remote Config"

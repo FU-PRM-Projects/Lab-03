@@ -395,3 +395,20 @@ html, body, #root, .stage {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
+
+.shots:has(img.full) figure {
+  width: 100%;
+  min-width: 0;
+}
+
+.shots img.full {
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: contain;
+}
+
+.shots:has(img.full) {
+  height: auto;
+  margin-top: 16px;
+}
