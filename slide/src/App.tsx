@@ -491,15 +491,48 @@ Sign out → local data cleared, back to /welcome`}</pre>
           title="Analytics"
           notes="docs/analytics-plan.md lists each event with its trigger, parameter types, Lab 2 flow and product question. DebugView shows the live stream from the emulator (debug.firebase.analytics.app). The text below is from adb logcat on the same run; every event fired except report_exported, which only fires after a successful upload and the Storage bucket is not provisioned. DebugView lists the top seven names, so login and self_control_logged are only in the log."
         >
-          <Gallery
-            cols={1}
-            height={330}
-            items={[{ src: 'app/console-analytics.png', alt: 'DebugView with screen_view, note_saved and challenge events', caption: 'DebugView · top events of the run' }]}
-          />
-          <pre className="log">{`login {method} · logout · note_saved {mood, note_type, has_journal, duration_ms=7690}
-note_viewed {note_type} · challenge_opened {challenge_id, note_type}
-challenge_completed {challenge_id} · self_control_logged {has_habit}
-report_exported {format}  (needs the Storage upload to succeed)`}</pre>
+          <div className="half">
+            <figure className="half-img">
+              <img
+                src={`${import.meta.env.BASE_URL}app/console-analytics.png`}
+                alt="DebugView with screen_view, note_saved and challenge events"
+              />
+              <figcaption>DebugView · top events of one run on the emulator</figcaption>
+            </figure>
+            <div className="half-text">
+              <p>
+                Eight custom events go through an <code>AnalyticsService</code> interface (Firebase
+                in the app, a console logger on the Emulator). No titles, note text, emails or
+                names are logged. The Firebase user ID is set after sign-in and cleared on sign-out.
+              </p>
+              <ul>
+                <li>
+                  <b>login / logout</b> · <code>method</code>
+                </li>
+                <li>
+                  <b>note_saved</b> · <code>mood, note_type, has_journal, duration_ms</code>. Tracks
+                  the 30-second goal: 7.7 s in this run.
+                </li>
+                <li>
+                  <b>note_viewed</b> · <code>note_type</code>
+                </li>
+                <li>
+                  <b>challenge_opened / challenge_completed</b> · <code>challenge_id, note_type</code>
+                </li>
+                <li>
+                  <b>self_control_logged</b> · <code>has_habit</code>
+                </li>
+                <li>
+                  <b>report_exported</b> · <code>format</code>. Fires after a successful upload, so
+                  it needs the Storage bucket.
+                </li>
+              </ul>
+              <p>
+                Checked three ways: DebugView (left), <code>adb logcat</code> for all events except
+                report_exported, and unit tests that assert the parameters.
+              </p>
+            </div>
+          </div>
         </Page>
 
         <Page

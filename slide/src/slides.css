@@ -510,3 +510,57 @@ html, body, #root, .stage {
 .reveal .slides section.dense .log {
   font-size: 15px;
 }
+
+/* 50/50: screenshot on the left, explanation on the right. */
+.half {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 36px;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.half-img {
+  margin: 0;
+  min-width: 0;
+}
+
+.half-img img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0;
+  border-radius: 4px;
+}
+
+.half-img figcaption {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #666;
+}
+
+.half-text {
+  min-width: 0;
+  font-size: 18px;
+  line-height: 1.45;
+}
+
+.half-text p {
+  margin: 0 0 12px;
+}
+
+.half-text ul {
+  margin: 0 0 12px;
+  padding-left: 20px;
+}
+
+.half-text li {
+  margin-bottom: 4px;
+}
+
+.half-text code {
+  font-size: 15px;
+  background: #f1f1f1;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
