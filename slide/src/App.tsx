@@ -561,9 +561,9 @@ Sign out → local data cleared, back to /welcome`}</pre>
             cols={3}
             height={300}
             items={[
-              { src: 'app/rc-before.png', alt: 'Settings before: milestone 25', caption: 'Before · 25 nốt, Dọn phòng…', ratio: '0.85', pos: '50% 62%' },
-              { src: 'app/rc-after.png', alt: 'Settings after: milestone 10', caption: 'After · 10 nốt, Uống đủ nước…', ratio: '0.85', pos: '50% 62%' },
-              { src: 'app/console-remoteconfig.png', alt: 'Remote Config parameters', caption: 'Console · 7 parameters' },
+              { src: 'app/rc-before.png', alt: 'Settings before: milestone 25', caption: 'Before · 25 nốt, Dọn phòng…' },
+              { src: 'app/rc-after.png', alt: 'Settings after: milestone 10', caption: 'After · 10 nốt, Uống đủ nước…' },
+              { src: 'app/console-remoteconfig.png', alt: 'Remote Config parameters', caption: 'Console · 3 parameters' },
             ]}
           />
         </Page>
