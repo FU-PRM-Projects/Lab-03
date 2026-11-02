@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -19,6 +20,7 @@ import '../../widgets/note_tile.dart';
 import '../../widgets/quick_win_chip.dart';
 import '../../widgets/setting_row.dart';
 import '../../widgets/state_views.dart';
+import '../jar/jar_screen.dart';
 
 /// S09 · Tự chủ (flow F2).
 class SelfControlScreen extends ConsumerStatefulWidget {
@@ -70,11 +72,35 @@ class _SelfControlScreenState extends ConsumerState<SelfControlScreen> {
     }
   }
 
+  /// "Ghi lại vừa rồi": hỏi "Vừa rồi thế nào?" rồi đi tiếp nhánh dừng được
+  /// (nốt Tự chủ) hoặc nhánh lỡ lướt (nốt Nhật ký, không trừ gì).
+  Future<void> _recordMoment(SelfControlSummary? summary, bool locked) async {
+    final outcome = await showModalBottomSheet<_Outcome>(
+      context: context,
+      showDragHandle: true,
+      builder: (_) => const _OutcomeSheet(),
+    );
+    if (outcome == null || !mounted) return;
+    switch (outcome) {
+      case _Outcome.stopped:
+        await _recordStop(summary, locked);
+      case _Outcome.slipped:
+        _openSlipSheet();
+    }
+  }
+
   void _openSlipSheet() => showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
-    builder: (_) => _SlipSheet(onSave: _viewModel.recordSlip),
+    builder: (_) => _SlipSheet(
+      onSave: _viewModel.recordSlip,
+      // Mở hũ ở bộ lọc Nhật ký để thấy ngay nốt vừa lưu.
+      onOpenJar: () {
+        ref.read(jarFilterProvider.notifier).select(NoteType.nhatKy);
+        context.go(AppRoutes.jar);
+      },
+    ),
   );
 
   Future<void> _pickAwakeTimes(UserSettings settings) async {
@@ -173,24 +199,17 @@ class _SelfControlScreenState extends ConsumerState<SelfControlScreen> {
                   ),
                 ),
                 const SizedBox(height: AppSpace.s16),
-                // Dùng được ngay, kể cả khi đang tải hoặc đang khoá (F2: 2 chạm).
+                // Một nút cho cả hai kết quả (dừng được / lỡ lướt); dùng được
+                // ngay, kể cả khi đang tải hoặc đang khoá.
                 AppButton(
-                  label: 'Mình vừa dừng lại',
+                  label: 'Ghi lại vừa rồi',
                   expand: true,
                   loading: state.saving,
                   onPressed: state.saving
                       ? null
-                      : () => _recordStop(summary, state.habitsLocked),
+                      : () => _recordMoment(summary, state.habitsLocked),
                 ),
-                const SizedBox(height: AppSpace.s16),
-                AppButton(
-                  label: 'Khó dừng? Thở 90 giây',
-                  variant: AppButtonVariant.tonal,
-                  expand: true,
-                  onPressed: () => context.push(AppRoutes.breathe),
-                ),
-                const SizedBox(height: AppSpace.s8),
-                _SlipCard(onTap: _openSlipSheet),
+                // Thở 90 giây đã có lối tắt "Stress?" ở S02 (deviation D-26).
                 const SizedBox(height: AppSpace.s16),
                 Text(
                   'THÓI QUEN MUỐN BỚT',
@@ -345,11 +364,89 @@ class _Habits extends StatelessWidget {
   }
 }
 
-/// Thẻ "Lỡ lướt quá đà?" (nhánh phục hồi F2): ngang hàng hai nút chính, nói
-/// rõ là không bị trừ gì.
-class _SlipCard extends StatelessWidget {
-  const _SlipCard({required this.onTap});
+enum _Outcome { stopped, slipped }
 
+/// "Vừa rồi thế nào?": hai lựa chọn lớn, chạm là đi tiếp.
+class _OutcomeSheet extends StatelessWidget {
+  const _OutcomeSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpace.screen,
+          0,
+          AppSpace.screen,
+          AppSpace.s24,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: AppSpace.s12,
+          children: <Widget>[
+            Semantics(
+              header: true,
+              child: Text(
+                'Vừa rồi thế nào?',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontSize: 20,
+                  letterSpacing: -0.4,
+                ),
+              ),
+            ),
+            _OptionCard(
+              type: NoteType.tuChu,
+              icon: SvgPicture.asset(
+                'assets/icons/hand-stop.svg',
+                width: 20,
+                height: 20,
+                colorFilter: ColorFilter.mode(
+                  theme.colorScheme.onSurface,
+                  BlendMode.srcIn,
+                ),
+                excludeFromSemantics: true,
+              ),
+              title: 'Mình đã dừng được',
+              subtitle: '+1 lần tự chủ vào hũ.',
+              onTap: () => Navigator.of(context).pop(_Outcome.stopped),
+            ),
+            _OptionCard(
+              type: NoteType.nhatKy,
+              icon: Icon(
+                Icons.edit_outlined,
+                size: 20,
+                color: theme.colorScheme.onSurface,
+              ),
+              title: 'Mình lỡ lướt quá đà',
+              subtitle:
+                  'Không sao. Ghi lại cảm giác để lần sau nhận ra sớm '
+                  'hơn.',
+              onTap: () => Navigator.of(context).pop(_Outcome.slipped),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Một lựa chọn trong "Vừa rồi thế nào?": vòng 40 tô màu loại nốt sẽ lưu.
+class _OptionCard extends StatelessWidget {
+  const _OptionCard({
+    required this.type,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  final NoteType type;
+  final Widget icon;
+  final String title;
+  final String subtitle;
   final VoidCallback onTap;
 
   @override
@@ -361,7 +458,7 @@ class _SlipCard extends StatelessWidget {
 
     return Semantics(
       button: true,
-      label: 'Lỡ lướt quá đà? Ghi lại cảm giác để lần sau nhận ra sớm hơn',
+      label: '$title. $subtitle',
       excludeSemantics: true,
       child: Material(
         color: scheme.surfaceContainerLow,
@@ -384,27 +481,19 @@ class _SlipCard extends StatelessWidget {
                   height: 40,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: colors.noteTint(NoteType.nhatKy),
+                    color: colors.noteTint(type),
                   ),
                   alignment: Alignment.center,
-                  child: Icon(
-                    Icons.edit_outlined,
-                    size: 20,
-                    color: scheme.onPrimaryContainer,
-                  ),
+                  child: icon,
                 ),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     spacing: AppSpace.s2,
                     children: <Widget>[
+                      Text(title, style: theme.textTheme.labelLarge),
                       Text(
-                        'Lỡ lướt quá đà?',
-                        style: theme.textTheme.labelLarge,
-                      ),
-                      Text(
-                        'Không sao. Ghi lại cảm giác để lần sau nhận ra sớm '
-                        'hơn.',
+                        subtitle,
                         style: theme.textTheme.labelMedium?.copyWith(
                           fontWeight: FontWeight.w400,
                           color: scheme.onSurfaceVariant,
@@ -547,9 +636,12 @@ class _AddHabitDialogState extends State<_AddHabitDialog> {
 
 /// Nhánh phục hồi F2: "Lúc đó mình đang thấy gì?", không trừ gì.
 class _SlipSheet extends StatefulWidget {
-  const _SlipSheet({required this.onSave});
+  const _SlipSheet({required this.onSave, required this.onOpenJar});
 
   final Future<bool> Function(String feeling) onSave;
+
+  /// "Xem trong hũ": mở hũ ở bộ lọc Nhật ký.
+  final VoidCallback onOpenJar;
 
   @override
   State<_SlipSheet> createState() => _SlipSheetState();
@@ -631,7 +723,7 @@ class _SlipSheetState extends State<_SlipSheet> {
                     expand: true,
                     onPressed: () {
                       Navigator.of(context).pop();
-                      context.go(AppRoutes.jar);
+                      widget.onOpenJar();
                     },
                   ),
                 ],
