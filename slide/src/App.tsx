@@ -477,6 +477,20 @@ D/FirebaseCrashlytics: Crashlytics report successfully
         />
 
         <Page
+          title="Deploy · Firebase Hosting"
+          line="GitHub Actions deploys the web build, with one preview channel per pull request."
+          images={[{ src: 'app/console-hosting.png', alt: 'Hosting dashboard with the current release and preview channels', full: true }]}
+          notes="Hosting dashboard of prm393-not-lab3. The current release and every pr<number> preview channel were deployed by the github-actions-deploy service account from .github/workflows/deploy.yml. Domains: prm393-not-lab3.web.app and firebaseapp.com. Storage is not part of the deploy target because the bucket is not provisioned."
+        />
+
+        <Page
+          title="Operate · Security Rules"
+          line="Published rules with a release history, tested by the rules emulator suite."
+          images={[{ src: 'app/console-rules.png', alt: 'Firestore Rules tab with release history and the published rules', full: true }]}
+          notes="Rules tab of Cloud Firestore. The release history shows each publish. The source is firebase/firestore.rules and is covered by node --test in firebase/tests (R-01 to R-15)."
+        />
+
+        <Page
           title="Remote Config"
           line="Change it in the Console, no rebuild. Defaults on failure."
           images={[
@@ -484,6 +498,13 @@ D/FirebaseCrashlytics: Crashlytics report successfully
             { src: 'app/rc-after.png', alt: 'Settings after: milestone 10, first chip Uống đủ nước', crop: true },
           ]}
           notes="FirebaseRemoteConfigService sets in-app defaults, then fetches on launch. Before: milestone 25, chips start with Dọn phòng. After publishing in the Console and tapping the Remote Config row: milestone 10, chips start with Uống đủ nước. A failed fetch keeps the defaults. Parameters: quick_win_chips, monthly_milestone, discord_*, firebase_demo_enabled. Template: firebase/remoteconfig.template.json."
+        />
+
+        <Page
+          title="Remote Config · Console"
+          line="Seven parameters, 100% fetched, published from the repo template."
+          images={[{ src: 'app/console-remoteconfig.png', alt: 'Remote Config parameters list', full: true }]}
+          notes="Parameters tab, Config version 4. Values come from firebase/remoteconfig.template.json and are published with firebase deploy --only remoteconfig. Fetch % is 100 because the only client is the test emulator."
         />
 
         <Page
