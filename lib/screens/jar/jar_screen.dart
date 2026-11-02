@@ -292,6 +292,8 @@ class _JarGrid extends StatelessWidget {
   static void _showStickers(BuildContext context, List<DateTime> months) {
     showModalBottomSheet<void>(
       context: context,
+      // Nằm trên thanh tab nổi, không bị nó che phần dưới.
+      useRootNavigator: true,
       showDragHandle: true,
       builder: (context) => SafeArea(
         child: Padding(

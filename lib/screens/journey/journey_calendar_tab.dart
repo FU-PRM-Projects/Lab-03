@@ -108,6 +108,8 @@ class _MonthView extends StatelessWidget {
     final notes = data.notesOn(day);
     showModalBottomSheet<void>(
       context: context,
+      // Nằm trên thanh tab nổi, không bị nó che phần dưới.
+      useRootNavigator: true,
       showDragHandle: true,
       isScrollControlled: true,
       builder: (sheetContext) => SafeArea(

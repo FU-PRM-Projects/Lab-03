@@ -14,6 +14,8 @@ import '../../widgets/quick_win_chip.dart';
 Future<FirstGroup?> showCreateGroupSheet(BuildContext context) =>
     showModalBottomSheet<FirstGroup>(
       context: context,
+      // Mở từ kệ ở tab Hũ: nằm trên thanh tab nổi.
+      useRootNavigator: true,
       isScrollControlled: true,
       builder: (_) => const _CreateGroupSheet(),
     );

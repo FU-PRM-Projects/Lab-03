@@ -18,6 +18,7 @@ import '../../widgets/note_tile.dart';
 import '../../widgets/offline_banner.dart';
 import '../../widgets/shortcut_button.dart';
 import '../../widgets/state_views.dart';
+import '../common/note_kind_sheet.dart';
 import '../common/screen_skeleton.dart';
 
 /// S02 · Hôm nay (tab 1).
@@ -69,7 +70,10 @@ class TodayScreen extends ConsumerWidget {
             label: hasDraft ? 'Tiếp tục ghi nốt' : 'Ghi nốt',
             icon: hasDraft ? Icons.edit_note : Icons.add,
             expand: true,
-            onPressed: () => context.push(AppRoutes.newNote()),
+            // Có nháp thì vào thẳng S03; chưa có thì hỏi chiến thắng hay nhật ký.
+            onPressed: hasDraft
+                ? () => context.push(AppRoutes.newNote())
+                : () => openNoteKindSheet(context),
           ),
           // Figma: khoảng đệm 16 + 2 khoảng cách 16 giữa nút và lối tắt.
           const SizedBox(height: AppSpace.s16 * 3),

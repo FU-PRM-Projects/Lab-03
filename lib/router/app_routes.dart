@@ -8,6 +8,9 @@ abstract final class AppRoutes {
   static const String jar = '/jar';
   static const String challenges = '/challenges';
   static const String selfControl = '/self-control';
+
+  /// Viết nhật ký (nốt loại Nhật ký).
+  static const String journal = '/journal';
   static const String breathe = '/breathe';
   static const String journey = '/journey';
   static const String settings = '/settings';

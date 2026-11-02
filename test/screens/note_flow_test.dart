@@ -15,6 +15,8 @@ void main() {
   Future<void> openComposer(WidgetTester tester) async {
     await tester.tap(find.text('Ghi nốt'));
     await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel(RegExp('^Chiến thắng nhỏ')));
+    await tester.pumpAndSettle();
     expect(find.byType(NoteComposerScreen), findsOneWidget);
   }
 
