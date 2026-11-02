@@ -12,6 +12,7 @@ import '../../widgets/app_button.dart';
 import '../../widgets/mascot.dart';
 import '../../widgets/state_views.dart';
 import '../common/screen_skeleton.dart';
+import 'create_challenge_sheet.dart';
 
 /// S07 · Thử thách (tab 3).
 class ChallengesScreen extends ConsumerStatefulWidget {
@@ -44,6 +45,49 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen> {
     }
   }
 
+  void _snack(String message) => ScaffoldMessenger.of(context)
+    ..hideCurrentSnackBar()
+    ..showSnackBar(SnackBar(content: Text(message)));
+
+  Future<void> _add() async {
+    final added = await showCreateChallengeSheet(context);
+    if (added == null || !mounted) return;
+    _snack('Đã thêm “${added.title}” vào thẻ của bạn.');
+    // Thẻ mới nằm đầu chồng thẻ.
+    if (_pages.hasClients) _goTo(0);
+  }
+
+  Future<void> _delete(DeckCard card) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Xoá thẻ này?'),
+        content: Text(
+          '“${card.challenge.title}” sẽ biến mất khỏi chồng thẻ. '
+          'Các nốt bạn đã ghi vẫn còn trong hũ.',
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Giữ lại'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Xoá'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    try {
+      await ref
+          .read(challengesViewModelProvider.notifier)
+          .deleteMine(card.challenge.id);
+    } on Object {
+      if (mounted) _snack('Chưa xoá được thẻ. Thử lại nhé.');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(challengesViewModelProvider);
@@ -72,12 +116,16 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen> {
             onRetry: viewModel.retry,
           ),
         ),
-        Empty<List<DeckCard>>() => const Padding(
-          padding: EdgeInsets.all(AppSpace.screen),
+        Empty<List<DeckCard>>() => Padding(
+          padding: const EdgeInsets.all(AppSpace.screen),
           child: EmptyState(
             title: 'Bạn đã làm hết thẻ thử thách!',
-            message: 'Thẻ mới sẽ được thêm sớm. Ghé lại sau nhé.',
+            message:
+                'Thẻ mới sẽ được thêm sớm. Trong lúc đó, bạn có thể tự thêm '
+                'một điều tốt nhỏ cho mình.',
             mascot: MascotState.xong,
+            actionLabel: 'Thêm điều tốt của bạn',
+            onAction: _add,
           ),
         ),
         Data<List<DeckCard>>(:final value) => _Deck(
@@ -86,6 +134,8 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen> {
           controller: _pages,
           onPageChanged: (page) => setState(() => _page = page),
           onGoTo: _goTo,
+          onAdd: _add,
+          onDelete: _delete,
         ),
       },
     );
@@ -99,6 +149,8 @@ class _Deck extends StatelessWidget {
     required this.controller,
     required this.onPageChanged,
     required this.onGoTo,
+    required this.onAdd,
+    required this.onDelete,
   });
 
   final List<DeckCard> cards;
@@ -106,6 +158,8 @@ class _Deck extends StatelessWidget {
   final PageController controller;
   final ValueChanged<int> onPageChanged;
   final ValueChanged<int> onGoTo;
+  final VoidCallback onAdd;
+  final ValueChanged<DeckCard> onDelete;
 
   /// Figma: thẻ 400 trên màn 800 (một nửa màn), trong khoảng này.
   static const double _minCardHeight = 320;
@@ -132,37 +186,41 @@ class _Deck extends StatelessWidget {
         AppSpace.tabContentBottom,
       ),
       children: <Widget>[
-        // Figma `cấp`: chủ đề · cấp, thanh 100 × 6, số thẻ đã làm.
-        Row(
-          spacing: AppSpace.s12,
-          children: <Widget>[
-            Flexible(
-              child: Text(current.header, style: theme.textTheme.labelLarge),
-            ),
-            SizedBox(
-              width: 100,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(3),
-                child: LinearProgressIndicator(
-                  value: current.levelTotal == 0
-                      ? 0
-                      : current.levelDone / current.levelTotal,
-                  minHeight: AppSpace.s6,
-                  backgroundColor: scheme.surfaceContainerHighest,
-                  semanticsLabel:
-                      '${current.header}, đã làm ${current.levelDone} '
-                      'trên ${current.levelTotal} thẻ',
+        // Figma `cấp`: chủ đề · cấp, thanh 100 × 6, số thẻ đã làm. Thẻ tự thêm
+        // không có cấp nên chỉ hiện nhãn.
+        if (current.challenge.mine)
+          Text(current.header, style: theme.textTheme.labelLarge)
+        else
+          Row(
+            spacing: AppSpace.s12,
+            children: <Widget>[
+              Flexible(
+                child: Text(current.header, style: theme.textTheme.labelLarge),
+              ),
+              SizedBox(
+                width: 100,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(3),
+                  child: LinearProgressIndicator(
+                    value: current.levelTotal == 0
+                        ? 0
+                        : current.levelDone / current.levelTotal,
+                    minHeight: AppSpace.s6,
+                    backgroundColor: scheme.surfaceContainerHighest,
+                    semanticsLabel:
+                        '${current.header}, đã làm ${current.levelDone} '
+                        'trên ${current.levelTotal} thẻ',
+                  ),
                 ),
               ),
-            ),
-            Text(
-              '${current.levelDone}/${current.levelTotal}',
-              style: theme.textTheme.labelLarge?.copyWith(
-                color: scheme.onSurfaceVariant,
+              Text(
+                '${current.levelDone}/${current.levelTotal}',
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
         const SizedBox(height: AppSpace.s16),
         // Figma `chồng thẻ`: hai thẻ sau (mono/1, surface-variant) lùi vào 12
         // và 24 mỗi bên, thẻ chính vuốt ngang được.
@@ -194,7 +252,10 @@ class _Deck extends StatelessWidget {
                     controller: controller,
                     itemCount: cards.length,
                     onPageChanged: onPageChanged,
-                    itemBuilder: (context, i) => _ChallengeCard(card: cards[i]),
+                    itemBuilder: (context, i) => _ChallengeCard(
+                      card: cards[i],
+                      onDelete: () => onDelete(cards[i]),
+                    ),
                   ),
                 ),
               ),
@@ -230,7 +291,63 @@ class _Deck extends StatelessWidget {
               ? null
               : () => onGoTo((page + 1) % cards.length),
         ),
+        // Dưới thẻ để giữ nguyên bố cục Figma phía trên.
+        const SizedBox(height: AppSpace.s8),
+        const _DailyBanner(),
+        const SizedBox(height: AppSpace.s16),
+        AppButton(
+          label: 'Thêm điều tốt của bạn',
+          variant: AppButtonVariant.outlined,
+          expand: true,
+          onPressed: onAdd,
+        ),
       ],
+    );
+  }
+}
+
+/// Dòng đầu tab: nhắc "mỗi ngày một điều tốt nhỏ" và đếm số điều đã làm hôm
+/// nay, để người dùng thấy các việc nhỏ cộng dồn lại.
+class _DailyBanner extends ConsumerWidget {
+  const _DailyBanner();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final done = ref.watch(goodDeedsTodayProvider).value;
+    final (title, message) = switch (done) {
+      null => ('Mỗi ngày một điều tốt nhỏ', null),
+      0 => (
+        'Mỗi ngày một điều tốt nhỏ',
+        'Hôm nay bạn chưa làm điều nào. Một việc nhỏ thôi cũng được.',
+      ),
+      final n => (
+        'Hôm nay bạn đã làm $n điều tốt',
+        'Nhỏ thôi mà cộng dồn lại. Mai làm tiếp nhé!',
+      ),
+    };
+
+    // Chừa chỗ cho nút "+" nổi của tab để không che chữ.
+    return Semantics(
+      container: true,
+      liveRegion: true,
+      child: Padding(
+        padding: const EdgeInsets.only(right: AppSize.minTouch + AppSpace.s24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: AppSpace.s4,
+          children: <Widget>[
+            Text(title, style: theme.textTheme.titleMedium),
+            if (message != null)
+              Text(
+                message,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -266,9 +383,10 @@ class _BackCard extends StatelessWidget {
 /// Figma `thẻ chính`: nền tint xanh lá, bo 24, lề 24, nội dung căn giữa cách
 /// nhau 12 (mascot, nhãn chủ đề, tên thử thách, nút).
 class _ChallengeCard extends StatelessWidget {
-  const _ChallengeCard({required this.card});
+  const _ChallengeCard({required this.card, required this.onDelete});
 
   final DeckCard card;
+  final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -300,6 +418,11 @@ class _ChallengeCard extends StatelessWidget {
                 'THẺ DỄ HƠN',
                 style: caption?.copyWith(color: theme.colorScheme.primary),
               ),
+            if (card.doneToday)
+              Text(
+                'ĐÃ LÀM HÔM NAY ✓',
+                style: caption?.copyWith(color: theme.colorScheme.primary),
+              ),
             Text(
               challenge.label,
               style: caption?.copyWith(color: colors.success),
@@ -312,11 +435,18 @@ class _ChallengeCard extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
             AppButton(
-              label: 'Nhận thử thách',
+              label: card.doneToday ? 'Làm thêm lần nữa' : 'Nhận thử thách',
               expand: true,
               onPressed: () =>
                   context.push(AppRoutes.challengeDetail(challenge.id)),
             ),
+            if (challenge.mine)
+              AppButton(
+                label: 'Xoá thẻ này',
+                variant: AppButtonVariant.text,
+                expand: true,
+                onPressed: onDelete,
+              ),
           ],
         ),
       ),

@@ -13,7 +13,7 @@ const { initializeApp } = require('firebase-admin/app');
 const { getAuth } = require('firebase-admin/auth');
 const { getFirestore, Timestamp } = require('firebase-admin/firestore');
 
-const projectId = 'demo-prm393';
+const projectId = 'prm393-not-lab3';
 const email = process.argv[2];
 if (!email) {
   console.error('Usage: npm run seed:demo -- <email>');

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 import '../firebase_options.dart';
 
@@ -9,11 +10,12 @@ import '../firebase_options.dart';
 /// của `firebase/` thay vì project thật.
 const bool useFirebaseEmulator = bool.fromEnvironment('USE_FIREBASE_EMULATOR');
 
-/// Máy chạy Emulator. `10.0.2.2` là máy tính khi app chạy trên Android
-/// emulator; điện thoại thật dùng IP LAN của máy tính.
+/// Máy chạy Emulator. Trên web app chạy ngay trên máy tính nên dùng
+/// `localhost`; Android emulator phải đi qua `10.0.2.2`; điện thoại thật dùng
+/// IP LAN của máy tính (`--dart-define=FIREBASE_EMULATOR_HOST=<IP>`).
 const String firebaseEmulatorHost = String.fromEnvironment(
   'FIREBASE_EMULATOR_HOST',
-  defaultValue: '10.0.2.2',
+  defaultValue: kIsWeb ? 'localhost' : '10.0.2.2',
 );
 
 /// Khởi tạo Firebase trước `runApp`.

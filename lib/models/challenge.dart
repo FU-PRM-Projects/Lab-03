@@ -22,7 +22,18 @@ enum ChallengeTopic {
   }
 }
 
-/// Một thẻ trong kho `challenges/{id}` (chỉ đọc với người dùng, D-10).
+/// Giới hạn thẻ người dùng tự thêm (khớp firestore.rules).
+abstract final class CustomChallengeLimits {
+  static const int titleMax = 80;
+  static const int tipMax = 120;
+  static const int minutesMax = 600;
+
+  /// Số thẻ tự thêm tối đa; quá nhiều thẻ thì chồng thẻ mất ý nghĩa "nhỏ".
+  static const int count = 20;
+}
+
+/// Một thẻ trong kho `challenges/{id}` (chỉ đọc với người dùng, D-10), hoặc
+/// thẻ người dùng tự thêm ở `users/{uid}/customChallenges/{id}` ([mine]).
 class Challenge {
   const Challenge({
     required this.id,
@@ -34,6 +45,7 @@ class Challenge {
     this.tip = '',
     this.script = '',
     this.discordRoom,
+    this.mine = false,
   });
 
   final String id;
@@ -59,10 +71,16 @@ class Challenge {
   /// tắt.
   final String? discordRoom;
 
+  /// Thẻ do chính người dùng thêm: không thuộc cấp nào, làm lại được mỗi ngày.
+  final bool mine;
+
   bool get onDiscord => discordRoom != null;
 
-  /// "DŨNG CẢM · 2 PHÚT"; thẻ Discord là "DŨNG CẢM · CẤP 3 · DISCORD".
-  String get label => onDiscord
+  /// "DŨNG CẢM · 2 PHÚT"; thẻ Discord là "DŨNG CẢM · CẤP 3 · DISCORD"; thẻ
+  /// tự thêm là "CỦA BẠN · DŨNG CẢM · 2 PHÚT".
+  String get label => mine
+      ? 'CỦA BẠN · ${topic.label.toUpperCase()} · $minutes PHÚT'
+      : onDiscord
       ? '${topic.label.toUpperCase()} · CẤP $level · DISCORD'
       : '${topic.label.toUpperCase()} · $minutes PHÚT';
 }

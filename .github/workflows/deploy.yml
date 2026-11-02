@@ -1,0 +1,153 @@
+name: Deploy
+
+# Tự động đưa bản web mới lên Firebase Hosting và cập nhật Security Rules khi
+# merge vào `main`. Mỗi pull request có một bản preview riêng (URL comment vào PR).
+#
+# Cần secret `FIREBASE_SERVICE_ACCOUNT` (JSON của service account có quyền
+# Firebase Develop Admin). Nếu chưa đặt, job chỉ cảnh báo và bỏ qua — CI vẫn xanh.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - lib/**
+      - web/**
+      - assets/**
+      - pubspec.yaml
+      - pubspec.lock
+      - firebase/**
+      - firebase.json
+      - .firebaserc
+      - .github/workflows/deploy.yml
+  pull_request:
+    paths:
+      - lib/**
+      - web/**
+      - assets/**
+      - pubspec.yaml
+      - pubspec.lock
+      - firebase/**
+      - firebase.json
+      - .firebaserc
+      - .github/workflows/deploy.yml
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+  # action-hosting-deploy tạo check run cho bản preview.
+  checks: write
+
+env:
+  FLUTTER_VERSION: 3.47.2
+  FIREBASE_PROJECT_ID: prm393-not-lab3
+
+jobs:
+  deploy:
+    name: Deploy hosting + rules (main)
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Check for deployment credentials
+        id: credentials
+        env:
+          SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -n "$SERVICE_ACCOUNT" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Chưa đặt secret FIREBASE_SERVICE_ACCOUNT — bỏ qua deploy."
+          fi
+
+      - name: Authenticate to Google Cloud
+        if: steps.credentials.outputs.enabled == 'true'
+        uses: google-github-actions/auth@v3
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      - name: Install Flutter
+        if: steps.credentials.outputs.enabled == 'true'
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        if: steps.credentials.outputs.enabled == 'true'
+        run: flutter pub get
+
+      - name: Build web
+        if: steps.credentials.outputs.enabled == 'true'
+        run: flutter build web --release
+
+      - name: Install Firebase CLI
+        if: steps.credentials.outputs.enabled == 'true'
+        run: npm install --global firebase-tools@15
+
+      # Hosting đọc `build/web`, rules lấy từ `firebase/`. `--non-interactive`
+      # để job không treo chờ xác nhận. Chưa deploy `storage`: project chưa có
+      # bucket (cần gói Blaze) và service account CI không được bật API này;
+      # thêm lại `,storage` khi Storage đã được thiết lập.
+      - name: Deploy to Firebase
+        if: steps.credentials.outputs.enabled == 'true'
+        run: |
+          firebase deploy \
+            --project "$FIREBASE_PROJECT_ID" \
+            --only hosting,firestore:rules,firestore:indexes \
+            --non-interactive
+
+  preview:
+    name: Hosting preview (PR)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Check for deployment credentials
+        id: credentials
+        env:
+          SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -n "$SERVICE_ACCOUNT" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Chưa đặt secret FIREBASE_SERVICE_ACCOUNT — bỏ qua preview."
+          fi
+
+      - name: Install Flutter
+        if: steps.credentials.outputs.enabled == 'true'
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        if: steps.credentials.outputs.enabled == 'true'
+        run: flutter pub get
+
+      - name: Build web
+        if: steps.credentials.outputs.enabled == 'true'
+        run: flutter build web --release
+
+      - name: Deploy preview channel
+        if: steps.credentials.outputs.enabled == 'true'
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: ${{ env.FIREBASE_PROJECT_ID }}
+          expires: 7d
+          repoToken: ${{ secrets.GITHUB_TOKEN }}

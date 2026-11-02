@@ -5,6 +5,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../models/self_control.dart';
 import '../../router/app_routes.dart';
+import '../../services/crash_reporter.dart';
 import '../../services/remote_config_service.dart';
 import '../../theme/app_tokens.dart';
 import '../../utils/vi_date_format.dart';
@@ -216,6 +217,18 @@ class SettingsScreen extends ConsumerWidget {
                       title: 'Thư viện component (dev)',
                       value: '',
                       onTap: () => context.push(AppRoutes.componentGallery),
+                    ),
+                  if (!kReleaseMode)
+                    SettingRow.value(
+                      title: 'Thử crash (dev)',
+                      subtitle: 'Gửi một lỗi thử lên Crashlytics',
+                      value: '',
+                      onTap: () async {
+                        final message = await ref
+                            .read(crashReporterProvider)
+                            .testCrash();
+                        snack(message);
+                      },
                     ),
                 ],
               ),

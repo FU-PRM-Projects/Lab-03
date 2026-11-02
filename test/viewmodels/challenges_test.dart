@@ -86,6 +86,45 @@ void main() {
       expect(done, isEmpty);
     });
 
+    test('thẻ tự thêm: chưa làm hôm nay lên đầu, đã làm thì xuống cuối', () {
+      const open = Challenge(
+        id: 'my-1',
+        topic: ChallengeTopic.dungCam,
+        level: 0,
+        order: 0,
+        title: 'Nhắn lời cảm ơn',
+        minutes: 2,
+        mine: true,
+      );
+      const done = Challenge(
+        id: 'my-2',
+        topic: ChallengeTopic.vanDong,
+        level: 0,
+        order: 0,
+        title: 'Đi bộ 10 phút',
+        minutes: 10,
+        mine: true,
+      );
+      final deck = ChallengeDeck.build(
+        catalog: catalog,
+        progress: const <ChallengeTopic, ChallengeProgress>{},
+        lowYesterday: false,
+        mine: <Challenge>[done, open],
+        doneToday: <String>{'my-2'},
+      );
+      expect(deck.first.challenge.id, 'my-1');
+      expect(deck.first.header, 'Của bạn · Dũng cảm');
+      expect(deck.first.challenge.label, 'CỦA BẠN · DŨNG CẢM · 2 PHÚT');
+      expect(deck.last.challenge.id, 'my-2');
+      expect(deck.last.doneToday, isTrue);
+      final withoutMine = ChallengeDeck.build(
+        catalog: catalog,
+        progress: const <ChallengeTopic, ChallengeProgress>{},
+        lowYesterday: false,
+      );
+      expect(deck.length, withoutMine.length + 2);
+    });
+
     test('thẻ dễ hơn: cấp thấp hơn cùng chủ đề, không có thì null', () {
       expect(ChallengeDeck.easierThan(card('dc-2-2'), catalog)?.level, 1);
       expect(ChallengeDeck.easierThan(card('dc-1-1'), catalog), isNull);
@@ -129,6 +168,93 @@ void main() {
       final c = makeContainer();
       await pumpEventQueue();
       expect(deck(c).first.challenge.topic, ChallengeTopic.vanDong);
+    });
+
+    test('S07 thẻ tự thêm: lên đầu chồng; làm xong không đổi tiến độ cấp, '
+        'xuống cuối và có dấu "đã làm hôm nay"', () async {
+      final c = makeContainer();
+      await pumpEventQueue();
+      final added = await c
+          .read(challengesViewModelProvider.notifier)
+          .addMine(
+            topic: ChallengeTopic.dungCam,
+            title: '  Nhắn lời cảm ơn ',
+            minutes: 2,
+          );
+      await pumpEventQueue();
+      expect(added.mine, isTrue);
+      expect(deck(c).first.challenge.id, added.id);
+      expect(deck(c).first.challenge.title, 'Nhắn lời cảm ơn');
+
+      c.listen(challengeDetailViewModelProvider(added.id), (_, _) {});
+      await pumpEventQueue();
+      await c
+          .read(challengeDetailViewModelProvider(added.id).notifier)
+          .save(ChallengeOutcome.smooth, '');
+      await pumpEventQueue();
+
+      final saved = notes.notes.single;
+      expect(saved.challenge?.challengeId, added.id);
+      expect(saved.challenge?.subtype, 'nguoi_la');
+      expect(challenges.progress, isEmpty);
+      expect(deck(c).last.challenge.id, added.id);
+      expect(deck(c).last.doneToday, isTrue);
+    });
+
+    test('S07 thẻ tự thêm: tên trống hoặc quá dài bị từ chối, xoá thì mất '
+        'khỏi chồng', () async {
+      final c = makeContainer();
+      await pumpEventQueue();
+      final vm = c.read(challengesViewModelProvider.notifier);
+      expect(
+        () =>
+            vm.addMine(topic: ChallengeTopic.dungCam, title: '  ', minutes: 2),
+        throwsA(isA<AppException>()),
+      );
+      expect(
+        () => vm.addMine(
+          topic: ChallengeTopic.dungCam,
+          title: 'a' * (CustomChallengeLimits.titleMax + 1),
+          minutes: 2,
+        ),
+        throwsA(isA<AppException>()),
+      );
+      expect(challenges.mine, isEmpty);
+
+      final added = await vm.addMine(
+        topic: ChallengeTopic.vanDong,
+        title: 'Giãn cơ 5 phút',
+        minutes: 5,
+      );
+      await pumpEventQueue();
+      expect(deck(c).any((d) => d.challenge.id == added.id), isTrue);
+      await vm.deleteMine(added.id);
+      await pumpEventQueue();
+      expect(deck(c).any((d) => d.challenge.id == added.id), isFalse);
+    });
+
+    test('S07 thẻ tự thêm: đủ giới hạn thì không thêm nữa', () async {
+      final c = makeContainer();
+      await pumpEventQueue();
+      final vm = c.read(challengesViewModelProvider.notifier);
+      for (var i = 0; i < CustomChallengeLimits.count; i++) {
+        await vm.addMine(
+          topic: ChallengeTopic.dungCam,
+          title: 'Việc nhỏ $i',
+          minutes: 1,
+        );
+        await pumpEventQueue();
+      }
+      expect(
+        () => vm.addMine(
+          topic: ChallengeTopic.dungCam,
+          title: 'Một việc nữa',
+          minutes: 1,
+        ),
+        throwsA(
+          isA<AppException>().having((e) => e.code, 'code', 'challenge-limit'),
+        ),
+      );
     });
 
     test('S07: lỗi tải kho thẻ → Error state', () async {

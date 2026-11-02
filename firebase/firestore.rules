@@ -85,6 +85,25 @@ service cloud.firestore {
                               && request.resource.data.level >= 1;
       }
 
+      // Cards the user adds for themselves ("one small good deed a day").
+      // Created and deleted, never edited; private to the owner.
+      match /customChallenges/{id} {
+        allow read, delete: if isOwner(uid);
+        allow create: if isOwner(uid)
+                      && request.resource.data.keys().hasAll(['topic', 'title', 'minutes', 'createdAt'])
+                      && request.resource.data.keys().hasOnly(['topic', 'title', 'minutes', 'tip', 'createdAt'])
+                      && request.resource.data.topic in ['dung_cam', 'van_dong']
+                      && request.resource.data.title is string
+                      && request.resource.data.title.size() >= 1
+                      && request.resource.data.title.size() <= 80
+                      && request.resource.data.minutes is int
+                      && request.resource.data.minutes >= 1
+                      && request.resource.data.minutes <= 600
+                      && (!('tip' in request.resource.data)
+                          || (request.resource.data.tip is string && request.resource.data.tip.size() <= 120))
+                      && request.resource.data.createdAt is timestamp;
+      }
+
       match /groups/{groupId} {
         allow read, delete: if isOwner(uid);
         allow create, update: if isOwner(uid) && validGroup(request.resource.data);
