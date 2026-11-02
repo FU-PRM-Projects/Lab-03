@@ -51,6 +51,16 @@ flutter run --dart-define=USE_FIREBASE_EMULATOR=true   # cửa sổ 2, Android e
 
 Điện thoại thật thì thêm `--dart-define=FIREBASE_EMULATOR_HOST=<IP máy tính>`. Trên Emulator chỉ đăng nhập bằng email được; Google Sign-In cần project thật.
 
+#### Dữ liệu demo để test
+
+Emulator mới mở thì trống. Để các màn có dữ liệu mà xem (biểu đồ năng lượng S11b, lịch tâm trạng, thẻ "Nhớ lại lần này nhé" ở S02, kệ Nhóm lần đầu), trong `firebase/`:
+
+1. Mở app, **đăng ký** một tài khoản email (ví dụ `demo@test.dev`).
+2. `npm run seed:emulator`: nạp kho thẻ thử thách.
+3. `npm run seed:demo -- demo@test.dev`: nạp cho tài khoản đó khoảng 48 ngày nốt có tâm trạng trong 60 ngày gần đây, 3 chiến thắng đáng nhớ và 2 nhóm lần đầu. Ngày tính theo hôm nay; chạy lại thì làm mới đúng các nốt đó, không nhân đôi.
+
+Mặc định tắt Emulator là mất hết dữ liệu. Muốn giữ lại giữa các lần chạy thì dùng `npm run emulators:keep` thay cho `npm run emulators`: dữ liệu lưu vào `firebase/emulator-data/` (đã có trong `.gitignore`) khi dừng bằng **Ctrl+C**, lần sau tự nạp lại. Xoá thư mục đó để về trống.
+
 Nối project thật (một lần, khi đã tạo project trên Firebase Console):
 
 1. `flutterfire configure --platforms=android`: ghi đè `lib/firebase_options.dart` và tạo `android/app/google-services.json`.
