@@ -439,7 +439,6 @@ Exported 1 account(s) · provider: google.com`}</pre>
         <Page
           title="Analytics"
           line="Measures the 30-second goal, with no personal data."
-          todo="Console DebugView not captured: the Analytics property is not linked yet. The event above is from the device log."
           notes="AnalyticsService is an interface; FirebaseAnalyticsService logs to the real project, DebugAnalyticsService prints on the Emulator. Events: login, logout, note_saved (mood, note_type, has_journal, duration_ms), challenge_completed, report_exported, plus screen_view by route pattern. No titles, bodies, emails or group names. Unit tests assert the parameters. Evidence: adb logcat with debug.firebase.analytics.app set."
         >
           <pre className="log">{`$ adb shell setprop debug.firebase.analytics.app com.quanphungg.lab03
@@ -449,6 +448,13 @@ FA-SVC  Logging event: name=note_saved
                 has_journal=false, duration_ms=13339}`}</pre>
           <p className="flow">13.3 s to save · goal under 30 s</p>
         </Page>
+
+        <Page
+          title="Analytics · DebugView"
+          line="The same event in the Console: note_saved with its parameters."
+          images={[{ src: 'app/console-analytics.png', alt: 'DebugView timeline with note_saved and its parameters', full: true }]}
+          notes="DebugView of the Google Analytics property linked to prm393-not-lab3 (property prm393-not-lab3, streams android and web). The emulator ran in debug mode (debug.firebase.analytics.app). Timeline: session_start, screen_view, note_saved. Opening note_saved lists duration_ms and the other parameters. The user id is hidden in this crop."
+        />
 
         <Page
           title="Crashlytics"
