@@ -121,6 +121,17 @@ function CompareTriple({ pairs }: { pairs: Pair[] }) {
   );
 }
 
+/** FPT University logo, top right of each page (top left on the cover). */
+function OrgLogo({ cover }: { cover?: boolean }) {
+  return (
+    <img
+      className={cover ? 'org-logo cover' : 'org-logo'}
+      src={`${import.meta.env.BASE_URL}assets/fpt-logo.webp`}
+      alt="FPT University"
+    />
+  );
+}
+
 function Page({
   title,
   line,
@@ -142,26 +153,29 @@ function Page({
 }) {
   return (
     <Slide notes={notes} className={dense ? 'dense' : undefined}>
+      <OrgLogo />
       <h2>{title}</h2>
       {line && <p className="line">{line}</p>}
-      {images && children ? (
-        <div className="split">
-          <div className="side-text">{children}</div>
-          <ShotImages images={images} />
-        </div>
-      ) : (
-        <>
-          {children}
-          {shots && (
-            <div className="shots">
-              {shots.map((label) => (
-                <Shot key={label} label={label} />
-              ))}
-            </div>
-          )}
-          {images && <ShotImages images={images} />}
-        </>
-      )}
+      <div className="page-body">
+        {images && children ? (
+          <div className="split">
+            <div className="side-text">{children}</div>
+            <ShotImages images={images} />
+          </div>
+        ) : (
+          <>
+            {children}
+            {shots && (
+              <div className="shots">
+                {shots.map((label) => (
+                  <Shot key={label} label={label} />
+                ))}
+              </div>
+            )}
+            {images && <ShotImages images={images} />}
+          </>
+        )}
+      </div>
       {todo && <p className="todo">{todo}</p>}
     </Slide>
   );
@@ -334,6 +348,7 @@ export default function App() {
         plugins={[RevealNotes]}
       >
         <Slide notes="Nốt is built for Minh, a 22-year-old final-year student. Lab 2 success criterion: log a mood and one win in under 30 seconds after tapping the evening notification.">
+          <OrgLogo cover />
           <h1>Nốt</h1>
           <p className="line">One positive note every day</p>
           <ul className="speakers">
@@ -540,16 +555,40 @@ Sign out → local data cleared, back to /welcome`}</pre>
           title="Crashlytics"
           notes="Report export fails in the real flow because the Storage bucket is not provisioned: the user sees Chưa tạo được thẻ tuần. Thử lại nhé. and WeeklyReportViewModel records a non-fatal (reason report_export). Console: the non-fatal issue FirebaseStorageService.uploadReport, its Keys tab (screen=/journey) and Data tab (User ID). The dashboard also shows the test crash from the dev-only button and a real Hero error found by the dashboard and fixed (heroTag null on the add-note button)."
         >
-          <Gallery
-            cols={2}
-            height={215}
-            items={[
-              { src: 'app/report-error.png', alt: 'App showing the export error message', caption: 'User still sees a message', ratio: '2.9', pos: '50% 94%' },
-              { src: 'app/console-crash-nonfatal.png', alt: 'Console non-fatal issue', caption: 'Non-fatal in Console' },
-              { src: 'app/console-crash-keys.png', alt: 'Custom key and user ID', caption: 'Key screen · user ID' },
-              { src: 'app/console-crashlytics.png', alt: 'Dashboard with the test crash and the Hero error', caption: 'Test crash + a real Hero error' },
-            ]}
-          />
+          <div className="half">
+            <Gallery
+              cols={2}
+              height={190}
+              items={[
+                { src: 'app/report-error.png', alt: 'App showing the export error message', caption: '1 · User still sees a message', ratio: '1.6', pos: '50% 94%' },
+                { src: 'app/console-crash-nonfatal.png', alt: 'Console non-fatal issue', caption: '2 · Non-fatal in Console', ratio: '1.6', pos: '50% 50%' },
+                { src: 'app/console-crash-keys.png', alt: 'Custom key and user ID', caption: '3 · Key screen · user ID', ratio: '1.6', pos: '0% 40%' },
+                { src: 'app/console-crashlytics.png', alt: 'Dashboard with the test crash and the Hero error', caption: '4 · Test crash + a real Hero error', ratio: '1.6', pos: '50% 50%' },
+              ]}
+            />
+            <div className="half-text">
+              <p>
+                Crashlytics collects errors from real devices, so we see problems the Emulator never
+                shows. Two kinds reach the dashboard:
+              </p>
+              <ul>
+                <li>
+                  <b>Non-fatal</b>: the app caught the error and kept running. Exporting the weekly
+                  card fails because the Storage bucket is not provisioned; the user sees
+                  "Chưa tạo được thẻ tuần. Thử lại nhé." and the app records the error (1, 2).
+                </li>
+                <li>
+                  <b>Context on every report</b>: the Firebase user ID and a custom key{' '}
+                  <code>screen</code> (here <code>/journey</code>) show who hit it and where (3).
+                </li>
+                <li>
+                  <b>Crash</b>: a dev-only "Thử crash" button sends a test crash. The same dashboard
+                  also surfaced a real Hero error, caused by two add-note buttons sharing one tag. We
+                  fixed it with <code>heroTag: null</code> (4).
+                </li>
+              </ul>
+            </div>
+          </div>
         </Page>
 
         <Page
@@ -575,11 +614,50 @@ Sign out → local data cleared, back to /welcome`}</pre>
         </Page>
 
         <Page
+          dense
           title="ARTEMIS E2E"
-          shots={['Test plan', 'Pass rates', 'Trace']}
-          todo="e2e_test/ scaffold and smoke test exist; no run results yet (needs a model API key). Missing: test-plan.md."
-          notes="Cover F1, F2, F3, sign-in, 4 tabs, PDF export, sign-out. Compare the values the agent reports, not only SUCCESS. Fill in from real runs only; explain every flaky, failed or skipped test. Link docs/test-plan.md."
-        />
+          notes="ARTEMIS drives the real app on the Android 15 emulator through ADB. Model: deepseek-v4.1-flash via OpenRouter, Flash profile. 12 cases (T01 to T12) cover F1 write a note (main path, empty note, leave with a draft, offline), F2 self-control and breathing, F3 challenges, the four tabs, Settings (feature flags) and a native Android case (Home, notification shade, relaunch). Each case ran 3 times and asserts on the value the agent reports, not only on success. First full run: 31 of 36. Two failures came from wrong assertions in our tests (T05 run 3 accepted only an answer starting with DIALOG; T12 demanded the Today screen although the app correctly restores the previous screen). We fixed those and re-ran T05 and T12: 6 of 6. T06 run 3 timed out after 420 seconds in the offline case and stays a failure. Final: 35 of 36. Not done: the 15 to 30 minute exploratory session. Details and the table: docs/test-plan.md (branch feat/e2e-artemis); proofs in evidence/artemis/."
+        >
+          <div className="half">
+            <Gallery
+              cols={1}
+              height={235}
+              items={[{ src: 'app/artemis-workspace.jpg', alt: 'ARTEMIS Workspace with the agent timeline and run history', caption: 'ARTEMIS Workspace · agent steps and run history (44 runs)' }]}
+            />
+            <div className="half-text">
+              <p>
+                An AI agent (<code>deepseek-v4.1-flash</code> via OpenRouter) drives the app on the
+                Android 15 emulator over ADB. Each case runs 3 times and asserts on the value the
+                agent reports.
+              </p>
+              <ul>
+                <li>
+                  <b>12 cases:</b> F1 save, empty, draft dialog, offline · F2 · F3 · tabs · flags ·
+                  native Home and relaunch
+                </li>
+                <li>
+                  <b>35 of 36 runs pass.</b> T06 (offline) timed out once.
+                </li>
+                <li>
+                  First run was 31 of 36: two assertions in our tests were wrong (fixed, re-run
+                  6 of 6).
+                </li>
+                <li>Not done yet: the 15 to 30 minute exploratory session.</li>
+              </ul>
+            </div>
+          </div>
+          <Gallery
+            cols={5}
+            height={245}
+            items={[
+              { src: 'app/artemis-saved.jpg', alt: 'Saved note confirmation', caption: 'T02 · note saved' },
+              { src: 'app/artemis-offline.jpg', alt: 'Offline banner after saving without network', caption: 'T06 · saved on device' },
+              { src: 'app/artemis-dialog.jpg', alt: 'Keep draft dialog', caption: 'T05 · keep-draft dialog' },
+              { src: 'app/artemis-delete.jpg', alt: 'Note deleted in the jar', caption: 'T03 · note deleted' },
+              { src: 'app/artemis-challenge.jpg', alt: 'Challenge card', caption: 'T09 · challenge opened' },
+            ]}
+          />
+        </Page>
 
         <Page
           title="AI code review"

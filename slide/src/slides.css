@@ -564,3 +564,48 @@ html, body, #root, .stage {
   padding: 1px 4px;
   border-radius: 3px;
 }
+
+/* Page content sits in the middle of the space under the title (the title stays put). */
+.page-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: safe center;
+  height: 461px;
+}
+
+.reveal .slides section.dense .page-body {
+  height: 590px;
+}
+
+.page-body > :first-child {
+  margin-top: 0;
+}
+
+.page-body:has(.arch),
+.page-body:has(.arch) .arch {
+  height: auto;
+  justify-content: flex-start;
+}
+
+.page-body > .arch {
+  margin-top: -36px;
+}
+
+/* Organization logo. */
+.reveal .slides img.org-logo {
+  position: absolute;
+  top: 36px;
+  right: 56px;
+  width: 112px;
+  height: auto;
+  margin: 0;
+  box-shadow: none;
+  border: 0;
+}
+
+.reveal .slides img.org-logo.cover {
+  top: 40px;
+  right: auto;
+  left: 112px;
+  width: 190px;
+}
