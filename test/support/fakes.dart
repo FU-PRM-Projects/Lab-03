@@ -14,6 +14,7 @@ import 'package:lab03/services/app_exception.dart';
 import 'package:lab03/services/auth_service.dart';
 import 'package:lab03/services/challenge_repository.dart';
 import 'package:lab03/services/clock.dart';
+import 'package:lab03/services/crash_reporter.dart';
 import 'package:lab03/services/discord_service.dart';
 import 'package:lab03/services/draft_store.dart';
 import 'package:lab03/services/group_repository.dart';
@@ -131,6 +132,31 @@ class FakeAnalyticsService implements AnalyticsService {
 
   @override
   Future<void> setUserId(String? uid) async => userId = uid;
+}
+
+/// Ghi lại lỗi non-fatal, user ID và khoá chẩn đoán gửi lên Crashlytics.
+class FakeCrashReporter implements CrashReporter {
+  final List<({Object error, String? reason, bool fatal})> errors =
+      <({Object error, String? reason, bool fatal})>[];
+  final Map<String, Object> keys = <String, Object>{};
+  String? userId;
+
+  @override
+  Future<void> recordError(
+    Object error,
+    StackTrace? stack, {
+    String? reason,
+    bool fatal = false,
+  }) async => errors.add((error: error, reason: reason, fatal: fatal));
+
+  @override
+  Future<void> setUser(String? uid) async => userId = uid;
+
+  @override
+  Future<void> setKey(String key, Object value) async => keys[key] = value;
+
+  @override
+  Future<String> testCrash() async => 'test';
 }
 
 class FixedClock implements Clock {

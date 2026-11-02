@@ -48,6 +48,26 @@ class ReceivedNotification {
   };
 }
 
+/// Màn đích khi người dùng chạm thông báo.
+///
+/// Thông báo gửi kèm `data: {route: "/jar"}`. Chỉ nhận đường dẫn nội bộ nằm
+/// trong danh sách cho phép; thiếu hoặc lạ thì về Hôm nay.
+String routeFromData(Map<String, dynamic> data) {
+  const allowed = <String>{
+    '/today',
+    '/jar',
+    '/challenges',
+    '/journey',
+    '/settings',
+    '/self-control',
+    '/breathe',
+    '/journal',
+  };
+  final route = data['route'];
+  if (route is String && allowed.contains(route)) return route;
+  return '/today';
+}
+
 /// Quyền nhận thông báo của hệ điều hành.
 enum NotificationPermission { granted, denied, notAsked }
 
@@ -63,6 +83,12 @@ abstract interface class MessagingService {
 
   /// Mở phần cài đặt thông báo của app trên máy.
   Future<void> openSystemSettings();
+
+  /// Màn đích mỗi khi người dùng chạm thông báo lúc app đang chạy.
+  Stream<String> get openedRoutes;
+
+  /// Màn đích của thông báo đã mở app từ trạng thái tắt (dùng một lần).
+  String? takePendingRoute();
 
   /// Token của máy này; `null` khi chưa có (chưa cấp quyền, mất mạng).
   Future<String?> token();
@@ -88,6 +114,12 @@ class NoopMessagingService implements MessagingService {
 
   @override
   Future<void> openSystemSettings() async {}
+
+  @override
+  Stream<String> get openedRoutes => const Stream<String>.empty();
+
+  @override
+  String? takePendingRoute() => null;
 
   @override
   Future<String?> token() async => null;

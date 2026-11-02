@@ -42,6 +42,8 @@ class FirebaseMessagingService implements MessagingService {
   final FlutterLocalNotificationsPlugin _local;
 
   bool _started = false;
+  final StreamController<String> _routes = StreamController<String>.broadcast();
+  String? _pendingRoute;
 
   static const AndroidNotificationDetails _channel = AndroidNotificationDetails(
     'fcm',
@@ -78,11 +80,16 @@ class FirebaseMessagingService implements MessagingService {
           );
         }
       });
-      FirebaseMessaging.onMessageOpenedApp.listen(
-        (m) => _record(m, MessageOrigin.background),
-      );
+      FirebaseMessaging.onMessageOpenedApp.listen((m) async {
+        await _record(m, MessageOrigin.background);
+        _routes.add(routeFromData(m.data));
+      });
       final initial = await _messaging.getInitialMessage();
-      if (initial != null) await _record(initial, MessageOrigin.terminated);
+      if (initial != null) {
+        await _record(initial, MessageOrigin.terminated);
+        _pendingRoute = routeFromData(initial.data);
+        _routes.add(_pendingRoute!);
+      }
       unawaited(_logToken());
     } on Object catch (error) {
       debugPrint('[fcm] không khởi động được: $error');
@@ -125,6 +132,16 @@ class FirebaseMessagingService implements MessagingService {
   @override
   Future<void> openSystemSettings() =>
       AppSettings.openAppSettings(type: AppSettingsType.notification);
+
+  @override
+  Stream<String> get openedRoutes => _routes.stream;
+
+  @override
+  String? takePendingRoute() {
+    final route = _pendingRoute;
+    _pendingRoute = null;
+    return route;
+  }
 
   @override
   Future<String?> token() async {

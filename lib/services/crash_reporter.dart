@@ -14,6 +14,12 @@ abstract interface class CrashReporter {
     bool fatal = false,
   });
 
+  /// Gắn user ID (uid, không phải email/tên) vào báo cáo; `null` khi đăng xuất.
+  Future<void> setUser(String? uid);
+
+  /// Khoá chẩn đoán tuỳ chỉnh kèm mọi báo cáo sau đó (ví dụ `screen`).
+  Future<void> setKey(String key, Object value);
+
   /// Gửi một lỗi thử để kiểm tra cấu hình; trả về thông báo cho UI.
   Future<String> testCrash();
 }
@@ -32,6 +38,16 @@ class NoopCrashReporter implements CrashReporter {
     debugPrint(
       '[crash] ${fatal ? 'fatal' : 'non-fatal'} ${reason ?? ''}: $error',
     );
+  }
+
+  @override
+  Future<void> setUser(String? uid) async {
+    debugPrint('[crash] user ${uid == null ? 'cleared' : 'set'}');
+  }
+
+  @override
+  Future<void> setKey(String key, Object value) async {
+    debugPrint('[crash] key $key=$value');
   }
 
   @override

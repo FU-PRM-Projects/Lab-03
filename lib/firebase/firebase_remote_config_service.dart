@@ -5,6 +5,37 @@ import 'package:flutter/foundation.dart';
 
 import '../services/remote_config_service.dart';
 
+/// Danh sách chuỗi từ JSON trên Console; JSON hỏng hoặc rỗng thì giữ [fallback].
+List<String> parseStringList(String raw, List<String> fallback) {
+  try {
+    final decoded = jsonDecode(raw);
+    if (decoded is List) {
+      final items = decoded.whereType<String>().toList();
+      if (items.isNotEmpty) return items;
+    }
+  } on FormatException {
+    // JSON hỏng trên Console: giữ giá trị mặc định.
+  }
+  return fallback;
+}
+
+/// Bảng chuỗi → chuỗi từ JSON; hỏng thì giữ [fallback].
+Map<String, String> parseStringMap(String raw, Map<String, String> fallback) {
+  try {
+    final decoded = jsonDecode(raw);
+    if (decoded is Map) {
+      return <String, String>{
+        for (final entry in decoded.entries)
+          if (entry.key is String && entry.value is String)
+            entry.key as String: entry.value as String,
+      };
+    }
+  } on FormatException {
+    // JSON hỏng: coi như chưa có link riêng.
+  }
+  return fallback;
+}
+
 /// Remote Config thật: giá trị mặc định lấy từ [InAppRemoteConfig], nên khi
 /// tải thất bại (mất mạng, chưa publish) app chạy y như trước.
 class FirebaseRemoteConfigService implements RemoteConfigService {
@@ -46,24 +77,11 @@ class FirebaseRemoteConfigService implements RemoteConfigService {
     return service;
   }
 
-  List<String> _strings(String key, List<String> fallback) {
-    try {
-      final decoded = jsonDecode(_config.getString(key));
-      if (decoded is List) {
-        final items = decoded.whereType<String>().toList();
-        if (items.isNotEmpty) {
-          return items;
-        }
-      }
-    } on FormatException {
-      // JSON hỏng trên Console: giữ giá trị mặc định.
-    }
-    return fallback;
-  }
-
   @override
-  List<String> get quickWinChips =>
-      _strings('quick_win_chips', _fallback.quickWinChips);
+  List<String> get quickWinChips => parseStringList(
+    _config.getString('quick_win_chips'),
+    _fallback.quickWinChips,
+  );
 
   @override
   int get monthlyMilestone {
@@ -81,25 +99,16 @@ class FirebaseRemoteConfigService implements RemoteConfigService {
   }
 
   @override
-  Map<String, String> get discordChannels {
-    try {
-      final decoded = jsonDecode(_config.getString('discord_channel_map'));
-      if (decoded is Map) {
-        return <String, String>{
-          for (final entry in decoded.entries)
-            if (entry.key is String && entry.value is String)
-              entry.key as String: entry.value as String,
-        };
-      }
-    } on FormatException {
-      // JSON hỏng: coi như chưa có link riêng.
-    }
-    return _fallback.discordChannels;
-  }
+  Map<String, String> get discordChannels => parseStringMap(
+    _config.getString('discord_channel_map'),
+    _fallback.discordChannels,
+  );
 
   @override
-  List<String> get discordGreetings =>
-      _strings('discord_greetings', _fallback.discordGreetings);
+  List<String> get discordGreetings => parseStringList(
+    _config.getString('discord_greetings'),
+    _fallback.discordGreetings,
+  );
 
   @override
   bool get firebaseDemoEnabled => _config.getBool('firebase_demo_enabled');

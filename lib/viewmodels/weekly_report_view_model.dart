@@ -6,6 +6,7 @@ import '../models/report.dart';
 import '../services/analytics_events.dart';
 import '../services/analytics_service.dart';
 import '../services/app_exception.dart';
+import '../services/crash_reporter.dart';
 import '../services/report_services.dart';
 
 enum ReportPhase { idle, building, uploading, done, failed }
@@ -83,8 +84,12 @@ class WeeklyReportViewModel extends Notifier<ReportState> {
           );
         }
       }
-    } on Object catch (error) {
-      // Stage 5: ghi non-fatal qua CrashReporter.
+    } on Object catch (error, stack) {
+      unawaited(
+        ref
+            .read(crashReporterProvider)
+            .recordError(error, stack, reason: 'report_export'),
+      );
       if (!ref.mounted) return;
       state = ReportState(phase: ReportPhase.failed, message: _message(error));
     }

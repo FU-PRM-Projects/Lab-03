@@ -1,0 +1,10 @@
+11-02 22:19:06.206 logout {}
+11-02 22:19:57.835 login {method=google, }
+11-02 23:04:17.893 note_saved {has_journal=false, duration_ms=7990, mood=vui, note_type=chien_thang}
+11-02 23:15:38.814 note_viewed {note_type=chienThang}
+11-02 23:15:53.512 challenge_opened {challenge_id=r1JwWuTitKq3ATsKJfg4, note_type=dungCam}
+11-02 23:16:10.666 challenge_completed {challenge_id=r1JwWuTitKq3ATsKJfg4}
+11-02 23:16:56.536 self_control_logged {has_habit=false}
+11-02 23:17:20.097 note_saved {has_journal=false, duration_ms=7690, mood=vui, note_type=chien_thang}
+11-02 23:18:07.370 logout {}
+11-02 23:18:22.798 login {method=google, }

@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/note.dart';
 import '../models/note_type.dart';
 import '../models/self_control.dart';
+import '../services/analytics_events.dart';
+import '../services/analytics_service.dart';
 import '../services/clock.dart';
 import '../services/note_repository.dart';
 import '../services/self_control_services.dart';
@@ -193,7 +195,12 @@ class SelfControlViewModel extends Notifier<SelfControlState> {
         ),
         createdAt: now,
       );
-      // Stage 5: logEvent(self_control_logged).
+      unawaited(
+        ref.read(analyticsServiceProvider).track(
+          AnalyticsEvents.selfControlLogged,
+          <String, Object>{AnalyticsParams.hasHabit: '${habit != null}'},
+        ),
+      );
       if (!ref.mounted) return;
       state = state.copyWith(saving: false, savedNoteId: note.id);
     } on Object catch (error) {

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/note.dart';
+import '../services/crash_reporter.dart';
 import '../services/note_repository.dart';
 
 /// Nốt đang chờ xoá và lỗi của lần xoá gần nhất.
@@ -58,8 +59,12 @@ class NoteDeleter extends Notifier<PendingDelete> {
       await ref.read(noteRepositoryProvider).delete(note.id);
       if (!ref.mounted) return;
       if (state.note?.id == note.id) state = const PendingDelete();
-    } on Object {
-      // Stage 5: ghi non-fatal qua CrashReporter.
+    } on Object catch (error, stack) {
+      unawaited(
+        ref
+            .read(crashReporterProvider)
+            .recordError(error, stack, reason: 'note_delete'),
+      );
       if (!ref.mounted) return;
       state = PendingDelete(
         // Giữ nốt khác đang chờ xoá (nếu có).

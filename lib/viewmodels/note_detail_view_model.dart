@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/note.dart';
+import '../services/analytics_events.dart';
+import '../services/analytics_service.dart';
+import '../services/crash_reporter.dart';
 import '../services/note_repository.dart';
 import 'error_messages.dart';
 import 'jar_view_model.dart';
@@ -113,6 +116,12 @@ class NoteDetailViewModel extends Notifier<NoteDetailState> {
       final note = await _notes.get(args.id);
       if (!ref.mounted) return;
       state = state.copyWith(note: Data<Note>(note));
+      unawaited(
+        ref.read(analyticsServiceProvider).track(
+          AnalyticsEvents.noteViewed,
+          <String, Object>{AnalyticsParams.noteType: note.type.id},
+        ),
+      );
       if (args.edit) startEdit();
     } on Object catch (error) {
       if (ref.mounted) {
@@ -164,8 +173,12 @@ class NoteDetailViewModel extends Notifier<NoteDetailState> {
         editing: false,
         saving: false,
       );
-    } on Object catch (error) {
-      // Stage 5: ghi non-fatal qua CrashReporter.
+    } on Object catch (error, stack) {
+      unawaited(
+        ref
+            .read(crashReporterProvider)
+            .recordError(error, stack, reason: 'note_update'),
+      );
       if (!ref.mounted) return;
       state = state.copyWith(
         saving: false,

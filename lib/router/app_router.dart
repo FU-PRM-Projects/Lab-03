@@ -26,6 +26,8 @@ import '../screens/splash/splash_screen.dart';
 import '../screens/today/today_screen.dart';
 import '../screens/welcome/welcome_screen.dart';
 import '../services/analytics_service.dart';
+import '../services/crash_reporter.dart';
+import '../services/messaging_service.dart';
 import '../viewmodels/auth_view_model.dart';
 import '../widgets/state_views.dart';
 import 'app_routes.dart';
@@ -40,7 +42,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   final rootKey = GlobalKey<NavigatorState>(debugLabel: 'root');
   final authChanged = ValueNotifier<int>(0);
   ref
-    ..listen(authUserProvider, (_, _) => authChanged.value++)
+    ..listen(authUserProvider, (_, next) {
+      authChanged.value++;
+      // user ID (uid, không email/tên) cho Analytics và Crashlytics; kể cả khi
+      // phiên đăng nhập được khôi phục lúc mở app.
+      final uid = next.value?.uid;
+      unawaited(ref.read(analyticsServiceProvider).setUserId(uid));
+      unawaited(ref.read(crashReporterProvider).setUser(uid));
+    })
     ..onDispose(authChanged.dispose);
   var lastScreen = '';
 
@@ -204,10 +213,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     if (path.isEmpty || path == lastScreen) return;
     lastScreen = path;
     unawaited(ref.read(analyticsServiceProvider).logScreen(path));
+    // Khoá chẩn đoán: màn đang mở khi có lỗi.
+    unawaited(ref.read(crashReporterProvider).setKey('screen', path));
   }
 
   router.routerDelegate.addListener(logScreen);
+
+  // Chạm thông báo FCM: mở đúng màn (chỉ khi đã đăng nhập, nếu không thì để
+  // authRedirect đưa về Welcome).
+  final messaging = ref.read(messagingServiceProvider);
+  final routeSub = messaging.openedRoutes.listen(router.go);
+  final pending = messaging.takePendingRoute();
+  if (pending != null) router.go(pending);
+
   ref.onDispose(() {
+    unawaited(routeSub.cancel());
     router.routerDelegate.removeListener(logScreen);
     router.dispose();
   });

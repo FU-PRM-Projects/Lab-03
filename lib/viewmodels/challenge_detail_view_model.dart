@@ -9,6 +9,7 @@ import '../services/analytics_events.dart';
 import '../services/analytics_service.dart';
 import '../services/challenge_repository.dart';
 import '../services/clock.dart';
+import '../services/crash_reporter.dart';
 import '../services/note_repository.dart';
 import '../services/remote_config_service.dart';
 import 'challenges_view_model.dart';
@@ -114,6 +115,15 @@ class ChallengeDetailViewModel extends Notifier<ChallengeDetailState> {
       state = state.copyWith(
         challenge: Data<Challenge>(challenge),
         minutes: challenge.minutes,
+      );
+      unawaited(
+        ref.read(analyticsServiceProvider).track(
+          AnalyticsEvents.challengeOpened,
+          <String, Object>{
+            AnalyticsParams.challengeId: challenge.id,
+            AnalyticsParams.noteType: challenge.topic.id,
+          },
+        ),
       );
     } on Object catch (error) {
       if (ref.mounted) {
@@ -228,9 +238,13 @@ class ChallengeDetailViewModel extends Notifier<ChallengeDetailState> {
       if (ref.mounted) {
         ref.read(challengesViewModelProvider.notifier).clearEasier();
       }
-    } on Object {
+    } on Object catch (error, stack) {
       // Nốt đã nằm trong hũ; tiến độ được tính lại lần làm thẻ sau.
-      // Stage 5: ghi non-fatal qua CrashReporter.
+      unawaited(
+        ref
+            .read(crashReporterProvider)
+            .recordError(error, stack, reason: 'challenge_progress'),
+      );
     }
   }
 

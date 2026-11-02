@@ -20,6 +20,14 @@ class FirebaseCrashReporter implements CrashReporter {
   );
 
   @override
+  Future<void> setUser(String? uid) =>
+      FirebaseCrashlytics.instance.setUserIdentifier(uid ?? '');
+
+  @override
+  Future<void> setKey(String key, Object value) =>
+      FirebaseCrashlytics.instance.setCustomKey(key, value);
+
+  @override
   Future<String> testCrash() async {
     // Lỗi cố ý, fatal để báo cáo được gửi ngay mà không làm tắt app (khác
     // với `FirebaseCrashlytics.instance.crash()`).
