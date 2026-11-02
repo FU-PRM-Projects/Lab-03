@@ -209,13 +209,7 @@ class _SelfControlScreenState extends ConsumerState<SelfControlScreen> {
                       ? null
                       : () => _recordMoment(summary, state.habitsLocked),
                 ),
-                const SizedBox(height: AppSpace.s16),
-                AppButton(
-                  label: 'Khó dừng? Thở 90 giây',
-                  variant: AppButtonVariant.tonal,
-                  expand: true,
-                  onPressed: () => context.push(AppRoutes.breathe),
-                ),
+                // Thở 90 giây đã có lối tắt "Stress?" ở S02 (deviation D-26).
                 const SizedBox(height: AppSpace.s16),
                 Text(
                   'THÓI QUEN MUỐN BỚT',

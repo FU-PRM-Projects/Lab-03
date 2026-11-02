@@ -85,12 +85,11 @@ void main() {
     expect(services.notes.notes.single.title, 'Dừng Video ngắn lúc 21:30');
   });
 
-  testWidgets('khó dừng: S10 thở → Cơn sóng đã hạ → Ghi vào hũ → S04', (
+  testWidgets('Stress? ở S02: S10 thở → Cơn sóng đã hạ → Ghi vào hũ → S04', (
     tester,
   ) async {
     final services = await pumpApp(tester);
-    await openSelfControl(tester);
-    await tester.tap(find.text('Khó dừng? Thở 90 giây'));
+    await tester.tap(find.bySemanticsLabel('Stress?, Thở 90 giây để thả lỏng'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
     expect(find.byType(BreathingScreen), findsOneWidget);
