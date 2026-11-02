@@ -191,6 +191,34 @@ void main() {
       expect(notes.stickers.single.month, 10);
     });
 
+    test('bộ sưu tập: 3 tháng gần nhất có nhãn dán rồi ô tháng sau', () async {
+      notes.stickers.addAll(<DateTime>[
+        DateTime(2026, 6),
+        DateTime(2026, 8),
+        DateTime(2026, 9),
+      ]);
+      notes.notes.addAll(<Note>[
+        for (var day = 1; day <= 3; day++)
+          sampleNote('n$day', DateTime(2026, 10, day)),
+      ]);
+      final c = makeContainer(smallMilestone: true);
+      final s = ((await load(c, 'n3')) as Data<SavedNoteSummary>).value;
+      expect(s.stickerMonths, <DateTime>[
+        DateTime(2026, 8),
+        DateTime(2026, 9),
+        DateTime(2026, 10),
+      ]);
+      expect(s.nextStickerMonth, DateTime(2026, 11));
+    });
+
+    test('mốc đầu tiên: bộ sưu tập chỉ có tháng này', () async {
+      notes.notes.add(sampleNote('n1', DateTime(2026, 12, 1)));
+      final s =
+          ((await load(makeContainer(), 'n1')) as Data<SavedNoteSummary>).value;
+      expect(s.stickerMonths, <DateTime>[DateTime(2026, 12)]);
+      expect(s.nextStickerMonth, DateTime(2027));
+    });
+
     test('không tìm thấy nốt: Error state', () async {
       final state = await load(makeContainer(), 'missing');
       expect(state, isA<Failure<SavedNoteSummary>>());

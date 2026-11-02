@@ -125,7 +125,7 @@ class JarViewModel extends Notifier<ViewState<JarData>> {
       final stickers = await _notes.listStickers();
       if (!ref.mounted) return;
       _monthCount = count;
-      _stickers = stickers.map(_parseMonth).nonNulls.toList();
+      _stickers = stickers.map(Dates.parseMonthId).nonNulls.toList();
       _emit();
     } on Object {
       // Số đếm chỉ là phần thêm trên đầu lưới.
@@ -168,14 +168,6 @@ class JarViewModel extends Notifier<ViewState<JarData>> {
   }
 
   /// "2026-10" → 01/10/2026.
-  static DateTime? _parseMonth(String id) {
-    final parts = id.split('-');
-    if (parts.length != 2) return null;
-    final year = int.tryParse(parts[0]);
-    final month = int.tryParse(parts[1]);
-    return year == null || month == null ? null : DateTime(year, month);
-  }
-
   /// Tải trang kế khi cuộn gần cuối lưới.
   Future<void> loadMore() async {
     final first = _firstPage;

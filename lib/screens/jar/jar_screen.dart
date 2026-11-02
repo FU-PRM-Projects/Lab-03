@@ -323,7 +323,7 @@ class _JarGrid extends StatelessWidget {
                 runSpacing: AppSpace.s16,
                 children: <Widget>[
                   for (final month in months)
-                    MilestoneSticker(label: 'Th${month.month}', unlocked: true),
+                    MilestoneSticker(month: month.month, unlocked: true),
                 ],
               ),
             ],

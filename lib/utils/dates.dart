@@ -17,4 +17,13 @@ abstract final class Dates {
 
   static bool sameDay(DateTime a, DateTime b) =>
       a.year == b.year && a.month == b.month && a.day == b.day;
+
+  /// Tháng từ id dạng "2026-10" (id của `users/{uid}/stickers`).
+  static DateTime? parseMonthId(String id) {
+    final parts = id.split('-');
+    if (parts.length != 2) return null;
+    final year = int.tryParse(parts[0]);
+    final month = int.tryParse(parts[1]);
+    return year == null || month == null ? null : DateTime(year, month);
+  }
 }

@@ -23,6 +23,7 @@ class SavedNoteSummary {
     this.savedToday = true,
     this.jarNotes = const <NoteType>[],
     this.group,
+    this.stickers = const <DateTime>[],
   });
 
   final Note note;
@@ -41,6 +42,24 @@ class SavedNoteSummary {
 
   /// Nhóm lần đầu chứa nốt, nếu có.
   final FirstGroup? group;
+
+  /// Các tháng đã gắn nhãn dán (`users/{uid}/stickers`).
+  final List<DateTime> stickers;
+
+  /// "Bộ sưu tập" ở biến thể mốc: tối đa 3 tháng đã có nhãn dán, cũ trước,
+  /// luôn gồm tháng của [note] (vừa đạt mốc).
+  List<DateTime> get stickerMonths {
+    final current = Dates.startOfMonth(note.createdAt);
+    final months = <DateTime>{
+      for (final m in stickers)
+        if (m.isBefore(current)) Dates.startOfMonth(m),
+      current,
+    }.toList()..sort();
+    return months.length <= 3 ? months : months.sublist(months.length - 3);
+  }
+
+  /// Ô "?" cuối bộ sưu tập: tháng kế tiếp, chưa mở.
+  DateTime get nextStickerMonth => Dates.startOfNextMonth(note.createdAt);
 
   /// Nốt đầu tiên của một nhóm: biến thể "Lần đầu tiên!" (khi không trùng
   /// với mốc tháng, vì mốc tháng cần bấm "Gắn vào hũ").
@@ -101,6 +120,16 @@ class NoteSavedViewModel extends Notifier<ViewState<SavedNoteSummary>> {
         before: Dates.startOfNextMonth(note.createdAt),
         limit: TodayViewModel.jarCapacity,
       );
+      List<DateTime> stickers;
+      try {
+        stickers = (await _notes.listStickers())
+            .map(Dates.parseMonthId)
+            .nonNulls
+            .toList();
+      } on Object {
+        // Bộ sưu tập chỉ là phần thêm; thiếu thì chỉ hiện tháng này.
+        stickers = const <DateTime>[];
+      }
       if (!ref.mounted) return;
       state = Data<SavedNoteSummary>(
         SavedNoteSummary(
@@ -117,6 +146,7 @@ class NoteSavedViewModel extends Notifier<ViewState<SavedNoteSummary>> {
               if (!n.createdAt.isBefore(monthStart)) n.type,
           ],
           group: group,
+          stickers: stickers,
         ),
       );
     } on Object catch (error) {
