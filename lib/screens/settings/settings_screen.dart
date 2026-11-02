@@ -256,9 +256,10 @@ class SettingsScreen extends ConsumerWidget {
                     SettingRow.value(
                       title: 'Remote Config',
                       subtitle:
-                          'Mốc tháng ${remoteConfig.monthlyMilestone} nốt · '
-                          '${remoteConfig.quickWinChips.length} gợi ý nhanh: '
-                          '${remoteConfig.quickWinChips.take(2).join(', ')}…',
+                          'Cờ tính năng · thẻ tự thêm: '
+                          '${remoteConfig.customChallengesEnabled ? 'bật' : 'tắt'}'
+                          ' · nhóm lần đầu: '
+                          '${remoteConfig.groupsEnabled ? 'bật' : 'tắt'}',
                       value: '',
                       onTap: () async {
                         final changed = await remoteConfig.refresh();

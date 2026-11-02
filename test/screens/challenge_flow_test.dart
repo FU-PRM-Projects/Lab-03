@@ -1,10 +1,14 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lab03/app.dart';
 import 'package:lab03/models/challenge.dart';
 import 'package:lab03/models/note_type.dart';
 import 'package:lab03/screens/challenge_detail/challenge_detail_screen.dart';
 import 'package:lab03/screens/challenges/challenges_screen.dart';
 import 'package:lab03/screens/note_saved/note_saved_screen.dart';
 import 'package:lab03/services/app_exception.dart';
+import 'package:lab03/services/remote_config_service.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../support/pump.dart';
@@ -143,4 +147,52 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Dũng cảm cấp 1 thẻ 1'), findsOneWidget);
   });
+
+  testWidgets('custom_challenges_enabled tắt: ẩn nút tự thêm thẻ', (
+    tester,
+  ) async {
+    final services = TestServices();
+    setScreenSize(tester, phone360);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: <Override>[
+          ...services.overrides,
+          remoteConfigServiceProvider.overrideWithValue(const _NoCustomCards()),
+        ],
+        child: const NotApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await openChallenges(tester);
+    await scrollToBottom(tester);
+    // Banner nằm sát nút thêm thẻ: thấy banner mà không có nút = đã ẩn.
+    expect(find.text('Mỗi ngày một điều tốt nhỏ'), findsOneWidget);
+    expect(find.text('Thêm điều tốt của bạn'), findsNothing);
+  });
+
+  testWidgets('custom_challenges_enabled bật (mặc định): có nút tự thêm thẻ', (
+    tester,
+  ) async {
+    await pumpApp(tester);
+    await openChallenges(tester);
+    await scrollToBottom(tester);
+    expect(find.text('Thêm điều tốt của bạn'), findsOneWidget);
+  });
+}
+
+/// Cuộn danh sách dọc của S07 xuống cuối để dựng hết các phần dưới thẻ.
+Future<void> scrollToBottom(WidgetTester tester) async {
+  final vertical = find.byWidgetPredicate(
+    (w) => w is Scrollable && w.axisDirection == AxisDirection.down,
+  );
+  await tester.drag(vertical.first, const Offset(0, -1500));
+  await tester.pumpAndSettle();
+}
+
+/// Remote Config tắt tính năng tự thêm thẻ.
+class _NoCustomCards extends InAppRemoteConfig {
+  const _NoCustomCards();
+
+  @override
+  bool get customChallengesEnabled => false;
 }

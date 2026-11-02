@@ -1,25 +1,25 @@
 {
   "parameters": {
-    "quick_win_chips": {
+    "custom_challenges_enabled": {
       "defaultValue": {
-        "value": "[\"Dọn phòng\", \"Giúp ai đó\", \"Đi bộ\", \"Ăn đủ bữa\", \"Ngủ trước 12h\", \"Xong 1 việc khó\"]"
+        "value": "true"
       },
-      "valueType": "JSON",
-      "description": "6 chip 'Hoặc chọn nhanh' ở S03b"
+      "valueType": "BOOLEAN",
+      "description": "Cờ: cho tự thêm thẻ thử thách (S07)"
     },
-    "monthly_milestone": {
+    "groups_enabled": {
       "defaultValue": {
-        "value": "25"
+        "value": "true"
       },
-      "valueType": "NUMBER",
-      "description": "Số nốt của mốc tháng ở S04"
+      "valueType": "BOOLEAN",
+      "description": "Cờ: hiện kệ Nhóm lần đầu ở hũ (S05)"
     },
     "firebase_demo_enabled": {
       "defaultValue": {
         "value": "true"
       },
       "valueType": "BOOLEAN",
-      "description": "Hiện khu demo Firebase ở S12"
+      "description": "Cờ: hiện khu demo Firebase ở S12"
     }
   }
 }

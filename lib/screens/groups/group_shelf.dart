@@ -4,6 +4,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../models/first_group.dart';
 import '../../router/app_routes.dart';
+import '../../services/remote_config_service.dart';
 import '../../theme/app_tokens.dart';
 import '../../theme/app_typography.dart';
 import '../../viewmodels/groups_view_model.dart';
@@ -29,6 +30,10 @@ class GroupShelf extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Cờ Remote Config `groups_enabled`: tắt thì ẩn cả kệ.
+    if (!ref.watch(remoteConfigServiceProvider).groupsEnabled) {
+      return const SizedBox.shrink();
+    }
     final state = ref.watch(groupsViewModelProvider);
     final theme = Theme.of(context);
     // Kệ chỉ là phần thêm của S05: chưa tải được thì vẫn có thẻ gợi ý.

@@ -555,16 +555,22 @@ Sign out → local data cleared, back to /welcome`}</pre>
         <Page
           dense
           title="Remote Config"
-          notes="FirebaseRemoteConfigService sets in-app defaults, then fetchAndActivate on launch; the fetch interval is zero in debug and one hour in release, and activated values stay cached until the next fetch. Before: milestone 25, chips start with Dọn phòng. After publishing: milestone 10, chips start with Uống đủ nước (the Remote Config row refreshes on tap). Broken or empty JSON keeps the defaults; unit tests cover parseStringList, parseStringMap and InAppRemoteConfig."
+          notes="Remote Config as feature flags. custom_challenges_enabled hides the add-your-own-card button on the Challenges tab; groups_enabled hides the first-time groups shelf on the jar; firebase_demo_enabled hides the Firebase demo area in Settings. Each flag has an in-app default (on), so a failed or empty fetch keeps every feature available. The values are published from firebase/remoteconfig.template.json with firebase deploy --only remoteconfig and fetched at launch (fetch interval zero in debug, one hour in release); activated values stay cached until the next fetch. Before: both flags on. After: both off, same app build, no rebuild."
         >
           <Gallery
-            cols={3}
-            height={300}
+            cols={4}
+            height={330}
             items={[
-              { src: 'app/rc-before.png', alt: 'Settings before: milestone 25', caption: 'Before · 25 nốt, Dọn phòng…' },
-              { src: 'app/rc-after.png', alt: 'Settings after: milestone 10', caption: 'After · 10 nốt, Uống đủ nước…' },
-              { src: 'app/console-remoteconfig.png', alt: 'Remote Config parameters', caption: 'Console · 3 parameters' },
+              { src: 'app/rc-jar-before.png', alt: 'Jar with the first-time groups shelf', caption: 'groups_enabled = true' },
+              { src: 'app/rc-jar-after.png', alt: 'Jar without the shelf', caption: 'groups_enabled = false' },
+              { src: 'app/rc-challenges-before.png', alt: 'Challenges tab with the add button', caption: 'custom_challenges_enabled = true' },
+              { src: 'app/rc-challenges-after.png', alt: 'Challenges tab without the add button', caption: 'custom_challenges_enabled = false' },
             ]}
+          />
+          <Gallery
+            cols={1}
+            height={150}
+            items={[{ src: 'app/console-remoteconfig.png', alt: 'Remote Config feature flags in the Console', caption: 'Console · three feature flags' }]}
           />
         </Page>
 

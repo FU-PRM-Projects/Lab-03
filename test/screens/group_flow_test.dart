@@ -1,12 +1,16 @@
 import 'dart:async';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lab03/app.dart';
 import 'package:lab03/models/first_group.dart';
 import 'package:lab03/models/mood.dart';
 import 'package:lab03/router/app_routes.dart';
 import 'package:lab03/screens/groups/group_detail_screen.dart';
 import 'package:lab03/screens/jar/jar_screen.dart';
 import 'package:lab03/screens/note_saved/note_saved_screen.dart';
+import 'package:lab03/services/remote_config_service.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../support/fakes.dart';
@@ -30,6 +34,24 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(GroupDetailScreen), findsOneWidget);
   }
+
+  testWidgets('groups_enabled tắt: ẩn kệ Nhóm lần đầu ở hũ', (tester) async {
+    final services = withNote();
+    setScreenSize(tester, phone360);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: <Override>[
+          ...services.overrides,
+          remoteConfigServiceProvider.overrideWithValue(const _NoGroups()),
+        ],
+        child: const NotApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await openJar(tester);
+    expect(find.text('Nhóm lần đầu'), findsNothing);
+    expect(find.text('Xem tất cả'), findsNothing);
+  });
 
   for (final size in <Size>[phone360, phone412]) {
     testWidgets('kệ ở ${size.width.toInt()} dp: gợi ý hệ thống và Tạo mới', (
@@ -230,4 +252,12 @@ void main() {
     expect(services.groups.deleted, isEmpty);
     expect(services.groups.groups, contains('bat-chuyen'));
   });
+}
+
+/// Remote Config tắt cờ nhóm lần đầu.
+class _NoGroups extends InAppRemoteConfig {
+  const _NoGroups();
+
+  @override
+  bool get groupsEnabled => false;
 }

@@ -36,7 +36,10 @@ void main() {
   test('InAppRemoteConfig là giá trị khi tải thất bại', () async {
     const config = InAppRemoteConfig();
     expect(config.quickWinChips, chips);
-    expect(config.monthlyMilestone, InAppRemoteConfig.defaultMonthlyMilestone);
+    // Mặc định khi tải thất bại: mọi cờ tính năng đều bật.
+    expect(config.customChallengesEnabled, isTrue);
+    expect(config.groupsEnabled, isTrue);
+    expect(config.firebaseDemoEnabled, isTrue);
     expect(await config.refresh(), isFalse);
   });
 }

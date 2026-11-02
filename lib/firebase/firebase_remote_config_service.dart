@@ -52,7 +52,8 @@ class FirebaseRemoteConfigService implements RemoteConfigService {
     try {
       await config.setDefaults(<String, Object>{
         'quick_win_chips': jsonEncode(InAppRemoteConfig.defaultQuickWinChips),
-        'monthly_milestone': InAppRemoteConfig.defaultMonthlyMilestone,
+        'groups_enabled': true,
+        'custom_challenges_enabled': true,
         'discord_enabled': true,
         'discord_invite_url': InAppRemoteConfig.defaultDiscordInviteUrl,
         'discord_channel_map': '{}',
@@ -84,10 +85,11 @@ class FirebaseRemoteConfigService implements RemoteConfigService {
   );
 
   @override
-  int get monthlyMilestone {
-    final value = _config.getInt('monthly_milestone');
-    return value > 0 ? value : _fallback.monthlyMilestone;
-  }
+  bool get groupsEnabled => _config.getBool('groups_enabled');
+
+  @override
+  bool get customChallengesEnabled =>
+      _config.getBool('custom_challenges_enabled');
 
   @override
   bool get discordEnabled => _config.getBool('discord_enabled');

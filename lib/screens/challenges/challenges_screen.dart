@@ -4,6 +4,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../models/note_type.dart';
 import '../../router/app_routes.dart';
+import '../../services/remote_config_service.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_tokens.dart';
 import '../../viewmodels/challenges_view_model.dart';
@@ -101,6 +102,11 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen> {
       }
     });
 
+    // Remote Config `custom_challenges_enabled`: tắt thì ẩn nút tự thêm thẻ.
+    final canAdd = ref
+        .watch(remoteConfigServiceProvider)
+        .customChallengesEnabled;
+
     return TabScaffold(
       title: 'Thử thách',
       body: switch (state) {
@@ -124,8 +130,8 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen> {
                 'Thẻ mới sẽ được thêm sớm. Trong lúc đó, bạn có thể tự thêm '
                 'một điều tốt nhỏ cho mình.',
             mascot: MascotState.xong,
-            actionLabel: 'Thêm điều tốt của bạn',
-            onAction: _add,
+            actionLabel: canAdd ? 'Thêm điều tốt của bạn' : null,
+            onAction: canAdd ? _add : null,
           ),
         ),
         Data<List<DeckCard>>(:final value) => _Deck(
@@ -134,7 +140,7 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen> {
           controller: _pages,
           onPageChanged: (page) => setState(() => _page = page),
           onGoTo: _goTo,
-          onAdd: _add,
+          onAdd: canAdd ? _add : null,
           onDelete: _delete,
         ),
       },
@@ -158,7 +164,7 @@ class _Deck extends StatelessWidget {
   final PageController controller;
   final ValueChanged<int> onPageChanged;
   final ValueChanged<int> onGoTo;
-  final VoidCallback onAdd;
+  final VoidCallback? onAdd;
   final ValueChanged<DeckCard> onDelete;
 
   /// Figma: thẻ 400 trên màn 800 (một nửa màn), trong khoảng này.
@@ -295,12 +301,13 @@ class _Deck extends StatelessWidget {
         const SizedBox(height: AppSpace.s8),
         const _DailyBanner(),
         const SizedBox(height: AppSpace.s16),
-        AppButton(
-          label: 'Thêm điều tốt của bạn',
-          variant: AppButtonVariant.outlined,
-          expand: true,
-          onPressed: onAdd,
-        ),
+        if (onAdd != null)
+          AppButton(
+            label: 'Thêm điều tốt của bạn',
+            variant: AppButtonVariant.outlined,
+            expand: true,
+            onPressed: onAdd,
+          ),
       ],
     );
   }

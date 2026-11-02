@@ -8,7 +8,6 @@ import '../models/note_type.dart';
 import '../services/clock.dart';
 import '../services/group_repository.dart';
 import '../services/note_repository.dart';
-import '../services/remote_config_service.dart';
 import '../utils/dates.dart';
 import 'error_messages.dart';
 import 'today_view_model.dart';
@@ -79,6 +78,13 @@ class SavedNoteSummary {
       milestone <= 0 ? 1 : (monthCount / milestone).clamp(0, 1);
 }
 
+/// Mốc nốt mỗi tháng (S04). Là mục tiêu của app nên không đưa vào Remote Config.
+final monthlyMilestoneProvider = Provider<int>(
+  (ref) => defaultMonthlyMilestone,
+);
+
+const int defaultMonthlyMilestone = 25;
+
 final noteSavedViewModelProvider = NotifierProvider.autoDispose
     .family<NoteSavedViewModel, ViewState<SavedNoteSummary>, String>(
       NoteSavedViewModel.new,
@@ -136,7 +142,7 @@ class NoteSavedViewModel extends Notifier<ViewState<SavedNoteSummary>> {
           note: note,
           // Bộ nhớ đệm có thể chưa thấy nốt vừa ghi; nốt này luôn được tính.
           monthCount: count < 1 ? 1 : count,
-          milestone: ref.read(remoteConfigServiceProvider).monthlyMilestone,
+          milestone: ref.read(monthlyMilestoneProvider),
           savedToday: Dates.sameDay(
             note.createdAt,
             ref.read(clockProvider).now(),
