@@ -596,10 +596,52 @@ class FakeChallengeRepository implements ChallengeRepository {
 
   @override
   Future<Challenge> get(String id) async {
-    for (final card in cards) {
+    for (final card in [...cards, ...mine]) {
       if (card.id == id) return card;
     }
     throw const AppException(AppErrorKind.notFound);
+  }
+
+  /// Thẻ tự thêm, mới nhất trước.
+  final List<Challenge> mine = <Challenge>[];
+  AppException? addError;
+
+  @override
+  Stream<List<Challenge>> watchMine() => Stream<List<Challenge>>.multi((
+    controller,
+  ) {
+    controller.add(List.of(mine));
+    final sub = _changes.stream.listen((_) => controller.add(List.of(mine)));
+    controller.onCancel = sub.cancel;
+  });
+
+  @override
+  Future<Challenge> addMine({
+    required ChallengeTopic topic,
+    required String title,
+    required int minutes,
+    String tip = '',
+  }) async {
+    if (addError != null) throw addError!;
+    final card = Challenge(
+      id: 'my-${mine.length + 1}',
+      topic: topic,
+      level: 0,
+      order: 0,
+      title: title,
+      minutes: minutes,
+      tip: tip,
+      mine: true,
+    );
+    mine.insert(0, card);
+    _changes.add(null);
+    return card;
+  }
+
+  @override
+  Future<void> deleteMine(String id) async {
+    mine.removeWhere((card) => card.id == id);
+    _changes.add(null);
   }
 
   @override

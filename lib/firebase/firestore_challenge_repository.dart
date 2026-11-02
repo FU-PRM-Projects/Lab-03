@@ -67,12 +67,118 @@ class FirestoreChallengeRepository implements ChallengeRepository {
     }
   }
 
+  CollectionReference<Map<String, Object?>> _mine() {
+    final uid = currentUid();
+    if (uid == null) {
+      throw const AppException(
+        AppErrorKind.permissionDenied,
+        code: 'signed-out',
+      );
+    }
+    return _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('customChallenges');
+  }
+
+  /// Thẻ tự thêm: không có cấp ([Challenge.level] 0), làm lại được mỗi ngày.
+  static Challenge? _toMine(DocumentSnapshot<Map<String, Object?>> doc) {
+    final data = doc.data();
+    final topic = ChallengeTopic.fromId(data?['topic'] as String?);
+    final title = data?['title'];
+    if (data == null || topic == null || title is! String) return null;
+    return Challenge(
+      id: doc.id,
+      topic: topic,
+      level: 0,
+      order: 0,
+      title: title,
+      minutes: data['minutes'] as int? ?? 2,
+      tip: data['tip'] as String? ?? '',
+      mine: true,
+    );
+  }
+
+  @override
+  Stream<List<Challenge>> watchMine() {
+    final Stream<QuerySnapshot<Map<String, Object?>>> snapshots;
+    try {
+      snapshots = _mine().orderBy('createdAt', descending: true).snapshots();
+    } on AppException catch (e, stack) {
+      return Stream<List<Challenge>>.error(e, stack);
+    }
+    return snapshots
+        .map((snapshot) => snapshot.docs.map(_toMine).nonNulls.toList())
+        .transform(
+          StreamTransformer<List<Challenge>, List<Challenge>>.fromHandlers(
+            handleError: (error, stack, sink) => sink.addError(
+              error is FirebaseException ? firestoreException(error) : error,
+              stack,
+            ),
+          ),
+        );
+  }
+
+  @override
+  Future<Challenge> addMine({
+    required ChallengeTopic topic,
+    required String title,
+    required int minutes,
+    String tip = '',
+  }) async {
+    try {
+      final doc = _mine().doc();
+      final write = doc.set(<String, Object?>{
+        'topic': topic.id,
+        'title': title,
+        'minutes': minutes,
+        if (tip.isNotEmpty) 'tip': tip,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+      try {
+        await write.timeout(const Duration(seconds: 2));
+      } on TimeoutException {
+        // Offline: Firestore giữ lệnh ghi và gửi khi có mạng.
+        write.ignore();
+      }
+      return Challenge(
+        id: doc.id,
+        topic: topic,
+        level: 0,
+        order: 0,
+        title: title,
+        minutes: minutes,
+        tip: tip,
+        mine: true,
+      );
+    } on FirebaseException catch (e) {
+      throw firestoreException(e);
+    }
+  }
+
+  @override
+  Future<void> deleteMine(String id) async {
+    try {
+      final write = _mine().doc(id).delete();
+      try {
+        await write.timeout(const Duration(seconds: 2));
+      } on TimeoutException {
+        write.ignore();
+      }
+    } on FirebaseException catch (e) {
+      throw firestoreException(e);
+    }
+  }
+
   @override
   Future<Challenge> get(String id) async {
     try {
-      final challenge = _toChallenge(
+      var challenge = _toChallenge(
         await _firestore.collection('challenges').doc(id).get(),
       );
+      if (challenge == null && currentUid() != null) {
+        challenge = _toMine(await _mine().doc(id).get());
+      }
       if (challenge == null) {
         throw AppException(
           AppErrorKind.notFound,
