@@ -72,7 +72,8 @@ class SettingsViewModel extends Notifier<SettingsState> {
 
   void retry() => ref.invalidateSelf();
 
-  /// Lưu ngay (handout S12). Stage 5: đặt lại lịch thông báo nhắc.
+  /// Lưu ngay (handout S12). Lời nhắc trên máy tự hẹn lại theo cài đặt
+  /// (`nudgeSyncProvider`).
   Future<void> _save(UserSettings Function(UserSettings) change) async {
     final current = _current;
     if (current == null) return;

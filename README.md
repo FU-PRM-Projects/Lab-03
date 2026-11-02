@@ -16,8 +16,8 @@
 | 1 | Design traceability | Xong | [`docs/design-traceability.md`](docs/design-traceability.md) |
 | 2 | Kiến trúc và theme | Xong | [`docs/architecture.md`](docs/architecture.md), `lib/theme/`, `lib/widgets/`, khung route 12 màn |
 | 3 | Firebase và đăng nhập | Xong (code + test; chờ project Firebase thật để chạy Google Sign-In trên máy) | `lib/services/`, `lib/firebase/`, S01, đăng xuất ở S12 |
-| 4 | Tính năng | Xong (code + test; chờ chạy thử trên máy với project Firebase thật): đủ 12 màn, 3 flow F1–F3 và các flow phụ, PDF Thẻ tuần lên Storage | Đủ 12 màn với mọi trạng thái, xuất và tải PDF |
-| 5 | Analytics, Crashlytics, Remote Config, FCM | Chưa làm | `docs/analytics-plan.md` |
+| 4 | Tính năng | Xong (code + test, chạy thử trên Emulator): đủ 12 màn, 3 flow F1–F3 và các flow phụ, PDF Thẻ tuần lên Storage; thêm phần mở rộng Final (Nhóm lần đầu, mốc tháng, Viết nhật ký, lời nhắc trên máy, Kết nối Discord) | Đủ 12 màn với mọi trạng thái, xuất và tải PDF |
+| 5 | Analytics, Crashlytics, Remote Config, FCM | Chưa làm; ghi chú bàn giao ở [`docs/stage5-handoff.md`](docs/stage5-handoff.md) | `docs/analytics-plan.md` |
 | 6 | Test plan và ARTEMIS | Chưa làm | `docs/test-plan.md`, `e2e_test/` |
 | 7 | AI code review | Chưa làm | `docs/code-review.md` |
 | 8 | Báo cáo, slide, video | Chưa làm | `report/`, `slides/` |
@@ -116,6 +116,7 @@ lib/
 | [`docs/design-traceability.md`](docs/design-traceability.md) | Màn, flow, component Lab 2 → route, widget, dữ liệu; các thay đổi so với thiết kế |
 | [`docs/architecture.md`](docs/architecture.md) | Lớp MVVM, sơ đồ, luồng F1, bảng ViewModel–service |
 | [`docs/system-architecture.md`](docs/system-architecture.md) | Kiến trúc cả hệ thống cho Final Assignment |
+| [`docs/stage5-handoff.md`](docs/stage5-handoff.md) | Bàn giao Stage 5: yêu cầu, chỗ đánh dấu sẵn trong code, thứ tự làm |
 
 ## Công cụ AI đã dùng
 

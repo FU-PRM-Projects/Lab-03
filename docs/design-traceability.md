@@ -56,8 +56,8 @@ Các section `AI · Nốt sắp xếp giúp (Gemini)`, `Làm quen & Tụi Nốt 
 | Mã | Màn hình (Figma) | Route | Screen widget | ViewModel | Nguồn dữ liệu | Trạng thái |
 |---|---|---|---|---|---|---|
 | S03b AI | Ghi nốt bước 2 · Kể tự do, đang đọc, gợi ý để xác nhận, AI nghỉ, lần đầu dùng (quyền riêng tư), gợi ý nhóm & lần đầu | `/note/new?step=2` (tab "Kể tự do") | `NoteComposerScreen` + `FreeTellPanel` | `NoteComposerViewModel`, `AiSortViewModel` | `AiService.sortNotes()` (Gemini qua Firebase AI Logic, App Check), Remote Config `ai_*`; đồng ý lần đầu lưu `users/{uid}/private/settings.aiConsent` | Planned |
-| S04 nhóm | Lần đầu tiên! (nhóm mới) | `/note/saved/:id` | `NoteSavedScreen` (biến thể `isFirst`) | `NoteSavedViewModel` | Nốt có `isFirst`, nhóm `groups/{uid}/items/{groupId}` | Planned |
-| S05 kệ | Hũ & Nhật ký · kệ "Nhóm lần đầu" | `/jar` | `JarScreen` + `GroupShelf` | `JarViewModel`, `GroupsViewModel` | Firestore `groups/{uid}/items` | Planned |
+| S04 nhóm | Lần đầu tiên! (nhóm mới) | `/note/saved/:id` | `NoteSavedScreen` (biến thể `isFirst`) | `NoteSavedViewModel` | Nốt có `isFirst`, nhóm `groups/{uid}/items/{groupId}` | Done (Nhóm lần đầu) |
+| S05 kệ | Hũ & Nhật ký · kệ "Nhóm lần đầu" | `/jar` | `JarScreen` + `GroupShelf` | `JarViewModel`, `GroupsViewModel` | Firestore `groups/{uid}/items` | Done (Nhóm lần đầu) |
 | S05e | Chi tiết nhóm (Bắt chuyện, lối vào phòng Discord) | `/jar/groups/:groupId` | `GroupDetailScreen` | `GroupDetailViewModel` | `groups/{uid}/items/{groupId}`, nốt có `groupId`; Remote Config `discord_channel_map` | Done (lối vào phòng Discord: D-30) |
 | S08b | Tập nói với Tụi Nốt (AI), vai người trong #chao-hoi | `/challenges/:id/practice?role=` | `PracticeChatScreen` | `PracticeChatViewModel` | `AiService.roleplay()` (tối đa `ai_roleplay_max_turns` lượt, không lưu đoạn chat); lỗi → câu mở lời có sẵn | Planned |
 | S08c | Sau thử thách · lời nhắn Tụi Nốt (AI), cần hỗ trợ | `/challenges/:id/message` | `ChallengeMessageScreen` | `ChallengeMessageViewModel` | `AiService.afterChallenge()` → `{message, needs_support}`; lưu lời nhắn kèm nốt | Planned |
