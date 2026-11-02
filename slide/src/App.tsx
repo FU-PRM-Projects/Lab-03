@@ -569,22 +569,6 @@ Sign out → local data cleared, back to /welcome`}</pre>
         </Page>
 
         <Page
-          dense
-          title="Deploy and operate"
-          notes="Hosting: the current release and each pr<number> preview channel were deployed by the github-actions-deploy service account from .github/workflows/deploy.yml. Rules: release history of the Firestore rules, source firebase/firestore.rules, tested with the rules emulator suite (R-01 to R-15). Firestore: challenges/dc-1-1 from the 22-card seed (D-10), read-only for users. Storage is not part of the deploy because the bucket is not provisioned."
-        >
-          <Gallery
-            cols={3}
-            height={340}
-            items={[
-              { src: 'app/console-hosting.png', alt: 'Hosting dashboard', caption: 'Hosting · release + PR previews' },
-              { src: 'app/console-rules.png', alt: 'Firestore rules and release history', caption: 'Firestore rules · releases' },
-              { src: 'app/console-firestore.png', alt: 'Firestore challenges document', caption: 'challenges/dc-1-1 (seeded)' },
-            ]}
-          />
-        </Page>
-
-        <Page
           title="ARTEMIS E2E"
           shots={['Test plan', 'Pass rates', 'Trace']}
           todo="e2e_test/ scaffold and smoke test exist; no run results yet (needs a model API key). Missing: test-plan.md."
