@@ -54,3 +54,9 @@ firebase/emulator-data/
 .firebase/
 
 .claude/
+
+# ARTEMIS (tools/artemis): khoá API và dữ liệu chạy
+tools/artemis/.env
+tools/artemis/.venv/
+tools/artemis/traces/
+tools/artemis/scratch/
