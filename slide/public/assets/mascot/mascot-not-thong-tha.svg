@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -8 96 108" width="120" height="135" role="img" aria-label="Nốt Thong Thả">
+<path d="M36 82v9M60 82v9M14 58l-8-6" stroke="#1B1D2A" stroke-width="4" stroke-linecap="round" fill="none"></path>
+<path d="M22 14H60L82 36V74Q82 82 74 82H22Q14 82 14 74V22Q14 14 22 14Z" fill="#4FB7E8"></path>
+<path d="M60 14V30Q60 36 66 36H82Z" fill="#2E8FC2"></path>
+<circle cx="36" cy="52" r="4.5" fill="#1B1D2A"></circle>
+<circle cx="58" cy="52" r="4.5" fill="#1B1D2A"></circle>
+<path d="M41 62q6 5 12 0" stroke="#1B1D2A" stroke-width="3" stroke-linecap="round" fill="none"></path>
+</svg>

@@ -1,0 +1,14 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="avatar">
+<g clip-path="url(#clip0_0_102)">
+<rect width="48" height="48" rx="24" fill="#DCE6FF"/>
+<circle id="avatar/body" cx="24" cy="48.48" r="17.76" fill="#3D4FD6"/>
+<circle id="avatar/head" cx="24" cy="18.24" r="8.64" fill="#3D4FD6"/>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_0_102">
+<rect width="48" height="48" rx="24" fill="white"/>
+</clipPath>
+</defs>
+</svg>
