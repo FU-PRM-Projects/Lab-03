@@ -126,7 +126,7 @@ void main() {
     await pickMoodAndContinue(tester, Mood.binhThuong);
     await tester.tap(find.text('Ăn đủ bữa'));
     await tester.pump();
-    await tester.tap(find.text('Bỏ qua nhật ký'));
+    await tester.tap(find.text('Bỏ qua phần kể thêm'));
     await tester.pumpAndSettle();
 
     expect(find.byType(NoteSavedScreen), findsOneWidget);
@@ -145,7 +145,7 @@ void main() {
     services.notes.nextError = const AppException(
       AppErrorKind.permissionDenied,
     );
-    await tester.tap(find.text('Bỏ qua nhật ký'));
+    await tester.tap(find.text('Bỏ qua phần kể thêm'));
     await tester.pumpAndSettle();
 
     expect(find.byType(NoteComposerScreen), findsOneWidget);

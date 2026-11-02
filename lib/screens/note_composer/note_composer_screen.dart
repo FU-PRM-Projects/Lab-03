@@ -205,7 +205,7 @@ class _NoteComposerScreenState extends ConsumerState<NoteComposerScreen> {
         ),
       if (state.step == 2)
         AppButton(
-          label: 'Bỏ qua nhật ký',
+          label: 'Bỏ qua phần kể thêm',
           variant: AppButtonVariant.text,
           expand: true,
           loading: saving,
@@ -524,7 +524,7 @@ class _JournalStep extends StatelessWidget {
       children: <Widget>[
         const _StepTitle('Viết thêm vài dòng?'),
         AppTextField(
-          label: 'Nhật ký hôm nay',
+          label: 'Kể thêm',
           helper: 'Không bắt buộc',
           controller: controller,
           minLines: 2,

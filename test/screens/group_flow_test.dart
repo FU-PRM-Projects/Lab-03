@@ -127,9 +127,9 @@ void main() {
         'Hỏi đường một chị ở tiệm sách',
       );
       await tester.pump();
-      await tester.ensureVisible(find.text('Bỏ qua nhật ký'));
+      await tester.ensureVisible(find.text('Bỏ qua phần kể thêm'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Bỏ qua nhật ký'));
+      await tester.tap(find.text('Bỏ qua phần kể thêm'));
       await tester.pumpAndSettle();
 
       expect(find.byType(NoteSavedScreen), findsOneWidget);
@@ -180,9 +180,9 @@ void main() {
       'Hỏi giờ chị bán nước',
     );
     await tester.pump();
-    await tester.ensureVisible(find.text('Bỏ qua nhật ký'));
+    await tester.ensureVisible(find.text('Bỏ qua phần kể thêm'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Bỏ qua nhật ký'));
+    await tester.tap(find.text('Bỏ qua phần kể thêm'));
     await tester.pumpAndSettle();
 
     expect(find.text('Đã vào hũ!'), findsOneWidget);

@@ -1,26 +1,28 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lab03/models/self_control.dart';
 import 'package:lab03/router/app_routes.dart';
+import 'package:lab03/screens/note_composer/note_composer_screen.dart';
 import 'package:lab03/screens/self_control/self_control_screen.dart';
 import 'package:lab03/screens/today/today_screen.dart';
+import 'package:lab03/services/nudge_service.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../support/pump.dart';
 
-/// Lời nhắc "Giờ tỉnh" (S09): hẹn theo cài đặt, chạm vào thì mở S09.
+/// Lời nhắc trên máy: "Giờ tỉnh" (S09) và "Nhắc ghi nốt buổi tối" (S12).
 void main() {
   testWidgets('đăng nhập: hẹn nhắc lúc bắt đầu khung giờ, xin quyền một lần', (
     tester,
   ) async {
     final services = await pumpApp(tester);
-    expect(services.nudges.awakeAt, 23 * 60);
+    expect(services.nudges.scheduled[Nudge.awake], 23 * 60);
     expect(services.nudges.permissionRequests, 1);
 
     await services.selfControl.save(
       const UserSettings(awakeStart: 22 * 60 + 30, awakeEnd: 30),
     );
     await tester.pumpAndSettle();
-    expect(services.nudges.awakeAt, 22 * 60 + 30);
+    expect(services.nudges.scheduled[Nudge.awake], 22 * 60 + 30);
     expect(services.nudges.permissionRequests, 1);
   });
 
@@ -39,7 +41,27 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(services.selfControl.settings.awakeEnabled, isFalse);
-    expect(services.nudges.awakeAt, isNull);
+    expect(services.nudges.scheduled[Nudge.awake], isNull);
+  });
+
+  testWidgets('nhắc buổi tối: hẹn lúc 21:30, đổi giờ thì hẹn lại', (
+    tester,
+  ) async {
+    final services = await pumpApp(tester);
+    expect(services.nudges.scheduled[Nudge.evening], 21 * 60 + 30);
+
+    await services.selfControl.save(
+      const UserSettings(eveningReminder: 20 * 60),
+    );
+    await tester.pumpAndSettle();
+    expect(services.nudges.scheduled[Nudge.evening], 20 * 60);
+  });
+
+  testWidgets('chạm nhắc buổi tối: mở S03a', (tester) async {
+    final services = await pumpApp(tester);
+    services.nudges.opened.add(Nudge.evening.route);
+    await tester.pumpAndSettle();
+    expect(find.byType(NoteComposerScreen), findsOneWidget);
   });
 
   testWidgets('chưa đăng nhập: không hẹn nhắc', (tester) async {
@@ -47,7 +69,7 @@ void main() {
       tester,
       services: TestServices(signedIn: false),
     );
-    expect(services.nudges.awakeAt, isNull);
+    expect(services.nudges.scheduled, isEmpty);
     expect(services.nudges.permissionRequests, 0);
   });
 

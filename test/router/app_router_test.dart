@@ -78,7 +78,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Đi bộ'));
     await tester.pump();
-    await tester.tap(find.text('Bỏ qua nhật ký'));
+    await tester.tap(find.text('Bỏ qua phần kể thêm'));
     await tester.pumpAndSettle();
     expect(find.byType(NoteSavedScreen), findsOneWidget);
 

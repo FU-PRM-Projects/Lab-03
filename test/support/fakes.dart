@@ -512,17 +512,18 @@ class FakeScreenGuard implements ScreenGuard {
 }
 
 class FakeNudgeService implements NudgeService {
-  /// Giờ (phút kể từ 0h) của lời nhắc "Giờ tỉnh" đang hẹn; `null` là không hẹn.
-  int? awakeAt;
+  /// Lời nhắc đang hẹn và giờ của nó (phút kể từ 0h).
+  final Map<Nudge, int> scheduled = <Nudge, int>{};
   int permissionRequests = 0;
   String? launch;
   final StreamController<String> opened = StreamController<String>.broadcast();
 
   @override
-  Future<void> scheduleAwakeNudge(int minutes) async => awakeAt = minutes;
+  Future<void> schedule(Nudge nudge, int minutes) async =>
+      scheduled[nudge] = minutes;
 
   @override
-  Future<void> cancelAwakeNudge() async => awakeAt = null;
+  Future<void> cancel(Nudge nudge) async => scheduled.remove(nudge);
 
   @override
   Future<bool> requestPermission() async {

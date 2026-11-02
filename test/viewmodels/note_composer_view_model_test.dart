@@ -93,7 +93,7 @@ void main() {
     expect(drafts.draft, isNull);
   });
 
-  test('"Bỏ qua nhật ký" lưu luôn với nhật ký rỗng', () async {
+  test('"Bỏ qua phần kể thêm" lưu luôn với nhật ký rỗng', () async {
     vm()
       ..selectMood(Mood.met)
       ..next()
