@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="5" skipped="0" tests="36" time="3725.646" timestamp="2026-11-03T01:15:27.306551+07:00" hostname="DESKTOP-581RD1H"><testcase classname="test_main_flows" name="test_t02_f1_save_a_note[run1]" time="205.599" /><testcase classname="test_main_flows" name="test_t02_f1_save_a_note[run2]" time="31.002" /><testcase classname="test_main_flows" name="test_t02_f1_save_a_note[run3]" time="173.528" /><testcase classname="test_main_flows" name="test_t04_f1_empty_note_cannot_be_saved[run1]" time="56.428" /><testcase classname="test_main_flows" name="test_t04_f1_empty_note_cannot_be_saved[run2]" time="54.658" /><testcase classname="test_main_flows" name="test_t04_f1_empty_note_cannot_be_saved[run3]" time="55.484" /><testcase classname="test_main_flows" name="test_t05_f1_leaving_asks_to_keep_draft[run1]" time="240.860" /><testcase classname="test_main_flows" name="test_t05_f1_leaving_asks_to_keep_draft[run2]" time="113.855" /><testcase classname="test_main_flows" name="test_t05_f1_leaving_asks_to_keep_draft[run3]" time="110.718"><failure message="AssertionError: 'TẠI MÀN HÔM NAY ĐÃ BẤM \'GHI NỐT\', CHỌN GHI MỘT ĐIỀU LÀM ĐƯỢC (\'CHIẾN THẮNG NHỎ\' → CHIP \'ĐI BỘ\', Ô NỘI DUNG CÓ CHỮ), RỒI BẤM BACK CỦA ANDROID. HỘP THOẠI HỎI GIỮ NHÁP &quot;GIỮ NỐT ĐANG GHI?&quot; HIỆN RA VÀ ĐÃ CHỌN \'BỎ\' ĐỂ BỎ NHÁP, QUAY VỀ MÀN HÔM NAY. DIALOG' (trace a4abb912-7656-45f6-910c-3e0851716fd0)&#10;assert False&#10; +  where False = &lt;built-in method startswith of str object at 0x000002D84E1351C0&gt;('DIALOG')&#10;[+1 more line; full report in element text]">ask = &lt;function ask.&lt;locals&gt;.run at 0x000002D850AAFCC0&gt;
+
+    async def test_t05_f1_leaving_asks_to_keep_draft(ask) -&gt; None:
+        """F1 nhánh lỗi: thoát giữa chừng phải hỏi có giữ nháp không."""
+        answer, result = await ask(
+            "Ở màn Hôm nay, bấm 'Ghi nốt', chọn ghi một điều làm được, gõ vài chữ vào ô nội "
+            "dung rồi bấm nút Back của Android. Nếu hiện hộp thoại hỏi giữ nháp thì trả lời "
+            "DIALOG (và chọn bỏ nháp), nếu thoát luôn không hỏi thì trả lời NO_DIALOG." + RULES,
+            "DIALOG hoặc NO_DIALOG",
+        )
+&gt;       assert answer.startswith("DIALOG"), f"{answer!r} (trace {result.trace_id})"
+E       AssertionError: 'TẠI MÀN HÔM NAY ĐÃ BẤM \'GHI NỐT\', CHỌN GHI MỘT ĐIỀU LÀM ĐƯỢC (\'CHIẾN THẮNG NHỎ\' → CHIP \'ĐI BỘ\', Ô NỘI DUNG CÓ CHỮ), RỒI BẤM BACK CỦA ANDROID. HỘP THOẠI HỎI GIỮ NHÁP "GIỮ NỐT ĐANG GHI?" HIỆN RA VÀ ĐÃ CHỌN \'BỎ\' ĐỂ BỎ NHÁP, QUAY VỀ MÀN HÔM NAY. DIALOG' (trace a4abb912-7656-45f6-910c-3e0851716fd0)
+E       assert False
+E        +  where False = &lt;built-in method startswith of str object at 0x000002D84E1351C0&gt;('DIALOG')
+E        +    where &lt;built-in method startswith of str object at 0x000002D84E1351C0&gt; = 'TẠI MÀN HÔM NAY ĐÃ BẤM \'GHI NỐT\', CHỌN GHI MỘT ĐIỀU LÀM ĐƯỢC (\'CHIẾN THẮNG NHỎ\' → CHIP \'ĐI BỘ\', Ô NỘI DUNG CÓ C... ANDROID. HỘP THOẠI HỎI GIỮ NHÁP "GIỮ NỐT ĐANG GHI?" HIỆN RA VÀ ĐÃ CHỌN \'BỎ\' ĐỂ BỎ NHÁP, QUAY VỀ MÀN HÔM NAY. DIALOG'.startswith
+
+test_main_flows.py:61: AssertionError</failure></testcase><testcase classname="test_main_flows" name="test_t06_f1_offline_note_is_kept_on_device[run1]" time="288.704" /><testcase classname="test_main_flows" name="test_t06_f1_offline_note_is_kept_on_device[run2]" time="263.564" /><testcase classname="test_main_flows" name="test_t06_f1_offline_note_is_kept_on_device[run3]" time="420.580"><failure message="artemis_client.errors.TaskTimeoutError: Task d37bc91b-30d4-4d96-9127-c81502cb226e did not finish within 420 seconds">ask = &lt;function ask.&lt;locals&gt;.run at 0x000002D850A3C880&gt;
+
+    async def test_t06_f1_offline_note_is_kept_on_device(ask) -&gt; None:
+        """F1 nhánh lỗi mạng: mất mạng thì lưu trên máy và báo cho người dùng biết."""
+        subprocess.run([ADB, "shell", "cmd", "connectivity", "airplane-mode", "enable"], check=False)
+        try:
+&gt;           answer, result = await ask(
+                "Máy đang mất mạng. Ở màn Hôm nay, bấm 'Ghi nốt', chọn ghi một điều làm được, "
+                f"tâm trạng bất kỳ, gõ '{NOTE_TEXT}' rồi lưu. Trả lời OFFLINE_BANNER nếu app "
+                "báo nốt được lưu trên máy / đang chờ mạng (banner hoặc thông báo), SAVED nếu "
+                "lưu như bình thường không nhắc gì đến mạng, FAILED nếu không lưu được." + RULES,
+                "OFFLINE_BANNER, SAVED hoặc FAILED",
+            )
+
+test_main_flows.py:68: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+conftest.py:123: in run
+    result = await client.run(
+.venv\Lib\site-packages\artemis_client\client.py:328: in run
+    return await self.wait_for_task(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;artemis_client.client.ArtemisClient object at 0x000002D850A73380&gt;
+task_id = 'd37bc91b-30d4-4d96-9127-c81502cb226e', timeout = 420
+poll_interval = None
+
+    async def wait_for_task(
+        self,
+        task_id: str,
+        *,
+        timeout: float = 1800.0,
+        poll_interval: float | None = None,
+    ) -&gt; TaskResult:
+        """Wait until a task reaches a terminal state."""
+        if timeout &lt;= 0:
+            raise ValueError("timeout must be greater than zero")
+        interval = self.poll_interval if poll_interval is None else float(poll_interval)
+        if interval &lt;= 0:
+            raise ValueError("poll_interval must be greater than zero")
+    
+        started = time.monotonic()
+        while True:
+            result = await self.get_task(task_id)
+            if result.done:
+                return result
+            elapsed = time.monotonic() - started
+            if elapsed &gt;= timeout:
+&gt;               raise TaskTimeoutError(task_id, timeout)
+E               artemis_client.errors.TaskTimeoutError: Task d37bc91b-30d4-4d96-9127-c81502cb226e did not finish within 420 seconds
+
+.venv\Lib\site-packages\artemis_client\client.py:292: TaskTimeoutError</failure></testcase><testcase classname="test_main_flows" name="test_t03_jar_open_and_delete_note[run1]" time="255.965" /><testcase classname="test_main_flows" name="test_t03_jar_open_and_delete_note[run2]" time="281.453" /><testcase classname="test_main_flows" name="test_t03_jar_open_and_delete_note[run3]" time="391.351" /><testcase classname="test_main_flows" name="test_t07_f2_self_control_screen_opens[run1]" time="51.540" /><testcase classname="test_main_flows" name="test_t07_f2_self_control_screen_opens[run2]" time="38.117" /><testcase classname="test_main_flows" name="test_t07_f2_self_control_screen_opens[run3]" time="43.071" /><testcase classname="test_main_flows" name="test_t08_f2_breathing_starts[run1]" time="19.765" /><testcase classname="test_main_flows" name="test_t08_f2_breathing_starts[run2]" time="21.657" /><testcase classname="test_main_flows" name="test_t08_f2_breathing_starts[run3]" time="27.891" /><testcase classname="test_main_flows" name="test_t09_f3_open_a_challenge_and_postpone[run1]" time="45.604" /><testcase classname="test_main_flows" name="test_t09_f3_open_a_challenge_and_postpone[run2]" time="50.440" /><testcase classname="test_main_flows" name="test_t09_f3_open_a_challenge_and_postpone[run3]" time="81.941" /><testcase classname="test_main_flows" name="test_t10_four_tabs_switch[run1]" time="33.048" /><testcase classname="test_main_flows" name="test_t10_four_tabs_switch[run2]" time="40.231" /><testcase classname="test_main_flows" name="test_t10_four_tabs_switch[run3]" time="35.297" /><testcase classname="test_main_flows" name="test_t11_settings_show_feature_flags[run1]" time="18.770" /><testcase classname="test_main_flows" name="test_t11_settings_show_feature_flags[run2]" time="14.669" /><testcase classname="test_main_flows" name="test_t11_settings_show_feature_flags[run3]" time="12.748" /><testcase classname="test_main_flows" name="test_t12_native_home_and_return[run1]" time="42.245"><failure message="AssertionError: 'OTHER' (trace d2cb03d5-e99e-40ad-87e8-0030be39aa6f)&#10;assert 'TODAY' in 'OTHER'">ask = &lt;function ask.&lt;locals&gt;.run at 0x000002D851B30670&gt;
+
+    async def test_t12_native_home_and_return(ask) -&gt; None:
+        """Android gốc: Home rồi mở lại app từ launcher, trạng thái vẫn còn."""
+        answer, result = await ask(
+            "Bấm nút Home của Android để ra màn hình chính, kéo thanh thông báo xuống rồi "
+            "đóng lại, sau đó mở lại app Nốt (com.quanphungg.lab03). Trả lời TODAY nếu app "
+            "mở lại ở màn có tiêu đề 'Hôm nay bạn làm được gì?', WELCOME nếu bị đưa về màn "
+            "đăng nhập, ngược lại OTHER." + RULES,
+            "TODAY, WELCOME hoặc OTHER",
+            locked=False,
+        )
+&gt;       assert "TODAY" in answer, f"{answer!r} (trace {result.trace_id})"
+E       AssertionError: 'OTHER' (trace d2cb03d5-e99e-40ad-87e8-0030be39aa6f)
+E       assert 'TODAY' in 'OTHER'
+
+test_main_flows.py:173: AssertionError</failure></testcase><testcase classname="test_main_flows" name="test_t12_native_home_and_return[run2]" time="69.767"><failure message="AssertionError: 'OTHER' (trace 8d005c80-4c75-4e10-8eea-aebc9b74a852)&#10;assert 'TODAY' in 'OTHER'">ask = &lt;function ask.&lt;locals&gt;.run at 0x000002D851B30E00&gt;
+
+    async def test_t12_native_home_and_return(ask) -&gt; None:
+        """Android gốc: Home rồi mở lại app từ launcher, trạng thái vẫn còn."""
+        answer, result = await ask(
+            "Bấm nút Home của Android để ra màn hình chính, kéo thanh thông báo xuống rồi "
+            "đóng lại, sau đó mở lại app Nốt (com.quanphungg.lab03). Trả lời TODAY nếu app "
+            "mở lại ở màn có tiêu đề 'Hôm nay bạn làm được gì?', WELCOME nếu bị đưa về màn "
+            "đăng nhập, ngược lại OTHER." + RULES,
+            "TODAY, WELCOME hoặc OTHER",
+            locked=False,
+        )
+&gt;       assert "TODAY" in answer, f"{answer!r} (trace {result.trace_id})"
+E       AssertionError: 'OTHER' (trace 8d005c80-4c75-4e10-8eea-aebc9b74a852)
+E       assert 'TODAY' in 'OTHER'
+
+test_main_flows.py:173: AssertionError</failure></testcase><testcase classname="test_main_flows" name="test_t12_native_home_and_return[run3]" time="41.502"><failure message="AssertionError: 'PRESSED HOME, OPENED AND CLOSED THE NOTIFICATION SHADE, THEN RELAUNCHED COM.QUANPHUNGG.LAB03. THE APP RESTORED TO ITS PREVIOUS SCREEN — THE SETTINGS PAGE (&quot;CÀI ĐẶT&quot;, NOT LOGGED OUT) — WHICH IS NEITHER THE &quot;HÔM NAY BẠN LÀM ĐƯỢC GÌ?&quot; SCREEN NOR THE LOGIN SCREEN. ANSWER: OTHER' (trace 5cb53c67-879a-4b20-b8cd-f7a906ff2a84)&#10;[+1 more line; full report in element text]">ask = &lt;function ask.&lt;locals&gt;.run at 0x000002D851B317A0&gt;
+
+    async def test_t12_native_home_and_return(ask) -&gt; None:
+        """Android gốc: Home rồi mở lại app từ launcher, trạng thái vẫn còn."""
+        answer, result = await ask(
+            "Bấm nút Home của Android để ra màn hình chính, kéo thanh thông báo xuống rồi "
+            "đóng lại, sau đó mở lại app Nốt (com.quanphungg.lab03). Trả lời TODAY nếu app "
+            "mở lại ở màn có tiêu đề 'Hôm nay bạn làm được gì?', WELCOME nếu bị đưa về màn "
+            "đăng nhập, ngược lại OTHER." + RULES,
+            "TODAY, WELCOME hoặc OTHER",
+            locked=False,
+        )
+&gt;       assert "TODAY" in answer, f"{answer!r} (trace {result.trace_id})"
+E       AssertionError: 'PRESSED HOME, OPENED AND CLOSED THE NOTIFICATION SHADE, THEN RELAUNCHED COM.QUANPHUNGG.LAB03. THE APP RESTORED TO ITS PREVIOUS SCREEN — THE SETTINGS PAGE ("CÀI ĐẶT", NOT LOGGED OUT) — WHICH IS NEITHER THE "HÔM NAY BẠN LÀM ĐƯỢC GÌ?" SCREEN NOR THE LOGIN SCREEN. ANSWER: OTHER' (trace 5cb53c67-879a-4b20-b8cd-f7a906ff2a84)
+E       assert 'TODAY' in 'PRESSED HOME, OPENED AND CLOSED THE NOTIFICATION SHADE, THEN RELAUNCHED COM.QUANPHUNGG.LAB03. THE APP RESTORED TO ITS...CÀI ĐẶT", NOT LOGGED OUT) — WHICH IS NEITHER THE "HÔM NAY BẠN LÀM ĐƯỢC GÌ?" SCREEN NOR THE LOGIN SCREEN. ANSWER: OTHER'
+
+test_main_flows.py:173: AssertionError</failure></testcase><testcase classname="test_smoke" name="test_app_opens_to_a_known_screen[run1]" time="51.724" /><testcase classname="test_smoke" name="test_app_opens_to_a_known_screen[run2]" time="21.895" /><testcase classname="test_smoke" name="test_app_opens_to_a_known_screen[run3]" time="19.774" /></testsuite></testsuites>
