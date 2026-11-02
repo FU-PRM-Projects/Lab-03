@@ -39,6 +39,8 @@ concurrency:
 permissions:
   contents: read
   pull-requests: write
+  # action-hosting-deploy tạo check run cho bản preview.
+  checks: write
 
 env:
   FLUTTER_VERSION: 3.47.2
