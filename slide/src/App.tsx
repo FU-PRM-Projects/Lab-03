@@ -33,6 +33,25 @@ function Compare({ screen, diffs }: { screen: string; diffs: string[] }) {
   );
 }
 
+type ShotImage = { src: string; alt: string; crop?: boolean; wide?: boolean; caption?: string };
+
+function ShotImages({ images }: { images: ShotImage[] }) {
+  return (
+    <div className="shots">
+      {images.map(({ src, alt, crop, wide, caption }) => (
+        <figure key={src}>
+          <img
+            className={crop ? 'crop' : wide ? 'wide' : undefined}
+            src={`${import.meta.env.BASE_URL}${src}`}
+            alt={alt}
+          />
+          {caption && <figcaption>{caption}</figcaption>}
+        </figure>
+      ))}
+    </div>
+  );
+}
+
 function Page({
   title,
   line,
@@ -46,7 +65,7 @@ function Page({
   line?: string;
   todo?: string;
   shots?: string[];
-  images?: { src: string; alt: string; crop?: boolean; wide?: boolean; caption?: string }[];
+  images?: ShotImage[];
   notes: string;
   children?: ReactNode;
 }) {
@@ -54,27 +73,23 @@ function Page({
     <Slide notes={notes}>
       <h2>{title}</h2>
       {line && <p className="line">{line}</p>}
-      {children}
-      {shots && (
-        <div className="shots">
-          {shots.map((label) => (
-            <Shot key={label} label={label} />
-          ))}
+      {images && children ? (
+        <div className="split">
+          <div className="side-text">{children}</div>
+          <ShotImages images={images} />
         </div>
-      )}
-      {images && (
-        <div className="shots">
-          {images.map(({ src, alt, crop, wide, caption }) => (
-            <figure key={src}>
-              <img
-                className={crop ? 'crop' : wide ? 'wide' : undefined}
-                src={`${import.meta.env.BASE_URL}${src}`}
-                alt={alt}
-              />
-              {caption && <figcaption>{caption}</figcaption>}
-            </figure>
-          ))}
-        </div>
+      ) : (
+        <>
+          {children}
+          {shots && (
+            <div className="shots">
+              {shots.map((label) => (
+                <Shot key={label} label={label} />
+              ))}
+            </div>
+          )}
+          {images && <ShotImages images={images} />}
+        </>
       )}
       {todo && <p className="todo">{todo}</p>}
     </Slide>
@@ -439,7 +454,7 @@ FA-SVC  Logging event: name=note_saved
         <Page
           title="Crashlytics"
           line="Errors are recorded, and users still see a message."
-          images={[{ src: 'app/crash-test.png', alt: 'Settings: test crash sent', wide: true }]}
+          images={[{ src: 'app/crash-test.png', alt: 'Settings: test crash sent' }]}
           todo="Dashboard not captured yet. The non-fatal path (note save failure) is coded but was not triggered on the device."
           notes="Test crash from S12 Khu demo Firebase (dev builds only). The report is enqueued and sent through Google DataTransport. recordError is also called when saving a note fails and when profile creation fails. Evidence: adb logcat with log.tag.FirebaseCrashlytics set to DEBUG."
         >
