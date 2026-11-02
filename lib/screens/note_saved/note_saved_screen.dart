@@ -108,7 +108,7 @@ class _SavedContent extends StatelessWidget {
     final (title, subtitle) = milestone
         ? (
             'Mốc ${summary.milestone} nốt!',
-            'Nốt thứ ${summary.monthCount} tháng này.',
+            'Tụi Nốt mang về nhãn dán tháng $month.',
           )
         : first
         ? ('Lần đầu tiên!', 'Nhóm “${group!.name}” có thêm một nấc.')
@@ -135,7 +135,10 @@ class _SavedContent extends StatelessWidget {
                   const SizedBox(height: AppSpace.s16),
                 ],
                 const Spacer(),
-                _Celebration(jarNotes: summary.jarNotes),
+                if (milestone)
+                  _MilestoneCelebration(month: month)
+                else
+                  _Celebration(jarNotes: summary.jarNotes),
                 const SizedBox(height: AppSpace.s16),
                 Semantics(
                   header: true,
@@ -157,35 +160,35 @@ class _SavedContent extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: AppSpace.s16),
-                // Tờ nốt 220 × 120 nghiêng 3° như vừa thả vào hũ.
-                Center(
-                  child: Transform.rotate(
-                    angle: 3 * math.pi / 180,
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        minWidth: 220,
-                        maxWidth: 220,
-                        minHeight: 120,
-                      ),
-                      child: IntrinsicHeight(
-                        child: NoteTile(
-                          type: note.type,
-                          title: note.title,
-                          dateLabel: dateLabel,
+                if (milestone)
+                  _StickerCollection(summary: summary)
+                else ...<Widget>[
+                  // Tờ nốt 220 × 120 nghiêng 3° như vừa thả vào hũ.
+                  Center(
+                    child: Transform.rotate(
+                      angle: 3 * math.pi / 180,
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(
+                          minWidth: 220,
+                          maxWidth: 220,
+                          minHeight: 120,
+                        ),
+                        child: IntrinsicHeight(
+                          child: NoteTile(
+                            type: note.type,
+                            title: note.title,
+                            dateLabel: dateLabel,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: AppSpace.s16),
-                if (milestone)
-                  Center(
-                    child: MilestoneSticker(label: 'Th$month', unlocked: true),
-                  )
-                else if (first)
-                  _GroupProgress(name: group!.name, count: summary.groupCount)
-                else
-                  _MilestoneProgress(summary: summary, month: month),
+                  const SizedBox(height: AppSpace.s16),
+                  if (first)
+                    _GroupProgress(name: group!.name, count: summary.groupCount)
+                  else
+                    _MilestoneProgress(summary: summary, month: month),
+                ],
                 const Spacer(),
                 const SizedBox(height: AppSpace.s16),
                 if (milestone) ...<Widget>[
@@ -234,6 +237,91 @@ class _SavedContent extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Figma S04 · đạt mốc tháng: mascot Thong Thả bên trái nhãn dán tháng cỡ
+/// 108.8 (cách 12, căn đáy), confetti 240 × 140 phủ phía trên.
+class _MilestoneCelebration extends StatelessWidget {
+  const _MilestoneCelebration({required this.month});
+
+  final int month;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: <Widget>[
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              spacing: AppSpace.s12,
+              children: <Widget>[
+                const Mascot(state: MascotState.thongTha, size: 97.2),
+                MilestoneSticker(month: month, unlocked: true, size: 108.8),
+              ],
+            ),
+            Positioned(
+              left: -9.6,
+              top: -28,
+              child: IgnorePointer(
+                child: SvgPicture.asset(
+                  'assets/illustrations/confetti.svg',
+                  width: 240,
+                  height: 140,
+                  excludeFromSemantics: true,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Figma `Bộ sưu tập`: khối primary-container bo 16, đệm 16; các tháng đã có
+/// nhãn dán rồi ô "?" của tháng sau.
+class _StickerCollection extends StatelessWidget {
+  const _StickerCollection({required this.summary});
+
+  final SavedNoteSummary summary;
+
+  @override
+  Widget build(BuildContext context) {
+    final stickers = <Widget>[
+      for (final m in summary.stickerMonths)
+        MilestoneSticker(month: m.month, unlocked: true),
+      MilestoneSticker(month: summary.nextStickerMonth.month, unlocked: false),
+    ];
+    final full = stickers.length == 4;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primaryContainer,
+        borderRadius: BorderRadius.circular(AppRadius.card),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpace.s16),
+        child: Row(
+          // Đủ 4 ô thì dàn đều như Figma; ít hơn thì gom giữa.
+          mainAxisAlignment: full
+              ? MainAxisAlignment.spaceBetween
+              : MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: full ? 0 : AppSpace.s12,
+          children: <Widget>[
+            for (final sticker in stickers)
+              Flexible(
+                child: FittedBox(fit: BoxFit.scaleDown, child: sticker),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }

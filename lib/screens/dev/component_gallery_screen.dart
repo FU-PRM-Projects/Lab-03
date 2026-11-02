@@ -208,8 +208,8 @@ class _ComponentGalleryScreenState extends State<ComponentGalleryScreen> {
               runSpacing: AppSpace.s12,
               crossAxisAlignment: WrapCrossAlignment.center,
               children: <Widget>[
-                const MilestoneSticker(label: 'Th9', unlocked: true),
-                const MilestoneSticker(label: 'Th10', unlocked: false),
+                const MilestoneSticker(month: 9, unlocked: true),
+                const MilestoneSticker(month: 10, unlocked: false),
                 ShortcutButton(
                   iconAsset: 'assets/icons/hand-stop.svg',
                   caption: 'ghi 1 lần tự chủ',
