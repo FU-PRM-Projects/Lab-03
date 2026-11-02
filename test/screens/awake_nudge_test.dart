@@ -28,8 +28,14 @@ void main() {
     final services = await pumpApp(tester);
     await tester.tap(find.bySemanticsLabel('Dừng lại, ghi 1 lần tự chủ'));
     await tester.pumpAndSettle();
-    await tester.scrollUntilVisible(find.text('Giờ tỉnh'), 100);
-    await tester.tap(find.text('Giờ tỉnh'));
+    await tester.scrollUntilVisible(
+      find.byType(Switch),
+      100,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.byType(Switch));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(Switch));
     await tester.pumpAndSettle();
 
     expect(services.selfControl.settings.awakeEnabled, isFalse);
