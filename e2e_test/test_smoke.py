@@ -17,7 +17,7 @@ GOAL = (
 
 
 async def test_app_opens_to_a_known_screen(
-    client: ArtemisClient, app_id: str, attempt: int
+    client: ArtemisClient, app_id: str, attempt: int, reported
 ) -> None:
     result = await client.run(
         GOAL,
@@ -27,8 +27,8 @@ async def test_app_opens_to_a_known_screen(
     )
 
     assert result.succeeded, f"[run{attempt}] {result.error or result.status}"
-    reported = str(result.output or "").upper()
-    assert "WELCOME" in reported or "TODAY" in reported, (
-        f"[run{attempt}] ARTEMIS báo về giá trị lạ: {result.output!r} "
+    answer = (await reported(result)).upper()
+    assert "WELCOME" in answer or "TODAY" in answer, (
+        f"[run{attempt}] ARTEMIS báo về giá trị lạ: {answer!r} "
         f"(trace {result.trace_id})"
     )

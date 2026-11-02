@@ -146,8 +146,8 @@
       // Summarizes intermediate steps in background without blocking the runner,
       // replacing images only after strictly objective, high-density summaries are ready.
       "step_summarizer": {
-        "enabled": true, // Whether background step summarization is active
-        "model": "deepseek/deepseek-v4.1-flash-1017", // Lightweight model for fast background inference
+        "enabled": false, // Off: the summarizer only supports Google models and this setup uses OpenRouter only
+        "model": "deepseek/deepseek-v4.1-flash-1017", // Unused while disabled
         "prune_history_xml": true // Prune outdated heavy XML trees from historical steps
       }
     },

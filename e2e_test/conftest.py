@@ -13,7 +13,8 @@ Biến môi trường:
 from __future__ import annotations
 
 import os
-from typing import Literal, cast
+from collections.abc import Awaitable, Callable
+from typing import Any, Literal, cast
 
 import pytest
 from artemis_client import ArtemisClient
@@ -87,3 +88,46 @@ async def server_ready(client: ArtemisClient) -> None:
 @pytest.fixture
 def app_id() -> str:
     return APP_ID
+
+
+@pytest.fixture
+def reported(client: ArtemisClient) -> Callable[[Any], Awaitable[str]]:
+    """Giá trị ARTEMIS báo về qua `report_task_status` (bước cuối của phiên).
+
+    Server hiện không điền `TaskResult.output`; câu trả lời nằm ở trường
+    `explanation` của bước cuối trong `/api/sessions/{id}/steps`.
+    """
+
+    async def read(result: Any) -> str:
+        steps = await client._request(  # noqa: SLF001 - client chưa có API công khai cho bước
+            "GET", f"/api/sessions/{result.task_id}/steps"
+        )
+        for step in reversed(steps if isinstance(steps, list) else []):
+            action = step.get("action_taken") or {}
+            if action.get("action") == "report_task_status":
+                return str((action.get("args") or {}).get("explanation") or "")
+        return str(result.output or "")
+
+    return read
+
+
+@pytest.fixture
+def ask(client: ArtemisClient, app_id: str, attempt: int, reported):
+    """Gửi một mục tiêu cho ARTEMIS và trả về (câu trả lời viết hoa, kết quả).
+
+    Test khẳng định trên câu trả lời (giá trị ARTEMIS báo), không chỉ trạng thái.
+    `locked=False` cho ca cần thao tác ngoài app (nút Home, thanh thông báo).
+    """
+
+    async def run(goal: str, expected: str, *, locked: bool = True, timeout: int = 420):
+        result = await client.run(
+            goal,
+            locked_app_package=app_id if locked else None,
+            expected_output=expected,
+            timeout=timeout,
+        )
+        assert result.succeeded, f"[run{attempt}] {result.error or result.status}"
+        answer = (await reported(result)).strip().upper()
+        return answer, result
+
+    return run
