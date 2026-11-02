@@ -156,6 +156,9 @@ class ChallengeDetailViewModel extends Notifier<ChallengeDetailState> {
               ChallengeOutcome.smooth => 'Mình đã chào ở phòng chung.',
               ChallengeOutcome.notAsHoped => 'Mình đã ghé phòng chung.',
             },
+            // Thẻ của riêng mình: thử một chút cũng là làm.
+            (_, ChallengeOutcome.notAsHoped) when challenge.mine =>
+              'Mình đã bắt đầu rồi.',
             // "Không như ý" vẫn tính là dũng cảm (F3).
             (false, ChallengeOutcome.notAsHoped) => 'Mình đã mở lời.',
             // Dừng sớm vẫn ghi (P3).
@@ -199,6 +202,8 @@ class ChallengeDetailViewModel extends Notifier<ChallengeDetailState> {
   }
 
   Future<void> _markCompleted(Challenge challenge) async {
+    // Thẻ tự thêm không có cấp: nốt đã ghi là đủ, hôm sau làm lại được.
+    if (challenge.mine) return;
     try {
       final catalog = ChallengeDeck.available(
         await _challenges.catalog(),

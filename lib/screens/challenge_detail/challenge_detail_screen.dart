@@ -154,10 +154,12 @@ class _Detail extends StatelessWidget {
                 _ChallengeHeader(challenge: challenge),
                 if (challenge.tip.isNotEmpty)
                   Text(challenge.tip, style: theme.textTheme.bodyLarge),
-                _AnxietyScale(
-                  value: state.anxiety,
-                  onChanged: viewModel.setAnxiety,
-                ),
+                // Điều tốt tự thêm là việc nhỏ, không cần chấm hồi hộp.
+                if (!challenge.mine)
+                  _AnxietyScale(
+                    value: state.anxiety,
+                    onChanged: viewModel.setAnxiety,
+                  ),
                 if (challenge.script.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: AppSpace.s12),
@@ -229,11 +231,16 @@ class _Detail extends StatelessWidget {
                 ] else ...<Widget>[
                   // Chấm hồi hộp không bắt buộc: "Xong rồi" luôn bật.
                   AppButton(label: 'Xong rồi', expand: true, onPressed: onDone),
+                  // Thẻ tự thêm không có cấp để "dễ hơn": chỉ có "Để mai".
                   AppButton(
-                    label: 'Đổi thẻ dễ hơn',
+                    label: challenge.mine ? 'Để mai' : 'Đổi thẻ dễ hơn',
                     variant: AppButtonVariant.text,
                     expand: true,
-                    onPressed: onEasier,
+                    onPressed: challenge.mine
+                        ? () => context.canPop()
+                              ? context.pop()
+                              : context.go(AppRoutes.challenges)
+                        : onEasier,
                   ),
                 ],
               ],

@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/challenge.dart';
 import '../models/note.dart';
+import '../models/note_type.dart';
+import '../services/app_exception.dart';
 import '../services/challenge_repository.dart';
 import '../services/clock.dart';
 import '../services/note_repository.dart';
@@ -20,7 +22,14 @@ class DeckCard {
     required this.levelDone,
     required this.levelTotal,
     this.easier = false,
+    this.doneToday = false,
   });
+
+  /// Thẻ tự thêm: không có cấp, nên không có thanh tiến độ.
+  const DeckCard.mine(this.challenge, {this.doneToday = false})
+    : levelDone = 0,
+      levelTotal = 0,
+      easier = false;
 
   final Challenge challenge;
 
@@ -31,8 +40,13 @@ class DeckCard {
   /// Thẻ dễ hơn vừa chọn từ "Đổi thẻ dễ hơn" ở S08.
   final bool easier;
 
-  /// "Dũng cảm · cấp 2".
-  String get header => '${challenge.topic.label} · cấp ${challenge.level}';
+  /// Thẻ tự thêm đã làm hôm nay; vẫn làm lại được, nằm cuối chồng thẻ.
+  final bool doneToday;
+
+  /// "Dũng cảm · cấp 2"; thẻ tự thêm là "Của bạn · Dũng cảm".
+  String get header => challenge.mine
+      ? 'Của bạn · ${challenge.topic.label}'
+      : '${challenge.topic.label} · cấp ${challenge.level}';
 }
 
 /// Dựng chồng thẻ từ kho thẻ, tiến độ và tâm trạng hôm qua (hàm thuần, để
@@ -48,11 +62,16 @@ abstract final class ChallengeDeck {
   /// Thẻ chưa làm ở cấp hiện tại của từng chủ đề. Làm hết một cấp thì lấy cấp
   /// kế tiếp. Hôm qua tâm trạng thấp thì chủ đề Vận động lên trước (nhẹ hơn
   /// mở lời với người lạ).
+  ///
+  /// Thẻ tự thêm ([mine]) chưa làm hôm nay nằm ngay sau thẻ dễ hơn; thẻ đã
+  /// làm hôm nay ([doneToday]) nằm cuối, vẫn làm lại được.
   static List<DeckCard> build({
     required List<Challenge> catalog,
     required Map<ChallengeTopic, ChallengeProgress> progress,
     required bool lowYesterday,
     Challenge? easier,
+    List<Challenge> mine = const <Challenge>[],
+    Set<String> doneToday = const <String>{},
   }) {
     final topics = lowYesterday
         ? <ChallengeTopic>[ChallengeTopic.vanDong, ChallengeTopic.dungCam]
@@ -72,6 +91,9 @@ abstract final class ChallengeDeck {
         ),
       );
     }
+    cards.addAll(
+      mine.where((c) => !doneToday.contains(c.id)).map(DeckCard.mine),
+    );
     for (final topic in topics) {
       final p = progress[topic] ?? const ChallengeProgress();
       final inTopic = catalog.where((c) => c.topic == topic).toList();
@@ -93,6 +115,11 @@ abstract final class ChallengeDeck {
         break;
       }
     }
+    cards.addAll(
+      mine
+          .where((c) => doneToday.contains(c.id))
+          .map((c) => DeckCard.mine(c, doneToday: true)),
+    );
     return cards;
   }
 
@@ -149,6 +176,8 @@ class ChallengesViewModel extends Notifier<ViewState<List<DeckCard>>> {
   Map<ChallengeTopic, ChallengeProgress>? _progress;
   bool? _lowYesterday;
   Challenge? _easier;
+  List<Challenge>? _mine;
+  Set<String> _doneToday = const <String>{};
 
   ChallengeRepository get _challenges => ref.read(challengeRepositoryProvider);
 
@@ -159,6 +188,8 @@ class ChallengesViewModel extends Notifier<ViewState<List<DeckCard>>> {
     _progress = null;
     _lowYesterday = null;
     _easier = null;
+    _mine = null;
+    _doneToday = const <String>{};
 
     final now = ref.read(clockProvider).now();
     final yesterday = Dates.startOfYesterday(now);
@@ -167,6 +198,17 @@ class ChallengesViewModel extends Notifier<ViewState<List<DeckCard>>> {
         _progress = progress;
         _emit();
       }, onError: _onError),
+      _challenges.watchMine().listen(
+        (mine) {
+          _mine = mine;
+          _emit();
+        },
+        // Thẻ tự thêm chỉ là phần thêm: lỗi thì vẫn có chồng thẻ của kho.
+        onError: (Object _) {
+          _mine = const <Challenge>[];
+          _emit();
+        },
+      ),
       ref
           .read(noteRepositoryProvider)
           .watchSince(yesterday)
@@ -177,6 +219,11 @@ class ChallengesViewModel extends Notifier<ViewState<List<DeckCard>>> {
                     Dates.sameDay(n.createdAt, yesterday) &&
                     (n.mood?.isLow ?? false),
               );
+              _doneToday = <String>{
+                for (final Note n in notes)
+                  if (Dates.sameDay(n.createdAt, now) && n.challenge != null)
+                    n.challenge!.challengeId,
+              };
               _emit();
             },
             // Tâm trạng hôm qua chỉ để sắp thứ tự; lỗi thì dùng thứ tự mặc định.
@@ -226,12 +273,17 @@ class ChallengesViewModel extends Notifier<ViewState<List<DeckCard>>> {
     final catalog = _catalog;
     final progress = _progress;
     final low = _lowYesterday;
-    if (catalog == null || progress == null || low == null) return;
+    final mine = _mine;
+    if (catalog == null || progress == null || low == null || mine == null) {
+      return;
+    }
     final cards = ChallengeDeck.build(
       catalog: catalog,
       progress: progress,
       lowYesterday: low,
       easier: _easier,
+      mine: mine,
+      doneToday: _doneToday,
     );
     state = cards.isEmpty
         ? const Empty<List<DeckCard>>()
@@ -259,4 +311,64 @@ class ChallengesViewModel extends Notifier<ViewState<List<DeckCard>>> {
     _easier = null;
     _emit();
   }
+
+  /// Thêm một điều tốt nhỏ của riêng người dùng. Ném `AppException` khi tên
+  /// trống hoặc quá dài, hoặc đã đủ [CustomChallengeLimits.count] thẻ.
+  Future<Challenge> addMine({
+    required ChallengeTopic topic,
+    required String title,
+    required int minutes,
+  }) {
+    final trimmed = title.trim();
+    if (trimmed.isEmpty || trimmed.length > CustomChallengeLimits.titleMax) {
+      throw const AppException(
+        AppErrorKind.invalidInput,
+        code: 'challenge-title',
+      );
+    }
+    if ((_mine?.length ?? 0) >= CustomChallengeLimits.count) {
+      throw const AppException(
+        AppErrorKind.invalidInput,
+        code: 'challenge-limit',
+      );
+    }
+    return _challenges.addMine(
+      topic: topic,
+      title: trimmed,
+      minutes: minutes.clamp(1, CustomChallengeLimits.minutesMax),
+    );
+  }
+
+  Future<void> deleteMine(String id) => _challenges.deleteMine(id);
+
+  /// Lời nhắn dưới ô tên khi [addMine] không thành công.
+  static String addError(Object error) => switch (error) {
+    AppException(code: 'challenge-limit') =>
+      'Bạn đã có ${CustomChallengeLimits.count} thẻ riêng. '
+          'Xoá bớt một thẻ để thêm thẻ mới.',
+    AppException(code: 'challenge-title') =>
+      'Tên thẻ cần từ 1 đến ${CustomChallengeLimits.titleMax} ký tự.',
+    AppException(kind: AppErrorKind.permissionDenied) =>
+      'Phiên đăng nhập đã hết. Đăng nhập lại rồi thử lại nhé.',
+    _ => 'Chưa thêm được thẻ. Thử lại nhé.',
+  };
 }
+
+/// Số thử thách đã làm hôm nay (nốt `thu_thach` tạo hôm nay): "mỗi ngày một
+/// điều tốt nhỏ, cộng dồn thành điều lớn".
+final goodDeedsTodayProvider = StreamProvider.autoDispose<int>((ref) {
+  ref.watch(authUserProvider.select((user) => user.value?.uid));
+  final now = ref.read(clockProvider).now();
+  return ref
+      .read(noteRepositoryProvider)
+      .watchSince(Dates.startOfDay(now))
+      .map(
+        (notes) => notes
+            .where(
+              (n) =>
+                  n.type == NoteType.thuThach &&
+                  Dates.sameDay(n.createdAt, now),
+            )
+            .length,
+      );
+});

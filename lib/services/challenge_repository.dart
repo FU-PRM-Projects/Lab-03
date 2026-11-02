@@ -8,8 +8,24 @@ abstract interface class ChallengeRepository {
   /// Toàn bộ kho thẻ (vài chục thẻ), sắp theo chủ đề, cấp, thứ tự.
   Future<List<Challenge>> catalog();
 
-  /// Ném `AppException(notFound)` khi không có thẻ [id].
+  /// Ném `AppException(notFound)` khi không có thẻ [id]; tìm trong kho rồi
+  /// đến thẻ tự thêm của người dùng.
   Future<Challenge> get(String id);
+
+  /// Thẻ người dùng tự thêm (`users/{uid}/customChallenges`), mới nhất trước.
+  Stream<List<Challenge>> watchMine();
+
+  /// Thêm một thẻ của riêng người dùng. Ngoại tuyến thì Firestore giữ lệnh
+  /// ghi và gửi khi có mạng.
+  Future<Challenge> addMine({
+    required ChallengeTopic topic,
+    required String title,
+    required int minutes,
+    String tip = '',
+  });
+
+  /// Xoá thẻ tự thêm; các nốt đã ghi từ thẻ đó vẫn còn trong hũ.
+  Future<void> deleteMine(String id);
 
   /// Tiến độ theo chủ đề; chủ đề chưa có tài liệu thì không có trong map.
   Stream<Map<ChallengeTopic, ChallengeProgress>> watchProgress();

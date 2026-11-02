@@ -109,6 +109,24 @@ test('R-13 challenge notes keep their result fields within range', async () => {
   await assertFails(setDoc(doc(db, 'users/alice/notes/c2'), note({ type: 'thu_thach', ...result, anxietyBefore: 9 })));
   await assertFails(setDoc(doc(db, 'users/alice/notes/c3'), note({ type: 'thu_thach', ...result, outcome: 'win' })));
 });
+test('R-15 user adds and deletes their own challenge cards, privately', async () => {
+  const db = env.authenticatedContext('alice').firestore();
+  const card = (extra = {}) => ({ topic: 'dung_cam', title: 'Nhắn lời cảm ơn', minutes: 2, createdAt: Timestamp.now(), ...extra });
+  await assertSucceeds(setDoc(doc(db, 'users/alice/customChallenges/c1'), card()));
+  await assertSucceeds(setDoc(doc(db, 'users/alice/customChallenges/c2'), card({ topic: 'van_dong', tip: 'Đi chậm thôi.' })));
+  await assertFails(setDoc(doc(db, 'users/alice/customChallenges/c3'), card({ title: '' })));
+  await assertFails(setDoc(doc(db, 'users/alice/customChallenges/c4'), card({ title: 'a'.repeat(81) })));
+  await assertFails(setDoc(doc(db, 'users/alice/customChallenges/c5'), card({ topic: 'spam' })));
+  await assertFails(setDoc(doc(db, 'users/alice/customChallenges/c6'), card({ minutes: 0 })));
+  await assertFails(setDoc(doc(db, 'users/alice/customChallenges/c7'), card({ minutes: 601 })));
+  await assertFails(setDoc(doc(db, 'users/alice/customChallenges/c8'), card({ tip: 'a'.repeat(121) })));
+  await assertFails(setDoc(doc(db, 'users/alice/customChallenges/c9'), card({ extra: true })));
+  await assertFails(updateDoc(doc(db, 'users/alice/customChallenges/c1'), { title: 'Đổi tên' }));
+  await assertFails(setDoc(doc(env.authenticatedContext('bob').firestore(), 'users/alice/customChallenges/c10'), card()));
+  await assertFails(getDoc(doc(env.authenticatedContext('bob').firestore(), 'users/alice/customChallenges/c1')));
+  await assertSucceeds(getDoc(doc(db, 'users/alice/customChallenges/c1')));
+  await assertSucceeds(deleteDoc(doc(db, 'users/alice/customChallenges/c1')));
+});
 test('R-14 user keeps "first time" groups; names and ideas are checked', async () => {
   const db = env.authenticatedContext('alice').firestore();
   const group = (extra = {}) => ({ name: 'Bắt chuyện', idea: 'nguoi_la', source: 'system', noteCount: 0, ...extra });
