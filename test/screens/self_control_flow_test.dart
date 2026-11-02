@@ -1,10 +1,13 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lab03/models/note_type.dart';
 import 'package:lab03/models/self_control.dart';
 import 'package:lab03/screens/breathing/breathing_screen.dart';
+import 'package:lab03/screens/jar/jar_screen.dart';
 import 'package:lab03/screens/note_saved/note_saved_screen.dart';
 import 'package:lab03/screens/self_control/self_control_screen.dart';
 import 'package:lab03/screens/today/today_screen.dart';
+import 'package:lab03/viewmodels/self_control_view_model.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../support/pump.dart';
@@ -17,8 +20,17 @@ void main() {
     expect(find.byType(SelfControlScreen), findsOneWidget);
   }
 
+  /// "Ghi lại vừa rồi" → "Mình đã dừng được".
+  Future<void> recordStopped(WidgetTester tester) async {
+    await tester.tap(find.text('Ghi lại vừa rồi'));
+    await tester.pumpAndSettle();
+    expect(find.text('Vừa rồi thế nào?'), findsOneWidget);
+    await tester.tap(find.text('Mình đã dừng được'));
+    await tester.pumpAndSettle();
+  }
+
   for (final size in <Size>[phone360, phone412]) {
-    testWidgets('dừng được ngay ở ${size.width.toInt()} dp: 2 chạm tới S04', (
+    testWidgets('dừng được ở ${size.width.toInt()} dp: 3 chạm tới S04', (
       tester,
     ) async {
       final services = await pumpApp(tester, size: size);
@@ -27,8 +39,7 @@ void main() {
       expect(find.text('Lướt mạng xã hội'), findsOneWidget);
       expect(services.screenGuard.secure, isTrue);
 
-      await tester.tap(find.text('Mình vừa dừng lại'));
-      await tester.pumpAndSettle();
+      await recordStopped(tester);
       expect(find.byType(NoteSavedScreen), findsOneWidget);
       expect(services.notes.notes.single.type, NoteType.tuChu);
       expect(services.screenGuard.secure, isFalse);
@@ -45,8 +56,7 @@ void main() {
     );
     await pumpApp(tester, services: services);
     await openSelfControl(tester);
-    await tester.tap(find.text('Mình vừa dừng lại'));
-    await tester.pumpAndSettle();
+    await recordStopped(tester);
     expect(find.byType(NoteSavedScreen), findsOneWidget);
     expect(services.notes.notes.single.title, 'Dừng Video ngắn lúc 21:30');
   });
@@ -60,8 +70,7 @@ void main() {
     );
     await pumpApp(tester, services: services);
     await openSelfControl(tester);
-    await tester.tap(find.text('Mình vừa dừng lại'));
-    await tester.pumpAndSettle();
+    await recordStopped(tester);
     expect(find.text('Bạn vừa dừng gì?'), findsOneWidget);
     expect(services.notes.notes, isEmpty);
 
@@ -135,7 +144,9 @@ void main() {
   ) async {
     final services = await pumpApp(tester);
     await openSelfControl(tester);
-    await tester.tap(find.text('Lỡ lướt quá đà?'));
+    await tester.tap(find.text('Ghi lại vừa rồi'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Mình lỡ lướt quá đà'));
     await tester.pumpAndSettle();
     expect(find.text('Lúc đó mình đang thấy gì?'), findsOneWidget);
 
@@ -151,6 +162,30 @@ void main() {
     await tester.tap(find.text('Về Hôm nay'));
     await tester.pumpAndSettle();
     expect(find.byType(TodayScreen), findsOneWidget);
+  });
+
+  testWidgets('đã lỡ lướt: "Xem trong hũ" mở hũ ở bộ lọc Nhật ký', (
+    tester,
+  ) async {
+    await pumpApp(tester);
+    await openSelfControl(tester);
+    await tester.tap(find.text('Ghi lại vừa rồi'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Mình lỡ lướt quá đà'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Mệt'));
+    await tester.pump();
+    await tester.tap(find.text('Ghi lại'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Xem trong hũ'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(JarScreen), findsOneWidget);
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(JarScreen)),
+    );
+    expect(container.read(jarFilterProvider), NoteType.nhatKy);
+    expect(find.text(SelfControlViewModel.slipTitle), findsOneWidget);
   });
 
   testWidgets('+ Thêm thói quen mới', (tester) async {
