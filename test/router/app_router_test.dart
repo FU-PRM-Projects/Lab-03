@@ -70,6 +70,8 @@ void main() {
     await enterApp(tester);
     await tester.tap(find.text('Ghi nốt'));
     await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel(RegExp('^Chiến thắng nhỏ')));
+    await tester.pumpAndSettle();
     expect(find.byType(NoteComposerScreen), findsOneWidget);
 
     await tester.tap(find.bySemanticsLabel('Tâm trạng Ổn'));
@@ -114,6 +116,8 @@ void main() {
     await tester.tap(findTab('Thử thách'));
     await tester.pumpAndSettle();
     await tester.tap(findTab('Ghi nốt'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel(RegExp('^Chiến thắng nhỏ')));
     await tester.pumpAndSettle();
     expect(find.byType(NoteComposerScreen), findsOneWidget);
   });

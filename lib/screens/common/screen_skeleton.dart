@@ -6,6 +6,7 @@ import '../../theme/app_tokens.dart';
 import '../../widgets/add_note_fab.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_top_bar.dart';
+import 'note_kind_sheet.dart';
 
 /// Một lối đi tới màn khác, dùng khi màn còn ở dạng khung.
 class SkeletonLink {
@@ -100,7 +101,7 @@ class TabScaffold extends StatelessWidget {
         ),
       ),
       floatingActionButton: showAddNote
-          ? AddNoteFab(onPressed: () => context.push(AppRoutes.newNote()))
+          ? AddNoteFab(onPressed: () => openNoteKindSheet(context))
           : null,
     );
   }
