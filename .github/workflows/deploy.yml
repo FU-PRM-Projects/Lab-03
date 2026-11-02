@@ -95,13 +95,15 @@ jobs:
         run: npm install --global firebase-tools@15
 
       # Hosting đọc `build/web`, rules lấy từ `firebase/`. `--non-interactive`
-      # để job không treo chờ xác nhận.
+      # để job không treo chờ xác nhận. Chưa deploy `storage`: project chưa có
+      # bucket (cần gói Blaze) và service account CI không được bật API này;
+      # thêm lại `,storage` khi Storage đã được thiết lập.
       - name: Deploy to Firebase
         if: steps.credentials.outputs.enabled == 'true'
         run: |
           firebase deploy \
             --project "$FIREBASE_PROJECT_ID" \
-            --only hosting,firestore:rules,firestore:indexes,storage \
+            --only hosting,firestore:rules,firestore:indexes \
             --non-interactive
 
   preview:
