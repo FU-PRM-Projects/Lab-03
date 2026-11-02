@@ -38,6 +38,7 @@ Test Security Rules trên Firebase Emulator: chạy `npm run test:rules` trong `
 Kho thẻ thử thách (`challenges`, chỉ đọc với người dùng) nạp từ `firebase/seed/challenges.json`:
 
 - Emulator: `npm run seed:emulator` trong `firebase/` khi `npm run emulators` đang chạy.
+- Thẻ cấp 3 "Chào 1 câu ở phòng chung" mở phòng Discord: link lấy từ Remote Config `discord_invite_url` / `discord_channel_map` (mặc định là link mẫu trong `InAppRemoteConfig`).
 - Project thật: đặt `GOOGLE_APPLICATION_CREDENTIALS` trỏ tới file khoá service account để **ngoài** repo, rồi `npm run seed -- <project-id>`.
 
 ### Firebase

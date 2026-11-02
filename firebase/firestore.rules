@@ -13,7 +13,7 @@ service cloud.firestore {
     function validNote(note) {
       return note.keys().hasAll(['type', 'title', 'createdAt'])
         && note.keys().hasOnly(['type', 'title', 'body', 'mood', 'createdAt',
-                                'challengeId', 'subtype', 'outcome', 'anxietyBefore', 'minutes',
+                                'challengeId', 'subtype', 'outcome', 'anxietyBefore', 'anxietyAfter', 'minutes',
                                 'groupId', 'isFirst'])
         && note.type in ['chien_thang', 'tu_chu', 'thu_thach', 'nhat_ky']
         && note.title is string && note.title.size() >= 1 && note.title.size() <= 120
@@ -23,6 +23,7 @@ service cloud.firestore {
         && (!('subtype' in note) || note.subtype in ['nguoi_la', 'van_dong'])
         && (!('outcome' in note) || note.outcome in ['suon_se', 'khong_nhu_y'])
         && (!('anxietyBefore' in note) || (note.anxietyBefore is int && note.anxietyBefore >= 1 && note.anxietyBefore <= 5))
+        && (!('anxietyAfter' in note) || (note.anxietyAfter is int && note.anxietyAfter >= 1 && note.anxietyAfter <= 5))
         && (!('minutes' in note) || (note.minutes is int && note.minutes >= 0 && note.minutes <= 600))
         && (!('groupId' in note) || (note.groupId is string && note.groupId.size() >= 1 && note.groupId.size() <= 64))
         && (!('isFirst' in note) || note.isFirst is bool);

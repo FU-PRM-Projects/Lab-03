@@ -42,6 +42,12 @@ abstract final class AppRoutes {
   /// S08.
   static String challengeDetail(String id) => '$challenges/$id';
 
+  /// S08d · Câu chào của bạn (thẻ thử thách trên Discord).
+  static String challengeGreeting(String id) => '$challenges/$id/greeting';
+
+  /// S14 · Phòng trò chuyện (Discord).
+  static const String rooms = '/rooms';
+
   /// S11 ở tab con [tab]: `path`, `stats` hoặc `calendar`.
   static String journeyTab(String tab) => '$journey?tab=$tab';
 }

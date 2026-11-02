@@ -11,6 +11,7 @@ class AppTextField extends StatelessWidget {
   const AppTextField({
     required this.label,
     this.controller,
+    this.focusNode,
     this.hint,
     this.helper,
     this.errorText,
@@ -29,6 +30,7 @@ class AppTextField extends StatelessWidget {
 
   final String label;
   final TextEditingController? controller;
+  final FocusNode? focusNode;
   final String? hint;
   final String? helper;
   final String? errorText;
@@ -66,6 +68,7 @@ class AppTextField extends StatelessWidget {
           label: label,
           child: TextField(
             controller: controller,
+            focusNode: focusNode,
             enabled: enabled,
             autofocus: autofocus,
             obscureText: obscureText,

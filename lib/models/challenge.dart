@@ -33,6 +33,7 @@ class Challenge {
     required this.minutes,
     this.tip = '',
     this.script = '',
+    this.discordRoom,
   });
 
   final String id;
@@ -54,8 +55,16 @@ class Challenge {
   /// Câu mẫu để nói (thử thách dũng cảm); rỗng nếu không có.
   final String script;
 
-  /// "DŨNG CẢM · 2 PHÚT".
-  String get label => '${topic.label.toUpperCase()} · $minutes PHÚT';
+  /// Thẻ làm trên Discord: mã phòng (`chao_hoi`). Ẩn khi `discord_enabled`
+  /// tắt.
+  final String? discordRoom;
+
+  bool get onDiscord => discordRoom != null;
+
+  /// "DŨNG CẢM · 2 PHÚT"; thẻ Discord là "DŨNG CẢM · CẤP 3 · DISCORD".
+  String get label => onDiscord
+      ? '${topic.label.toUpperCase()} · CẤP $level · DISCORD'
+      : '${topic.label.toUpperCase()} · $minutes PHÚT';
 }
 
 /// Tiến độ của một chủ đề (`users/{uid}/challengeProgress/{topic}`).
@@ -92,6 +101,7 @@ class ChallengeResult {
     required this.subtype,
     required this.outcome,
     this.anxietyBefore,
+    this.anxietyAfter,
     this.minutes,
   });
 
@@ -104,6 +114,9 @@ class ChallengeResult {
   /// Mức hồi hộp 1–5 trước khi làm; không bắt buộc.
   final int? anxietyBefore;
 
+  /// "Sau đó bạn thấy sao?" 1–5 khi quay lại từ Discord; không bắt buộc.
+  final int? anxietyAfter;
+
   /// Số phút vận động thực tế (P3, dừng sớm vẫn lưu).
   final int? minutes;
 
@@ -114,9 +127,16 @@ class ChallengeResult {
       other.subtype == subtype &&
       other.outcome == outcome &&
       other.anxietyBefore == anxietyBefore &&
+      other.anxietyAfter == anxietyAfter &&
       other.minutes == minutes;
 
   @override
-  int get hashCode =>
-      Object.hash(challengeId, subtype, outcome, anxietyBefore, minutes);
+  int get hashCode => Object.hash(
+    challengeId,
+    subtype,
+    outcome,
+    anxietyBefore,
+    anxietyAfter,
+    minutes,
+  );
 }

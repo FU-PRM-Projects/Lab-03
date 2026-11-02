@@ -47,6 +47,7 @@ class FirestoreChallengeRepository implements ChallengeRepository {
       minutes: data['minutes'] as int? ?? 2,
       tip: data['tip'] as String? ?? '',
       script: data['script'] as String? ?? '',
+      discordRoom: data['discordRoom'] as String?,
     );
   }
 

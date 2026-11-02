@@ -88,8 +88,14 @@ class SettingRow extends StatelessWidget {
                   if (isToggle)
                     Switch(value: switchValue!, onChanged: onChanged)
                   else ...<Widget>[
+                    // Giá trị chỉ rộng bằng chữ của nó (tối đa ~nửa dòng, dài
+                    // hơn thì "…"); `Flexible` sẽ giữ chỗ nửa dòng kể cả khi
+                    // giá trị ngắn như "Mở" và làm tiêu đề xuống dòng.
                     if (value!.isNotEmpty)
-                      Flexible(
+                      ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: MediaQuery.sizeOf(context).width * 0.45,
+                        ),
                         child: Text(
                           value!,
                           style: theme.textTheme.labelLarge?.copyWith(

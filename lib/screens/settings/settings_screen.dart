@@ -5,6 +5,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../models/self_control.dart';
 import '../../router/app_routes.dart';
+import '../../services/remote_config_service.dart';
 import '../../theme/app_tokens.dart';
 import '../../utils/vi_date_format.dart';
 import '../../viewmodels/auth_view_model.dart';
@@ -172,6 +173,21 @@ class SettingsScreen extends ConsumerWidget {
             children: <Widget>[
               for (final section in settingsSection) ...<Widget>[
                 section,
+                const SizedBox(height: AppSpace.s16),
+              ],
+              // Spec "Kết nối Discord": S12 là một lối vào S14.
+              if (ref.watch(remoteConfigServiceProvider).discordEnabled) ...[
+                SettingGroup(
+                  label: 'CỘNG ĐỒNG',
+                  children: <Widget>[
+                    SettingRow.value(
+                      title: 'Phòng trò chuyện',
+                      subtitle: 'Gặp người cũng đang tập, trên Discord',
+                      value: '',
+                      onTap: () => context.push(AppRoutes.rooms),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: AppSpace.s16),
               ],
               SettingGroup(

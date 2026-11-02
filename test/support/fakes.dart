@@ -13,6 +13,7 @@ import 'package:lab03/services/app_exception.dart';
 import 'package:lab03/services/auth_service.dart';
 import 'package:lab03/services/challenge_repository.dart';
 import 'package:lab03/services/clock.dart';
+import 'package:lab03/services/discord_service.dart';
 import 'package:lab03/services/draft_store.dart';
 import 'package:lab03/services/group_repository.dart';
 import 'package:lab03/services/note_repository.dart';
@@ -536,6 +537,28 @@ class FakeNudgeService implements NudgeService {
 
   @override
   Future<String?> launchRoute() async => launch;
+}
+
+class FakeDiscordService implements DiscordService {
+  /// Link đã mở, theo thứ tự; [inBrowser] ghi kèm "(web)".
+  final List<String> opened = <String>[];
+
+  /// `false`: giả máy chưa cài Discord (mở bằng app thất bại).
+  bool appWorks = true;
+  bool seen = false;
+
+  @override
+  Future<bool> open(String url, {bool inBrowser = false}) async {
+    if (!inBrowser && !appWorks) return false;
+    opened.add(inBrowser ? '$url (web)' : url);
+    return true;
+  }
+
+  @override
+  Future<bool> rulesSeen() async => seen;
+
+  @override
+  Future<void> markRulesSeen() async => seen = true;
 }
 
 /// Kho thẻ mẫu: 2 chủ đề × 2 cấp × [perLevel] thẻ, id dạng `dc-1-1`, `vd-2-3`.
