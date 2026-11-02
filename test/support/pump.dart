@@ -10,6 +10,7 @@ import 'package:lab03/services/clock.dart';
 import 'package:lab03/services/draft_store.dart';
 import 'package:lab03/services/group_repository.dart';
 import 'package:lab03/services/note_repository.dart';
+import 'package:lab03/services/nudge_service.dart';
 import 'package:lab03/services/report_services.dart';
 import 'package:lab03/services/self_control_services.dart';
 import 'package:lab03/services/user_repository.dart';
@@ -45,6 +46,7 @@ class TestServices {
   final FakeSelfControl selfControl = FakeSelfControl();
   final FakeLocalAuth localAuth = FakeLocalAuth();
   final FakeScreenGuard screenGuard = FakeScreenGuard();
+  final FakeNudgeService nudges = FakeNudgeService();
   final FakeChallengeRepository challenges = FakeChallengeRepository();
   final FakeReportService reports = FakeReportService();
   final FakeStorageService storage = FakeStorageService();
@@ -60,6 +62,7 @@ class TestServices {
     settingsRepositoryProvider.overrideWithValue(selfControl.settingsView),
     localAuthServiceProvider.overrideWithValue(localAuth),
     screenGuardProvider.overrideWithValue(screenGuard),
+    nudgeServiceProvider.overrideWithValue(nudges),
     challengeRepositoryProvider.overrideWithValue(challenges),
     reportServiceProvider.overrideWithValue(reports),
     storageServiceProvider.overrideWithValue(storage),

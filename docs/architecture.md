@@ -135,6 +135,7 @@ Khi Firestore trả lỗi quyền (`permission-denied`) hoặc lỗi khác, `Not
 | `NoteRepository` | `FirestoreNoteRepository` | `users/{uid}/notes`: theo dõi nốt từ một ngày, đọc theo trang, đếm theo khoảng ngày, thêm nốt; nhãn dán tháng `users/{uid}/stickers` |
 | `ChallengeRepository` | `FirestoreChallengeRepository` | Đọc kho `challenges` (chỉ đọc); tiến độ `users/{uid}/challengeProgress/{topic}` (`level`, `completed`) |
 | `HabitRepository`, `SettingsRepository` | `FirestoreHabitRepository`, `FirestoreSettingsRepository` | `users/{uid}/private/habits` (thói quen muốn bớt), `users/{uid}/private/settings` (Giờ tỉnh, khoá Tự chủ; S12 thêm giờ nhắc) |
+| `NudgeService` | `LocalNudgeService` (`flutter_local_notifications`, `timezone`) | Lời nhắc "Giờ tỉnh" trên máy: hẹn mỗi ngày lúc bắt đầu khung giờ, huỷ khi tắt hoặc đăng xuất (`awakeNudgeSyncProvider` theo dõi cài đặt), chạm vào mở S09 |
 | `DraftStore` | `PrefsDraftStore` (`shared_preferences`) | Nháp S03 trên máy; xoá khi đăng xuất |
 | `StorageService` | `FirebaseStorageService` | Tải PDF lên `reports/{uid}/weekly-<tuần ISO>.pdf`, phát tiến độ, trả URL; `storage.rules` chỉ cho chủ thư mục, PDF dưới 5 MB |
 | `ReportService` | `PdfReportService` (`pdf`, `printing`) | Dựng PDF Thẻ tuần (font Be Vietnam Pro qua `PdfGoogleFonts`), mở hộp chia sẻ |

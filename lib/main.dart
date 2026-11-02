@@ -11,6 +11,7 @@ import 'firebase/firestore_group_repository.dart';
 import 'firebase/firestore_note_repository.dart';
 import 'firebase/firestore_self_control.dart';
 import 'firebase/firestore_user_repository.dart';
+import 'firebase/local_nudge_service.dart';
 import 'firebase/prefs_draft_store.dart';
 import 'firebase/report_impl.dart';
 import 'services/auth_service.dart';
@@ -18,6 +19,7 @@ import 'services/challenge_repository.dart';
 import 'services/draft_store.dart';
 import 'services/group_repository.dart';
 import 'services/note_repository.dart';
+import 'services/nudge_service.dart';
 import 'services/report_services.dart';
 import 'services/self_control_services.dart';
 import 'services/user_repository.dart';
@@ -67,6 +69,7 @@ Future<void> main() async {
         ),
         localAuthServiceProvider.overrideWithValue(DeviceLocalAuthService()),
         screenGuardProvider.overrideWithValue(const MethodChannelScreenGuard()),
+        nudgeServiceProvider.overrideWithValue(LocalNudgeService()),
       ],
       child: NotApp(
         font: (style) => GoogleFonts.beVietnamPro(textStyle: style),
