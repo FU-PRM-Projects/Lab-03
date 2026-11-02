@@ -188,7 +188,7 @@ class NoteComposerViewModel extends Notifier<NoteComposerState> {
     ref.invalidate(hasDraftProvider);
   }
 
-  /// Lưu nốt. [skipJournal] cho "Bỏ qua nhật ký" (bước 2) và "Bỏ qua"
+  /// Lưu nốt. [skipJournal] cho "Bỏ qua phần kể thêm" (bước 2) và "Bỏ qua"
   /// (bước 3): lưu với nhật ký rỗng.
   Future<void> save({bool skipJournal = false}) async {
     if (state.saving || state.savedNoteId != null) return;

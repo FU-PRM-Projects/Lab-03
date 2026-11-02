@@ -354,7 +354,7 @@ class _EditView extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpace.s16),
                 AppTextField(
-                  label: 'Nhật ký',
+                  label: 'Kể thêm',
                   helper: 'Không bắt buộc',
                   controller: body,
                   // "Viết thêm" từ S04: gõ được ngay.
