@@ -7,7 +7,6 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 
-import '../router/app_routes.dart';
 import '../services/nudge_service.dart';
 
 /// [NudgeService] bằng `flutter_local_notifications`: lịch nằm trên máy nên
@@ -20,13 +19,11 @@ class LocalNudgeService implements NudgeService {
   final StreamController<String> _opened = StreamController<String>.broadcast();
   Future<bool>? _ready;
 
-  static const int _awakeId = 1;
-
-  static const NotificationDetails _awakeDetails = NotificationDetails(
+  static NotificationDetails _details(Nudge nudge) => NotificationDetails(
     android: AndroidNotificationDetails(
-      'awake',
-      'Giờ tỉnh',
-      channelDescription: 'Nhắc nhẹ trong khung giờ dễ lướt vô thức.',
+      nudge.channel,
+      nudge.channelName,
+      channelDescription: nudge.channelDescription,
       icon: '@mipmap/ic_launcher',
     ),
   );
@@ -58,7 +55,7 @@ class LocalNudgeService implements NudgeService {
   }();
 
   @override
-  Future<void> scheduleAwakeNudge(int minutes) async {
+  Future<void> schedule(Nudge nudge, int minutes) async {
     if (!await _init()) return;
     final now = tz.TZDateTime.now(tz.local);
     var at = tz.TZDateTime(
@@ -72,14 +69,14 @@ class LocalNudgeService implements NudgeService {
     if (!at.isAfter(now)) at = at.add(const Duration(days: 1));
     try {
       await _plugin.zonedSchedule(
-        id: _awakeId,
+        id: nudge.id,
         scheduledDate: at,
-        notificationDetails: _awakeDetails,
+        notificationDetails: _details(nudge),
         // Lời nhắc nhẹ: lệch vài phút không sao, khỏi xin quyền báo thức chính xác.
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-        title: 'Đến giờ tỉnh rồi',
-        body: 'Đang lướt à? Chạm để dừng lại và ghi 1 lần tự chủ.',
-        payload: AppRoutes.selfControl,
+        title: nudge.title,
+        body: nudge.body,
+        payload: nudge.route,
         matchDateTimeComponents: DateTimeComponents.time,
       );
     } on PlatformException {
@@ -88,10 +85,10 @@ class LocalNudgeService implements NudgeService {
   }
 
   @override
-  Future<void> cancelAwakeNudge() async {
+  Future<void> cancel(Nudge nudge) async {
     if (!await _init()) return;
     try {
-      await _plugin.cancel(id: _awakeId);
+      await _plugin.cancel(id: nudge.id);
     } on PlatformException {
       // Như trên.
     }
