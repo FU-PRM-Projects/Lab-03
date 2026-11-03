@@ -237,7 +237,11 @@ def main() -> None:
         raise
     before, rest = text.split(START, 1)
     _, after = rest.split(END, 1)
-    OUT.write_text(before + render(findings, old_verdicts(text)) + after, encoding="utf-8")
+    OUT.write_text(
+        before + render(findings, old_verdicts(text)) + after,
+        encoding="utf-8",
+        newline="\n",
+    )
     print(f"Đã ghi {len(findings)} góp ý vào {OUT}")
 
 
