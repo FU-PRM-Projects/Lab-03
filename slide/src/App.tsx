@@ -458,6 +458,46 @@ export default function App() {
         </Page>
 
         <Page
+          title="Meet Tụi Nốt and the jar"
+          line="Eight mascot moods and one jar that fills up with your wins"
+          notes="Tụi Nốt are the app's mascots: one sticky-note character in 8 states, exported as SVG from Lab 2 (DESIGN.md section 9) and drawn by the Mascot widget. Each mood a user picks has its own face, so mood is never shown by colour alone: Vui is Nốt Xong, Ổn is Thong Thả, Bình thường is Đợi, Mệt is Ngủ, Rối is Lạc. The same characters mark app states: Đợi for loading and empty, Lạc for errors, Ngủ when the AI is resting. Vội and Cháy are in the design system but not on a screen yet. The jar (Hũ chiến thắng) is the app's core metaphor: every saved note drops in as a slip coloured by its type, the 8 newest are shown, and the number next to it counts this month's notes. It appears on Today, after saving a note and on the Jar tab."
+        >
+          <div className="cast">
+            <div className="cast-grid">
+              {[
+                ['xong', 'Nốt Xong', 'A win saved · Vui'],
+                ['thong-tha', 'Nốt Thong Thả', 'Welcome, breathing · Ổn'],
+                ['doi', 'Nốt Đợi', 'Loading, empty · Bình thường'],
+                ['ngu', 'Nốt Ngủ', 'AI resting · Mệt'],
+                ['lac', 'Nốt Lạc', 'Errors · Rối'],
+                ['tap-trung', 'Nốt Tập Trung', 'Challenges, self-control'],
+                ['voi', 'Nốt Vội', 'Design system only'],
+                ['chay', 'Nốt Cháy', 'Design system only'],
+              ].map(([file, name, role]) => (
+                <figure key={file}>
+                  <img src={`assets/mascot/mascot-not-${file}.svg`} alt={name} />
+                  <figcaption>
+                    <b>{name}</b>
+                    <span>{role}</span>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+            <div className="cast-jar">
+              <img src="assets/illustrations/jar.svg" alt="Hũ chiến thắng with coloured note slips" />
+              <ul>
+                <li>
+                  <b>Hũ chiến thắng:</b> every saved note drops in as a slip
+                </li>
+                <li>Slip colour shows the type: Chiến thắng, Tự chủ, Thử thách, Nhật ký</li>
+                <li>Shows the 8 newest; the number counts this month's notes</li>
+                <li>Each mood has its own face, so mood is not shown by colour alone</li>
+              </ul>
+            </div>
+          </div>
+        </Page>
+
+        <Page
           dense
           title="Authentication"
           images={[

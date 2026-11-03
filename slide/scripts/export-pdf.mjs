@@ -1,6 +1,6 @@
 // Chụp từng slide qua Chrome DevTools Protocol rồi ghép thành một PDF 16:9.
 // Chạy trong slide/ khi `npx vite preview` đang mở cổng 4173:
-//   node scripts/export-pdf.mjs http://localhost:4173/ 13 ../slides/Lab03_<StudentID>_slides.pdf
+//   node scripts/export-pdf.mjs http://localhost:4173/ 14 ../slides/Lab03_<StudentID>_slides.pdf
 // Bản React không tự bật chế độ in `?print-pdf` của Reveal, nên chụp từng slide.
 // Đổi đường dẫn Chrome bằng biến môi trường CHROME nếu cần.
 import { spawn } from 'node:child_process';

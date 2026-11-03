@@ -79,6 +79,61 @@ html, body, #root, .stage {
   line-height: 1.5;
 }
 
+.cast {
+  display: flex;
+  gap: 48px;
+  align-items: center;
+}
+
+.cast-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 150px);
+  gap: 18px 20px;
+}
+
+.cast-grid figure {
+  margin: 0;
+  text-align: center;
+}
+
+.cast-grid img {
+  width: 92px;
+  height: 92px;
+}
+
+.cast-grid figcaption {
+  display: flex;
+  flex-direction: column;
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.cast-grid figcaption span {
+  color: #666;
+}
+
+.cast-jar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cast-jar img {
+  width: 170px;
+}
+
+.cast-jar ul {
+  margin: 16px 0 0;
+  padding-left: 22px;
+  font-size: 19px;
+  line-height: 1.4;
+}
+
+.cast-jar li {
+  margin-bottom: 6px;
+}
+
 .lessons {
   margin: 0;
   padding-left: 28px;
