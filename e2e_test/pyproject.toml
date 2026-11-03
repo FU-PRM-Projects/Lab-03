@@ -1,0 +1,22 @@
+[project]
+name = "lab03-e2e"
+version = "0.1.0"
+description = "Bộ test E2E ARTEMIS cho Nốt (PRM393 Lab 3)"
+requires-python = ">=3.12"
+dependencies = [
+  # Ghim commit ARTEMIS (yêu cầu của handout): cập nhật hash này cùng README.
+  "artemis-client @ git+https://github.com/google/artemis.git@351ca8422f7b5b54e80a9c1ce03a222e02415b6b#subdirectory=packages/artemis-client",
+  "pytest>=8",
+  "pytest-asyncio>=0.24",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+# Một event loop cho cả phiên để dùng chung một ArtemisClient.
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
+testpaths = ["."]
+markers = [
+  "exploratory: phiên khám phá 15–30 phút (profile Pro), không chạy mặc định",
+]
+addopts = "-ra"
