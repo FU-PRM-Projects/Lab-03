@@ -661,16 +661,93 @@ Sign out → local data cleared, back to /welcome`}</pre>
 
         <Page
           title="AI code review"
-          shots={['Finding · Decision · Reason · Commit']}
-          todo="Not done yet"
-          notes="Needs at least 5 findings across 2 kinds and 3 fix commits. Link docs/code-review.md."
-        />
+          line="CodeRabbit reviewed every PR: 52 findings on #28, #29 and #38"
+          notes="CodeRabbit reviews each PR automatically. tools/export_coderabbit.py collects its findings into docs/code-review.md, and we checked every one against the code. 51 of 52 were technically right; 40 are real bugs in scope, 11 are right but not worth fixing for this Lab, and 1 was wrong: it said _saving was never read, but canSubmit reads it. It is strong on async Flutter errors, privacy, docs that drift from code and missing tests. It is weak on project scope (a Major for iOS, which we do not ship), on severity (45 of 52 are Minor) and it skipped the 826-file ARTEMIS PR. Three findings are fixed, one commit each: 211a4d5 (Analytics user ID on a restored session), 736453a (clear the FCM inbox on sign-out) and 5e13651 (foreground notification tap opens its route). The two FCM fixes come with tests. The rest are listed with a decision in docs/code-review.md."
+        >
+          <table className="review">
+            <thead>
+              <tr>
+                <th>Finding</th>
+                <th>Kind</th>
+                <th>Decision</th>
+                <th>Reason · commit</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Restored session has no Analytics user ID</td>
+                <td>Correctness</td>
+                <td>Fixed</td>
+                <td>Router sets the ID on every auth change · 211a4d5</td>
+              </tr>
+              <tr>
+                <td>FCM inbox survives sign-out</td>
+                <td>Privacy · Major</td>
+                <td>Fixed</td>
+                <td>Sign-out clears the inbox · 736453a</td>
+              </tr>
+              <tr>
+                <td>Foreground notification has no route payload</td>
+                <td>Correctness</td>
+                <td>Fixed</td>
+                <td>Payload carries the route, tap opens it · 5e13651</td>
+              </tr>
+              <tr>
+                <td>No context.mounted check after await</td>
+                <td>Stability</td>
+                <td>Accepted</td>
+                <td>Settings can throw if the user leaves mid-call</td>
+              </tr>
+              <tr>
+                <td>Pass iOS settings to notifications init</td>
+                <td>Correctness · Major</td>
+                <td>Won't fix</td>
+                <td>The app ships on Android and web only</td>
+              </tr>
+              <tr>
+                <td>Add-card sheet can submit twice</td>
+                <td>Correctness</td>
+                <td>Rejected</td>
+                <td>canSubmit already reads _saving</td>
+              </tr>
+            </tbody>
+          </table>
+          <p className="review-sum">
+            <b>51 of 52 right</b> · 40 real bugs, 11 not worth it, 1 wrong · <b>3 fixed, one commit each</b> ·
+            full list in docs/code-review.md
+          </p>
+        </Page>
 
         <Page
           title="Lessons learned"
-          notes="Examples: the Emulator has no real Analytics or Crashlytics; D-11, two Lab 2 documents conflicted; D-26 and D-28 changed labels after users misread them. Add challenges from the test stage. AI disclosure: Claude Code for brief analysis and slides; add other tools. Links must open in a private window."
+          notes="Five lessons, one per stage that surprised us. Emulator: Stage 5 could only be checked on the real project. D-11: two Lab 2 documents set different title limits. D-28: users misread the journal label. ARTEMIS: the first run failed 5 of 36, and two of the causes were our own assertions. CodeRabbit: 51 of 52 findings were technically right, but only 1 of 40 real bugs was fixed before merge. AI disclosure: Claude Code, CodeRabbit, ARTEMIS with DeepSeek. Links must open in a private window."
         >
-          <p className="foot">Repo · docs/ · evidence/ · Video · AI tools: Claude Code · [add others]</p>
+          <ul className="lessons">
+            <li>
+              <b>Test on the real project early.</b> The Emulator has no Analytics, Crashlytics,
+              Remote Config or FCM, so Stage 5 only worked once we connected the real project.
+            </li>
+            <li>
+              <b>Design documents can disagree.</b> Two Lab 2 documents set different title
+              limits; we picked one and logged it (D-11).
+            </li>
+            <li>
+              <b>Labels that users misread must change.</b> "Bỏ qua nhật ký" became "Bỏ qua phần
+              kể thêm" (D-28).
+            </li>
+            <li>
+              <b>An AI tester needs checking too.</b> The first ARTEMIS run failed 5 of 36; two
+              causes were wrong assertions in our tests, not app bugs.
+            </li>
+            <li>
+              <b>AI review only helps if someone reads it.</b> CodeRabbit was right on 51 of 52
+              findings, but we had fixed only 1 of 40 real bugs when we merged.
+            </li>
+          </ul>
+          <p className="foot">
+            Repo · docs/ · evidence/ · Video · AI tools: Claude Code · CodeRabbit (review) ·
+            ARTEMIS with DeepSeek (E2E)
+          </p>
         </Page>
       </Deck>
     </div>
