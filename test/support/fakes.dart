@@ -9,10 +9,12 @@ import 'package:lab03/models/note.dart';
 import 'package:lab03/models/note_type.dart';
 import 'package:lab03/models/report.dart';
 import 'package:lab03/models/self_control.dart';
+import 'package:lab03/services/analytics_service.dart';
 import 'package:lab03/services/app_exception.dart';
 import 'package:lab03/services/auth_service.dart';
 import 'package:lab03/services/challenge_repository.dart';
 import 'package:lab03/services/clock.dart';
+import 'package:lab03/services/crash_reporter.dart';
 import 'package:lab03/services/discord_service.dart';
 import 'package:lab03/services/draft_store.dart';
 import 'package:lab03/services/group_repository.dart';
@@ -113,6 +115,50 @@ class FakeUserRepository implements UserRepository {
 }
 
 /// Giờ cố định: Thứ Bảy, 24/10/2026, 21:30 (dữ liệu mẫu Lab 2).
+/// Ghi lại sự kiện Analytics để test assert, không gọi plugin.
+class FakeAnalyticsService implements AnalyticsService {
+  final List<({String name, Map<String, Object> params})> events =
+      <({String name, Map<String, Object> params})>[];
+  final List<String> screens = <String>[];
+  String? userId;
+
+  @override
+  Future<void> logEvent(String name, [Map<String, Object>? parameters]) async {
+    events.add((name: name, params: parameters ?? const <String, Object>{}));
+  }
+
+  @override
+  Future<void> logScreen(String screenName) async => screens.add(screenName);
+
+  @override
+  Future<void> setUserId(String? uid) async => userId = uid;
+}
+
+/// Ghi lại lỗi non-fatal, user ID và khoá chẩn đoán gửi lên Crashlytics.
+class FakeCrashReporter implements CrashReporter {
+  final List<({Object error, String? reason, bool fatal})> errors =
+      <({Object error, String? reason, bool fatal})>[];
+  final Map<String, Object> keys = <String, Object>{};
+  String? userId;
+
+  @override
+  Future<void> recordError(
+    Object error,
+    StackTrace? stack, {
+    String? reason,
+    bool fatal = false,
+  }) async => errors.add((error: error, reason: reason, fatal: fatal));
+
+  @override
+  Future<void> setUser(String? uid) async => userId = uid;
+
+  @override
+  Future<void> setKey(String key, Object value) async => keys[key] = value;
+
+  @override
+  Future<String> testCrash() async => 'test';
+}
+
 class FixedClock implements Clock {
   FixedClock([DateTime? now]) : current = now ?? DateTime(2026, 10, 24, 21, 30);
 

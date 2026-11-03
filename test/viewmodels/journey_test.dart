@@ -9,6 +9,7 @@ import 'package:lab03/services/app_exception.dart';
 import 'package:lab03/services/auth_service.dart';
 import 'package:lab03/services/challenge_repository.dart';
 import 'package:lab03/services/clock.dart';
+import 'package:lab03/services/crash_reporter.dart';
 import 'package:lab03/services/note_repository.dart';
 import 'package:lab03/services/report_services.dart';
 import 'package:lab03/utils/journey_stats.dart';
@@ -120,12 +121,14 @@ void main() {
     late FakeChallengeRepository challenges;
     late FakeReportService reports;
     late FakeStorageService storage;
+    late FakeCrashReporter crash;
 
     setUp(() {
       notes = FakeNoteRepository();
       challenges = FakeChallengeRepository();
       reports = FakeReportService();
       storage = FakeStorageService();
+      crash = FakeCrashReporter();
     });
 
     ProviderContainer makeContainer() {
@@ -139,6 +142,7 @@ void main() {
           clockProvider.overrideWithValue(FixedClock()),
           reportServiceProvider.overrideWithValue(reports),
           storageServiceProvider.overrideWithValue(storage),
+          crashReporterProvider.overrideWithValue(crash),
         ],
       );
       addTearDown(c.dispose);
@@ -263,6 +267,9 @@ void main() {
       expect(report.phase, ReportPhase.failed);
       expect(report.message, contains('Wi-Fi'));
       expect(reports.shared, isEmpty);
+      // Lỗi đã xử lý: người dùng vẫn thấy thông báo, Crashlytics nhận non-fatal.
+      expect(crash.errors.single.reason, 'report_export');
+      expect(crash.errors.single.fatal, isFalse);
     });
   });
 }

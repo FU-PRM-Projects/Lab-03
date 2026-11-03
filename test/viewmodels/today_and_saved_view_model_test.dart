@@ -7,20 +7,11 @@ import 'package:lab03/services/app_exception.dart';
 import 'package:lab03/services/auth_service.dart';
 import 'package:lab03/services/clock.dart';
 import 'package:lab03/services/note_repository.dart';
-import 'package:lab03/services/remote_config_service.dart';
 import 'package:lab03/viewmodels/note_saved_view_model.dart';
 import 'package:lab03/viewmodels/today_view_model.dart';
 import 'package:lab03/viewmodels/view_state.dart';
 
 import '../support/fakes.dart';
-
-/// Remote Config với mốc tháng nhỏ để dễ chạm mốc trong test.
-class _SmallMilestone extends InAppRemoteConfig {
-  const _SmallMilestone();
-
-  @override
-  int get monthlyMilestone => 3;
-}
 
 void main() {
   late FakeNoteRepository notes;
@@ -34,10 +25,8 @@ void main() {
         ),
         noteRepositoryProvider.overrideWithValue(notes),
         clockProvider.overrideWithValue(clock),
-        if (smallMilestone)
-          remoteConfigServiceProvider.overrideWithValue(
-            const _SmallMilestone(),
-          ),
+        // Mốc tháng nhỏ để dễ chạm mốc trong test.
+        if (smallMilestone) monthlyMilestoneProvider.overrideWithValue(3),
       ],
     );
     addTearDown(c.dispose);
@@ -168,7 +157,7 @@ void main() {
       final state = await load(makeContainer(), 'b');
       final s = (state as Data<SavedNoteSummary>).value;
       expect(s.monthCount, 2);
-      expect(s.milestone, InAppRemoteConfig.defaultMonthlyMilestone);
+      expect(s.milestone, defaultMonthlyMilestone);
       expect(s.reachedMilestone, isFalse);
       expect(s.progress, closeTo(2 / 25, 1e-9));
       expect(s.savedToday, isTrue);

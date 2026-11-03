@@ -6,7 +6,10 @@ import '../models/first_group.dart';
 import '../models/mood.dart';
 import '../models/note.dart';
 import '../models/note_type.dart';
+import '../services/analytics_events.dart';
+import '../services/analytics_service.dart';
 import '../services/clock.dart';
+import '../services/crash_reporter.dart';
 import '../services/draft_store.dart';
 import '../services/group_repository.dart';
 import '../services/note_repository.dart';
@@ -100,12 +103,16 @@ class NoteComposerViewModel extends Notifier<NoteComposerState> {
 
   final ComposerArgs args;
 
+  /// Lúc mở bước 1, để đo tiêu chí "ghi nốt dưới 30 giây" (`duration_ms`).
+  late DateTime _openedAt;
+
   NoteRepository get _notes => ref.read(noteRepositoryProvider);
   GroupRepository get _groups => ref.read(groupRepositoryProvider);
   DraftStore get _drafts => ref.read(draftStoreProvider);
 
   @override
   NoteComposerState build() {
+    _openedAt = ref.read(clockProvider).now();
     unawaited(_restoreDraft());
     if (args.groupId case final id?) unawaited(_loadGroup(id));
     return NoteComposerState(
@@ -222,7 +229,21 @@ class NoteComposerViewModel extends Notifier<NoteComposerState> {
           // Nốt đã lưu và mang groupId; số đếm của nhóm chỉ lệch tạm thời.
         }
       }
-      // Stage 5: logEvent(note_saved) và đo thời gian từ bước 1.
+      unawaited(
+        ref.read(analyticsServiceProvider).track(
+          AnalyticsEvents.noteSaved,
+          <String, Object>{
+            AnalyticsParams.mood: toSave.mood?.name ?? 'none',
+            AnalyticsParams.noteType: 'chien_thang',
+            AnalyticsParams.hasJournal: '${toSave.body.isNotEmpty}',
+            AnalyticsParams.durationMs: ref
+                .read(clockProvider)
+                .now()
+                .difference(_openedAt)
+                .inMilliseconds,
+          },
+        ),
+      );
       try {
         await _drafts.clear();
       } on Object {
@@ -232,7 +253,11 @@ class NoteComposerViewModel extends Notifier<NoteComposerState> {
       ref.invalidate(hasDraftProvider);
       state = state.copyWith(saving: false, savedNoteId: note.id);
     } on Object catch (error) {
-      // Stage 5: ghi non-fatal qua CrashReporter.
+      unawaited(
+        ref
+            .read(crashReporterProvider)
+            .recordError(error, null, reason: 'note_save'),
+      );
       try {
         await _drafts.save(state.draft);
       } on Object {

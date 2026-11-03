@@ -6,6 +6,7 @@ import 'package:material_ui/material_ui.dart';
 import '../../models/self_control.dart';
 import '../../router/app_routes.dart';
 import '../../services/crash_reporter.dart';
+import '../../services/messaging_service.dart';
 import '../../services/remote_config_service.dart';
 import '../../theme/app_tokens.dart';
 import '../../utils/vi_date_format.dart';
@@ -37,6 +38,11 @@ class SettingsScreen extends ConsumerWidget {
     final auth = ref.watch(authViewModelProvider);
     final authViewModel = ref.read(authViewModelProvider.notifier);
     final user = ref.watch(authUserProvider).value;
+    ref.watch(remoteConfigRevisionProvider);
+    final remoteConfig = ref.watch(remoteConfigServiceProvider);
+    final permission = ref
+        .watch(notificationPermissionProvider)
+        .maybeWhen(data: (value) => value, orElse: () => null);
 
     void snack(String message) => ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
@@ -64,6 +70,33 @@ class SettingsScreen extends ConsumerWidget {
         confirmLabel: 'Đăng xuất',
       );
       if (confirmed ?? false) await authViewModel.signOut();
+    }
+
+    Future<void> openInbox() async {
+      final service = ref.read(messagingServiceProvider);
+      var granted = await service.permission();
+      if (granted == NotificationPermission.notAsked) {
+        granted = await service.requestPermission();
+        ref.invalidate(notificationPermissionProvider);
+      }
+      if (!context.mounted) return;
+      if (granted == NotificationPermission.denied) {
+        final open = await showAppDialog(
+          context: context,
+          title: 'Nốt cần quyền thông báo',
+          message: 'Bạn đã tắt thông báo. Mở cài đặt của máy để bật lại.',
+          confirmLabel: 'Mở cài đặt',
+        );
+        if (open ?? false) await service.openSystemSettings();
+        return;
+      }
+      ref.invalidate(inboxProvider);
+      if (!context.mounted) return;
+      await showModalBottomSheet<void>(
+        context: context,
+        showDragHandle: true,
+        builder: (_) => const _InboxSheet(),
+      );
     }
 
     Future<void> pickReminder(UserSettings settings) async {
@@ -202,36 +235,68 @@ class SettingsScreen extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: AppSpace.s16),
-              // Khu demo Firebase (Lab 3 mục 3, deviation D-01).
-              SettingGroup(
-                label: 'KHU DEMO FIREBASE',
-                children: <Widget>[
-                  SettingRow.value(
-                    title: 'Xuất & tải lên Thẻ tuần (PDF)',
-                    subtitle: 'Cloud Storage · reports/{uid}/',
-                    value: '',
-                    onTap: () => context.go(AppRoutes.journeyTab('stats')),
-                  ),
-                  if (!kReleaseMode)
+              // Khu demo Firebase (Lab 3 mục 3, deviation D-01); tắt được bằng
+              // Remote Config `firebase_demo_enabled`.
+              if (remoteConfig.firebaseDemoEnabled)
+                SettingGroup(
+                  label: 'KHU DEMO FIREBASE',
+                  children: <Widget>[
                     SettingRow.value(
-                      title: 'Thư viện component (dev)',
+                      title: 'Thông báo đẩy (FCM)',
+                      subtitle: switch (permission) {
+                        NotificationPermission.granted =>
+                          'Đã cho phép · chạm để xem hộp thư',
+                        NotificationPermission.denied =>
+                          'Đã tắt · chạm để mở cài đặt',
+                        _ => 'Chạm để cho phép thông báo',
+                      },
                       value: '',
-                      onTap: () => context.push(AppRoutes.componentGallery),
+                      onTap: openInbox,
                     ),
-                  if (!kReleaseMode)
                     SettingRow.value(
-                      title: 'Thử crash (dev)',
-                      subtitle: 'Gửi một lỗi thử lên Crashlytics',
+                      title: 'Remote Config',
+                      subtitle:
+                          'Cờ tính năng · thẻ tự thêm: '
+                          '${remoteConfig.customChallengesEnabled ? 'bật' : 'tắt'}'
+                          ' · nhóm lần đầu: '
+                          '${remoteConfig.groupsEnabled ? 'bật' : 'tắt'}',
                       value: '',
                       onTap: () async {
-                        final message = await ref
-                            .read(crashReporterProvider)
-                            .testCrash();
-                        snack(message);
+                        final changed = await remoteConfig.refresh();
+                        ref.read(remoteConfigRevisionProvider.notifier).bump();
+                        snack(
+                          changed
+                              ? 'Đã áp dụng cấu hình mới từ Console.'
+                              : 'Cấu hình chưa có gì mới.',
+                        );
                       },
                     ),
-                ],
-              ),
+                    SettingRow.value(
+                      title: 'Xuất & tải lên Thẻ tuần (PDF)',
+                      subtitle: 'Cloud Storage · reports/{uid}/',
+                      value: '',
+                      onTap: () => context.go(AppRoutes.journeyTab('stats')),
+                    ),
+                    if (!kReleaseMode)
+                      SettingRow.value(
+                        title: 'Thư viện component (dev)',
+                        value: '',
+                        onTap: () => context.push(AppRoutes.componentGallery),
+                      ),
+                    if (!kReleaseMode)
+                      SettingRow.value(
+                        title: 'Thử crash (dev)',
+                        subtitle: 'Gửi một lỗi thử lên Crashlytics',
+                        value: '',
+                        onTap: () async {
+                          final message = await ref
+                              .read(crashReporterProvider)
+                              .testCrash();
+                          snack(message);
+                        },
+                      ),
+                  ],
+                ),
               const SizedBox(height: AppSpace.s24),
               AppButton(
                 label: 'Đăng xuất',
@@ -243,6 +308,73 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Hộp thư các thông báo FCM đã nhận, mới nhất trước.
+class _InboxSheet extends ConsumerWidget {
+  const _InboxSheet();
+
+  static String _origin(MessageOrigin origin) => switch (origin) {
+    MessageOrigin.foreground => 'Đang mở app',
+    MessageOrigin.background => 'Từ nền',
+    MessageOrigin.terminated => 'App đã tắt',
+  };
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final inbox = ref.watch(inboxProvider);
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpace.s20,
+          0,
+          AppSpace.s20,
+          AppSpace.s20,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              'Thông báo đã nhận',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: AppSpace.s12),
+            ...switch (inbox) {
+              AsyncData(:final value) when value.isEmpty => <Widget>[
+                const Text(
+                  'Chưa có thông báo nào. Gửi thử từ Firebase Console.',
+                ),
+              ],
+              AsyncData(:final value) => <Widget>[
+                for (final item in value.take(6))
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpace.s12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          item.title.isEmpty
+                              ? '(không có tiêu đề)'
+                              : item.title,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        Text(item.body),
+                        Text(
+                          '${_origin(item.origin)} · ${ViDateFormat.time(item.receivedAt)}',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+              _ => const <Widget>[Text('Đang tải…')],
+            },
+          ],
         ),
       ),
     );

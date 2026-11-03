@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lab03/models/note.dart';
+import 'package:lab03/services/analytics_events.dart';
+import 'package:lab03/services/analytics_service.dart';
 import 'package:lab03/services/app_exception.dart';
 import 'package:lab03/services/auth_service.dart';
 import 'package:lab03/services/draft_store.dart';
@@ -13,6 +15,7 @@ void main() {
   late FakeAuthService auth;
   late FakeUserRepository users;
   late FakeDraftStore drafts;
+  late FakeAnalyticsService analytics;
   late ProviderContainer container;
 
   AuthViewModel vm() => container.read(authViewModelProvider.notifier);
@@ -22,11 +25,13 @@ void main() {
     auth = FakeAuthService();
     users = FakeUserRepository();
     drafts = FakeDraftStore();
+    analytics = FakeAnalyticsService();
     container = ProviderContainer(
       overrides: [
         authServiceProvider.overrideWithValue(auth),
         userRepositoryProvider.overrideWithValue(users),
         draftStoreProvider.overrideWithValue(drafts),
+        analyticsServiceProvider.overrideWithValue(analytics),
       ],
     );
     addTearDown(container.dispose);
@@ -137,6 +142,21 @@ void main() {
       },
     );
   });
+
+  test(
+    'đăng nhập ghi login + userId; đăng xuất ghi logout rồi xoá userId',
+    () async {
+      await vm().signInWithGoogle();
+      await Future<void>.delayed(Duration.zero);
+      expect(analytics.userId, testUser.uid);
+      expect(analytics.events.single.name, AnalyticsEvents.login);
+      expect(analytics.events.single.params[AnalyticsParams.method], 'google');
+
+      await vm().signOut();
+      expect(analytics.events.last.name, AnalyticsEvents.logout);
+      expect(analytics.userId, isNull);
+    },
+  );
 
   test('đăng xuất xoá dữ liệu trên máy (kể cả nháp S03)', () async {
     await vm().signInWithGoogle();

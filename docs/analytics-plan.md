@@ -111,24 +111,23 @@ demo Stage 5 trên emulator vẫn "thấy" sự kiện và test widget không c�
 
 Quy ước: snake_case, ≤ 40 ký tự, tham số ≤ 40 ký tự, giá trị chuỗi ≤ 100 ký tự,
 không dùng tiền tố `firebase_`, `google_`, `ga_`. Giá trị bool ghi dạng
-`'true'`/`'false'` (Analytics chỉ nhận String và num).
+`'true'`/`'false'` (Analytics chỉ nhận String và num). Không có tham số nào chứa
+tiêu đề/nội dung nốt, email, tên hay tên nhóm.
 
-| Sự kiện | Tham số | Gọi ở | Ghi chú |
-|---|---|---|---|
-| `login` | `method` (`email`, `google`) | `AuthViewModel` | Dùng `logLogin` |
-| `sign_up` | `method` | `AuthViewModel` | Dùng `logSignUp` |
-| `note_saved` | `mood`, `note_type`, `has_journal`, `duration_ms` | `NoteComposerViewModel` | Đo tiêu chí F2 "< 30 giây" |
-| `note_edited` | `note_type` | `NoteDetailViewModel` | |
-| `note_deleted` | `note_type` | `NoteDetailViewModel` | |
-| `jar_opened` | `note_count_bucket` (`0`, `1_9`, `10_49`, `50_plus`) | `JarViewModel` | |
-| `challenge_opened` | `tier`, `challenge_id` | `ChallengesViewModel` | `challenge_id` là id kho, không phải PII |
-| `challenge_completed` | `tier`, `challenge_id`, `minutes` | `ChallengeDetailViewModel` | |
-| `report_exported` | `format` (`pdf`), `week_offset` | `WeeklyReportViewModel` | |
-| `group_created` | `member_count_bucket` | `GroupsViewModel` | |
-| `discord_room_opened` | `room_code`, `source` | `DiscordRoomsViewModel` | |
-| `self_control_toggled` | `enabled` | `SelfControlViewModel` | |
-| `settings_changed` | `key` | `SettingsViewModel` | Không log giá trị |
-| `screen_view` | `firebase_screen` | `AnalyticsObserver` | Tự động theo route |
+| # | Sự kiện | Kích hoạt khi | Tham số (kiểu) | Gọi ở | Luồng Lab 2 · tiêu chí | Câu hỏi sản phẩm |
+|---|---|---|---|---|---|---|
+| 1 | `login` | Đăng nhập xong (Google/email) | `method` (String: `google`, `email`) | `AuthViewModel` | P1 · vào được app lần đầu | Người dùng chọn cách đăng nhập nào? |
+| 2 | `logout` | Bấm Đăng xuất | — | `AuthViewModel` | S12 · quyền riêng tư | Bao nhiêu người đăng xuất mỗi tuần? |
+| 3 | `note_saved` | Lưu nốt Chiến thắng ở bước 3 | `mood` (String), `note_type` (String), `has_journal` (String bool), `duration_ms` (int) | `NoteComposerViewModel` | F1 · ghi một nốt dưới 30 giây | Bao nhiêu phần trăm nốt được lưu dưới 30 000 ms? |
+| 4 | `note_viewed` | Mở chi tiết một nốt (S06) | `note_type` (String) | `NoteDetailViewModel` | F1 · xem lại nốt cũ | Người dùng có quay lại xem nốt đã ghi không? |
+| 5 | `challenge_opened` | Mở chi tiết thẻ thử thách (S08) | `challenge_id` (String, id kho), `note_type` (String: chủ đề) | `ChallengeDetailViewModel` | F3 · thử thách | Thẻ nào được mở nhiều nhưng ít được làm xong? |
+| 6 | `challenge_completed` | Lưu kết quả thẻ | `challenge_id` (String), `minutes` (int, thẻ vận động) | `ChallengeDetailViewModel` | F3 · hoàn thành thẻ | Tỉ lệ hoàn thành sau khi mở thẻ là bao nhiêu? |
+| 7 | `self_control_logged` | Ghi một lần tự chủ | `has_habit` (String bool) | `SelfControlViewModel` | F2 · tự chủ | Người dùng theo dõi thói quen cụ thể hay ghi chung? |
+| 8 | `report_exported` | Xuất Thẻ tuần PDF xong | `format` (String: `pdf`) | `WeeklyReportViewModel` | S11b · xuất tệp | Có ai xuất báo cáo tuần không? |
+| — | `screen_view` | Đổi màn | `firebase_screen` (String, mẫu route như `/note/saved/:id`) | `appRouterProvider` | mọi luồng | Luồng nào bị bỏ giữa chừng? |
+
+Có 8 sự kiện tuỳ chỉnh (yêu cầu tối thiểu 7) cộng `screen_view`. User ID đặt
+bằng `setUserId(uid)` khi đăng nhập hoặc khôi phục phiên, xoá khi đăng xuất.
 
 Giới hạn cần nhớ: tối đa **500 loại sự kiện**, **25 user property**; Crashlytics
 giữ **8 non-fatal** gần nhất, **64 custom key** (1 kB/key), log tối đa 64 kB.
@@ -202,6 +201,10 @@ adb shell setprop log.tag.FirebaseCrashlytics DEBUG
 adb logcat -s FirebaseCrashlytics      # "Crashlytics report upload complete" / 204
 ```
 
+Bằng chứng DebugView cho từng sự kiện: chạy app với `debug.firebase.analytics.app`,
+thực hiện từng hành động ở bảng §4, mở **Analytics → DebugView** và chụp dòng sự
+kiện cùng bảng tham số (xem ảnh trong `evidence/analytics/`).
+
 Test tự động: thêm `FakeAnalyticsService`/`FakeCrashReporter` vào
 `test/support/fakes.dart`, override trong `pumpApp`, assert danh sách event.
 Không để test nào gọi plugin thật.
@@ -218,14 +221,15 @@ Không để test nào gọi plugin thật.
 4. (Nếu deploy) `.firebaserc` đã trỏ `prm393-not-lab3`; test Security Rules vẫn
    dùng `demo-prm393` trong `firebase/package.json` để không cần đăng nhập.
 
-## 10. Ngoài phạm vi (Stage 5, việc tiếp theo)
+## 10. Remote Config và FCM (đã làm cùng Stage 5)
 
-- **Remote Config**: thêm `firebase_remote_config`, hiện thực
-  `FirebaseRemoteConfigService` cho interface đã có trong
-  `lib/services/remote_config_service.dart` (6 giá trị mặc định đang dùng).
-- **FCM**: `firebase_messaging` + `MessagingService`/`NotificationInbox` như
-  bảng service trong `docs/architecture.md`, dùng lại
-  `flutter_local_notifications`.
+- **Remote Config**: `lib/firebase/firebase_remote_config_service.dart` hiện thực
+  `RemoteConfigService`; mặc định lấy từ `InAppRemoteConfig`, tải thất bại thì dùng
+  mặc định. Mẫu tham số: `firebase/remoteconfig.template.json`, đưa lên bằng
+  `firebase deploy --only remoteconfig`. S12 khu demo có dòng Remote Config (chạm để tải lại).
+- **FCM**: `lib/firebase/firebase_messaging_service.dart`. Xin quyền, nhắc mở cài đặt khi bị
+  từ chối, hộp thư lưu thông báo kèm trạng thái nhận (đang mở / nền / đã tắt). Gửi thử bằng
+  FCM HTTP v1 tới token in ra log (`[fcm] token`).
 
 ## 11. Rủi ro
 

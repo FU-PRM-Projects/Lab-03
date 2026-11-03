@@ -1,0 +1,25 @@
+{
+  "parameters": {
+    "custom_challenges_enabled": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "valueType": "BOOLEAN",
+      "description": "Cờ: cho tự thêm thẻ thử thách (S07)"
+    },
+    "groups_enabled": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "valueType": "BOOLEAN",
+      "description": "Cờ: hiện kệ Nhóm lần đầu ở hũ (S05)"
+    },
+    "firebase_demo_enabled": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "valueType": "BOOLEAN",
+      "description": "Cờ: hiện khu demo Firebase ở S12"
+    }
+  }
+}

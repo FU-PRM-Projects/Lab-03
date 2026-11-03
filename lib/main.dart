@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,9 +10,12 @@ import 'app.dart';
 import 'firebase/crash_handlers.dart';
 import 'firebase/device_discord_service.dart';
 import 'firebase/device_services.dart';
+import 'firebase/firebase_analytics_service.dart';
 import 'firebase/firebase_auth_service.dart';
 import 'firebase/firebase_bootstrap.dart';
 import 'firebase/firebase_crash_reporter.dart';
+import 'firebase/firebase_messaging_service.dart';
+import 'firebase/firebase_remote_config_service.dart';
 import 'firebase/firestore_challenge_repository.dart';
 import 'firebase/firestore_group_repository.dart';
 import 'firebase/firestore_note_repository.dart';
@@ -18,14 +24,17 @@ import 'firebase/firestore_user_repository.dart';
 import 'firebase/local_nudge_service.dart';
 import 'firebase/prefs_draft_store.dart';
 import 'firebase/report_impl.dart';
+import 'services/analytics_service.dart';
 import 'services/auth_service.dart';
 import 'services/challenge_repository.dart';
 import 'services/crash_reporter.dart';
 import 'services/discord_service.dart';
 import 'services/draft_store.dart';
 import 'services/group_repository.dart';
+import 'services/messaging_service.dart';
 import 'services/note_repository.dart';
 import 'services/nudge_service.dart';
+import 'services/remote_config_service.dart';
 import 'services/report_services.dart';
 import 'services/self_control_services.dart';
 import 'services/user_repository.dart';
@@ -45,17 +54,31 @@ Future<void> main() async {
   // Android/iOS với project thật.
   const crashEnabled = !useFirebaseEmulator && !kIsWeb;
   installCrashHandlers(enabled: crashEnabled);
+  final messaging = FirebaseMessagingService();
+  if (!kIsWeb) {
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    unawaited(messaging.start());
+  }
   final auth = FirebaseAuthService(
     serverClientId: _googleServerClientId.isEmpty
         ? null
         : _googleServerClientId,
   );
   String? uid() => auth.currentUser?.uid;
+  // Remote Config không có emulator: dùng project thật, lỗi thì về mặc định.
+  final remoteConfig = await FirebaseRemoteConfigService.create();
 
   runApp(
     ProviderScope(
       overrides: [
         authServiceProvider.overrideWithValue(auth),
+        messagingServiceProvider.overrideWithValue(messaging),
+        analyticsServiceProvider.overrideWithValue(
+          useFirebaseEmulator
+              ? const DebugAnalyticsService()
+              : FirebaseAnalyticsService(),
+        ),
+        remoteConfigServiceProvider.overrideWithValue(remoteConfig),
         userRepositoryProvider.overrideWithValue(FirestoreUserRepository()),
         noteRepositoryProvider.overrideWithValue(
           FirestoreNoteRepository(currentUid: uid),

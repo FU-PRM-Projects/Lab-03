@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nốt — Technical Conference Presentation (Reveal.js)</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/theme/dracula.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight/monokai.css">
+
+    <style>
+      :root {
+        --conf-primary: #3d4fd6;
+        --conf-primary-light: #7a88ea;
+        --conf-accent-mint: #7fd9b3;
+        --conf-accent-amber: #ffd24a;
+        --conf-accent-coral: #f0524b;
+        --conf-accent-cyan: #8be9fd;
+        --conf-border: rgba(255, 255, 255, 0.12);
+        --conf-text-dim: #a0aec0;
+      }
+
+      .reveal {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        color: #f8f8f2;
+      }
+      .reveal h1, .reveal h2, .reveal h3 {
+        text-transform: none;
+        letter-spacing: -0.02em;
+        font-weight: 700;
+      }
+      .conf-grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        text-align: left;
+      }
+      .conf-grid-3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 20px;
+        text-align: left;
+      }
+      .conf-card {
+        background: rgba(40, 42, 54, 0.75);
+        border: 1px solid var(--conf-border);
+        border-radius: 12px;
+        padding: 20px;
+        backdrop-filter: blur(10px);
+      }
+      .conf-card.accent-coral { border-left: 4px solid var(--conf-accent-coral); }
+      .conf-card.accent-amber { border-left: 4px solid var(--conf-accent-amber); }
+      .conf-card.accent-mint  { border-left: 4px solid var(--conf-accent-mint); }
+      .conf-card.accent-cyan  { border-left: 4px solid var(--conf-accent-cyan); }
+      .conf-card.highlight    { border-left: 4px solid var(--conf-primary-light); }
+      .badge-group {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin: 16px 0;
+      }
+      .conf-badge {
+        display: inline-flex;
+        background: rgba(61, 79, 214, 0.25);
+        border: 1px solid rgba(122, 136, 234, 0.4);
+        color: #c0c8f8;
+        font-size: 0.55em;
+        font-weight: 600;
+        padding: 4px 12px;
+        border-radius: 20px;
+        text-transform: uppercase;
+      }
+      .conf-badge.green {
+        background: rgba(127, 217, 179, 0.2);
+        border-color: rgba(127, 217, 179, 0.5);
+        color: #7fd9b3;
+      }
+      .metric-box {
+        text-align: center;
+        padding: 16px;
+      }
+      .metric-value {
+        font-size: 2.2em;
+        font-weight: 800;
+        color: #7a88ea;
+        line-height: 1;
+        margin-bottom: 6px;
+      }
+      .metric-label {
+        font-size: 0.6em;
+        color: var(--conf-text-dim);
+        text-transform: uppercase;
+      }
+      .arch-flow {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin: 20px 0;
+      }
+      .arch-node {
+        background: #21222c;
+        border: 1px solid var(--conf-primary-light);
+        border-radius: 10px;
+        padding: 12px 16px;
+        text-align: center;
+        flex: 1;
+      }
+      .arch-node-title { font-weight: 700; font-size: 0.75em; color: #fff; }
+      .arch-node-desc { font-size: 0.55em; color: var(--conf-text-dim); }
+    </style>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+
+        <!-- Slide 1: Title -->
+        <section>
+          <div class="badge-group">
+            <span class="conf-badge">Flutter 3.47+</span>
+            <span class="conf-badge green">Riverpod 3.4</span>
+            <span class="conf-badge" style="color:#ffd24a;border-color:#ffd24a">Firebase Suite</span>
+            <span class="conf-badge" style="color:#8be9fd;border-color:#8be9fd">MVVM Pattern</span>
+          </div>
+          <h1 style="font-size: 2em; margin-top: 15px;">NỐT — KIẾN TRÚC OFFLINE-FIRST & RIVERPOD 3</h1>
+          <p style="color: #7a88ea; font-size: 0.95em;">Technical Conference Presentation — PRM393 Lab 3</p>
+          <p style="font-size: 0.7em; color: #a0aec0; margin-top: 30px;">
+            Hệ thống ghi nhận cảm xúc & chiến thắng nhỏ chịu tải cao • Target Android & Web
+          </p>
+          <aside class="notes">
+            Chào ban giám khảo và hội đồng chuyên môn. Nhóm xin thuyết trình về kiến trúc phần mềm và giải pháp kỹ thuật của ứng dụng Nốt.
+          </aside>
+        </section>
+
+        <!-- Slide 2: Context -->
+        <section>
+          <h2>Bối Cảnh & Ràng Buộc Kỹ Thuật</h2>
+          <p style="color: #a0aec0; font-size: 0.8em; margin-bottom: 24px;">
+            Thiết kế ứng dụng phục vụ sinh viên năm cuối bị kiệt sức (burnout)
+          </p>
+          <div class="conf-grid-3">
+            <div class="conf-card accent-coral">
+              <h3 style="font-size: 0.85em; color: #f0524b;">SLA Dưới 30 Giây</h3>
+              <p style="font-size: 0.7em;">Từ lúc nhận push notification buổi tối tới khi hoàn tất ghi 1 chiến thắng nhỏ.</p>
+            </div>
+            <div class="conf-card accent-amber">
+              <h3 style="font-size: 0.85em; color: #ffd24a;">Offline-First</h3>
+              <p style="font-size: 0.7em;">Ghi nhận dữ liệu tức thời không cần chờ mạng; đồng bộ ngầm khi có kết nối.</p>
+            </div>
+            <div class="conf-card accent-mint">
+              <h3 style="font-size: 0.85em; color: #7fd9b3;">Strict Isolation</h3>
+              <p style="font-size: 0.7em;">Widget không gọi Firebase SDK; cô lập 100% logic để kiểm thử tự động.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 3: Architecture -->
+        <section>
+          <h2>Kiến Trúc MVVM + Riverpod 3</h2>
+          <p style="color: #a0aec0; font-size: 0.8em;">Luồng phụ thuộc một chiều nghiêm ngặt (Unidirectional Flow)</p>
+          <div class="arch-flow">
+            <div class="arch-node">
+              <div class="arch-node-title">View Layer</div>
+              <div class="arch-node-desc">Screens & Widgets</div>
+            </div>
+            <div style="color:#7a88ea; font-weight:bold;">→</div>
+            <div class="arch-node">
+              <div class="arch-node-title">ViewModel</div>
+              <div class="arch-node-desc">Riverpod Notifier</div>
+            </div>
+            <div style="color:#7a88ea; font-weight:bold;">→</div>
+            <div class="arch-node">
+              <div class="arch-node-title">Service Interface</div>
+              <div class="arch-node-desc">Abstract Contract</div>
+            </div>
+            <div style="color:#7a88ea; font-weight:bold;">→</div>
+            <div class="arch-node">
+              <div class="arch-node-title">Infrastructure</div>
+              <div class="arch-node-desc">Firebase SDK</div>
+            </div>
+          </div>
+
+          <div class="conf-grid-2">
+            <div class="conf-card highlight">
+              <h4 style="font-size: 0.8em; color: #8be9fd; margin:0 0 8px 0;">Quy Tắc Bất Biến</h4>
+              <ul style="font-size: 0.7em; padding-left: 18px; margin:0;">
+                <li>Widget chỉ vẽ từ state, không có logic nghiệp vụ trong build().</li>
+                <li>Không mutable global state, không singleton đọc từ widget.</li>
+              </ul>
+            </div>
+            <div class="conf-card highlight">
+              <h4 style="font-size: 0.8em; color: #7fd9b3; margin:0 0 8px 0;">Hiệu Quả</h4>
+              <ul style="font-size: 0.7em; padding-left: 18px; margin:0;">
+                <li>Gắn Fake Service test UI trong tích tắc mà không phụ thuộc cloud.</li>
+                <li>Code base rõ ràng, sẵn sàng mở rộng web admin và backend sau này.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 4: Code Walkthrough -->
+        <section>
+          <h2>State Management: Sealed ViewState&lt;T&gt;</h2>
+          <pre><code class="language-dart" data-line-numbers="1-5|7-14|16-24">
+// 1. Định nghĩa sealed state exhaustive
+sealed class ViewState&lt;T&gt; {
+  const ViewState();
+}
+final class ViewLoading&lt;T&gt; extends ViewState&lt;T&gt; { const ViewLoading(); }
+final class ViewEmpty&lt;T&gt; extends ViewState&lt;T&gt; { const ViewEmpty(); }
+final class ViewFailure&lt;T&gt; extends ViewState&lt;T&gt; {
+  final String message;
+  const ViewFailure(this.message);
+}
+final class ViewSuccess&lt;T&gt; extends ViewState&lt;T&gt; {
+  final T data;
+  const ViewSuccess(this.data);
+}
+
+// 2. Switch expression an toàn trong build()
+Widget build(BuildContext context, WidgetRef ref) {
+  final state = ref.watch(todayVictoryViewModelProvider);
+  return switch (state) {
+    ViewLoading() => const ShimmerVictoryCard(),
+    ViewEmpty() => const EmptyJarMascot(),
+    ViewFailure(:final message) => ErrorNotice(message: message),
+    ViewSuccess(:final data) => VictoryCard(note: data),
+  };
+}
+          </code></pre>
+        </section>
+
+        <!-- Slide 5: Testing & Conclusion -->
+        <section>
+          <h2>Chất Lượng & Thành Quả Kỹ Thuật</h2>
+          <div class="conf-grid-3" style="margin-top: 24px;">
+            <div class="metric-box conf-card">
+              <div class="metric-value">12/12</div>
+              <div class="metric-label">Màn Hình Hoàn Thiện</div>
+            </div>
+            <div class="metric-box conf-card">
+              <div class="metric-value" style="color: #50fa7b;">100%</div>
+              <div class="metric-label">Security Rules Pass</div>
+            </div>
+            <div class="metric-box conf-card">
+              <div class="metric-value" style="color: #8be9fd;">&lt; 30s</div>
+              <div class="metric-label">SLA Ghi Nốt Thành Công</div>
+            </div>
+          </div>
+          <div style="margin-top: 30px;">
+            <p style="font-size: 0.85em; color: #bd93f9;">Nhấn ESC để xem tổng quan slide • Nhấn S để mở Speaker View</p>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/highlight/highlight.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/plugin/notes/notes.js"></script>
+    <script>
+      Reveal.initialize({
+        hash: true,
+        slideNumber: 'c/t',
+        transition: 'slide',
+        plugins: [ RevealHighlight, RevealNotes ]
+      });
+    </script>
+  </body>
+</html>

@@ -5,8 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/challenge.dart';
 import '../models/note.dart';
 import '../models/note_type.dart';
+import '../services/analytics_events.dart';
+import '../services/analytics_service.dart';
 import '../services/challenge_repository.dart';
 import '../services/clock.dart';
+import '../services/crash_reporter.dart';
 import '../services/note_repository.dart';
 import '../services/remote_config_service.dart';
 import 'challenges_view_model.dart';
@@ -113,6 +116,15 @@ class ChallengeDetailViewModel extends Notifier<ChallengeDetailState> {
         challenge: Data<Challenge>(challenge),
         minutes: challenge.minutes,
       );
+      unawaited(
+        ref.read(analyticsServiceProvider).track(
+          AnalyticsEvents.challengeOpened,
+          <String, Object>{
+            AnalyticsParams.challengeId: challenge.id,
+            AnalyticsParams.noteType: challenge.topic.id,
+          },
+        ),
+      );
     } on Object catch (error) {
       if (ref.mounted) {
         state = state.copyWith(challenge: ErrorMessages.failure(error));
@@ -188,7 +200,15 @@ class ChallengeDetailViewModel extends Notifier<ChallengeDetailState> {
             ),
             createdAt: ref.read(clockProvider).now(),
           );
-      // Stage 5: logEvent(challenge_completed).
+      unawaited(
+        ref.read(analyticsServiceProvider).track(
+          AnalyticsEvents.challengeCompleted,
+          <String, Object>{
+            AnalyticsParams.challengeId: challenge.id,
+            if (movement) AnalyticsParams.minutes: minutes,
+          },
+        ),
+      );
       await _markCompleted(challenge);
       if (!ref.mounted) return;
       state = state.copyWith(saving: false, savedNoteId: note.id);
@@ -218,9 +238,13 @@ class ChallengeDetailViewModel extends Notifier<ChallengeDetailState> {
       if (ref.mounted) {
         ref.read(challengesViewModelProvider.notifier).clearEasier();
       }
-    } on Object {
+    } on Object catch (error, stack) {
       // Nốt đã nằm trong hũ; tiến độ được tính lại lần làm thẻ sau.
-      // Stage 5: ghi non-fatal qua CrashReporter.
+      unawaited(
+        ref
+            .read(crashReporterProvider)
+            .recordError(error, stack, reason: 'challenge_progress'),
+      );
     }
   }
 
