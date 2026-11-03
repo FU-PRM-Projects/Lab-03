@@ -63,23 +63,18 @@ class FirebaseMessagingService implements MessagingService {
     if (_started || kIsWeb) return;
     _started = true;
     try {
+      // Plugin chỉ giữ một bộ nghe chạm cho cả app. Lời nhắc trên máy
+      // (`LocalNudgeService`) khởi tạo sau thì bộ nghe của nó thay bộ này;
+      // cả hai đều mở màn theo `payload`, nên bộ nào thắng cũng mở đúng màn.
       await _local.initialize(
         settings: const InitializationSettings(
           android: AndroidInitializationSettings('@mipmap/ic_launcher'),
         ),
+        onDidReceiveNotificationResponse: (response) {
+          if (response.payload case final route?) _routes.add(route);
+        },
       );
-      FirebaseMessaging.onMessage.listen((m) async {
-        await _record(m, MessageOrigin.foreground);
-        final n = m.notification;
-        if (n != null) {
-          await _local.show(
-            id: m.hashCode,
-            title: n.title,
-            body: n.body,
-            notificationDetails: const NotificationDetails(android: _channel),
-          );
-        }
-      });
+      FirebaseMessaging.onMessage.listen(showForeground);
       FirebaseMessaging.onMessageOpenedApp.listen((m) async {
         await _record(m, MessageOrigin.background);
         _routes.add(routeFromData(m.data));
@@ -93,6 +88,23 @@ class FirebaseMessagingService implements MessagingService {
       unawaited(_logToken());
     } on Object catch (error) {
       debugPrint('[fcm] không khởi động được: $error');
+    }
+  }
+
+  /// Tin đến khi app đang mở: lưu vào hộp thư và hiện heads-up. `payload` là
+  /// màn đích, để chạm vào thông báo mở đúng màn như khi app ở nền.
+  @visibleForTesting
+  Future<void> showForeground(RemoteMessage m) async {
+    await _record(m, MessageOrigin.foreground);
+    final n = m.notification;
+    if (n != null) {
+      await _local.show(
+        id: m.hashCode,
+        title: n.title,
+        body: n.body,
+        notificationDetails: const NotificationDetails(android: _channel),
+        payload: routeFromData(m.data),
+      );
     }
   }
 
