@@ -1,0 +1,10 @@
+{
+  "quick_win_chips": "[\"Dọn phòng\",\"Giúp ai đó\",\"Đi bộ\",\"Ăn đủ bữa\",\"Ngủ trước 12h\",\"Xong 1 việc khó\"]",
+  "groups_enabled": "true",
+  "custom_challenges_enabled": "true",
+  "discord_enabled": "true",
+  "discord_invite_url": "https://discord.gg/not-demo",
+  "discord_channel_map": "{}",
+  "discord_greetings": "[\"Chào mọi người! Mình mới vào, mong được làm quen.\",\"Hi cả phòng, mình đang tập bắt chuyện.\"]",
+  "firebase_demo_enabled": "true"
+}
