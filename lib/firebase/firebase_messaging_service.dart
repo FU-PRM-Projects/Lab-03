@@ -164,6 +164,12 @@ class FirebaseMessagingService implements MessagingService {
         ReceivedNotification.fromJson(jsonDecode(raw) as Map<String, dynamic>),
     ];
   }
+
+  @override
+  Future<void> clearInbox() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_inboxKey);
+  }
 }
 
 /// Chạy trong isolate riêng khi app ở nền hoặc đã tắt. Thông báo có phần
