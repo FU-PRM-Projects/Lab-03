@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lab03/firebase/firebase_remote_config_service.dart';
 import 'package:lab03/services/remote_config_service.dart';
@@ -41,5 +44,22 @@ void main() {
     expect(config.groupsEnabled, isTrue);
     expect(config.firebaseDemoEnabled, isTrue);
     expect(await config.refresh(), isFalse);
+  });
+
+  test('firebase/remote-config-defaults.json khớp InAppRemoteConfig', () {
+    final file = File('firebase/remote-config-defaults.json');
+    final values = (jsonDecode(file.readAsStringSync()) as Map)
+        .cast<String, String>();
+    const config = InAppRemoteConfig();
+    expect(values, <String, String>{
+      'quick_win_chips': jsonEncode(config.quickWinChips),
+      'groups_enabled': '${config.groupsEnabled}',
+      'custom_challenges_enabled': '${config.customChallengesEnabled}',
+      'discord_enabled': '${config.discordEnabled}',
+      'discord_invite_url': config.discordInviteUrl,
+      'discord_channel_map': jsonEncode(config.discordChannels),
+      'discord_greetings': jsonEncode(config.discordGreetings),
+      'firebase_demo_enabled': '${config.firebaseDemoEnabled}',
+    });
   });
 }

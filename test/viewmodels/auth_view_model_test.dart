@@ -6,6 +6,7 @@ import 'package:lab03/services/analytics_service.dart';
 import 'package:lab03/services/app_exception.dart';
 import 'package:lab03/services/auth_service.dart';
 import 'package:lab03/services/draft_store.dart';
+import 'package:lab03/services/messaging_service.dart';
 import 'package:lab03/services/user_repository.dart';
 import 'package:lab03/viewmodels/auth_view_model.dart';
 
@@ -16,6 +17,7 @@ void main() {
   late FakeUserRepository users;
   late FakeDraftStore drafts;
   late FakeAnalyticsService analytics;
+  late FakeMessagingService messaging;
   late ProviderContainer container;
 
   AuthViewModel vm() => container.read(authViewModelProvider.notifier);
@@ -26,12 +28,14 @@ void main() {
     users = FakeUserRepository();
     drafts = FakeDraftStore();
     analytics = FakeAnalyticsService();
+    messaging = FakeMessagingService();
     container = ProviderContainer(
       overrides: [
         authServiceProvider.overrideWithValue(auth),
         userRepositoryProvider.overrideWithValue(users),
         draftStoreProvider.overrideWithValue(drafts),
         analyticsServiceProvider.overrideWithValue(analytics),
+        messagingServiceProvider.overrideWithValue(messaging),
       ],
     );
     addTearDown(container.dispose);
@@ -166,6 +170,14 @@ void main() {
     expect(users.clearCount, 1);
     expect(drafts.draft, isNull);
     expect(auth.currentUser, isNull);
+  });
+
+  test('đăng xuất xoá hộp thư FCM và báo màn hộp thư đọc lại', () async {
+    await vm().signInWithGoogle();
+    final revision = container.read(inboxRevisionProvider);
+    await vm().signOut();
+    expect(messaging.clearInboxCount, 1);
+    expect(container.read(inboxRevisionProvider), revision + 1);
   });
 
   test('không chạy hai việc cùng lúc', () async {

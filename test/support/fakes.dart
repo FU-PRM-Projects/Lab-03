@@ -18,6 +18,7 @@ import 'package:lab03/services/crash_reporter.dart';
 import 'package:lab03/services/discord_service.dart';
 import 'package:lab03/services/draft_store.dart';
 import 'package:lab03/services/group_repository.dart';
+import 'package:lab03/services/messaging_service.dart';
 import 'package:lab03/services/note_repository.dart';
 import 'package:lab03/services/nudge_service.dart';
 import 'package:lab03/services/report_services.dart';
@@ -132,6 +133,14 @@ class FakeAnalyticsService implements AnalyticsService {
 
   @override
   Future<void> setUserId(String? uid) async => userId = uid;
+}
+
+/// FCM không khả dụng trong test; chỉ đếm số lần xoá hộp thư.
+class FakeMessagingService extends NoopMessagingService {
+  int clearInboxCount = 0;
+
+  @override
+  Future<void> clearInbox() async => clearInboxCount++;
 }
 
 /// Ghi lại lỗi non-fatal, user ID và khoá chẩn đoán gửi lên Crashlytics.

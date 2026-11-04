@@ -35,23 +35,23 @@ Giá trị cho cột Kết luận:
 
 | Kết luận | Số góp ý |
 |---|---|
-| Đúng, chưa sửa | 39 |
+| Đúng, chưa sửa | 37 |
 | Không cần | 11 |
-| Đúng, đã sửa | 1 |
+| Đúng, đã sửa | 3 |
 | Sai | 1 |
 
 ## Từng góp ý
 
 | ID | PR | Vị trí | Mức độ | Loại | Công sức | Góp ý của AI | Kết luận | Ghi chú |
 |---|---|---|---|---|---|---|---|---|
-| 38-bfeb007a | #38 | `lib/firebase/firebase_messaging_service.dart:12-18` | Major | Security & Privacy | Quick win | [Clear the notification inbox on sign-out.](https://github.com/FU-PRM-Projects/Lab-03/pull/38#discussion_r4444517565) | Đúng, chưa sửa | `signOut` không xoá `fcm_inbox`, tài khoản sau đọc được thông báo của tài khoản trước. Lỗi quyền riêng tư thật, nên sửa trước khi merge #38. |
+| 38-bfeb007a | #38 | `lib/firebase/firebase_messaging_service.dart:12-18` | Major | Security & Privacy | Quick win | [Clear the notification inbox on sign-out.](https://github.com/FU-PRM-Projects/Lab-03/pull/38#discussion_r4444517565) | Đúng, đã sửa | 736453a: `signOut` xoá `fcm_inbox` và bump `inboxRevisionProvider`; có test ở `auth_view_model_test.dart` và `firebase_messaging_service_test.dart`. |
 | 38-cfffb9a5 | #38 | `lib/firebase/firebase_messaging_service.dart:66-70` | Major | Functional Correctness | Quick win | [Pass Darwin settings to `initialize` in `start()`.](https://github.com/FU-PRM-Projects/Lab-03/pull/38#discussion_r4444517594) | Không cần | Đúng với iOS, nhưng app chỉ chạy Android và web (`firebase_options.dart` không có iOS). Gắn mức Major là quá tay. |
 | 38-042626b5 | #38 | `evidence/artemis/capture_loop.sh:4` | Minor | Functional Correctness | Quick win | [Create the screenshot output directory before the capture loop starts.](https://github.com/FU-PRM-Projects/Lab-03/pull/38#discussion_r4447174005) | Không cần | Script phụ để chụp bằng chứng, không thuộc app. AI bỏ sót lỗi lớn hơn: đường dẫn cứng `/e/PRM-Lab03/...` của máy cá nhân. |
 | 38-98a589d3 | #38 | `evidence/artemis/capture_loop.sh:5` | Minor | Stability & Availability | Quick win | [Bound the capture loop with a deadline or a run-process check.](https://github.com/FU-PRM-Projects/Lab-03/pull/38#discussion_r4447174032) | Không cần | Cùng script phụ chụp bằng chứng; chạy tay rồi tắt. |
 | 38-bac00548 | #38 | `evidence/artemis/capture_loop.sh:6` | Minor | Stability & Availability | Quick win | [Add the date to screenshot filenames so reruns do not overwrite earlier captures.](https://github.com/FU-PRM-Projects/Lab-03/pull/38#discussion_r4447174042) | Không cần | Cùng script phụ. Comment này còn gộp thêm một góp ý thứ hai (file PNG rỗng khi `adb` lỗi), cũng không cần. |
 | 38-70fbc6ae | #38 | `lib/firebase/firebase_messaging_service.dart:17-22` | Minor | Data Integrity & Integration | Low value | [Serialize the inbox read-modify-write in `_saveToInbox`.](https://github.com/FU-PRM-Projects/Lab-03/pull/38#discussion_r4444517581) | Không cần | Đúng về lý thuyết (hai tin foreground đến cùng lúc). AI tự đánh "Low value"; hộp thư chỉ để demo. |
 | 38-df26118d | #38 | `lib/firebase/firebase_messaging_service.dart:70-71` | Minor | Functional Correctness | Quick win | [Notify the open inbox after a foreground message is saved.](https://github.com/FU-PRM-Projects/Lab-03/pull/38#discussion_r4444517670) | Đúng, chưa sửa | Không chỗ nào bump `inboxRevisionProvider`; sheet đang mở không tự cập nhật. Ảnh hưởng nhỏ. |
-| 38-75b5e00c | #38 | `lib/firebase/firebase_messaging_service.dart:83-85` | Minor | Functional Correctness | Quick win | [Set the route as the payload of foreground notifications.](https://github.com/FU-PRM-Projects/Lab-03/pull/38#discussion_r4445377398) | Đúng, chưa sửa | `_local.show` không có `payload`, còn `LocalNudgeService` bỏ qua payload rỗng, nên chạm thông báo lúc app đang mở không mở đúng màn. Chạm vào yêu cầu FCM "chạm vào mở đúng màn". |
+| 38-75b5e00c | #38 | `lib/firebase/firebase_messaging_service.dart:83-85` | Minor | Functional Correctness | Quick win | [Set the route as the payload of foreground notifications.](https://github.com/FU-PRM-Projects/Lab-03/pull/38#discussion_r4445377398) | Đúng, đã sửa | 5e13651: thông báo foreground gắn `payload` là màn đích (`routeFromData`), bộ nghe chạm của FCM cũng mở màn theo payload; có test ở `firebase_messaging_service_test.dart`. |
 | 38-66b21d84 | #38 | `lib/firebase/firebase_messaging_service.dart:84-85` | Minor | Functional Correctness | Quick win | [Emit the route before awaiting the inbox write.](https://github.com/FU-PRM-Projects/Lab-03/pull/38#discussion_r4445377412) | Đúng, chưa sửa | Thứ tự `await` có thật; chỉ lỗi khi SharedPreferences hỏng. |
 | 38-984d603f | #38 | `lib/firebase/firebase_remote_config_service.dart:49-78` | Minor | Functional Correctness | Quick win | [Fall back to in-app booleans when `setDefaults` fails.](https://github.com/FU-PRM-Projects/Lab-03/pull/38#discussion_r4444517688) | Đúng, chưa sửa | Bốn getter bool không có fallback; chỉ xảy ra khi `setDefaults` lỗi (hiếm). |
 | 38-53c2130e | #38 | `lib/firebase/firebase_remote_config_service.dart:66-70` | Minor | Functional Correctness | Heavy lift | [Make the explicit Remote Config refresh bypass the release fetch throttle.](https://github.com/FU-PRM-Projects/Lab-03/pull/38#discussion_r4444517706) | Đúng, chưa sửa | Chỉ ảnh hưởng bản release (fetch 1 giờ, chưa dùng `onConfigUpdated`). Bản debug dùng để demo có interval 0. |
@@ -146,16 +146,23 @@ Mỗi góp ý ở bảng trên được đối chiếu với code hiện tại: 
 
 ### Nhóm đã dùng kết quả thế nào
 
-Chỉ 1/40 lỗi thật đã được sửa (38-322a383f). #28 và #29 đã merge mà chưa xử lý góp ý nào.
-Đây là điểm yếu trong quy trình của nhóm, không phải của AI: góp ý có sẵn nhưng không ai
-đọc trước khi merge. Nên sửa trước khi nộp, theo thứ tự:
+Lúc merge, chỉ 1/40 lỗi thật đã được sửa (38-322a383f); #28 và #29 đã merge mà chưa xử lý
+góp ý nào. Đây là điểm yếu trong quy trình của nhóm, không phải của AI: góp ý có sẵn nhưng
+không ai đọc trước khi merge.
 
-1. 38-bfeb007a: xoá hộp thư FCM khi đăng xuất (quyền riêng tư).
-2. 38-75b5e00c: gắn `payload` cho thông báo foreground để chạm vào mở đúng màn (yêu cầu FCM).
-3. 38-0f823abd: chỉ ghi `logout` và xoá user ID sau khi đăng xuất thành công.
-4. 38-3c797d6d, 28-d3e86e35: thêm `context.mounted` trong màn Cài đặt.
-5. 38-01eec050: hiện trạng thái lỗi khi hộp thư không tải được.
-6. 28-5f2af2d9, 28-f26b506b: seeder không mặc định ghi vào project thật; deploy chờ CI.
+Sau khi tổng hợp file này, nhóm sửa hai lỗi nặng nhất, mỗi lỗi một commit kèm test, nâng
+lên 3/40:
+
+- 38-bfeb007a (736453a): xoá hộp thư FCM khi đăng xuất (quyền riêng tư).
+- 38-75b5e00c (5e13651): gắn màn đích cho thông báo foreground để chạm vào mở đúng màn
+  (yêu cầu FCM).
+
+Nên sửa tiếp, theo thứ tự:
+
+1. 38-0f823abd: chỉ ghi `logout` và xoá user ID sau khi đăng xuất thành công.
+2. 38-3c797d6d, 28-d3e86e35: thêm `context.mounted` trong màn Cài đặt.
+3. 38-01eec050: hiện trạng thái lỗi khi hộp thư không tải được.
+4. 28-5f2af2d9, 28-f26b506b: seeder không mặc định ghi vào project thật; deploy chờ CI.
 
 ### Có nên tin CodeRabbit không
 
