@@ -2,7 +2,9 @@ import 'package:flutter/services.dart' show SystemUiOverlayStyle;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../models/image_ref.dart';
 import '../theme/app_tokens.dart';
+import 'app_network_image.dart';
 
 /// Nút đầu của [AppTopBar]: Back (mặc định) hoặc Close (form).
 enum AppBarLeading { back, close }
@@ -90,12 +92,16 @@ class TabHeader extends StatelessWidget {
     required this.title,
     required this.onNotifications,
     required this.onProfile,
+    this.photo,
     super.key,
   });
 
   final String title;
   final VoidCallback onNotifications;
   final VoidCallback onProfile;
+
+  /// Ảnh đại diện; `null` thì dùng avatar mặc định.
+  final ImageRef? photo;
 
   @override
   Widget build(BuildContext context) {
@@ -155,10 +161,16 @@ class TabHeader extends StatelessWidget {
                 child: InkWell(
                   onTap: onProfile,
                   customBorder: const CircleBorder(),
-                  child: SvgPicture.asset(
-                    'assets/icons/avatar.svg',
-                    width: AppSize.minTouch,
-                    height: AppSize.minTouch,
+                  child: AppNetworkImage.square(
+                    image: photo,
+                    semanticLabel: 'Ảnh đại diện',
+                    size: AppSize.minTouch,
+                    circle: true,
+                    fallback: SvgPicture.asset(
+                      'assets/icons/avatar.svg',
+                      width: AppSize.minTouch,
+                      height: AppSize.minTouch,
+                    ),
                   ),
                 ),
               ),
