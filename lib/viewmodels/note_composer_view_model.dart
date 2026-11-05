@@ -116,7 +116,10 @@ class NoteComposerViewModel extends Notifier<NoteComposerState> {
   NoteComposerState build() {
     _openedAt = ref.read(clockProvider).now();
     // Ảnh vừa tải lên xong: gắn vào nháp rồi đưa khối chọn ảnh về đầu.
-    ref.listen(imageUploadViewModelProvider(ImageFolder.note), (previous, next) {
+    ref.listen(imageUploadViewModelProvider(ImageFolder.note), (
+      previous,
+      next,
+    ) {
       final image = next.image;
       if (next.phase == ImageUploadPhase.done &&
           image != null &&

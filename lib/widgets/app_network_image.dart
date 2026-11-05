@@ -62,7 +62,8 @@ class _AppNetworkImageState extends State<AppNetworkImage> {
 
     final Widget content;
     if (ref == null) {
-      content = widget.fallback ?? const _Placeholder(icon: Icons.image_outlined);
+      content =
+          widget.fallback ?? const _Placeholder(icon: Icons.image_outlined);
     } else {
       final url = size != null
           ? CloudinaryUrl.thumb(ref.url, size: _pixels(size, ratio))

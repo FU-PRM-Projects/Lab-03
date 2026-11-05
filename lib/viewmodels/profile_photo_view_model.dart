@@ -53,16 +53,22 @@ class ProfilePhotoViewModel extends Notifier<ProfilePhotoState> {
     });
 
     if (uid == null) return const ProfilePhotoState();
-    _sub = ref.read(profilePhotoRepositoryProvider).watch().listen((photo) {
-      if (!ref.mounted) return;
-      state = ProfilePhotoState(
-        photo: photo,
-        saving: state.saving,
-        message: state.message,
-      );
-    }, onError: (Object _) {
-      // Không đọc được ảnh thì giữ avatar mặc định, không báo lỗi.
-    });
+    _sub = ref
+        .read(profilePhotoRepositoryProvider)
+        .watch()
+        .listen(
+          (photo) {
+            if (!ref.mounted) return;
+            state = ProfilePhotoState(
+              photo: photo,
+              saving: state.saving,
+              message: state.message,
+            );
+          },
+          onError: (Object _) {
+            // Không đọc được ảnh thì giữ avatar mặc định, không báo lỗi.
+          },
+        );
     return const ProfilePhotoState();
   }
 
@@ -96,7 +102,8 @@ class ProfilePhotoViewModel extends Notifier<ProfilePhotoState> {
     }
     // Đưa khối chọn ảnh về trạng thái đầu: nó sẽ hiện ảnh đã lưu.
     if (ref.mounted) {
-      ref.read(imageUploadViewModelProvider(ImageFolder.avatar).notifier)
+      ref
+          .read(imageUploadViewModelProvider(ImageFolder.avatar).notifier)
           .reset();
     }
   }

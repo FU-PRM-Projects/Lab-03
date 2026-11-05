@@ -64,20 +64,23 @@ class GroupCard extends StatelessWidget {
             )
           else
             Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: scheme.primaryContainer,
-              borderRadius: BorderRadius.circular(10),
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: scheme.primaryContainer,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              alignment: Alignment.center,
+              child: SvgPicture.asset(
+                create ? 'assets/icons/plus.svg' : 'assets/icons/phase.svg',
+                width: 20,
+                height: 20,
+                colorFilter: ColorFilter.mode(
+                  scheme.onSurface,
+                  BlendMode.srcIn,
+                ),
+              ),
             ),
-            alignment: Alignment.center,
-            child: SvgPicture.asset(
-              create ? 'assets/icons/plus.svg' : 'assets/icons/phase.svg',
-              width: 20,
-              height: 20,
-              colorFilter: ColorFilter.mode(scheme.onSurface, BlendMode.srcIn),
-            ),
-          ),
           Text(
             _title,
             style: theme.textTheme.bodyMedium?.copyWith(

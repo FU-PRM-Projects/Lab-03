@@ -70,7 +70,10 @@ class _CreateGroupSheetState extends ConsumerState<_CreateGroupSheet> {
       imageUploadViewModelProvider(ImageFolder.group).notifier,
     );
     // Ảnh vừa tải xong: giữ trong sheet, đưa khối chọn ảnh về đầu.
-    ref.listen(imageUploadViewModelProvider(ImageFolder.group), (previous, next) {
+    ref.listen(imageUploadViewModelProvider(ImageFolder.group), (
+      previous,
+      next,
+    ) {
       final image = next.image;
       if (next.phase == ImageUploadPhase.done &&
           image != null &&
@@ -148,7 +151,10 @@ class _CreateGroupSheetState extends ConsumerState<_CreateGroupSheet> {
                     ),
                 ],
               ),
-              Text('Ảnh nhóm (không bắt buộc)', style: theme.textTheme.labelLarge),
+              Text(
+                'Ảnh nhóm (không bắt buộc)',
+                style: theme.textTheme.labelLarge,
+              ),
               AppImagePicker(
                 upload: upload,
                 image: _image,

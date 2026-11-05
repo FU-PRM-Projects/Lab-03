@@ -131,7 +131,10 @@ class _Progress extends StatelessWidget {
           Row(
             children: <Widget>[
               Expanded(
-                child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
+                child: Text(
+                  text,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
               ),
               if (uploading && onCancel != null)
                 AppButton(

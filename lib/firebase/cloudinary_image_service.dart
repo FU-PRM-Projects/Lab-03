@@ -96,7 +96,10 @@ class CloudinaryImageService implements ImageService {
         );
       }
       out.add(
-        ImageUploadProgress(1, image: ImageRef(url: url, publicId: publicId)),
+        ImageUploadProgress(
+          1,
+          image: ImageRef(url: url, publicId: publicId),
+        ),
       );
     } on DioException catch (e, stack) {
       if (!out.isClosed) out.addError(_map(e), stack);
