@@ -79,11 +79,7 @@ class FirebaseStreakShareService implements StreakShareService {
         ),
       );
     } on Object catch (error) {
-      throw AppException(
-        AppErrorKind.unknown,
-        code: 'share',
-        detail: '$error',
-      );
+      throw AppException(AppErrorKind.unknown, code: 'share', detail: '$error');
     }
   }
 }

@@ -34,6 +34,5 @@ abstract interface class StreakShareService {
 }
 
 final streakShareServiceProvider = Provider<StreakShareService>(
-  (ref) =>
-      throw UnimplementedError('streakShareServiceProvider chưa được gắn'),
+  (ref) => throw UnimplementedError('streakShareServiceProvider chưa được gắn'),
 );

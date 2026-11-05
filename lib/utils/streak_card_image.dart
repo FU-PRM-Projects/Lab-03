@@ -6,8 +6,10 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Chụp [boundaryKey] thành PNG. Tách khỏi UI để test thay bằng ảnh giả.
-typedef StreakImageRenderer =
-    Future<Uint8List> Function(GlobalKey boundaryKey, {double pixelRatio});
+typedef StreakImageRenderer = Future<Uint8List> Function(
+  GlobalKey boundaryKey, {
+  double pixelRatio,
+});
 
 final streakImageRendererProvider = Provider<StreakImageRenderer>(
   (ref) => renderStreakCardImage,

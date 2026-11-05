@@ -9,11 +9,7 @@ import '../utils/vi_date_format.dart';
 /// Thẻ dọc 9:16 để chia sẻ chuỗi ngày. Không chứa nội dung nốt hay thông tin
 /// cá nhân — chỉ con số chuỗi, kỷ lục, mốc và 7 ngày gần nhất.
 class StreakShareCard extends StatelessWidget {
-  const StreakShareCard({
-    required this.streak,
-    required this.date,
-    super.key,
-  });
+  const StreakShareCard({required this.streak, required this.date, super.key});
 
   final StreakSummary streak;
 
@@ -178,11 +174,7 @@ class StreakShareCard extends StatelessWidget {
 }
 
 class _Stat extends StatelessWidget {
-  const _Stat({
-    required this.label,
-    required this.value,
-    required this.color,
-  });
+  const _Stat({required this.label, required this.value, required this.color});
 
   final String label;
   final String value;
