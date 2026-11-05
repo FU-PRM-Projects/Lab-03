@@ -697,6 +697,244 @@ html, body, #root, .stage {
   text-align: center;
 }
 
+.stg {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.stg figure {
+  margin: 0;
+}
+
+.stg-phone {
+  text-align: center;
+}
+
+.stg-phone img {
+  height: 440px;
+  border: 1px solid #ddd;
+  border-radius: 18px;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 10%);
+}
+
+.stg-phone figcaption {
+  margin-top: 8px;
+  font-size: 15px;
+  color: #666;
+}
+
+.stg-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stg-col figcaption {
+  margin-bottom: 5px;
+  font-size: 15px;
+  color: #555;
+}
+
+.stg b {
+  color: #111;
+}
+
+.stg-col figcaption code {
+  margin-left: 6px;
+  font-size: 12px;
+  color: #777;
+}
+
+.stg-console {
+  display: grid;
+  place-items: center;
+  width: 446px;
+  height: 150px;
+  padding: 0 20px;
+  border: 2px dashed #e5262b;
+  border-radius: 10px;
+  font-size: 14px;
+  text-align: center;
+  color: #b42318;
+}
+
+.dsm {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 36px;
+}
+
+.dsm h3 {
+  margin: 0 0 10px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.dsm-block {
+  margin-bottom: 12px;
+}
+
+.dsm-head {
+  margin: 0 0 6px;
+  font-size: 14px;
+  color: #3d4fd6;
+}
+
+.dsm code {
+  font-size: 13px;
+  color: #2c3aa8;
+}
+
+.dsm-head small {
+  margin-left: 6px;
+  font-size: 12px;
+  color: #888;
+}
+
+.dsm-swatches {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 6px;
+}
+
+.dsm-swatches figure {
+  margin: 0;
+}
+
+.dsm-swatches i {
+  display: block;
+  height: 30px;
+  border-radius: 7px;
+  border: 1px solid rgb(0 0 0 / 8%);
+}
+
+.dsm-swatches figcaption {
+  display: flex;
+  flex-direction: column;
+  margin-top: 3px;
+  font-size: 10px;
+  line-height: 1.2;
+  color: #444;
+  word-break: break-word;
+}
+
+.dsm-swatches figcaption small {
+  color: #999;
+}
+
+.dsm-type {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  line-height: 1.3;
+  color: #111;
+}
+
+.dsm-type small {
+  font-size: 11.5px;
+  color: #888;
+  white-space: nowrap;
+}
+
+.dsm-sizes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.dsm-space,
+.dsm-radius {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  font-size: 11px;
+  color: #666;
+}
+
+.dsm-space span,
+.dsm-radius span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.dsm-space i {
+  height: 22px;
+  border-radius: 3px;
+  background: #c9cff9;
+}
+
+.dsm-radius i {
+  width: 34px;
+  height: 34px;
+  border: 2px solid #3d4fd6;
+  background: #eef0fe;
+}
+
+.dsm-theme {
+  margin: 4px 0 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: #f4f5fb;
+  font-size: 13.5px;
+  color: #555;
+}
+
+.dsm-comps table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.dsm-comps td {
+  padding: 5px 6px;
+  border-bottom: 1px solid #eceef4;
+  vertical-align: middle;
+}
+
+.dsm-comps td:nth-child(2) {
+  width: 20px;
+  color: #999;
+  text-align: center;
+}
+
+.dsm-cast {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-top: 14px;
+}
+
+.dsm-cast figure {
+  margin: 0;
+  text-align: center;
+}
+
+.dsm-cast img {
+  width: 40px;
+  height: 40px;
+}
+
+.dsm-cast .dsm-jar {
+  width: 44px;
+  height: 52px;
+}
+
+.dsm-cast figcaption {
+  font-size: 10.5px;
+  color: #666;
+}
+
+.dsm-cast-cap {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  color: #777;
+}
+
 .ll {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -1090,6 +1328,11 @@ html, body, #root, .stage {
   font-size: 40px;
 }
 
+.reveal .slides section.dense .foot {
+  left: 56px;
+  bottom: 18px;
+}
+
 .reveal .slides section.dense .line {
   margin-top: 8px;
   font-size: 18px;
@@ -1297,4 +1540,156 @@ html, body, #root, .stage {
 .reveal .slides section.thanks h1 {
   margin-top: 28px;
   font-size: 96px;
+}
+
+.reveal .slides section.thanks .thanks-ai {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 44px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 26px;
+}
+
+.thanks-ai-label {
+  font-size: 15px;
+  color: #888;
+}
+
+.thanks-ai-tool {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.thanks-ai-tool img {
+  width: 28px;
+  height: 28px;
+}
+
+.thanks-ai-tool b {
+  font-size: 17px;
+  color: #333;
+}
+
+.thanks-ai-tool small {
+  font-size: 13px;
+  color: #888;
+}
+
+/* Analytics: DebugView captions, larger and bold */
+.dv-gal .gallery figcaption {
+  font-size: 15px;
+  font-weight: 700;
+  color: #333;
+}
+
+/* Remote Config: "same build" band and the defaults / fetch row */
+.rc-same {
+  margin: 0 0 6px;
+  padding: 4px 10px;
+  border-left: 4px solid #e03131;
+  background: #fff5f5;
+  font-size: 15px;
+}
+.rc-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 14px;
+  align-items: start;
+  margin-top: 14px;
+}
+.rc-row figure {
+  margin: 0;
+}
+.rc-row figcaption {
+  font-size: 12px;
+  margin-bottom: 3px;
+  color: #444;
+}
+.rc-row > figure > img {
+  width: 100%;
+  border: 1px solid #ddd;
+}
+
+/* ARTEMIS: result per case */
+.rt {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 24px;
+  align-items: start;
+}
+.rt table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 19px;
+}
+.rt th,
+.rt td {
+  padding: 5px 10px;
+  border-bottom: 1px solid #e5e5e5;
+  text-align: left;
+}
+.rt th {
+  font-size: 16px;
+  color: #666;
+  border-bottom: 2px solid #ccc;
+}
+.rt td code {
+  font-size: 15px;
+}
+.rt-fail td {
+  background: #fff5f5;
+  color: #c92a2a;
+}
+.rt-notes p {
+  font-size: 18px;
+  margin: 0 0 12px;
+}
+
+/* Semantics labels: three code shots */
+.sem {
+  display: grid;
+  gap: 14px;
+  justify-items: start;
+}
+.sem figure {
+  margin: 0;
+}
+.sem figcaption {
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+
+/* ARTEMIS: gaps */
+.gap {
+  display: grid;
+  gap: 10px;
+}
+.gap-row {
+  display: grid;
+  grid-template-columns: 200px 1fr 320px;
+  gap: 16px;
+  padding: 10px 14px;
+  border-left: 4px solid #e03131;
+  background: #fafafa;
+  font-size: 18px;
+  align-items: center;
+}
+.gap-next {
+  color: #2f6f3e;
+}
+.sem-wrap {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 36px;
+  align-items: center;
+}
+.sem-why {
+  font-size: 18px;
+}
+.sem-why li {
+  margin-bottom: 12px;
 }

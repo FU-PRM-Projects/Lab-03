@@ -20,6 +20,17 @@ const all = [
   ['main', 'main.dart', 83, 85],
   ['models', 'models/note.dart', 5, 8],
   ['redirect', 'router/auth_redirect.dart', 25, 29],
+  // Cloud Storage: luật bảo mật (ngoài lib/), tải lên kèm tiến độ và URL.
+  ['storage-rules', '../firebase/storage.rules', 6, 10],
+  ['storage-upload', 'firebase/report_impl.dart', 250, 264],
+  ['storage-progress', 'screens/journey/weekly_card_page.dart', 173, 179],
+  // Remote Config: giá trị mặc định trong app, chu kỳ tải và cache.
+  ['rc-defaults', 'firebase/firebase_remote_config_service.dart', 53, 64],
+  ['rc-fetch', 'firebase/firebase_remote_config_service.dart', 65, 77],
+  // Semantics: nhãn cho trình đọc màn hình và cho agent ARTEMIS.
+  ['sem-mood', 'widgets/mood_option.dart', 28, 34],
+  ['sem-shortcut', 'widgets/shortcut_button.dart', 32, 36],
+  ['sem-offline', 'widgets/offline_banner.dart', 22, 23],
   // Bản xoá hộp thư FCM khi đăng xuất (736453a) đang ở nhánh này.
   ['signout', 'viewmodels/auth_view_model.dart', 120, 127, 'chore/submission-files'],
 ];
