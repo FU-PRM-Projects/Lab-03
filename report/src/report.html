@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Lab03_SE190992 · Nốt · Final report</title>
+<!-- Source of report/Lab03_SE190992.pdf. Export: node report/export-pdf.mjs (from the repo root). -->
+<style>
+  @page {
+    size: A4;
+    margin: 16mm 16mm 16mm 16mm;
+    @bottom-right { content: counter(page) ' / ' counter(pages); font: 9pt 'Segoe UI', sans-serif; color: #777; }
+    @bottom-left { content: 'PRM393 Lab 3 · Nốt · Final report · SE190992'; font: 9pt 'Segoe UI', sans-serif; color: #777; }
+  }
+  @page :first { @bottom-left { content: none; } @bottom-right { content: none; } }
+  :root { --ink: #1f2330; --muted: #5d6475; --line: #dfe2ea; --brand: #4f46e5; --soft: #f4f5fb; --bad: #c92a2a; }
+  * { box-sizing: border-box; }
+  body { font: 10pt/1.48 'Segoe UI', 'Be Vietnam Pro', sans-serif; color: var(--ink); margin: 0; text-align: justify; hyphens: auto; }
+  h1 { font-size: 21pt; margin: 0 0 4px; }
+  h2 { font-size: 14pt; margin: 18px 0 6px; padding-bottom: 3px; border-bottom: 2px solid var(--brand); break-after: avoid; text-align: left; }
+  h3 { font-size: 11pt; margin: 12px 0 4px; break-after: avoid; text-align: left; }
+  p { margin: 4px 0 7px; }
+  ul, ol { margin: 4px 0 7px; padding-left: 18px; }
+  li { margin: 2px 0; }
+  code { font: 8.6pt Consolas, monospace; background: #f1f2f6; padding: 0 3px; border-radius: 3px; }
+  pre { font: 8.4pt/1.4 Consolas, monospace; background: #f6f7fa; border: 1px solid var(--line); border-radius: 4px; padding: 6px 8px; margin: 4px 0 8px; white-space: pre-wrap; text-align: left; break-inside: avoid; }
+  a { color: var(--brand); text-decoration: none; }
+  table { border-collapse: collapse; width: 100%; font-size: 8.8pt; margin: 4px 0 9px; text-align: left; break-inside: avoid; }
+  table.long { break-inside: auto; }
+  th, td { border-bottom: 1px solid var(--line); padding: 3px 6px; vertical-align: top; }
+  th { background: var(--soft); font-weight: 600; }
+  tr { break-inside: avoid; }
+  figure { margin: 6px 0 9px; break-inside: avoid; }
+  figure img { display: block; max-width: 100%; border: 1px solid var(--line); border-radius: 4px; }
+  figcaption { font-size: 8.4pt; color: var(--muted); margin-top: 3px; text-align: left; }
+  .row { display: flex; gap: 10px; align-items: flex-start; break-inside: avoid; }
+  .row > figure { flex: 1; min-width: 0; }
+  .phone img { height: 210px; width: auto; margin: 0 auto; }
+  .phone.sm img { height: 170px; }
+  .note { background: var(--soft); border-left: 4px solid var(--brand); padding: 6px 10px; margin: 6px 0 9px; font-size: 9.3pt; break-inside: avoid; }
+  .warn { border-left-color: var(--bad); background: #fff5f5; }
+  .fail td { color: var(--bad); }
+  .ev { font-size: 8.4pt; color: var(--muted); }
+  .cover { height: 247mm; display: flex; flex-direction: column; justify-content: space-between; break-after: page; text-align: left; }
+  .cover .top img { height: 46px; }
+  .cover .mid { display: flex; gap: 22px; align-items: center; }
+  .cover .mid img { width: 120px; }
+  .cover h1 { font-size: 34pt; }
+  .cover .sub { font-size: 13pt; color: var(--muted); }
+  .cover table { width: auto; font-size: 10.5pt; }
+  .cover td { border: none; padding: 2px 14px 2px 0; }
+  .toc { columns: 2; font-size: 9.6pt; text-align: left; }
+  .flow { display: flex; align-items: stretch; gap: 0; margin: 6px 0 9px; font-size: 8.4pt; text-align: left; break-inside: avoid; }
+  .flow div { flex: 1; border: 1px solid var(--line); border-top: 3px solid var(--brand); padding: 4px 6px; background: #fff; }
+  .flow span { align-self: center; padding: 0 3px; color: var(--muted); }
+  .flow b { display: block; font-size: 8.8pt; }
+</style>
+</head>
+<body>
+
+<!-- ============================== Cover ============================== -->
+<section class="cover">
+  <div class="top"><img src="../../slide/public/assets/fpt-logo.webp" alt="FPT University" /></div>
+  <div>
+    <div class="mid">
+      <img src="../../slide/public/assets/mascot/mascot-not-xong.svg" alt="" />
+      <div>
+        <h1>Nốt</h1>
+        <div class="sub">One positive note every day</div>
+      </div>
+    </div>
+    <p style="font-size:13pt;margin-top:18px"><b>PRM393 · Lab 3: Cloud-Enabled Mobile App</b><br />Final report: Flutter and Firebase, ARTEMIS end-to-end tests, AI code review</p>
+  </div>
+  <div>
+    <table>
+      <tr><td>Student</td><td><b>Đoàn Thị Kim Thúy · SE190992</b></td></tr>
+      <tr><td>Team</td><td>Phùng Thế Quân · SE193519 · Phan Đức Duy · SE193591 · Phan Hữu Phước · SE161951</td></tr>
+      <tr><td>Repository</td><td><a href="https://github.com/FU-PRM-Projects/Lab-03">github.com/FU-PRM-Projects/Lab-03</a></td></tr>
+      <tr><td>Lab 2 design</td><td><a href="https://github.com/FU-PRM-Projects/prm393-lab2-group9">github.com/FU-PRM-Projects/prm393-lab2-group9</a></td></tr>
+      <tr><td>Firebase project</td><td><code>prm393-not-lab3</code>, Android app <code>com.quanphungg.lab03</code></td></tr>
+      <tr><td>Slides</td><td><code>slides/Lab03_SE190992_slides.pdf</code></td></tr>
+    </table>
+    <p class="ev" style="margin-top:14px">This report is the written record of the lab; the slides summarise it. Every claim that something works points to a figure in this report or to a file in the repository (paths are relative to the repository root). Work that is not finished is stated as such, with the reason.</p>
+  </div>
+</section>
+
+<h2 style="margin-top:0">Contents</h2>
+<ol class="toc">
+  <li>Project overview and Lab 2 recap</li>
+  <li>Design traceability and deviations</li>
+  <li>Architecture and MVVM implementation</li>
+  <li>Design system in code</li>
+  <li>Firebase design and failure handling</li>
+  <li>Analytics event plan and DebugView evidence</li>
+  <li>Crashlytics and Remote Config evidence</li>
+  <li>ARTEMIS test plan, results and exploratory session</li>
+  <li>AI code review findings and decisions</li>
+  <li>Challenges encountered</li>
+  <li>Lessons learned</li>
+  <li>AI tools used</li>
+</ol>
+
+<!-- ============================== 1 ============================== -->
+<h2>1. Project overview and Lab 2 recap</h2>
+<p><b>Nốt</b> ("note") is a daily journal for final-year students who feel burnt out. Their evenings tend to end with a list of what is still not done. Nốt asks a smaller question, "Hôm nay bạn làm được gì?" ("What did you get done today?"), and keeps every answer as a coloured note in a jar, so progress becomes visible. Around this core the app adds two habits that Lab 2 research pointed to: stopping a late-night scrolling session (self-control) and small social or physical challenges.</p>
+<p>Lab 2 produced the research, persona, flows and a Figma design with a Flutter handoff (<code>flutter-handoff.md</code>). Lab 3 builds that design as a Flutter app on Firebase. The target is Android; a web build of the same code also runs on Firebase Hosting.</p>
+<table>
+  <tr><th style="width:20%">Persona</th><td>Minh, 22, final-year IT student. Tired in the evening, opens short videos "for five minutes" and stays until after midnight; feels he achieved nothing even on productive days.</td></tr>
+  <tr><th>Success criterion</th><td>From tapping the evening notification, Minh logs a mood and one win in <b>under 30 seconds</b>. The app measures this itself: <code>note_saved</code> carries <code>duration_ms</code> (7 990 ms in the run in §6).</td></tr>
+  <tr><th>Data</th><td>All user data is real Firestore data under <code>users/{uid}</code>. The challenge catalogue (22 cards) is a read-only collection seeded from <code>firebase/seed/challenges.json</code>; there is no mock data in the app.</td></tr>
+</table>
+<p>The three main flows from Lab 2 are implemented end to end, each with its alternative and error paths:</p>
+<table>
+  <tr><th style="width:16%">Flow</th><th style="width:38%">Screens</th><th>Alternative and error paths</th></tr>
+  <tr><td><b>F1</b> Evening note</td><td>S02 Today → S03a mood → S03b win → S03c extra text → S04 saved → S02; or the 21:30 reminder → S03a</td><td>Skip the extra text; mood "Rối" offers a one-minute first aid; leaving midway asks to keep the draft; offline saves on the device and shows a banner</td></tr>
+  <tr><td><b>F2</b> Self-control</td><td>S02 → S09 → S04; when it is hard to stop: "Stress?" → S10 90-second breathing → S04</td><td>"Mình lỡ lướt quá đà" (I scrolled too much) is a recovery branch, not a failure; the habit list can be locked behind <code>local_auth</code></td></tr>
+  <tr><td><b>F3</b> Challenges</td><td>S07 card deck → S08 detail → S04 → S07</td><td>Switch to an easier card; postpone (nothing is lost); an outcome "Không như ý" (did not go well) still counts as having tried</td></tr>
+</table>
+<p>Besides F1–F3 the traceability file tracks eight supporting flows (P1–P8: first sign-in, email sign-up, exercise log, long journal, view/edit/delete a note, a bad week, notification deep link, settings) and three state flows (T1 empty jar, T2 offline or load error, T3 loading). Their status is in <code>docs/design-traceability.md</code> §2; two are partial (P4 keeps no draft when the app is killed; P7 and P8 depend on FCM, done in Stage 5). The code base has <b>240 unit and widget tests</b>, all passing, and <code>flutter analyze</code> reports no issues; CI runs both on every pull request (<code>.github/workflows/</code>).</p>
+
+<!-- ============================== 2 ============================== -->
+<h2>2. Design traceability and deviations</h2>
+<p><code>docs/design-traceability.md</code> is the matrix between the Lab 2 design and the code. Section 1 maps each of the 12 screens (plus their dialogs, sheets and states) to a route, a screen widget, a ViewModel and a data source. Section 2 maps flows to screens and tests, section 3 maps each Figma component on page "05 Components" to a widget, and section 4 maps each token to the theme. Section 5 is the list of deviations: <b>30 entries, D-01 to D-30</b>, each with the Lab 2 design, what the app does, the reason and whether the Figma file has been updated.</p>
+<p>The deviations fall into four groups:</p>
+<table>
+  <tr><th style="width:24%">Group</th><th style="width:22%">Entries</th><th>Example and reason</th></tr>
+  <tr><td>Required by Lab 3</td><td>D-01, D-06, D-07, D-10</td><td>D-06: the weekly card is uploaded to Cloud Storage with progress and a link before the share sheet, because Lab 3 requires a generated file in the cloud. D-01: a "Firebase demo" group at the end of Settings, hidden by a Remote Config flag.</td></tr>
+  <tr><td>Platform and engineering</td><td>D-03, D-04, D-05, D-08, D-09, D-12, D-22</td><td>D-08: offline save uses Firestore's offline cache and <code>hasPendingWrites</code> instead of a custom <code>pendingSync</code> flag: same behaviour, less code, no data loss. D-22: groups live under <code>users/{uid}</code> so one ownership rule covers all private data.</td></tr>
+  <tr><td>Contradictions in Lab 2 documents</td><td>D-02, D-11</td><td>D-11: <code>DESIGN.md</code> allows 2 title lines, the handoff 3; a third line is cut at 360 dp, so titles stop at 2 lines. D-02 records limits the handoff set but Figma never showed (120 characters per win, 2 000 per journal, 5-second undo).</td></tr>
+  <tr><td>Usability and accessibility</td><td>D-13 to D-21, D-23 to D-30</td><td>D-28: users read "Bỏ qua nhật ký" (skip journal) as creating a Journal note, so it became "Bỏ qua phần kể thêm" (skip the extra text). D-20: the tab bar background went from 14 % to 72 % white so icons keep 3:1 contrast over the colourful jar. D-21: "swipe to change card" also works as a button for screen-reader users.</td></tr>
+</table>
+<div class="row">
+  <figure class="phone sm"><img src="../../slide/public/figma/s03b.png" alt="S03b Figma" /><figcaption>S03b in Figma</figcaption></figure>
+  <figure class="phone sm"><img src="../../slide/public/app/s03b.png" alt="S03b app" /><figcaption>S03b in the app: D-28 label, D-02 counter</figcaption></figure>
+  <figure class="phone sm"><img src="../../slide/public/figma/s11b.png" alt="S11b Figma" /><figcaption>S11b in Figma</figcaption></figure>
+  <figure class="phone sm"><img src="../../slide/public/app/s11b.png" alt="S11b app" /><figcaption>S11b in the app: previous 30 days (D-18), chart fits the card (D-09)</figcaption></figure>
+</div>
+<p>Two things are not built: the AI free-tell on S03b (planned with Nốt AI) and group merging (D-23). Most deviations are still marked "Cần cập nhật" (Figma needs updating): the code and this matrix are up to date, the Figma file is not yet.</p>
+
+<!-- ============================== 3 ============================== -->
+<h2>3. Architecture and MVVM implementation</h2>
+<p>The app uses MVVM with <b>Riverpod</b> for state and dependency injection. Four rules from <code>docs/architecture.md</code> §1 keep the layers apart: a screen only watches a ViewModel and calls its methods; a ViewModel only depends on service interfaces; only <code>lib/firebase/</code> imports an SDK (Firebase, but also <code>shared_preferences</code>); and models are plain Dart shared by all layers. A search for Firebase imports in <code>lib/screens</code>, <code>lib/widgets</code> and <code>lib/viewmodels</code> finds none.</p>
+<table>
+  <tr><th style="width:17%">Layer</th><th style="width:22%">Folder</th><th>What lives there</th></tr>
+  <tr><td>View</td><td><code>lib/screens/</code>, <code>lib/widgets/</code></td><td>One folder per screen; shared widgets for each Lab 2 component. Screens switch on the ViewModel state and never hold business logic.</td></tr>
+  <tr><td>ViewModel</td><td><code>lib/viewmodels/</code></td><td>17 ViewModels, each a Riverpod <code>Notifier</code>. Lists use a sealed <code>ViewState&lt;T&gt;</code>: <code>Loading</code>, <code>Data</code>, <code>Empty</code>, <code>Error</code>; forms have their own state (for example <code>NoteComposerState</code> with step, mood, title and saving flag).</td></tr>
+  <tr><td>Service</td><td><code>lib/services/</code></td><td>Interfaces and their providers: <code>AuthService</code>, <code>NoteRepository</code>, <code>ChallengeRepository</code>, <code>StorageService</code>, <code>AnalyticsService</code>, <code>CrashReporter</code>, <code>RemoteConfigService</code>, <code>MessagingService</code>, <code>Clock</code> and others.</td></tr>
+  <tr><td>Implementation</td><td><code>lib/firebase/</code></td><td>Firestore, Auth, Storage, FCM, Remote Config, Analytics and Crashlytics implementations, plus <code>PrefsDraftStore</code>.</td></tr>
+  <tr><td>Composition root</td><td><code>lib/main.dart</code></td><td>Initialises Firebase and overrides each service provider with its Firebase implementation; tests override the same providers with fakes.</td></tr>
+</table>
+<h3>3.1 Data flow of F1</h3>
+<p>The path from tapping "Lưu vào hũ" (save to the jar) on S03c to seeing S04 is also the part of the 30-second criterion that the app controls:</p>
+<div class="flow">
+  <div><b>NoteComposerScreen</b>calls <code>save()</code></div><span>→</span>
+  <div><b>NoteComposerViewModel</b>validates mood, title 1–120, journal ≤ 2000; state = saving</div><span>→</span>
+  <div><b>NoteRepository.add</b>interface only</div><span>→</span>
+  <div><b>FirestoreNoteRepository</b>writes <code>users/{uid}/notes</code>; waits ≤ 2 s for the server</div><span>→</span>
+  <div><b>ViewModel</b>logs <code>note_saved</code>; state = saved(id, pendingSync)</div><span>→</span>
+  <div><b>S04</b>"Đã vào hũ!", offline banner if pending</div>
+</div>
+<p>If the server does not answer within two seconds the repository returns the note with <code>pendingSync = true</code>: the write is already in Firestore's offline cache and is sent when the network returns, so the screen never hangs offline. The note uses the device time instead of <code>serverTimestamp</code>, because a server timestamp is <code>null</code> until it syncs and an offline note would then be missing from date queries. If the write fails, the repository throws an <code>AppException</code>, the ViewModel returns to editing with a message, keeps the draft and records a Crashlytics non-fatal.</p>
+<div class="row">
+  <figure><img src="../../slide/public/code/viewmodel.png" alt="TodayViewModel" /><figcaption><code>todayViewModelProvider</code>: a <code>NotifierProvider</code> whose state is <code>ViewState&lt;TodaySummary&gt;</code></figcaption></figure>
+  <figure><img src="../../slide/public/code/main.png" alt="main.dart overrides" /><figcaption><code>main.dart</code> overrides <code>noteRepositoryProvider</code> with the Firestore implementation</figcaption></figure>
+</div>
+<h3>3.2 Errors and testing</h3>
+<p>Services translate SDK exceptions into one <code>AppException</code> with a kind (<code>network</code>, <code>permissionDenied</code>, <code>cancelled</code>, <code>notFound</code>, <code>unknown</code>), so ViewModels never depend on Firebase types. ViewModels turn the kind into a short Vietnamese message in the Lab 2 tone, for example "Chưa tải được hũ. Kiểm tra Wi-Fi rồi thử lại." (could not load the jar, check Wi-Fi and retry). Loads longer than 10 seconds become an error state with a retry button. Because every dependency is injected, each ViewModel is tested with fakes from <code>test/support/fakes.dart</code>; for example <code>test/viewmodels/group_detail_view_model_test.dart</code> checks that opening a group logs <code>group_viewed</code> exactly once with the right parameters.</p>
+
+<!-- ============================== 4 ============================== -->
+<h2>4. Design system in code</h2>
+<p>The Lab 2 tokens exist only in <code>lib/theme/</code>, and widgets read them from the theme:</p>
+<table>
+  <tr><th style="width:26%">Lab 2</th><th>Code</th></tr>
+  <tr><td>Colour variables</td><td><code>app_colors.dart</code>: a Material 3 <code>ColorScheme</code> plus <code>AppColors</code>, a <code>ThemeExtension</code> for colours M3 has no role for (moods, note types, chart, success, warning)</td></tr>
+  <tr><td>Text styles</td><td><code>app_typography.dart</code>: a <code>TextTheme</code> following handout table 1.2 in Be Vietnam Pro, plus <code>AppTextStyles</code> for four extra styles</td></tr>
+  <tr><td>Spacing, radius, elevation, sizes</td><td><code>app_tokens.dart</code>: <code>AppSpace</code>, <code>AppRadius</code>, <code>AppElevation</code>, <code>AppSize</code> (for example the 48 dp minimum touch target)</td></tr>
+  <tr><td>Component themes</td><td><code>app_theme.dart</code>: buttons 48 dp high, app bar 48, navigation bar 64, padded tap targets; <code>AppTheme.light()</code> builds one <code>ThemeData</code></td></tr>
+  <tr><td>Components</td><td>21 widgets in <code>lib/widgets/</code>, one per Figma component, with variants and states as parameters: <code>AppButton</code> has 5 variants and 4 states (<code>docs/design-traceability.md</code> §3)</td></tr>
+</table>
+<p>Screens use <code>Theme.of(context).colorScheme</code>, <code>AppColors.of(context)</code> and the <code>AppSpace</code> constants instead of literal values. A debug-only page, Settings → "Thư viện component (dev)", renders every widget in every state at <code>/dev/components</code> so it can be compared with the Figma page; it does not exist in release builds. The mascot Tụi Nốt has 8 faces, one per mood, so mood is shown by colour, face and text together and never by colour alone.</p>
+<p><b>Accessibility.</b> Touch targets are at least 48 dp through the theme, body text is at least 14 sp, and widget tests lay screens out at 360 and 412 dp. 41 files in <code>lib/</code> set <code>Semantics</code>, including 17 of the 21 shared widgets: <code>MoodOption</code> is announced as one button with a selected state ("Tâm trạng Vui"), <code>ShortcutButton</code> reads its label and caption together, and <code>OfflineBanner</code> is a live region, so TalkBack announces it as soon as it appears. These labels also let test tools that read the accessibility tree find controls by name.</p>
+
+<!-- ============================== 5 ============================== -->
+<h2>5. Firebase design and failure handling</h2>
+<p>Seven Firebase services are used. Each one sits behind an interface, so the rest of the app is unaffected by how it is implemented or whether it is available. The table summarises what the user sees when each service fails; the subsections give the design.</p>
+<table>
+  <tr><th style="width:16%">Service</th><th>Failure</th><th style="width:40%">What the user sees / what the app does</th></tr>
+  <tr><td>Authentication</td><td>Google chooser cancelled · wrong email password · other error</td><td>"Bạn đã huỷ đăng nhập." · "Email hoặc mật khẩu chưa đúng." under the field · "Không đăng nhập được. Thử lại."</td></tr>
+  <tr><td>Firestore</td><td>Offline write · load error · load over 10 s · permission denied</td><td>Saved on the device + offline banner · error state with "Thử lại" · same · message, draft kept, non-fatal recorded</td></tr>
+  <tr><td>Storage</td><td>Offline · session expired · any other error</td><td>"Chưa tải lên được: kiểm tra Wi-Fi" · asked to sign in again · "Chưa tạo được thẻ tuần. Thử lại nhé." with a retry; non-fatal recorded</td></tr>
+  <tr><td>FCM</td><td>Permission denied · unknown route in a message · start-up error</td><td>Dialog with "Mở cài đặt" (open settings) · opens Today · logged, app keeps running</td></tr>
+  <tr><td>Remote Config</td><td>Fetch fails or returns nothing · broken JSON value</td><td>In-app defaults (every feature on) · default list; a manual refresh shows "Cấu hình chưa có gì mới."</td></tr>
+  <tr><td>Analytics</td><td>Logging throws</td><td><code>SafeAnalytics.track</code> catches and skips it; the user's action never fails</td></tr>
+  <tr><td>Crashlytics</td><td>Emulator or web (not supported)</td><td>A no-op reporter is injected; errors are only printed</td></tr>
+</table>
+
+<h3>5.1 Authentication</h3>
+<p>Users sign in with Google or with email and password (sign-up and password reset are in a bottom sheet on S01, D-13). The router listens to the auth state through <code>refreshListenable</code> (<code>lib/router/auth_redirect.dart</code>): a signed-out user is sent to <code>/welcome?next=&lt;target&gt;</code>, so a notification deep link still lands on its screen after signing in; a signed-in user on <code>/welcome</code> goes to <code>next</code> or <code>/today</code>. A splash route waits for the first auth event to avoid flashing the sign-in screen (D-12). On first sign-in <code>users/{uid}</code> is created with <code>role = user</code>. Sign-out clears the cached Firestore data, the note draft, local reminders and the FCM inbox on the device; the last one was added after the code review (§9). The Console shows the accounts created through the app.</p>
+<div class="row">
+  <figure class="phone sm"><img src="../../slide/public/app/welcome-cancelled.png" alt="Sign-in cancelled" /><figcaption>S01 after cancelling Google sign-in</figcaption></figure>
+  <figure style="flex:3"><img src="../../evidence/auth/console-users.png" alt="Console users" /><figcaption>Console → Authentication → Users, emails hidden. <code>evidence/auth/console-users.png</code></figcaption></figure>
+</div>
+
+<h3>5.2 Cloud Firestore: data model and Security Rules</h3>
+<table>
+  <tr><th style="width:33%">Path</th><th>Content</th><th style="width:30%">Rule</th></tr>
+  <tr><td><code>users/{uid}</code></td><td>Profile and <code>role</code></td><td>Owner reads; created only with <code>role == 'user'</code>; only an admin may change <code>role</code></td></tr>
+  <tr><td><code>users/{uid}/notes/{id}</code></td><td>type, title, body, mood, createdAt; challenge result fields; groupId</td><td>Owner only; <code>validNote</code> checks keys, enums and lengths</td></tr>
+  <tr><td><code>users/{uid}/groups/{id}</code></td><td>"First time" groups: name, idea, source, noteCount</td><td>Owner only; <code>validGroup</code></td></tr>
+  <tr><td><code>users/{uid}/private/habits</code>, <code>/settings</code></td><td>Habits to cut down, reminder times, lock</td><td>Owner only; fixed set of keys, list sizes capped</td></tr>
+  <tr><td><code>users/{uid}/challengeProgress/{topic}</code></td><td>Level and completed cards per topic</td><td>Owner only</td></tr>
+  <tr><td><code>challenges/{id}</code></td><td>Catalogue, managed by staff or the seed script</td><td>Read for signed-in users; no client writes</td></tr>
+</table>
+<p><code>firebase/firestore.rules</code> is deny-by-default: anything not matched is refused, and there is no <code>if true</code>. <code>validNote</code> accepts only known keys, a type and mood from fixed lists, a title of 1–120 characters, a journal of at most 2 000 characters and challenge values in range (anxiety 1–5, minutes 0–600). The rules are tested on the Emulator with <code>@firebase/rules-unit-testing</code> (<code>npm run test:rules</code> in <code>firebase/</code>): 15 cases, each with an allowed and a denied request.</p>
+<table>
+  <tr><th style="width:8%">ID</th><th>Case</th><th style="width:8%">ID</th><th>Case</th></tr>
+  <tr><td>R-01</td><td>User cannot change own role</td><td>R-09</td><td>Invalid notes are rejected</td></tr>
+  <tr><td>R-02</td><td>Admin can change a role</td><td>R-10</td><td>Month sticker only under its own id</td></tr>
+  <tr><td>R-03</td><td>Own profile readable; unauthenticated denied</td><td>R-11</td><td>Habits and settings private to the owner</td></tr>
+  <tr><td>R-04</td><td>Unknown collection denied by default</td><td>R-12</td><td>Catalogue read-only; progress private</td></tr>
+  <tr><td>R-05</td><td>Profile created with role <code>user</code></td><td>R-13</td><td>Challenge result fields within range</td></tr>
+  <tr><td>R-06</td><td>Cannot create a profile as admin or for someone else</td><td>R-14</td><td>Group names and ideas are checked</td></tr>
+  <tr><td>R-07</td><td>Write, read and delete own notes</td><td>R-15</td><td>Own challenge cards, privately</td></tr>
+  <tr><td>R-08</td><td>Cannot read or write someone else's notes</td><td></td><td></td></tr>
+</table>
+<figure style="width:62%"><img src="../../evidence/deploy/firestore-rules.png" alt="Rules in Console" /><figcaption>The deployed rules in the Console (not test mode). <code>evidence/deploy/firestore-rules.png</code></figcaption></figure>
+
+<h3>5.3 Cloud Storage</h3>
+<p>The weekly card on S11b is a one-page PDF built on the device with the <code>pdf</code> package, with Be Vietnam Pro embedded. <code>FirebaseStorageService</code> uploads it to <code>reports/{uid}/weekly-&lt;ISO week&gt;.pdf</code>, emits progress events that the screen shows as a percentage bar, and returns the download URL, shown with a copy button before the share sheet opens. <code>firebase/storage.rules</code> allows a user to read and write only their own folder, and only files with content type <code>application/pdf</code> under 5 MB. The weekly card was chosen because it is the one file the persona would want to keep or send; Storage was chosen over a Firestore field because PDFs are binary and can be larger than the 1 MB document limit.</p>
+<div class="note warn"><b>Limitation.</b> The project is on the Spark plan, and Firebase now requires the Blaze plan to create a Storage bucket. The upload was tested end to end on the Firebase Emulator only. On the real project the upload fails, the user sees the error message with a retry (figure in §7.1), and a non-fatal reaches Crashlytics. For the same reason there is no Console screenshot of an uploaded file and <code>report_exported</code> has not appeared in DebugView.</div>
+
+<h3>5.4 Cloud Messaging</h3>
+<p><code>FirebaseMessagingService</code> requests <code>POST_NOTIFICATIONS</code> on Android 13+ at the first moment a reminder matters, not at launch. If the user refuses, Settings explains why notifications help and offers "Mở cài đặt", which opens the system page. A message is received in all three app states. In the background and when the app is terminated, Android shows it in the system tray. In the foreground Android shows nothing, so the app displays it with <code>flutter_local_notifications</code> and passes the target route as the payload. Every message is saved to an inbox on the device with the state it arrived in; the inbox is in the Firebase demo area. A message may carry data <code>route</code>; <code>routeFromData</code> accepts only an allow-list of internal routes, and an unknown route opens Today. Test messages were sent from Console → Messaging → "Send test message" and through the FCM HTTP v1 API to the device token from the debug log; the token is not stored in the repository.</p>
+<div class="row">
+  <div style="flex:2.3">
+    <figure><img src="../../slide/public/app/fcm-foreground.png" alt="Foreground" /><figcaption>Foreground: shown by the app</figcaption></figure>
+    <figure><img src="../../slide/public/app/fcm-terminated.png" alt="Terminated" /><figcaption>Terminated: system tray (background looks the same; <code>evidence/fcm/background.png</code>)</figcaption></figure>
+    <figure><img src="../../slide/public/app/fcm-console.png" alt="Console test message" /><figcaption>Test message sent from the Firebase Console</figcaption></figure>
+  </div>
+  <figure class="phone"><img src="../../slide/public/app/fcm-inbox.png" alt="Inbox" style="height:auto;width:100%" /><figcaption>Inbox with the arrival state of each message</figcaption></figure>
+  <figure class="phone"><img src="../../slide/public/app/fcm-route.png" alt="Tap opens jar" /><figcaption>Tapping a message with <code>route=/jar</code> opens the jar</figcaption></figure>
+</div>
+<p>Two reminders do not need a server and are scheduled locally instead (D-27): the evening note reminder (default 21:30, opens S03a) and the "Giờ tỉnh" (wake-up hour) nudge at the start of the late-night window (default 23:00, opens S09). Both are rescheduled when the time changes and cancelled on sign-out.</p>
+
+<h3>5.5 Remote Config, Analytics, Crashlytics</h3>
+<p>Remote Config is used for feature flags and content (§7.2). Analytics and Crashlytics are described with their evidence in §6 and §7.1. All three are wrapped so that a failure never reaches the user: Remote Config falls back to in-app defaults, Analytics calls go through <code>SafeAnalytics.track</code>, and Crashlytics is replaced by a no-op on the Emulator and on web, where it is not supported.</p>
+
+<!-- ============================== 6 ============================== -->
+<h2>6. Analytics event plan and DebugView evidence</h2>
+<p><code>docs/analytics-plan.md</code> is the plan. Each event answers a product question tied to a Lab 2 flow; events are sent by ViewModels through <code>AnalyticsService</code>, never by widgets. Naming follows the Analytics limits: snake_case, at most 40 characters, no reserved prefixes, booleans sent as <code>'true'</code>/<code>'false'</code> strings. No parameter contains a note title or text, an email, a name or a group name. The user ID is set with <code>setUserId</code> after sign-in or when a session is restored at start-up, and cleared on sign-out. There are <b>9 custom events</b> (the minimum is 7) plus <code>screen_view</code>, sent by the router with the route pattern (for example <code>/note/saved/:id</code>, never an id).</p>
+<table>
+  <tr><th style="width:26%">Event</th><th style="width:30%">Parameters</th><th>Sent by · question it answers</th></tr>
+  <tr><td><code>login</code>, <code>logout</code></td><td><code>method</code></td><td><code>AuthViewModel</code> · which sign-in method do users choose?</td></tr>
+  <tr><td><code>note_saved</code></td><td><code>mood, note_type, has_journal, duration_ms</code></td><td><code>NoteComposerViewModel</code> · what share of notes is saved in under 30 000 ms (the success criterion)?</td></tr>
+  <tr><td><code>note_viewed</code></td><td><code>note_type</code></td><td><code>NoteDetailViewModel</code> · do users come back to old notes?</td></tr>
+  <tr><td><code>challenge_opened</code></td><td><code>challenge_id, note_type</code></td><td rowspan="2"><code>ChallengeDetailViewModel</code> · which cards are opened often but rarely finished?</td></tr>
+  <tr><td><code>challenge_completed</code></td><td><code>challenge_id, minutes</code></td></tr>
+  <tr><td><code>self_control_logged</code></td><td><code>has_habit</code></td><td><code>SelfControlViewModel</code> · do users track a specific habit or log in general?</td></tr>
+  <tr><td><code>group_viewed</code></td><td><code>group_source, group_idea, note_count</code></td><td><code>GroupDetailViewModel</code> · which "first time" groups are reopened?</td></tr>
+  <tr><td><code>report_exported</code></td><td><code>format</code></td><td><code>WeeklyReportViewModel</code> · does anyone export the weekly card?</td></tr>
+</table>
+<p><b>How it was verified.</b> Analytics has no emulator, so the app ran against the real project with debug mode enabled on the emulator (<code>adb shell setprop debug.firebase.analytics.app com.quanphungg.lab03</code>), which makes events appear in DebugView within seconds. One account signed in with Google, saved a note, logged self-control, opened a challenge and a group, and signed out. The same run was captured three ways: DebugView in the Console (figure), <code>adb logcat</code> (<code>evidence/analytics/logcat-events.txt</code>, for example <code>note_saved {duration_ms=7990, mood=vui, note_type=chien_thang, has_journal=false}</code>), and unit tests that assert the exact name and parameters of each event. Every event was observed except <code>report_exported</code>, which is only sent after a successful upload (§5.3).</p>
+<div class="row">
+  <figure><img src="../../slide/public/app/console-analytics.png" alt="DebugView" /><figcaption>DebugView: event stream and top events of the run</figcaption></figure>
+  <figure><img src="../../slide/public/app/dv-params.png" alt="DebugView parameters" /><figcaption>Parameter values cut from the DebugView panels. Full screenshots: <code>evidence/analytics/debugview-*.webp</code></figcaption></figure>
+</div>
+<p>The parameters confirm the privacy rule: <code>group_viewed</code> for the system group "Bắt chuyện" (start a conversation) sends <code>group_source=system</code>, <code>group_idea=nguoi_la</code> and <code>note_count=0</code>, but not the group's name, which users can edit. User properties listed in the plan (§5 of the plan) are not implemented yet.</p>
+
+<!-- ============================== 7 ============================== -->
+<h2>7. Crashlytics and Remote Config evidence</h2>
+<h3>7.1 Crashlytics</h3>
+<p>Crash handlers for Flutter and platform errors are installed in <code>main.dart</code> before <code>runApp</code>, except on the Emulator and on web. Handled errors are recorded as non-fatals at six places where the user's action really fails, each with a reason: <code>ensureProfile</code> (sign-in), <code>note_save</code>, <code>note_update</code>, <code>note_delete</code>, <code>challenge_progress</code> and <code>report_export</code>. The router sets the custom key <code>screen</code> to the current route, and the Crashlytics user ID is set after sign-in. A "test crash" button exists in the Firebase demo area of debug builds only.</p>
+<p>The non-fatal in the figure comes from a real path, not a staged one: exporting the weekly card on the real project fails because there is no Storage bucket, the user sees the message, and <code>WeeklyReportViewModel</code> records it. The issue arrives grouped as <code>FirebaseStorageService.uploadReport</code> with <code>screen=/journey</code> and the user ID. The dashboard also showed a real fatal that nobody had noticed: a Hero error caused by a null <code>heroTag</code> on the add-note button, which was then fixed.</p>
+<div class="row">
+  <figure class="phone"><img src="../../slide/public/app/report-error.png" alt="Export error" /><figcaption>The user still gets a message and a retry</figcaption></figure>
+  <div style="flex:3.2">
+    <div class="row">
+      <figure><img src="../../evidence/crashlytics/nonfatal-list.png" alt="Non-fatal" /><figcaption>Non-fatal <code>uploadReport</code></figcaption></figure>
+      <figure><img src="../../evidence/crashlytics/keys-and-user.png" alt="Keys" /><figcaption>Keys tab: <code>screen=/journey</code>, user ID</figcaption></figure>
+    </div>
+    <figure><img src="../../slide/public/app/console-crashlytics.png" alt="Dashboard" /><figcaption>Dashboard with the test crash and the Hero error. <code>evidence/crashlytics/</code></figcaption></figure>
+  </div>
+</div>
+<h3>7.2 Remote Config</h3>
+<p>Remote Config holds four feature flags (the three below and <code>discord_enabled</code>) and four content values (quick-win chips, Discord invite link, channel map and greetings). The flags shown here change visible behaviour: <code>groups_enabled</code> shows or hides the "first time groups" shelf on the jar, <code>custom_challenges_enabled</code> the add-your-own-card button, <code>firebase_demo_enabled</code> the Firebase demo area in Settings.</p>
+<ul>
+  <li><b>Defaults in the app.</b> <code>setDefaults</code> is called before any fetch with the same values as <code>firebase/remote-config-defaults.json</code>; every flag defaults to on, so a failed fetch never removes a feature.</li>
+  <li><b>Fetch and cache.</b> One <code>fetchAndActivate</code> at launch with a 10-second timeout. The minimum fetch interval is zero in debug builds, so a Console change shows on the next launch for the demo, and one hour in release; activated values stay cached on the device until the next successful fetch. Errors are caught and the defaults stay.</li>
+  <li><b>No rebuild.</b> Values are published from <code>firebase/remoteconfig.template.json</code> with <code>firebase deploy --only remoteconfig</code> or edited in the Console. The before and after screenshots come from the same installed APK; only the Console value changed.</li>
+</ul>
+<div class="row">
+  <figure class="phone sm"><img src="../../slide/public/app/rc-jar-before.png" alt="" /><figcaption>Before · <code>groups_enabled=true</code></figcaption></figure>
+  <figure class="phone sm"><img src="../../slide/public/app/rc-jar-after.png" alt="" /><figcaption>After · <code>false</code></figcaption></figure>
+  <figure class="phone sm"><img src="../../slide/public/app/rc-challenges-before.png" alt="" /><figcaption>Before · <code>custom_challenges_enabled=true</code></figcaption></figure>
+  <figure class="phone sm"><img src="../../slide/public/app/rc-challenges-after.png" alt="" /><figcaption>After · <code>false</code></figcaption></figure>
+  <figure style="flex:2.2"><img src="../../evidence/remote-config/console-flags.png" alt="Console flags" /><figcaption>Console values. <code>evidence/remote-config/</code></figcaption></figure>
+</div>
+<p>One known weakness, reported by the code review and not fixed: the Challenges tab and the group shelf keep their state, so a flag changed by a manual refresh is only visible after the screen is rebuilt (finding 38-ec03d165).</p>
+
+<!-- ============================== 8 ============================== -->
+<h2>8. ARTEMIS test plan, results and exploratory session</h2>
+<p><b>Tool and setup.</b> ARTEMIS (google/artemis, pinned at commit <code>351ca84</code>, vendored in <code>tools/artemis/</code>) is an AI agent that operates an Android device through ADB from a goal written in natural language. It ran on an Android 15 emulator with the debug build signed in with a test account. Every agent node used <code>deepseek/deepseek-v4.1-flash</code> through OpenRouter with the Flash profile; the only config changes from upstream are the model routing and turning off a summariser that supports only Google models. The test suite is a pytest project in <code>e2e_test/</code>; plan, environment and results are in <code>docs/test-plan.md</code>.</p>
+<p><b>How a case asserts.</b> A goal ends by asking the agent to answer with one fixed keyword, and the test asserts on that reported value, not only on the agent saying it succeeded. The answer is read from the last <code>report_task_status</code> step of the session, because the server does not fill <code>TaskResult.output</code>. Each case runs three times (<code>--runs 3</code>):</p>
+<pre>async def test_t04_f1_empty_note_cannot_be_saved(ask) -&gt; None:
+    answer, result = await ask(
+        "Ở màn Hôm nay, bấm 'Ghi nốt', ... KHÔNG gõ gì vào ô nội dung. Nhìn nút lưu: "
+        "trả lời DISABLED nếu nút bị mờ hoặc bấm vào không đi tiếp, ENABLED nếu ...",
+        "DISABLED hoặc ENABLED",
+    )
+    assert "DISABLED" in answer, f"{answer!r} (trace {result.trace_id})"</pre>
+<table>
+  <tr><th>ID</th><th>Flow</th><th>Agent must report</th><th>Pass</th><th>Time / run</th></tr>
+  <tr><td>T01</td><td>Launch</td><td><code>WELCOME</code> or <code>TODAY</code></td><td>3/3</td><td>20–52 s</td></tr>
+  <tr><td>T02</td><td>F1 main path: save a note</td><td><code>SAVED</code></td><td>3/3</td><td>31–206 s</td></tr>
+  <tr><td>T03</td><td>Jar: open and delete the test note</td><td><code>DELETED</code></td><td>3/3</td><td>256–391 s</td></tr>
+  <tr><td>T04</td><td>F1 error: empty note</td><td><code>DISABLED</code></td><td>3/3</td><td>55–56 s</td></tr>
+  <tr><td>T05</td><td>F1 error: Back with a draft</td><td><code>DIALOG</code></td><td>3/3 *</td><td>108–214 s</td></tr>
+  <tr class="fail"><td>T06</td><td>F1 error: airplane mode via adb</td><td><code>OFFLINE_BANNER</code></td><td>2/3</td><td>264–421 s</td></tr>
+  <tr><td>T07</td><td>F2 self-control screen</td><td><code>SELF_CONTROL</code></td><td>3/3</td><td>38–52 s</td></tr>
+  <tr><td>T08</td><td>F2 breathing</td><td><code>BREATHING</code></td><td>3/3</td><td>20–28 s</td></tr>
+  <tr><td>T09</td><td>F3 open a challenge, go back</td><td><code>DETAIL_THEN_BACK</code></td><td>3/3</td><td>46–82 s</td></tr>
+  <tr><td>T10</td><td>Four tabs</td><td><code>ALL_TABS</code></td><td>3/3</td><td>33–40 s</td></tr>
+  <tr><td>T11</td><td>Settings: Remote Config row</td><td>contains "Cờ tính năng"</td><td>3/3</td><td>13–19 s</td></tr>
+  <tr><td>T12</td><td>Native: Home, notification shade, relaunch</td><td><code>LOGGED_IN</code></td><td>3/3 *</td><td>32–39 s</td></tr>
+</table>
+<p><b>Results: 35 of 36 runs pass (97 %).</b> Error paths are covered by T04, T05 and T06; T06 and T12 act outside the app (airplane mode through <code>adb</code>; the Home button and the notification shade, with the agent not locked to the app package). The first full run took 62 minutes and passed 31 of 36. We analysed each failure before changing anything:</p>
+<ul>
+  <li><b>T05 run 3, assertion error.</b> The keep-draft dialog did appear, but the agent answered with a sentence that did not start with <code>DIALOG</code>. The check became "contains <code>DIALOG</code> and not <code>NO_DIALOG</code>".</li>
+  <li><b>T12, all runs, assertion error.</b> The test required the Today screen, but the app correctly reopens the screen the user was on (Settings) and stays signed in. The expected keyword became <code>LOGGED_IN</code>. Both changes were made after seeing the results; they make the test match the intended behaviour and do not hide an app bug. T05 and T12 were re-run: 6 of 6.</li>
+  <li><b>T06 run 3, real failure, kept.</b> The run hit the 420-second timeout without an answer. T06 is also the slowest case after T03 (264–289 s when it passes), so the agent probably got stuck while the device was offline. The root cause has not been investigated, and there is no evidence that it is an app bug.</li>
+</ul>
+<p class="ev">JUnit reports: <code>evidence/artemis/junit-full-run.xml</code>, <code>junit-rerun-t05-t12.xml</code>; device screenshots and the Workspace page: <code>evidence/artemis/</code>.</p>
+<div class="note warn"><b>Not run yet.</b> Five more cases are written in <code>e2e_test/test_main_flows.py</code> but have no results, so they are not in the table above and the requirement they cover is not yet met:
+<ul style="margin-bottom:0">
+  <li><b>T13 Analytics.</b> Saves a note, then the test enables verbose Firebase logging and reads <code>adb logcat</code>: it must find <code>note_saved</code> with <code>mood</code> and <code>note_type</code>, and must not find the note text.</li>
+  <li><b>T14 Export and upload.</b> Expects the upload and link when <code>E2E_STORAGE_READY=1</code>, otherwise the error message with "Thử lại".</li>
+  <li><b>T15 and T16 Sign-out and sign-in.</b> Sign out, then sign in with an email test account, once with a wrong password first. Google sign-in is not driven by the agent because the chooser shows a real name and email.</li>
+  <li><b>X01 Exploratory session.</b> 15–30 minutes with the Pro profile; the agent explores freely and returns bug lines. It has not been run, so <b>there is no list of bugs found by exploration</b>.</li>
+</ul>
+They need an OpenRouter key on the test machine and an email test account. No app bug was found by T01–T12.</div>
+<p><b>Observations.</b> Gboard's handwriting toolbar intercepted taps on the text field until it was turned off (<code>stylus_handwriting_enabled</code>), which made T02 time out early on. Restarting the ARTEMIS server during a run left orphan agent processes that held the emulator. <code>scrcpy</code> was not installed, so traces have periodic screenshots instead of video.</p>
+
+<!-- ============================== 9 ============================== -->
+<h2>9. AI code review findings and decisions</h2>
+<p>Every pull request into <code>main</code> is reviewed automatically by <b>CodeRabbit</b>. Its comments on PRs #28, #29 and #38 were exported with <code>tools/export_coderabbit.py</code> into <code>docs/code-review.md</code>, one row per finding with the file and lines, severity, category, the tool's suggestion and our verdict with a reason. We checked every finding against the code before deciding.</p>
+<div class="row" style="gap:16px">
+  <table style="flex:1">
+    <tr><th>Severity</th><th>Count</th></tr>
+    <tr><td>Major</td><td>3</td></tr><tr><td>Minor</td><td>45</td></tr><tr><td>Trivial</td><td>4</td></tr>
+    <tr><th>Category</th><th></th></tr>
+    <tr><td>Functional correctness</td><td>33</td></tr><tr><td>Stability and availability</td><td>10</td></tr><tr><td>Maintainability</td><td>4</td></tr><tr><td>Security and privacy</td><td>3</td></tr><tr><td>Data integrity</td><td>2</td></tr>
+  </table>
+  <table style="flex:1.6">
+    <tr><th>Verdict</th><th>Count</th><th>Meaning</th></tr>
+    <tr><td>Right, fixed</td><td>3</td><td>Real bug; the fix commit is named</td></tr>
+    <tr><td>Right, not fixed</td><td>37</td><td>Real bug, left with a reason; mostly small or rare</td></tr>
+    <tr><td>Not needed</td><td>11</td><td>Technically right but not worth it here (helper scripts, iOS)</td></tr>
+    <tr><td>Wrong</td><td>1</td><td>The tool misread the code</td></tr>
+  </table>
+</div>
+<table>
+  <tr><th style="width:14%">Finding</th><th style="width:38%">What CodeRabbit reported</th><th>Our decision and reason</th></tr>
+  <tr><td>38-bfeb007a<br />Major · privacy</td><td>The FCM inbox is stored on the device and survives sign-out, so the next account on the phone can read the previous user's notifications.</td><td><b>Accepted, fixed in 736453a.</b> <code>signOut</code> now clears <code>fcm_inbox</code>; tests in <code>auth_view_model_test.dart</code> and <code>firebase_messaging_service_test.dart</code>.</td></tr>
+  <tr><td>38-75b5e00c<br />Minor</td><td>Foreground notifications have no payload, so tapping one opens nothing.</td><td><b>Accepted, fixed in 5e13651.</b> The route is passed as the payload and the tap listener navigates to it; tests added. This was a missing FCM requirement.</td></tr>
+  <tr><td>38-322a383f<br />Minor</td><td>The Analytics user ID is not set when a session is restored at start-up.</td><td><b>Accepted, fixed in 211a4d5.</b> The router sets it whenever the auth user changes.</td></tr>
+  <tr><td>38-cfffb9a5<br />Major</td><td>Pass Darwin settings to <code>initialize</code> in <code>start()</code>.</td><td><b>Rejected, not needed.</b> Correct for iOS, but the app ships on Android and web only and <code>firebase_options.dart</code> has no iOS app. Major is too strong here.</td></tr>
+  <tr><td>Saving flag<br />Minor</td><td><code>_saving</code> is set but never read, so a double tap could add the same card twice.</td><td><b>Rejected, wrong.</b> <code>canSubmit</code> is <code>!_saving &amp;&amp;</code> title not empty, and the button is disabled while saving. The only wrong finding of 52.</td></tr>
+  <tr><td>38-f0574c79<br />Minor</td><td><code>logScreen</code> is called directly, so an Analytics error there is not caught.</td><td><b>Right, not fixed yet.</b> Valid; unlike <code>track</code> it bypasses the safe wrapper. Low impact, scheduled with 38-3b4a994a.</td></tr>
+  <tr><td>38-3c797d6d<br />Minor</td><td>Missing <code>context.mounted</code> check after the Remote Config refresh in Settings.</td><td><b>Right, not fixed yet.</b> The method above it has the check; this one does not.</td></tr>
+</table>
+<p>What we learned about the tool: it is precise about the lines it reads (51 of 52 findings were technically right) and it found two bugs that broke requirements, but its severity labels are not reliable, and it missed a bigger issue in a script it reviewed (a hard-coded path from one developer's machine in <code>evidence/artemis/capture_loop.sh</code>). Most of the real findings were read only after the pull request had been merged; only one of the 40 real bugs was fixed before merge.</p>
+<div class="row">
+  <figure><img src="../../slide/public/review/proof-review.png" alt="CodeRabbit review" style="max-height:180px;object-fit:cover;object-position:top" /><figcaption>CodeRabbit's review on PR #38</figcaption></figure>
+  <figure><img src="../../slide/public/review/proof-commit-736453a.png" alt="Fix commit" style="max-height:180px;object-fit:cover;object-position:top" /><figcaption>The fix commit names the finding it addresses</figcaption></figure>
+</div>
+
+<!-- ============================== 10 ============================== -->
+<h2>10. Challenges encountered</h2>
+<p><b>Analytics and Crashlytics have no emulator.</b> Stages 3 and 4 were built against the Firebase Emulator Suite, which made rules and data easy to test. Stage 5 could not be checked that way: Analytics and Crashlytics only work against a real project. We kept a console logger and a no-op reporter for the Emulator and web, and verified Stage 5 on the real project with DebugView and the Crashlytics dashboard.</p>
+<p><b>Cloud Storage needs the Blaze plan.</b> The project is on the free Spark plan, which can no longer create a bucket. Rather than fake a successful upload, we kept the real failure: the user sees a message with a retry, and the error is the non-fatal shown in §7.1. The complete upload was tested only on the Emulator.</p>
+<p><b>Google Sign-In on a new machine.</b> On a second development machine Google Sign-In failed with "Không đăng nhập được". There were three causes: no Google account on the emulator, the machine's debug SHA-1 was not registered, and the committed <code>google-services.json</code> had no OAuth client. Adding the fingerprint in the Console and committing the regenerated file fixed it.</p>
+<p><b>An AI agent as the tester.</b> The agent's answers vary from run to run, it sometimes tapped controls the goal told it not to touch, and the keyboard and leftover processes interfered. Fixed keywords in the answers made the results checkable, and analysing each failure showed that most of them were in our tests, not in the app.</p>
+<p><b>Lab 2 documents that disagree.</b> Two Lab 2 documents gave different limits (D-11), and some Lab 2 labels confused users (D-28). Each case needed a decision and a log entry instead of a silent change.</p>
+<p><b>Evidence from protected screens.</b> The self-control screen sets <code>FLAG_SECURE</code> so the user's habits never appear in screenshots; the same flag makes our own screenshots black. Those steps were checked with <code>uiautomator dump</code> instead.</p>
+
+<!-- ============================== 11 ============================== -->
+<h2>11. Lessons learned</h2>
+<ol>
+  <li><b>Test against the real project early.</b> The Emulator covers rules and data, but not Analytics, Crashlytics or FCM. Several issues appeared only on the real project.</li>
+  <li><b>Design documents can disagree.</b> Pick one, explain the choice and log it as a deviation; the next reader then knows it was a decision.</li>
+  <li><b>Rename what users misread.</b> Changing one label (D-28) removed a misunderstanding that more explanation would not have fixed.</li>
+  <li><b>Check the AI tester as well as the app.</b> Four of the five failures in the first ARTEMIS run came from our own assertions; only one (T06) is a real problem. A failing test is a question, not a verdict.</li>
+  <li><b>Read AI review before merging.</b> CodeRabbit was right 51 times out of 52, but most findings were read after merge. Its severity labels still need human judgement.</li>
+  <li><b>Say what is not done.</b> Storage, the unrun ARTEMIS cases and the exploratory session are written down as gaps with reasons, which is more useful to a reviewer than a claim that cannot be checked.</li>
+</ol>
+
+<!-- ============================== 12 ============================== -->
+<h2>12. AI tools used</h2>
+<table>
+  <tr><th style="width:21%">Tool</th><th>Used for</th><th style="width:35%">How the output was checked</th></tr>
+  <tr><td><b>Claude Code</b> (Anthropic)</td><td>Writing and refactoring Flutter code and tests; writing docs; building the slides (React + reveal.js) and this report; capturing evidence over <code>adb</code></td><td>Changes went through <code>flutter analyze</code>, <code>flutter test</code> and a pull request; facts in the docs were checked against the code, the Console and the evidence files</td></tr>
+  <tr><td><b>CodeRabbit</b></td><td>Automatic review of every pull request</td><td>Each of the 52 findings was verified by hand and given a verdict in <code>docs/code-review.md</code></td></tr>
+  <tr><td><b>ARTEMIS</b> (Google) with <b>DeepSeek</b> v4.1 Flash via OpenRouter</td><td>AI agent that drives the app for the end-to-end tests</td><td>Assertions on the reported value; every failure analysed, and changed assertions disclosed</td></tr>
+</table>
+<p class="ev">The agent sees screenshots of the app, so tests use a test account and a note text reserved for tests ("E2E test note"). No service-account keys, API keys or keystores are committed; <code>tools/artemis/.env</code> is git-ignored. The Android <code>google-services.json</code> is committed, as the handout allows, because access is controlled by the Security Rules.</p>
+
+</body>
+</html>

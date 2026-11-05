@@ -9,6 +9,7 @@ import '../services/app_exception.dart';
 import '../services/auth_service.dart';
 import '../services/crash_reporter.dart';
 import '../services/draft_store.dart';
+import '../services/messaging_service.dart';
 import '../services/user_repository.dart';
 import '../utils/validators.dart';
 
@@ -120,6 +121,10 @@ class AuthViewModel extends Notifier<AuthState> {
     try {
       await _users.clearLocalData();
       await ref.read(draftStoreProvider).clear();
+      // Hộp thư FCM nằm trên máy, không theo tài khoản: xoá để người đăng
+      // nhập sau không đọc được thông báo cũ.
+      await ref.read(messagingServiceProvider).clearInbox();
+      ref.read(inboxRevisionProvider.notifier).bump();
     } on Object {
       // Không chặn đăng xuất nếu chưa xoá được bộ nhớ đệm; lần sau xoá lại.
     }

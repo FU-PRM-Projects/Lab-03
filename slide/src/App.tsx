@@ -1,6 +1,20 @@
 import type { ReactNode } from 'react';
 import { Deck, Slide } from '@revealjs/react';
 import RevealNotes from 'reveal.js/plugin/notes';
+import {
+  BellRing,
+  Bot,
+  Cloud,
+  FileStack,
+  GitPullRequest,
+  Tag,
+  Bug,
+  ChartColumn,
+  CloudUpload,
+  Database,
+  KeyRound,
+  SlidersHorizontal,
+} from 'lucide-react';
 
 import 'reveal.js/reveal.css';
 import './slides.css';
@@ -185,18 +199,29 @@ function Flow({ steps }: { steps: string[] }) {
   return <p className="flow">{steps.join('  →  ')}</p>;
 }
 
-type ArchBox = { x: number; y: number; w: number; title: string; sub: string; dim?: boolean };
+type ArchBox = { x: number; y: number; w: number; title: string; sub: string; dim?: boolean; n?: number };
 
 const ARCH_BOXES: ArchBox[] = [
-  { x: 20, y: 44, w: 150, title: 'screens/', sub: 'S01 … S12' },
-  { x: 205, y: 44, w: 150, title: 'widgets/', sub: 'shared components' },
-  { x: 390, y: 44, w: 150, title: 'theme/', sub: 'design tokens' },
-  { x: 190, y: 160, w: 180, title: 'ViewModel', sub: 'Notifier + ViewState<T>' },
-  { x: 190, y: 260, w: 180, title: 'Service', sub: 'interfaces + Providers' },
-  { x: 190, y: 370, w: 180, title: 'Implementation', sub: 'firebase/ · 15 classes' },
+  { x: 20, y: 44, w: 150, title: 'screens/', sub: 'S01 … S12', n: 1 },
+  { x: 205, y: 44, w: 150, title: 'widgets/', sub: 'shared components', n: 2 },
+  { x: 390, y: 44, w: 150, title: 'theme/', sub: 'design tokens', n: 3 },
+  { x: 190, y: 160, w: 180, title: 'ViewModel', sub: 'Notifier + ViewState<T>', n: 4 },
+  { x: 190, y: 260, w: 180, title: 'Service', sub: 'interfaces + Providers', n: 5 },
+  { x: 190, y: 370, w: 180, title: 'Implementation', sub: 'firebase/ · 15 classes', n: 6 },
   { x: 190, y: 480, w: 180, title: 'Firebase SDK', sub: 'Auth · Firestore · …', dim: true },
-  { x: 430, y: 370, w: 130, title: 'main.dart', sub: 'composition root', dim: true },
+  { x: 430, y: 370, w: 130, title: 'main.dart', sub: 'composition root', dim: true, n: 7 },
 ];
+
+function Badge({ x, y, n }: { x: number; y: number; n: number }) {
+  return (
+    <g>
+      <circle cx={x + 2} cy={y + 2} r="13" fill="#e5262b" />
+      <text x={x + 2} y={y + 7} textAnchor="middle" fontSize="14" fontWeight="700" fill="#fff">
+        {n}
+      </text>
+    </g>
+  );
+}
 
 function ArchDiagram() {
   const line = { stroke: '#000', strokeWidth: 1.5, markerEnd: 'url(#arr)', fill: 'none' };
@@ -217,6 +242,7 @@ function ArchDiagram() {
       <rect x="0" y="590" width="560" height="64" rx="12" fill="#f4f4f4" stroke="#888" strokeWidth="1.5" />
       <text x="280" y="619" textAnchor="middle" fontSize="20" fontWeight="600">models/ · plain Dart</text>
       <text x="280" y="641" textAnchor="middle" fontSize="14" fill="#555">Note · Mood · Challenge · AppUser</text>
+      <Badge x={0} y={590} n={8} />
 
       {ARCH_BOXES.map((b) => (
         <g key={b.title}>
@@ -232,6 +258,7 @@ function ArchDiagram() {
           />
           <text x={b.x + b.w / 2} y={b.y + 27} textAnchor="middle" fontSize="20" fontWeight="600">{b.title}</text>
           <text x={b.x + b.w / 2} y={b.y + 49} textAnchor="middle" fontSize="14" fill="#555">{b.sub}</text>
+          {b.n && <Badge x={b.x} y={b.y} n={b.n} />}
         </g>
       ))}
 
@@ -271,59 +298,224 @@ const DS_COLORS: { label: string; chips: [string, string][] }[] = [
   },
 ];
 
-const DS_TYPE: [string, number, number][] = [
-  ['Display · 44 Bold', 44, 700],
-  ['Headline · 28 Bold', 28, 700],
-  ['Title · 20 Bold', 20, 700],
-  ['Body · 16 Regular', 16, 400],
-  ['Label · 14 SemiBold', 14, 600],
-  ['Caption · 12 Regular', 12, 400],
-];
-
-function DesignSystem() {
+function DesignSystemMap() {
+  const swatches = DS_COLORS.flatMap((g) => g.chips).filter(([name]) =>
+    ['primary', 'primary-container', 'surface', 'on-surface', 'error', 'success', 'heat/3', 'heat/5'].includes(name),
+  );
+  const components: [string, string][] = [
+    ['Button · 5 variants × 4 states', 'AppButton(variant:, loading:)'],
+    ['Text field · error, disabled', 'AppTextField(errorText:)'],
+    ['Card/Nốt · 4 note types', 'NoteCard(type:)'],
+    ['BottomNav · 4 tabs', 'AppBottomNav(currentIndex:)'],
+    ['Dialog · confirm, destructive', 'showAppDialog(kind:)'],
+    ['Loading · Empty · Error', 'LoadingState · EmptyState · ErrorState'],
+    ['MoodOption · selected', 'MoodOption(mood:, selected:)'],
+    ['Mascot · 8 states (below)', 'Mascot(state:)'],
+    ['Illustration/Hũ chiến thắng', 'JarIllustration(notes:)'],
+  ];
   return (
-    <div className="ds">
-      <div className="ds-colors">
-        {DS_COLORS.map((g) => (
-          <div className="ds-row" key={g.label}>
-            <span className="ds-label">{g.label}</span>
-            {g.chips.map(([name, hex]) => (
-              <span className="ds-chip" key={name}>
+    <div className="dsm">
+      <div className="dsm-tokens">
+        <h3>Tokens → ThemeData</h3>
+        <div className="dsm-block">
+          <p className="dsm-head">
+            Colour → <code>ColorScheme</code> <small>app_colors.dart</small>
+          </p>
+          <div className="dsm-swatches">
+            {swatches.map(([name, hex]) => (
+              <figure key={name}>
                 <i style={{ background: hex }} />
-                <b>{name}</b>
-                <em>{hex}</em>
-              </span>
+                <figcaption>
+                  {name}
+                  <small>{hex}</small>
+                </figcaption>
+              </figure>
             ))}
           </div>
-        ))}
-      </div>
-      <div className="ds-side">
-        <div className="ds-type">
-          {DS_TYPE.map(([name, size, weight]) => (
-            <div key={name}>
-              <span style={{ fontSize: size, fontWeight: weight }}>Nốt nhắc bạn</span>
-              <small>{name}</small>
+        </div>
+        <div className="dsm-block">
+          <p className="dsm-head">
+            Type → <code>TextTheme</code> <small>app_typography.dart · Be Vietnam Pro</small>
+          </p>
+          {(
+            [
+              ['Display', 44, 700, 'displayMedium', 28],
+              ['Headline', 28, 700, 'headlineMedium', 21],
+              ['Title', 18, 700, 'titleMedium', 17],
+              ['Body', 16, 400, 'bodyLarge', 15],
+              ['Label', 14, 600, 'labelLarge', 13.5],
+            ] as const
+          ).map(([name, size, weight, role, shown]) => (
+            <div key={name} className="dsm-type">
+              <span style={{ fontSize: shown, fontWeight: weight }}>Nốt nhắc bạn</span>
+              <small>
+                {name} {size} · <code>{role}</code>
+              </small>
             </div>
           ))}
         </div>
-        <div className="ds-scale">
-          <span className="ds-label">Space</span>
-          {[2, 4, 8, 12, 16, 24].map((v) => (
-            <span className="ds-chip" key={v}>
-              <i className="sq" style={{ width: v, height: v }} />
-              <em>{v}</em>
-            </span>
-          ))}
+        <div className="dsm-block dsm-sizes">
+          <div>
+            <p className="dsm-head">
+              Space → <code>AppSpace</code>
+            </p>
+            <div className="dsm-space">
+              {[4, 8, 12, 16, 24].map((s) => (
+                <span key={s}>
+                  <i style={{ width: s * 1.5 }} />
+                  {s}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className="dsm-head">
+              Radius → <code>AppRadius</code>
+            </p>
+            <div className="dsm-radius">
+              {(
+                [
+                  [8, '8'],
+                  [14, '14 note'],
+                  [16, '16 card'],
+                  [999, 'full'],
+                ] as const
+              ).map(([r, label]) => (
+                <span key={label}>
+                  <i style={{ borderRadius: Math.min(r, 17) }} />
+                  {label}
+                </span>
+              ))}
+            </div>
+          </div>
         </div>
-        <div className="ds-scale">
-          <span className="ds-label">Radius</span>
-          {[4, 6, 8, 12].map((v) => (
-            <span className="ds-chip" key={v}>
-              <i className="sq big" style={{ borderRadius: v }} />
-              <em>{v}</em>
-            </span>
+        <p className="dsm-theme">
+          <code>AppTheme.light()</code> wires all of it into one <code>ThemeData</code>; screens read the theme, never a raw
+          colour or size
+        </p>
+      </div>
+      <div className="dsm-comps">
+        <h3>Lab 2 components → widgets/</h3>
+        <table>
+          <tbody>
+            {components.map(([lab2, widget]) => (
+              <tr key={lab2}>
+                <td>{lab2}</td>
+                <td>→</td>
+                <td>
+                  <code>{widget}</code>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div className="dsm-cast">
+          {(
+            [
+              ['xong', 'Xong'],
+              ['thong-tha', 'Thong Thả'],
+              ['doi', 'Đợi'],
+              ['ngu', 'Ngủ'],
+              ['lac', 'Lạc'],
+              ['tap-trung', 'Tập Trung'],
+              ['voi', 'Vội'],
+              ['chay', 'Cháy'],
+            ] as const
+          ).map(([m, name]) => (
+            <figure key={m}>
+              <img src={`assets/mascot/mascot-not-${m}.svg`} alt="" />
+              <figcaption>{name}</figcaption>
+            </figure>
           ))}
+          <figure>
+            <img className="dsm-jar" src="assets/illustrations/jar.svg" alt="" />
+            <figcaption>Hũ</figcaption>
+          </figure>
         </div>
+        <p className="dsm-cast-cap">Tụi Nốt: one face per mood and app state, so mood is never colour alone</p>
+      </div>
+    </div>
+  );
+}
+
+/** Cắt một vùng của ảnh chụp: [x, y] và kích thước tính theo px CSS của ảnh gốc. */
+function Crop({
+  src,
+  alt,
+  natural,
+  x = 0,
+  y = 0,
+  w,
+  h,
+  scale,
+}: {
+  src: string;
+  alt: string;
+  natural: number;
+  x?: number;
+  y?: number;
+  w: number;
+  h: number;
+  scale: number;
+}) {
+  return (
+    <div className="crop" style={{ width: w * scale, height: h * scale }}>
+      <img src={src} alt={alt} style={{ width: natural * scale, marginLeft: -x * scale, marginTop: -y * scale }} />
+    </div>
+  );
+}
+
+/** Ảnh chụp code thật trên GitHub (nhánh main), số khớp với sơ đồ MVVM. */
+function CodeShot({ n, layer, file, shot }: { n: number; layer: string; file: string; shot: string }) {
+  return (
+    <figure className="cs">
+      <figcaption>
+        <em>{n}</em>
+        <b>{layer}</b>
+        <code>lib/{file}</code>
+      </figcaption>
+      <img src={`code/${shot}.png`} alt={`${layer}: lib/${file} on GitHub, key lines marked in red`} />
+    </figure>
+  );
+}
+
+type Finding = {
+  shot: string;
+  where: string;
+  kind: string;
+  found: string;
+  decision: 'Fixed' | "Won't fix" | 'Rejected';
+  detail: string;
+  commit?: string;
+};
+
+function ReviewFinding({ f }: { f: Finding }) {
+  const tone = f.decision === 'Fixed' ? 'ok' : f.decision === 'Rejected' ? 'no' : 'skip';
+  return (
+    <div className="rv">
+      <img className="rv-shot" src={`review/${f.shot}.png`} alt={`CodeRabbit comment: ${f.found}`} />
+      <div className="rv-notes">
+        <p>
+          <em>1</em>
+          <b>Where</b>
+          {f.where}
+        </p>
+        <p>
+          <em>2</em>
+          <b>Kind</b>
+          {f.kind}
+        </p>
+        <p>
+          <em>3</em>
+          <b>Found</b>
+          {f.found}
+        </p>
+      </div>
+      <span className="rv-arrow">→</span>
+      <div className={`rv-decision rv-${tone}`}>
+        <b>{f.decision}</b>
+        {f.commit && <code>{f.commit}</code>}
+        <span>{f.detail}</span>
       </div>
     </div>
   );
@@ -380,6 +572,139 @@ export default function App() {
 
         <Page
           dense
+          title="Overview"
+          line="From the Lab 2 design to a cloud-connected Flutter app"
+          notes="Read left to right, this is how Lab 3 was built. One: start from the Lab 2 Figma design, all 12 screens and flows F1 to F3, including error states. Two: keep MVVM with Riverpod, so screens talk to ViewModels, ViewModels to services, and only lib/firebase imports the SDK. Three: wire in seven Firebase services, Auth, Firestore, Storage, Analytics, Crashlytics, Remote Config and Cloud Messaging, and tell the user in plain words when something fails. Four: back every claim with evidence someone else can check: Console screenshots, logs, ARTEMIS runs, all in evidence/."
+        >
+          <div className="stages">
+            <figure className="st">
+              <div className="st-vis">
+                <img className="st-phone" src="figma/s02.png" alt="S02 Today in the Lab 2 Figma file" />
+                <div className="st-map">
+                  <span>S02 Hôm nay</span>↓<code>/today</code>↓<code>TodayScreen</code>↓
+                  <code>TodayViewModel</code>
+                </div>
+              </div>
+              <figcaption>
+                <b><em>1</em> Lab 2 design → code</b>
+                <span>Each Figma screen mapped to a route, Screen and ViewModel</span>
+              </figcaption>
+            </figure>
+            <span className="st-arrow">→</span>
+            <figure className="st">
+              <div className="st-vis st-layers">
+                <span>
+                  <small>View</small>TodayScreen
+                </span>
+                <span>
+                  <small>ViewModel · Riverpod</small>TodayViewModel
+                </span>
+                <span>
+                  <small>Service · interface</small>NoteRepository
+                </span>
+                <span className="st-fb">
+                  <small>Firebase · lib/firebase</small>FirestoreNoteRepository
+                </span>
+              </div>
+              <figcaption>
+                <b><em>2</em> MVVM</b>
+                <span>Screens never touch the SDK; only lib/firebase does</span>
+              </figcaption>
+            </figure>
+            <span className="st-arrow">→</span>
+            <figure className="st">
+              <div className="st-vis">
+                <img className="st-phone" src="app/welcome.png" alt="Sign-in screen with Google and email" />
+                <div className="st-chips">
+                  {(
+                    [
+                      [KeyRound, 'Auth'],
+                      [Database, 'Firestore'],
+                      [CloudUpload, 'Storage'],
+                    ] as const
+                  ).map(([Icon, name]) => (
+                    <i key={name}>
+                      <Icon size={14} strokeWidth={2.2} />
+                      {name}
+                    </i>
+                  ))}
+                </div>
+              </div>
+              <figcaption>
+                <b><em>3</em> Firebase, round 1</b>
+                <span>Sign-in, notes in Firestore, weekly PDF to Storage</span>
+              </figcaption>
+            </figure>
+
+            <figure className="st">
+              <div className="st-vis st-trio">
+                {[
+                  ['app/s02.png', 'S02'],
+                  ['app/s03b.png', 'S03'],
+                  ['app/artemis-challenge.jpg', 'S07'],
+                ].map(([src, label]) => (
+                  <span key={label}>
+                    <img src={src} alt={`${label} in the running app`} />
+                    {label}
+                  </span>
+                ))}
+              </div>
+              <figcaption>
+                <b><em>4</em> Features</b>
+                <span>All 12 screens; flows F1 to F3 with their error states</span>
+              </figcaption>
+            </figure>
+            <span className="st-arrow">→</span>
+            <figure className="st">
+              <div className="st-vis st-col">
+                <img className="st-wide" src="app/fcm-foreground.png" alt="FCM notification while the app is open" />
+                <div className="st-chips st-chips-row">
+                  {(
+                    [
+                      [ChartColumn, 'Analytics'],
+                      [Bug, 'Crashlytics'],
+                      [SlidersHorizontal, 'Remote Config'],
+                      [BellRing, 'FCM'],
+                    ] as const
+                  ).map(([Icon, name]) => (
+                    <i key={name}>
+                      <Icon size={14} strokeWidth={2.2} />
+                      {name}
+                    </i>
+                  ))}
+                </div>
+              </div>
+              <figcaption>
+                <b><em>5</em> Firebase, round 2</b>
+                <span>Events, crashes, feature flags and push messages</span>
+              </figcaption>
+            </figure>
+            <span className="st-arrow">→</span>
+            <figure className="st">
+              <div className="st-vis st-col">
+                <img className="st-wide" src="app/console-analytics.png" alt="Analytics DebugView in the Firebase Console" />
+                <img className="st-wide" src="app/console-crash-keys.png" alt="Crashlytics issue with user ID and custom keys" />
+              </div>
+              <figcaption>
+                <b><em>6</em> Evidence</b>
+                <span>Console, DebugView, Crashlytics, ARTEMIS · evidence/</span>
+              </figcaption>
+            </figure>
+          </div>
+        </Page>
+
+        <Page
+          dense
+          title="Design system in code"
+          line="Lab 2 tokens become one ThemeData; each Lab 2 component is one reusable widget"
+          notes="Left: the Lab 2 tokens from flutter-handoff.md live only in lib/theme: colours in a ColorScheme (app_colors.dart), text styles in a TextTheme (app_typography.dart), spacing, radius and elevation as named constants (app_tokens.dart). AppTheme.light() wires them into one ThemeData, and screens read the theme rather than hard-coding a colour or size. Right: each Lab 2 component is one widget in lib/widgets with its variants and states as parameters, for example AppButton has 5 variants and 4 states. The mascot Tụi Nốt has 8 states, one face per mood so mood is never shown by colour alone, and the jar fills with every saved note. The full component table is section 3 of docs/design-traceability.md."
+        >
+          <DesignSystemMap />
+          <p className="foot">docs/design-traceability.md §3 components, §4 tokens · lib/theme/ · lib/widgets/</p>
+        </Page>
+
+        <Page
+          dense
           title="Figma vs app"
           notes="Three screens, Figma on the left and the running app on the right. D-xx ids are in docs/design-traceability.md, section 5. S03b free-tell with AI is planned and not built. The Stats screenshot comes from a test account with a few notes."
         >
@@ -414,6 +739,7 @@ export default function App() {
               },
             ]}
           />
+          <p className="foot">docs/design-traceability.md · §1 screens, §5 every deviation with its reason</p>
         </Page>
 
         <Page
@@ -448,35 +774,178 @@ export default function App() {
     └── dates.dart          pure helpers`}</pre>
             <ArchDiagram />
           </div>
+          <p className="foot">docs/architecture.md · layers, sequence diagram, ViewModel ↔ service table</p>
         </Page>
 
         <Page
-          title="Design system"
-          notes="Tokens live in lib/theme, components in lib/widgets. Example: AppButton has 5 variants and 4 states."
+          dense
+          title="MVVM in the code: View → ViewModel"
+          line="S02 Today on GitHub (main). Numbers match the MVVM diagram"
+          notes="Real source on GitHub, branch main, for screen S02 Today. One, screens: TodayScreen.build only watches todayViewModelProvider and switches on its state. Two, widgets: AppButton is the shared button component, used by every screen. Three, theme: AppSpace holds the spacing tokens, so screens never hard-code numbers. Four, ViewModel: todayViewModelProvider is a Riverpod NotifierProvider, and TodayViewModel extends Notifier of ViewState."
         >
-          <DesignSystem />
+          <div className="cs-grid">
+            <CodeShot n={1} layer="screens/" file="screens/today/today_screen.dart" shot="screens" />
+            <CodeShot n={2} layer="widgets/" file="widgets/app_button.dart" shot="widgets" />
+            <CodeShot n={3} layer="theme/" file="theme/app_tokens.dart" shot="theme" />
+            <CodeShot n={4} layer="ViewModel" file="viewmodels/today_view_model.dart" shot="viewmodel" />
+          </div>
+        </Page>
+
+        <Page
+          dense
+          title="MVVM in the code: Service → Firebase"
+          line="The data side of S02 Today. Only lib/firebase imports the Firebase SDK"
+          notes="Five, Service: NoteRepository is an abstract interface; the ViewModel only knows this. Six, Implementation: FirestoreNoteRepository implements it with FirebaseFirestore. Seven, main.dart: the composition root overrides noteRepositoryProvider with the Firestore version; tests override it with a fake. Eight, models: Note is plain Dart, shared by every layer. A grep finds no Firebase import in lib/screens, lib/widgets or lib/viewmodels."
+        >
+          <div className="cs-grid">
+            <CodeShot n={5} layer="Service" file="services/note_repository.dart" shot="service" />
+            <CodeShot n={6} layer="Implementation" file="firebase/firestore_note_repository.dart" shot="implementation" />
+            <CodeShot n={7} layer="main.dart" file="main.dart" shot="main" />
+            <CodeShot n={8} layer="models/" file="models/note.dart" shot="models" />
+          </div>
+          <p className="cc-proof">
+            <code>$ grep -rl "package:firebase" lib/screens lib/widgets lib/viewmodels</code>
+            <span>→ 0 files</span>
+          </p>
         </Page>
 
         <Page
           dense
           title="Authentication"
-          images={[
-            { src: 'app/welcome.png', alt: 'Welcome screen with Google and email sign-in' },
-            { src: 'app/welcome-cancelled.png', alt: 'Welcome screen after cancelling: Bạn đã huỷ đăng nhập.' },
-          ]}
-          notes="Google and email sign-in. authStateChanges drives the router: signed-out users go to /welcome and the destination is kept through next. Cancelling the account chooser shows Bạn đã huỷ đăng nhập. The chooser itself is not shown because it displays a real name and email. Sign-out clears local data. Console check by CLI: firebase auth:export returned 1 account with provider google.com."
+          line="When it fails: cancel → “Bạn đã huỷ đăng nhập.” · offline → “Không có mạng. Kiểm tra Wi-Fi rồi thử lại.” · sign-out error → “Chưa đăng xuất được. Thử lại.”"
+          notes="Left: the router follows auth state. Signed out, any route redirects to /welcome with Google and email sign-in; signed in, /welcome redirects to /today. Cancelling the Google account chooser shows Bạn đã huỷ đăng nhập. The chooser itself is not shown because it displays a real name and email. Right, top: the Firebase Console of project Not - PRM393 Lab 3 (prm393-not-lab3), Authentication, Users tab: three accounts, all with the Google provider, emails hidden. Right, below: auth_redirect.dart decides the route from auth state, and signOut clears cached Firestore data, the note draft and the FCM inbox on this device."
         >
-          <pre className="log">{`$ firebase auth:export users.json
-Exported 1 account(s) · provider: google.com
+          <div className="au">
+            <div className="au-phones">
+              <figure>
+                <img src="app/welcome.png" alt="Signed out: welcome screen with Google and email sign-in" />
+                <figcaption>
+                  <b>Signed out</b> → /welcome
+                </figcaption>
+              </figure>
+              <span className="au-arrow">→</span>
+              <figure>
+                <img src="app/s02.png" alt="Signed in: Today screen" />
+                <figcaption>
+                  <b>Signed in</b> → /today
+                </figcaption>
+              </figure>
+              <figure className="au-cancel">
+                <img src="app/welcome-cancelled.png" alt="Cancelled sign-in: Bạn đã huỷ đăng nhập." />
+                <figcaption>
+                  <b>Cancelled</b> → message
+                </figcaption>
+              </figure>
+            </div>
+            <div className="au-side">
+              <figure>
+                <figcaption>
+                  <b>Console</b> · Authentication › Users
+                </figcaption>
+                <div className="au-console">
+                  <Crop
+                    src="app/console-auth-users.png"
+                    alt="Firebase Console header: project Not - PRM393 Lab 3, Authentication, Users tab"
+                    natural={1810}
+                    y={4}
+                    w={1040}
+                    h={128}
+                    scale={0.45}
+                  />
+                  <Crop
+                    src="app/console-auth-users.png"
+                    alt="Users table: three accounts signed in with Google, emails hidden"
+                    natural={1810}
+                    x={490}
+                    y={455}
+                    w={1310}
+                    h={250}
+                    scale={0.357}
+                  />
+                </div>
+              </figure>
+              <figure>
+                <figcaption>
+                  <b>Routes by auth state</b> <code>lib/router/auth_redirect.dart</code>
+                </figcaption>
+                <Crop
+                  src="code/redirect.png"
+                  alt="auth_redirect.dart: signed out goes to welcome, signed in leaves welcome"
+                  natural={620}
+                  y={22}
+                  w={620}
+                  h={114}
+                  scale={0.75}
+                />
+              </figure>
+              <figure>
+                <figcaption>
+                  <b>Sign-out clears local data</b> <code>auth_view_model.dart</code>
+                </figcaption>
+                <Crop
+                  src="code/signout.png"
+                  alt="signOut clears local data, the draft and the FCM inbox"
+                  natural={620}
+                  y={22}
+                  w={620}
+                  h={174}
+                  scale={0.75}
+                />
+              </figure>
+            </div>
+          </div>
+          <p className="foot">evidence/auth/ · lib/firebase/firebase_auth_service.dart</p>
+        </Page>
 
-Cancel   → "Bạn đã huỷ đăng nhập."
-Offline  → "Không có mạng. Kiểm tra Wi-Fi rồi thử lại."
-Sign out → local data cleared, back to /welcome`}</pre>
+        <Page
+          dense
+          title="Cloud Storage"
+          line="When it fails: offline → “Chưa tải lên được: kiểm tra Wi-Fi” · signed out → “đăng nhập lại” · any other error → “Chưa tạo được thẻ tuần” + Thử lại"
+          notes="The weekly card (S11b) is built as a PDF on the device and uploaded to reports/{uid}/ in Cloud Storage. The upload streams its progress, which the screen shows as a percentage bar, and then returns the download URL, shown with a copy button. storage.rules lets each user read and write only their own folder, and only PDFs under 5 MB. Failures never crash: no network, an expired session and any other error each show a message with a retry, and the error is also sent to Crashlytics as a non-fatal. The project is on the Spark plan, and Firebase now needs the Blaze plan to create a Storage bucket, so on the real project the upload currently fails and shows the error on the left; the full flow was tested on the Firebase Emulator."
+        >
+          <div className="stg">
+            <figure className="stg-phone">
+              <img src="app/report-error.png" alt="Upload failed: Chưa tạo được thẻ tuần. Thử lại nhé. with a retry button" />
+              <figcaption>
+                <b>Failure</b> → message + Thử lại
+              </figcaption>
+            </figure>
+            <div className="stg-col">
+              <figure>
+                <figcaption>
+                  <b>Console</b> · Storage › reports/
+                </figcaption>
+                <div className="stg-console">Console file list: add after the Storage bucket is created (Blaze plan)</div>
+              </figure>
+              <figure>
+                <figcaption>
+                  <b>Rules: own folder only</b> <code>firebase/storage.rules</code>
+                </figcaption>
+                <Crop src="code/storage-rules.png" alt="storage.rules: read and write only reports/{uid} of the signed-in user, PDF under 5 MB" natural={620} y={22} w={620} h={114} scale={0.72} />
+              </figure>
+            </div>
+            <div className="stg-col">
+              <figure>
+                <figcaption>
+                  <b>Upload to reports/&#123;uid&#125;, progress, URL</b> <code>report_impl.dart</code>
+                </figcaption>
+                <Crop src="code/storage-upload.png" alt="uploadReport: putData to reports/uid, yields progress, then the download URL" natural={620} y={22} w={620} h={314} scale={0.72} />
+              </figure>
+              <figure>
+                <figcaption>
+                  <b>Progress on screen</b> <code>weekly_card_page.dart</code>
+                </figcaption>
+                <Crop src="code/storage-progress.png" alt="Weekly card page shows Đang tải lên đám mây with a percentage bar" natural={620} y={22} w={620} h={154} scale={0.72} />
+              </figure>
+            </div>
+          </div>
+          <p className="foot">firebase/storage.rules · lib/firebase/report_impl.dart</p>
         </Page>
 
         <Page
           dense
           title="Cloud Messaging"
+          line="When it fails: permission denied → dialog + “Mở cài đặt” · unknown route → opens Today · FCM start error → logged, the app keeps running"
           notes="Row 1: permission denied prompt with Mở cài đặt, the system notification page, the inbox listing the three delivery states, and a tap on a message with data route=/jar landing on the jar. Row 2: foreground (heads-up from flutter_local_notifications), background and terminated (system tray), and a test message sent from the Firebase Console. Sent with the FCM HTTP v1 API and from Console, Messaging, Send test message, to the device token printed in the debug log (the token is not stored in the repo). routeFromData only accepts allow-listed internal routes."
         >
           <Gallery
@@ -499,24 +968,86 @@ Sign out → local data cleared, back to /welcome`}</pre>
               { src: 'app/fcm-console.png', alt: 'Message sent from the Firebase Console', caption: 'Sent from Console' },
             ]}
           />
+          <p className="foot">evidence/fcm/ · docs/analytics-plan.md §10</p>
+        </Page>
+
+        <Page
+          dense
+          title="Cloud Messaging: requirements met"
+          line="Each Lab 3 requirement for FCM, and the screenshot that proves it"
+          notes="One: the same push arrives in all three app states. Foreground is shown by the app itself with flutter_local_notifications, because Android does not show FCM banners while the app is open; background and terminated go to the system tray. Two: on Android 13 and later the app asks for POST_NOTIFICATIONS; if the user said no, Settings explains it and opens the system page. Three: every message is saved to an inbox on the device, listing which state it arrived in. Four: a message carries data route, here /jar, and tapping it opens that screen; only allow-listed routes are accepted. Five: a test message sent from the Firebase Console, Messaging, Send test message, reached the device. The three state messages were sent the same way and through the FCM HTTP v1 API."
+        >
+          <div className="fq">
+            <figure className="fq-states">
+              <figcaption>
+                <i>✓</i>
+                <b>Foreground · background · terminated</b>
+              </figcaption>
+              {[
+                ['fcm-foreground', 'Foreground'],
+                ['fcm-background', 'Background'],
+                ['fcm-terminated', 'Terminated'],
+              ].map(([shot, label]) => (
+                <div key={shot} className="fq-strip">
+                  <span>{label}</span>
+                  <img src={`app/${shot}.png`} alt={`Notification received while the app is ${label.toLowerCase()}`} />
+                </div>
+              ))}
+              <figcaption className="fq-sub">
+                <i>✓</i>
+                <b>Test message from the Console</b>
+              </figcaption>
+              <div className="fq-strip">
+                <span>Console</span>
+                <img src="app/fcm-console.png" alt="Test message sent from the Firebase Console reached the device" />
+              </div>
+            </figure>
+            <figure>
+              <figcaption>
+                <i>✓</i>
+                <b>Asks permission (Android 13+)</b>
+              </figcaption>
+              <img className="fq-phone" src="app/fcm-denied.png" alt="Permission denied: the app explains and opens settings" />
+            </figure>
+            <figure>
+              <figcaption>
+                <i>✓</i>
+                <b>List of received notifications</b>
+              </figcaption>
+              <img className="fq-inbox" src="app/fcm-inbox.png" alt="In-app inbox listing notifications from all three states" />
+            </figure>
+            <figure>
+              <figcaption>
+                <i>✓</i>
+                <b>Tap opens the screen</b>
+              </figcaption>
+              <img className="fq-phone" src="app/fcm-route.png" alt="Tapping a message with route /jar opens the jar" />
+              <small>data route = /jar → Jar tab</small>
+            </figure>
+          </div>
+          <p className="foot">evidence/fcm/ · lib/firebase/firebase_messaging_service.dart</p>
         </Page>
 
         <Page
           dense
           title="Analytics"
-          notes="docs/analytics-plan.md lists each event with its trigger, parameter types, Lab 2 flow and product question. DebugView shows the live stream from the emulator (debug.firebase.analytics.app). The text below is from adb logcat on the same run; every event fired except report_exported, which only fires after a successful upload and the Storage bucket is not provisioned. DebugView lists the top seven names, so login and self_control_logged are only in the log."
+          line="When it fails: a failed log is caught and skipped (SafeAnalytics.track), so the user's action never fails"
+          notes="docs/analytics-plan.md lists each event with its trigger, parameter types, Lab 2 flow and product question. DebugView shows the live stream from the emulator (debug.firebase.analytics.app). The text below is from adb logcat on the same run; every event fired except report_exported, which only fires after a successful upload and the Storage bucket is not provisioned. The second image puts together the DebugView panels with each parameter opened: login sends method google, self_control_logged sends has_habit false on a new account, and group_viewed for the system group Bắt chuyện sends group_source system, group_idea nguoi_la and note_count 0, with no group name."
         >
           <div className="half">
-            <figure className="half-img">
-              <img
-                src={`${import.meta.env.BASE_URL}app/console-analytics.png`}
-                alt="DebugView with screen_view, note_saved and challenge events"
+            <div className="dv-gal" style={{ width: '84%' }}>
+              <Gallery
+                cols={1}
+                height={190}
+                items={[
+                  { src: 'app/console-analytics.png', alt: 'DebugView with screen_view, note_saved and challenge events', caption: '1 · DebugView · top events of one run', ratio: '3', pos: '50% 35%' },
+                  { src: 'app/dv-params.png', alt: 'DebugView parameters: login method google, self_control_logged has_habit false, group_viewed group_source system and group_idea nguoi_la', caption: '2 · Values sent, cut from DebugView panels', ratio: '1.907' },
+                ]}
               />
-              <figcaption>DebugView · top events of one run on the emulator</figcaption>
-            </figure>
+            </div>
             <div className="half-text">
               <p>
-                Eight custom events go through an <code>AnalyticsService</code> interface (Firebase
+                Nine custom events go through an <code>AnalyticsService</code> interface (Firebase
                 in the app, a console logger on the Emulator). No titles, note text, emails or
                 names are logged. The Firebase user ID is set after sign-in and cleared on sign-out.
               </p>
@@ -529,7 +1060,8 @@ Sign out → local data cleared, back to /welcome`}</pre>
                   the 30-second goal: 7.7 s in this run.
                 </li>
                 <li>
-                  <b>note_viewed</b> · <code>note_type</code>
+                  <b>note_viewed / group_viewed</b> · <code>note_type</code> ·{' '}
+                  <code>group_source, group_idea, note_count</code>
                 </li>
                 <li>
                   <b>challenge_opened / challenge_completed</b> · <code>challenge_id, note_type</code>
@@ -548,11 +1080,13 @@ Sign out → local data cleared, back to /welcome`}</pre>
               </p>
             </div>
           </div>
+          <p className="foot">docs/analytics-plan.md §4 event table · evidence/analytics/</p>
         </Page>
 
         <Page
           dense
           title="Crashlytics"
+          line="When it fails: the user still sees the error message; Emulator and web builds use a no-op reporter"
           notes="Report export fails in the real flow because the Storage bucket is not provisioned: the user sees Chưa tạo được thẻ tuần. Thử lại nhé. and WeeklyReportViewModel records a non-fatal (reason report_export). Console: the non-fatal issue FirebaseStorageService.uploadReport, its Keys tab (screen=/journey) and Data tab (User ID). The dashboard also shows the test crash from the dev-only button and a real Hero error found by the dashboard and fixed (heroTag null on the add-note button)."
         >
           <div className="half">
@@ -589,28 +1123,49 @@ Sign out → local data cleared, back to /welcome`}</pre>
               </ul>
             </div>
           </div>
+          <p className="foot">docs/analytics-plan.md §6 · evidence/crashlytics/</p>
         </Page>
 
         <Page
           dense
           title="Remote Config"
+          line="When it fails: fetch error → in-app defaults · broken JSON on the Console → default list · refresh shows “Cấu hình chưa có gì mới.”"
           notes="Remote Config as feature flags. custom_challenges_enabled hides the add-your-own-card button on the Challenges tab; groups_enabled hides the first-time groups shelf on the jar; firebase_demo_enabled hides the Firebase demo area in Settings. Each flag has an in-app default (on), so a failed or empty fetch keeps every feature available. The values are published from firebase/remoteconfig.template.json with firebase deploy --only remoteconfig and fetched at launch (fetch interval zero in debug, one hour in release); activated values stay cached until the next fetch. Before: both flags on. After: both off, same app build, no rebuild."
         >
+          <p className="rc-same">
+            <b>Same APK, no rebuild:</b> only the value on the Console changed between before and after
+          </p>
           <Gallery
             cols={4}
-            height={330}
+            height={262}
             items={[
-              { src: 'app/rc-jar-before.png', alt: 'Jar with the first-time groups shelf', caption: 'groups_enabled = true' },
-              { src: 'app/rc-jar-after.png', alt: 'Jar without the shelf', caption: 'groups_enabled = false' },
-              { src: 'app/rc-challenges-before.png', alt: 'Challenges tab with the add button', caption: 'custom_challenges_enabled = true' },
-              { src: 'app/rc-challenges-after.png', alt: 'Challenges tab without the add button', caption: 'custom_challenges_enabled = false' },
+              { src: 'app/rc-jar-before.png', alt: 'Jar with the first-time groups shelf', caption: 'Before · groups_enabled = true' },
+              { src: 'app/rc-jar-after.png', alt: 'Jar without the shelf', caption: 'After · groups_enabled = false' },
+              { src: 'app/rc-challenges-before.png', alt: 'Challenges tab with the add button', caption: 'Before · custom_challenges_enabled = true' },
+              { src: 'app/rc-challenges-after.png', alt: 'Challenges tab without the add button', caption: 'After · custom_challenges_enabled = false' },
             ]}
           />
-          <Gallery
-            cols={1}
-            height={150}
-            items={[{ src: 'app/console-remoteconfig.png', alt: 'Remote Config feature flags in the Console', caption: 'Console · three feature flags' }]}
-          />
+          <div className="rc-row">
+            <figure>
+              <figcaption>
+                <b>Console</b> · three feature flags
+              </figcaption>
+              <img src="app/console-remoteconfig.png" alt="Remote Config feature flags in the Console" />
+            </figure>
+            <figure>
+              <figcaption>
+                <b>In-app defaults</b> · used until a fetch succeeds
+              </figcaption>
+              <Crop src="code/rc-defaults.png" alt="setDefaults: every flag defaults to true, same values as firebase/remote-config-defaults.json" natural={620} y={22} w={620} h={250} scale={0.52} />
+            </figure>
+            <figure>
+              <figcaption>
+                <b>Fetch and cache</b> · debug: every launch · release: 1 h cache
+              </figcaption>
+              <Crop src="code/rc-fetch.png" alt="setConfigSettings: fetchTimeout 10 s, minimumFetchInterval 1 hour in release and zero in debug, then fetchAndActivate; errors keep the defaults" natural={620} y={22} w={620} h={268} scale={0.52} />
+            </figure>
+          </div>
+          <p className="foot">docs/analytics-plan.md §10 · firebase/remote-config-defaults.json · evidence/remote-config/</p>
         </Page>
 
         <Page
@@ -657,21 +1212,322 @@ Sign out → local data cleared, back to /welcome`}</pre>
               { src: 'app/artemis-challenge.jpg', alt: 'Challenge card', caption: 'T09 · challenge opened' },
             ]}
           />
+          <p className="foot">docs/test-plan.md · e2e_test/ · evidence/artemis/</p>
         </Page>
 
         <Page
+          dense
+          title="ARTEMIS: result per case"
+          line="12 cases × 3 runs · 35 of 36 pass (97%) · full run 62 minutes"
+          notes="This is the table from docs/test-plan.md section 5. Each case ran three times; time is the range of one run. T04, T05 and T06 are error paths: empty note, leaving with a draft, and no network. T06 and T12 act outside the app: airplane mode over adb, the Home button and the notification shade. T06 run 3 is a real failure: it timed out after 420 seconds and the agent reported nothing; we have not found the root cause and have no evidence it is an app bug. T05 run 3 and all of T12 failed first because our own assertions were wrong, so we fixed the assertions, said so in the test plan, and re-ran both cases: 6 of 6. JUnit files: evidence/artemis/junit-full-run.xml and junit-rerun-t05-t12.xml."
+        >
+          <div className="rt">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Flow</th>
+                  <th>Agent must report</th>
+                  <th>Pass</th>
+                  <th>Time / run</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  ['T01', 'Launch', 'WELCOME or TODAY', '3/3', '20–52 s'],
+                  ['T02', 'F1 main path: save a note', 'SAVED', '3/3', '31–206 s'],
+                  ['T03', 'Jar: open and delete the note', 'DELETED', '3/3', '256–391 s'],
+                  ['T04', 'F1 error: empty note', 'DISABLED', '3/3', '55–56 s'],
+                  ['T05', 'F1 error: Back with a draft', 'DIALOG', '3/3 *', '108–214 s'],
+                  ['T06', 'F1 error: airplane mode (adb)', 'OFFLINE_BANNER', '2/3', '264–421 s'],
+                  ['T07', 'F2 self-control', 'SELF_CONTROL', '3/3', '38–52 s'],
+                  ['T08', 'F2 hard to stop: breathing', 'BREATHING', '3/3', '20–28 s'],
+                  ['T09', 'F3 open a challenge, back', 'DETAIL_THEN_BACK', '3/3', '46–82 s'],
+                  ['T10', 'Four tabs', 'ALL_TABS', '3/3', '33–40 s'],
+                  ['T11', 'Settings: Remote Config row', '“Cờ tính năng”', '3/3', '13–19 s'],
+                  ['T12', 'Native: Home, shade, relaunch', 'LOGGED_IN', '3/3 *', '32–39 s'],
+                ].map(([id, flow, expect, pass, time]) => (
+                  <tr key={id} className={pass === '2/3' ? 'rt-fail' : undefined}>
+                    <td>
+                      <b>{id}</b>
+                    </td>
+                    <td>{flow}</td>
+                    <td>
+                      <code>{expect}</code>
+                    </td>
+                    <td>{pass}</td>
+                    <td>{time}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div className="rt-notes">
+              <p>
+                <b>T06 run 3 · real failure:</b> timed out at 420 s, no answer from the agent. Root
+                cause not found; no sign it is an app bug.
+              </p>
+              <p>
+                <b>* T05 run 3, T12:</b> our assertions were wrong (the app was right). Fixed the
+                assertion, re-ran both: 6 of 6.
+              </p>
+              <p>
+                <b>Error paths:</b> T04, T05, T06
+                <br />
+                <b>Outside the app:</b> T06, T12
+              </p>
+            </div>
+          </div>
+          <p className="foot">docs/test-plan.md §5 · evidence/artemis/junit-full-run.xml · junit-rerun-t05-t12.xml</p>
+        </Page>
+
+        <Page
+          dense
+          title="Semantics labels"
+          line="41 files in lib/ set Semantics, including 17 of the 21 shared widgets"
+          notes="Every main control has a Semantics label, so TalkBack reads a clear name, and test tools that read the accessibility tree can find the control by name. Three examples from lib/widgets. MoodOption: a button with selected state and the label Tâm trạng plus the mood, and excludeSemantics so the reader does not also read the emoji and text inside. ShortcutButton: the Today shortcuts read their label and caption as one button. OfflineBanner: a live region, so the screen reader announces the offline message as soon as it appears."
+        >
+          <div className="sem-wrap">
+            <div className="sem">
+            <figure>
+              <figcaption>
+                <b>Mood choice</b> · button, selected, one clear label <code>mood_option.dart</code>
+              </figcaption>
+              <Crop src="code/sem-mood.png" alt="MoodOption Semantics: button true, selected, label Tâm trạng plus mood, excludeSemantics" natural={620} y={22} w={620} h={154} scale={0.95} />
+            </figure>
+            <figure>
+              <figcaption>
+                <b>Today shortcuts</b> · label and caption read together <code>shortcut_button.dart</code>
+              </figcaption>
+              <Crop src="code/sem-shortcut.png" alt="ShortcutButton Semantics: button true, label with caption, excludeSemantics" natural={620} y={22} w={620} h={114} scale={0.95} />
+            </figure>
+            <figure>
+              <figcaption>
+                <b>Offline banner</b> · live region, announced when it appears <code>offline_banner.dart</code>
+              </figcaption>
+              <Crop src="code/sem-offline.png" alt="OfflineBanner Semantics with liveRegion true" natural={620} y={22} w={620} h={54} scale={0.95} />
+            </figure>
+          </div>
+            <div className="sem-why">
+              <p>
+                <b>Why</b>
+              </p>
+              <ul>
+                <li>TalkBack reads one clear name per control, not the icon and text inside it.</li>
+                <li>
+                  <code>selected</code> and <code>liveRegion</code> tell the reader about state and new messages.
+                </li>
+                <li>Test tools that read the accessibility tree can find a control by its name.</li>
+              </ul>
+            </div>
+          </div>
+          <p className="foot">lib/widgets/ · mood_option.dart · shortcut_button.dart · offline_banner.dart</p>
+        </Page>
+
+        <Page
+          dense
+          title="ARTEMIS: written, not run yet"
+          line="Five parts of the brief now have a case in e2e_test/, but no run result yet"
+          notes="We are open about the gaps. These five cases are written in e2e_test/test_main_flows.py but have not run, so the result table does not include them. T13: the agent saves a note, then the test reads adb logcat for note_saved and its parameters, because the agent only sees the screen. T14: exports the weekly card; until the Storage bucket exists (Blaze plan) it expects the error message with Thử lại instead of an upload. T15 and T16: sign out, then sign in with an email test account, once with a wrong password; Google sign-in is avoided because the account picker shows a real name and email. They run last because they change the session. X01: the 15 to 30 minute exploratory session with the Pro profile; its bug list will go into docs/test-plan.md."
+        >
+          <div className="gap">
+            {[
+              ['T15 · Sign-out, sign-in', 'Sign out, then sign in with an email test account (not Google: its picker shows a real name and email)', 'Needs a test account'],
+              ['T16 · Wrong password', 'Error message under the field, then sign in with the right password', 'Needs a test account'],
+              ['T14 · Export and upload', 'Weekly card PDF: upload and link, or the error message + Thử lại while there is no bucket', 'Upload part needs Blaze'],
+              ['T13 · Analytics event', 'Save a note, then the test reads adb logcat: note_saved with mood, note_type, no note text', 'Needs the OpenRouter key'],
+              ['X01 · Exploratory', '15–30 min, Pro profile; the agent explores and returns BUG lines or NO_BUGS', 'Not run: no bug list yet'],
+            ].map(([what, why, next]) => (
+              <div key={what} className="gap-row">
+                <b>{what}</b>
+                <span>{why}</span>
+                <span className="gap-next">{next}</span>
+              </div>
+            ))}
+          </div>
+          <p className="foot">e2e_test/test_main_flows.py · docs/test-plan.md §4, §6</p>
+        </Page>
+
+        <Page
+          dense
           title="AI code review"
-          shots={['Finding · Decision · Reason · Commit']}
-          todo="Not done yet"
-          notes="Needs at least 5 findings across 2 kinds and 3 fix commits. Link docs/code-review.md."
-        />
+          line="CodeRabbit reviewed every PR: 52 findings on #28, #29 and #38"
+          notes="Three real screenshots, left to right. One: CodeRabbit reviews every PR on GitHub; here is its review on PR #38 with follow-up comments and an inline comment on the FCM service. It left 52 findings on #28, #29 and #38. Two: we checked every finding against the code and wrote a verdict in docs/code-review.md; 51 were technically right and 1 was wrong. Of the right ones, 40 are real bugs and 11 are not worth fixing for this Lab. Three: each fix is its own commit, and the message names the finding it addresses; 211a4d5, 736453a and 5e13651 are fixed so far. The next two slides zoom in on four findings."
+        >
+          <div className="pf">
+            <figure>
+              <Crop
+                src="review/proof-review.png"
+                alt="CodeRabbit review on PR #38 with follow-up and inline comments"
+                natural={840}
+                w={840}
+                h={720}
+                scale={0.62}
+              />
+              <figcaption>
+                <b><em>1</em> CodeRabbit reviews every PR</b>
+                <span>52 findings on #28, #29 and #38</span>
+              </figcaption>
+            </figure>
+            <span className="pf-arrow">→</span>
+            <div className="pf-right">
+              <figure>
+                <Crop
+                  src="review/proof-verdicts.png"
+                  alt="docs/code-review.md: the AI finding, our verdict and a note for each row"
+                  natural={1328}
+                  x={795}
+                  w={533}
+                  h={172}
+                  scale={1.05}
+                />
+                <figcaption>
+                  <b><em>2</em> We judge every finding</b>
+                  <span>51 right, 1 wrong · verdicts in docs/code-review.md</span>
+                </figcaption>
+              </figure>
+              <figure>
+                <div className="pf-commits">
+                  {(
+                    [
+                      ['736453a', 118],
+                      ['5e13651', 146],
+                    ] as const
+                  ).map(([sha, h]) => (
+                    <Crop
+                      key={sha}
+                      src={`review/proof-commit-${sha}.png`}
+                      alt={`Fix commit ${sha} naming the CodeRabbit finding it addresses`}
+                      natural={1609}
+                      y={52}
+                      w={560}
+                      h={h}
+                      scale={1}
+                    />
+                  ))}
+                </div>
+                <figcaption>
+                  <b><em>3</em> We fix with a commit</b>
+                  <span>3 fixed so far; each message names its finding</span>
+                </figcaption>
+              </figure>
+            </div>
+          </div>
+        </Page>
+
+        <Page
+          dense
+          title="AI review: what we fixed"
+          line="Real CodeRabbit comments on PR #38, marked in red, and the commit that fixed each one"
+          notes="Two real CodeRabbit comments from PR #38. Box 1 is the file and lines it commented on, box 2 the kind and severity it gave, box 3 what it found. The first is a privacy bug: the FCM inbox is stored on the device and survived sign-out, so the next account could read the previous user's notifications. Commit 736453a clears it on sign-out. The second broke an FCM requirement: a notification shown while the app is open had no payload, so tapping it opened nothing. Commit 5e13651 passes the route as the payload. Both fixes come with tests."
+        >
+          <div className="rv-pair">
+            <ReviewFinding
+              f={{
+                shot: 'inbox',
+                where: 'firebase_messaging_service.dart, lines 12–18',
+                kind: 'Major · Security & Privacy',
+                found: 'The FCM inbox survives sign-out, so the next account can read old notifications',
+                decision: 'Fixed',
+                commit: '736453a',
+                detail: 'Sign-out clears the inbox and the open sheet reloads. Two tests.',
+              }}
+            />
+            <ReviewFinding
+              f={{
+                shot: 'payload',
+                where: 'firebase_messaging_service.dart, lines 83–85',
+                kind: 'Minor · Functional Correctness',
+                found: 'A notification shown while the app is open has no payload, so a tap opens nothing',
+                decision: 'Fixed',
+                commit: '5e13651',
+                detail: 'The payload carries the route; tapping opens that screen. Two tests.',
+              }}
+            />
+          </div>
+          <p className="foot">docs/code-review.md · rows 38-bfeb007a, 38-75b5e00c</p>
+        </Page>
+
+        <Page
+          dense
+          title="AI review: what we did not fix"
+          line="Every comment was checked against the code before deciding"
+          notes="Two comments we did not act on, and why. The first is right for iOS: flutter_local_notifications needs Darwin settings there. But this app ships on Android and web only, firebase_options.dart has no iOS app, so we marked it won't fix; calling it Major was too strong for this project. The second is wrong: CodeRabbit says _saving is set but never read, so a fast double tap could add the same card twice. In fact canSubmit is !_saving && the title is not empty, and the button is disabled while saving. Out of 52 findings this was the only one that was wrong."
+        >
+          <div className="rv-pair">
+            <ReviewFinding
+              f={{
+                shot: 'ios',
+                where: 'firebase_messaging_service.dart, lines 64–68',
+                kind: 'Major · Functional Correctness',
+                found: 'Notification setup has no iOS (Darwin) settings, so it would fail on iOS',
+                decision: "Won't fix",
+                detail: 'Right for iOS, but the app ships on Android and web only. Major is too strong here.',
+              }}
+            />
+            <ReviewFinding
+              f={{
+                shot: 'saving',
+                where: 'create_challenge_sheet.dart, lines 75–83',
+                kind: 'Minor · Functional Correctness',
+                found: '_submit sets _saving but never reads it, so one tap could add two cards',
+                decision: 'Rejected',
+                detail: 'The AI is wrong: canSubmit = !_saving && … already disables the button while saving.',
+              }}
+            />
+          </div>
+          <p className="foot">docs/code-review.md · rows 38-cfffb9a5, 29-c0bdd08c</p>
+        </Page>
 
         <Page
           title="Lessons learned"
-          notes="Examples: the Emulator has no real Analytics or Crashlytics; D-11, two Lab 2 documents conflicted; D-26 and D-28 changed labels after users misread them. Add challenges from the test stage. AI disclosure: Claude Code for brief analysis and slides; add other tools. Links must open in a private window."
+          notes="Five lessons, one per stage that surprised us. Emulator: Stage 5 could only be checked on the real project. D-11: two Lab 2 documents set different title limits. D-28: users misread the journal label. ARTEMIS: the first run failed 5 of 36; 4 of those came from two wrong assertions in our tests, and only 1 (T06 offline timeout) was real. CodeRabbit: 51 of 52 findings were technically right, but only 1 of 40 real bugs was fixed before merge. AI disclosure: Claude Code, CodeRabbit, ARTEMIS with DeepSeek. Links must open in a private window."
         >
-          <p className="foot">Repo · docs/ · evidence/ · Video · AI tools: Claude Code · [add others]</p>
+          <div className="ll">
+            {(
+              [
+                [Cloud, 'Test on the real project early', 'Emulator has no Analytics or FCM'],
+                [FileStack, 'Design docs can disagree', 'Pick one, log it · D-11'],
+                [Tag, 'Rename what users misread', '"Bỏ qua phần kể thêm" · D-28'],
+                [Bot, 'Check the AI tester too', '4 of 5 failures: our own asserts'],
+                [GitPullRequest, 'Read AI review before merging', '1 of 40 bugs fixed at merge'],
+              ] as const
+            ).map(([Icon, head, tag], i) => (
+              <div key={head}>
+                <span className="ll-icon">
+                  <Icon size={34} strokeWidth={1.8} />
+                </span>
+                <em>{i + 1}</em>
+                <b>{head}</b>
+                <small>{tag}</small>
+              </div>
+            ))}
+          </div>
         </Page>
+
+        <Slide className="thanks" notes="Thank the audience and invite questions. Have the repo, docs/ and evidence/ open in case the teacher wants to check something live.">
+          <OrgLogo cover />
+          <div className="thanks-cast">
+            {['thong-tha', 'xong', 'tap-trung'].map((m) => (
+              <img key={m} src={`assets/mascot/mascot-not-${m}.svg`} alt="" />
+            ))}
+          </div>
+          <h1>Thank you!</h1>
+          <div className="thanks-ai">
+            <span className="thanks-ai-label">AI tools used</span>
+            {[
+              ['claude', 'Claude Code', 'code, docs, slides'],
+              ['coderabbit', 'CodeRabbit', 'PR review'],
+              ['google', 'ARTEMIS', 'E2E agent'],
+              ['deepseek', 'DeepSeek', 'ARTEMIS model'],
+            ].map(([logo, name, role]) => (
+              <span key={name} className="thanks-ai-tool">
+                <img src={`logos/${logo}.svg`} alt="" />
+                <b>{name}</b>
+                <small>{role}</small>
+              </span>
+            ))}
+          </div>
+        </Slide>
       </Deck>
     </div>
   );

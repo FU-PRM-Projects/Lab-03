@@ -95,6 +95,9 @@ abstract interface class MessagingService {
 
   /// Hộp thư, mới nhất trước.
   Future<List<ReceivedNotification>> inbox();
+
+  /// Xoá hộp thư trên máy (khi đăng xuất), để tài khoản sau không đọc được.
+  Future<void> clearInbox();
 }
 
 /// Không làm gì: test và nền tảng không có FCM.
@@ -127,6 +130,9 @@ class NoopMessagingService implements MessagingService {
   @override
   Future<List<ReceivedNotification>> inbox() async =>
       const <ReceivedNotification>[];
+
+  @override
+  Future<void> clearInbox() async {}
 }
 
 final messagingServiceProvider = Provider<MessagingService>(

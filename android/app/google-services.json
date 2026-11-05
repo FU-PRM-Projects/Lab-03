@@ -14,6 +14,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "1069128102779-2vvmv3lab2pd2jvlnd079nll4cf2211r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.quanphungg.lab03",
+            "certificate_hash": "815b91a3a2e993dbd6432fac9c6ad1fb914af19e"
+          }
+        },
+        {
+          "client_id": "1069128102779-97o16f0lmt2uvohp0tafhue6spg92q58.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.quanphungg.lab03",
+            "certificate_hash": "cb15b9dce6af47189d429e0201304eb6e63da086"
+          }
+        },
+        {
           "client_id": "1069128102779-pn65nbb88ird4mig461m7030ndldipja.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

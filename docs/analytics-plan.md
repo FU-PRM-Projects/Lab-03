@@ -124,11 +124,12 @@ tiêu đề/nội dung nốt, email, tên hay tên nhóm.
 | 6 | `challenge_completed` | Lưu kết quả thẻ | `challenge_id` (String), `minutes` (int, thẻ vận động) | `ChallengeDetailViewModel` | F3 · hoàn thành thẻ | Tỉ lệ hoàn thành sau khi mở thẻ là bao nhiêu? |
 | 7 | `self_control_logged` | Ghi một lần tự chủ | `has_habit` (String bool) | `SelfControlViewModel` | F2 · tự chủ | Người dùng theo dõi thói quen cụ thể hay ghi chung? |
 | 8 | `report_exported` | Xuất Thẻ tuần PDF xong | `format` (String: `pdf`) | `WeeklyReportViewModel` | S11b · xuất tệp | Có ai xuất báo cáo tuần không? |
-| 9 | `streak_extended` | Nốt đầu tiên trong ngày nối dài chuỗi (S04) | `streak_length` (int), `streak_milestone` (int, 0 khi không chạm mốc) | `NoteSavedViewModel` | F1/F2/F3 · chuỗi ngày | Người dùng có giữ chuỗi ngày không? Mốc nào giữ chân họ? |
-| 10 | `streak_shared` | Chia sẻ ảnh chuỗi xong (S02 → màn chia sẻ) | `streak_length` (int), `streak_milestone` (int, 0 khi không chạm mốc), `method` (String: `image`) | `StreakShareViewModel` | F1/F2/F3 · chuỗi ngày | Người dùng có chia sẻ chuỗi ra ngoài không? Mốc nào được chia sẻ nhiều? |
+| 9 | `group_viewed` | Mở chi tiết một nhóm lần đầu (S05e) | `group_source` (String: `system`, `user`, `ai_suggested`), `group_idea` (String: ý của Nốt), `note_count` (int) | `GroupDetailViewModel` | Nhóm lần đầu · xem lại tiến bộ | Nhóm nào được mở lại nhiều nhất, và người dùng có quay lại nhóm khi đã có vài nốt không? |
+| 10 | `streak_extended` | Nốt đầu tiên trong ngày nối dài chuỗi (S04) | `streak_length` (int), `streak_milestone` (int, 0 khi không chạm mốc) | `NoteSavedViewModel` | F1/F2/F3 · chuỗi ngày | Người dùng có giữ chuỗi ngày không? Mốc nào giữ chân họ? |
+| 11 | `streak_shared` | Chia sẻ ảnh chuỗi xong (S02 → màn chia sẻ) | `streak_length` (int), `streak_milestone` (int, 0 khi không chạm mốc), `method` (String: `image`) | `StreakShareViewModel` | F1/F2/F3 · chuỗi ngày | Người dùng có chia sẻ chuỗi ra ngoài không? Mốc nào được chia sẻ nhiều? |
 | — | `screen_view` | Đổi màn | `firebase_screen` (String, mẫu route như `/note/saved/:id`) | `appRouterProvider` | mọi luồng | Luồng nào bị bỏ giữa chừng? |
 
-Có 10 sự kiện tuỳ chỉnh (yêu cầu tối thiểu 7) cộng `screen_view`. User ID đặt
+Có 11 sự kiện tuỳ chỉnh (yêu cầu tối thiểu 7) cộng `screen_view`; mỗi loại màn chi tiết có một sự kiện mở riêng (`note_viewed`, `challenge_opened`, `group_viewed`). User ID đặt
 bằng `setUserId(uid)` khi đăng nhập hoặc khôi phục phiên, xoá khi đăng xuất.
 
 Giới hạn cần nhớ: tối đa **500 loại sự kiện**, **25 user property**; Crashlytics
