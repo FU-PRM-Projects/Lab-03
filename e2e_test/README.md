@@ -58,6 +58,13 @@ uv run pytest -m exploratory         # phiên khám phá 15–30 phút (profile 
 Biến môi trường: `ARTEMIS_BASE_URL`, `ARTEMIS_DEVICE_SERIAL`,
 `ARTEMIS_PROFILE` (`flash` mặc định, `pro` cho kịch bản dài).
 
+Cho các ca T14–T16:
+
+- `E2E_EMAIL`, `E2E_PASSWORD`: tài khoản email **chỉ dùng cho test** (T15, T16 bỏ
+  qua nếu thiếu). Mật khẩu được gửi cho model của agent, không dùng tài khoản thật.
+- `E2E_STORAGE_READY=1` khi project đã có Storage bucket: T14 khi đó đòi tải lên
+  thành công thay vì câu báo lỗi.
+
 ## Viết ca mới
 
 - Nhận `client`, `app_id` và `attempt` để được chạy lặp và khoá vào app Nốt.
