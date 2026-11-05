@@ -122,7 +122,7 @@ class _Progress extends StatelessWidget {
     return Semantics(
       liveRegion: true,
       label: uploading ? 'Đang tải ảnh lên, $percent phần trăm' : text,
-      excludeSemantics: true,
+      // Không dùng excludeSemantics: nó sẽ loại luôn nút "Huỷ" bên trong.
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: AppSpace.s8,

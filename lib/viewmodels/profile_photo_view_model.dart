@@ -100,8 +100,11 @@ class ProfilePhotoViewModel extends Notifier<ProfilePhotoState> {
         message: ErrorMessages.update(error),
       );
     }
-    // Đưa khối chọn ảnh về trạng thái đầu: nó sẽ hiện ảnh đã lưu.
-    if (ref.mounted) {
+    // Đưa khối chọn ảnh về trạng thái đầu: nó sẽ hiện ảnh đã lưu. Bỏ qua nếu
+    // người dùng đã bắt đầu một lần tải mới trong lúc lưu: reset lúc này sẽ xoá
+    // tiến độ/nút huỷ của lần tải đó và cho phép mở thêm lần thứ hai song song.
+    if (ref.mounted &&
+        !ref.read(imageUploadViewModelProvider(ImageFolder.avatar)).busy) {
       ref
           .read(imageUploadViewModelProvider(ImageFolder.avatar).notifier)
           .reset();

@@ -162,7 +162,9 @@ class _CreateGroupSheetState extends ConsumerState<_CreateGroupSheet> {
                 circle: true,
                 onPick: uploadViewModel.pickAndUpload,
                 onCancel: uploadViewModel.cancel,
-                onRemove: () => setState(() => _image = null),
+                // Đang lưu nhóm: `_image` đã được gửi đi, gỡ lúc này chỉ làm
+                // xem trước lệch với nhóm thực sự được tạo.
+                onRemove: _saving ? null : () => setState(() => _image = null),
               ),
               AppButton(
                 label: primaryLabel,

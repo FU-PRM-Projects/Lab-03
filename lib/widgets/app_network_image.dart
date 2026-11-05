@@ -71,7 +71,9 @@ class _AppNetworkImageState extends State<AppNetworkImage> {
       content = Image.network(
         url,
         key: ValueKey<String>('$url#$_attempt'),
-        fit: BoxFit.cover,
+        // Ô vuông: cắt cho đầy ô. Ảnh trong nốt (wide): giữ nguyên tỉ lệ để
+        // thấy trọn ảnh, vì màn chi tiết chưa có chế độ xem ảnh đầy đủ.
+        fit: size != null ? BoxFit.cover : BoxFit.contain,
         gaplessPlayback: true,
         excludeFromSemantics: true,
         loadingBuilder: (context, child, progress) =>
@@ -131,6 +133,9 @@ class _ErrorPlaceholder extends StatelessWidget {
     return Semantics(
       button: true,
       label: 'Không tải được ảnh. Chạm để thử lại',
+      // InkWell nằm trong nhánh bị excludeSemantics nên hành động chạm phải
+      // khai báo ở đây, nếu không trình đọc màn hình không thử lại được.
+      onTap: onRetry,
       excludeSemantics: true,
       child: InkWell(
         onTap: onRetry,

@@ -31,7 +31,10 @@ class DeviceImagePickerService implements ImagePickerService {
       throw AppException(
         switch (e.code) {
           'camera_access_denied' ||
-          'photo_access_denied' => AppErrorKind.permissionDenied,
+          'photo_access_denied' ||
+          // iOS: bị hạn chế bởi Screen Time / quản trị thiết bị.
+          'camera_access_restricted' ||
+          'photo_access_restricted' => AppErrorKind.permissionDenied,
           _ => AppErrorKind.unknown,
         },
         code: e.code,

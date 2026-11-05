@@ -52,12 +52,25 @@ class FirestoreProfilePhotoRepository implements ProfilePhotoRepository {
 
   @override
   Future<void> save(ImageRef? photo) async {
+    final doc = _doc();
     try {
-      await _doc().update(<String, Object?>{
+      await doc.update(<String, Object?>{
         'photo': photo == null ? FieldValue.delete() : photo.toMap(),
       });
     } on FirebaseException catch (e) {
-      throw firestoreException(e);
+      if (e.code != 'not-found') throw firestoreException(e);
+      // `update()` lỗi vì hồ sơ `users/{uid}` chưa tồn tại (lần tạo lúc đăng
+      // nhập từng thất bại). Không có ảnh để xoá thì xong; có ảnh thì tạo hồ sơ
+      // tối thiểu, đúng luật `create` (role == 'user').
+      if (photo == null) return;
+      try {
+        await doc.set(<String, Object?>{
+          'role': 'user',
+          'photo': photo.toMap(),
+        });
+      } on FirebaseException catch (createError) {
+        throw firestoreException(createError);
+      }
     }
   }
 }

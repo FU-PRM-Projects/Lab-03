@@ -22,6 +22,7 @@ import 'firebase/firebase_remote_config_service.dart';
 import 'firebase/firestore_challenge_repository.dart';
 import 'firebase/firestore_group_repository.dart';
 import 'firebase/firestore_note_repository.dart';
+import 'firebase/firestore_profile_photo_repository.dart';
 import 'firebase/firestore_self_control.dart';
 import 'firebase/firestore_user_repository.dart';
 import 'firebase/local_nudge_service.dart';
@@ -37,6 +38,7 @@ import 'services/group_repository.dart';
 import 'services/messaging_service.dart';
 import 'services/note_repository.dart';
 import 'services/nudge_service.dart';
+import 'services/profile_photo_repository.dart';
 import 'services/remote_config_service.dart';
 import 'services/report_services.dart';
 import 'services/self_control_services.dart';
@@ -47,8 +49,14 @@ import 'services/user_repository.dart';
 const String _googleServerClientId = String.fromEnvironment(
   'GOOGLE_SERVER_CLIENT_ID',
 );
-const String _cloudinaryCloudName = String.fromEnvironment('t7crbqj0');
-const String _cloudinaryUploadPreset = String.fromEnvironment('PRM_Lab3');
+const String _cloudinaryCloudName = String.fromEnvironment(
+  'CLOUDINARY_CLOUD_NAME',
+  defaultValue: 't7crbqj0',
+);
+const String _cloudinaryUploadPreset = String.fromEnvironment(
+  'CLOUDINARY_UPLOAD_PRESET',
+  defaultValue: 'PRM_Lab3',
+);
 
 /// Composition root: khởi tạo Firebase và gắn hiện thực Firebase vào từng
 /// service. Test gắn bản fake theo cùng cách.
@@ -105,6 +113,11 @@ Future<void> main() async {
             cloudName: _cloudinaryCloudName,
             uploadPreset: _cloudinaryUploadPreset,
           ),
+        ),
+        // Không override thì dùng bản Noop: lưu avatar "thành công" nhưng không
+        // ghi gì vào `users/{uid}.photo`.
+        profilePhotoRepositoryProvider.overrideWithValue(
+          FirestoreProfilePhotoRepository(currentUid: uid),
         ),
         challengeRepositoryProvider.overrideWithValue(
           FirestoreChallengeRepository(currentUid: uid),

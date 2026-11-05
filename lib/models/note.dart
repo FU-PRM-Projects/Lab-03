@@ -104,8 +104,14 @@ class NoteDraft {
   final ImageRef? image;
 
   /// Có gì đáng giữ khi người dùng thoát giữa chừng.
+  ///
+  /// Ảnh đã đính cũng là dữ liệu người dùng đã bỏ công tải lên, nên tính cả
+  /// [image]: nháp chỉ có ảnh vẫn phải hỏi "Giữ nháp?" thay vì bỏ lặng lẽ.
   bool get hasInput =>
-      mood != null || title.trim().isNotEmpty || body.trim().isNotEmpty;
+      mood != null ||
+      title.trim().isNotEmpty ||
+      body.trim().isNotEmpty ||
+      image != null;
 
   NoteDraft copyWith({
     NoteType? type,

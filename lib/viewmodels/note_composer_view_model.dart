@@ -220,6 +220,9 @@ class NoteComposerViewModel extends Notifier<NoteComposerState> {
   /// (bước 3): lưu với nhật ký rỗng.
   Future<void> save({bool skipJournal = false}) async {
     if (state.saving || state.savedNoteId != null) return;
+    // Ảnh còn đang tải: `draft.image` chưa có, lưu lúc này sẽ tạo nốt không
+    // ảnh rồi rời màn hình làm huỷ luôn lần tải. Chờ tải xong (hoặc huỷ).
+    if (ref.read(imageUploadViewModelProvider(ImageFolder.note)).busy) return;
     final title = state.draft.title.trim();
     if (state.draft.mood == null ||
         title.isEmpty ||
