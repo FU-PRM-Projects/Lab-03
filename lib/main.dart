@@ -4,6 +4,9 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lab03/firebase/cloudinary_image_service.dart';
+import 'package:lab03/firebase/device_image_picker_service.dart';
+import 'package:lab03/services/image_service.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'app.dart';
@@ -44,6 +47,8 @@ import 'services/user_repository.dart';
 const String _googleServerClientId = String.fromEnvironment(
   'GOOGLE_SERVER_CLIENT_ID',
 );
+const String _cloudinaryCloudName = String.fromEnvironment('t7crbqj0');
+const String _cloudinaryUploadPreset = String.fromEnvironment('PRM_Lab3');
 
 /// Composition root: khởi tạo Firebase và gắn hiện thực Firebase vào từng
 /// service. Test gắn bản fake theo cùng cách.
@@ -90,6 +95,16 @@ Future<void> main() async {
         reportServiceProvider.overrideWithValue(const PdfReportService()),
         storageServiceProvider.overrideWithValue(
           FirebaseStorageService(currentUid: uid),
+        ),
+        imagePickerServiceProvider.overrideWithValue(
+          DeviceImagePickerService(),
+        ),
+        imageServiceProvider.overrideWithValue(
+          CloudinaryImageService(
+            currentUid: uid,
+            cloudName: _cloudinaryCloudName,
+            uploadPreset: _cloudinaryUploadPreset,
+          ),
         ),
         challengeRepositoryProvider.overrideWithValue(
           FirestoreChallengeRepository(currentUid: uid),
