@@ -22,6 +22,10 @@ abstract interface class CrashReporter {
 
   /// Gửi một lỗi thử để kiểm tra cấu hình; trả về thông báo cho UI.
   Future<String> testCrash();
+
+  /// Làm app sập thật (crash native) để demo. Báo cáo được gửi ở lần mở app
+  /// tiếp theo; bản no-op chỉ ghi log và trả về thông báo cho UI.
+  Future<String> forceCrash();
 }
 
 /// Bản không gửi gì lên Google: dùng cho widget test và khi chạy Emulator.
@@ -54,6 +58,12 @@ class NoopCrashReporter implements CrashReporter {
   Future<String> testCrash() async {
     debugPrint('[crash] test crash (no-op)');
     return 'Không gửi lên Google (Emulator/test): đã ghi log.';
+  }
+
+  @override
+  Future<String> forceCrash() async {
+    debugPrint('[crash] force crash (no-op)');
+    return 'Không làm sập app (Emulator/test): đã ghi log.';
   }
 }
 

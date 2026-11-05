@@ -100,9 +100,14 @@ void main() {
     await tester.tap(find.byTooltip('Cài đặt'));
     await tester.pumpAndSettle();
     expect(find.byType(SettingsScreen), findsOneWidget);
+    final email = find.text(testUser.email!);
+    await tester.scrollUntilVisible(email, 200);
+    expect(email, findsOneWidget);
+
     final signOut = find.widgetWithText(OutlinedButton, 'Đăng xuất');
     await tester.scrollUntilVisible(signOut, 200);
-    expect(find.text(testUser.email!), findsOneWidget);
+    await tester.ensureVisible(signOut);
+    await tester.pumpAndSettle();
 
     await tester.tap(signOut);
     await tester.pumpAndSettle();

@@ -166,6 +166,9 @@ class FakeCrashReporter implements CrashReporter {
 
   @override
   Future<String> testCrash() async => 'test';
+
+  @override
+  Future<String> forceCrash() async => 'crash';
 }
 
 class FixedClock implements Clock {
