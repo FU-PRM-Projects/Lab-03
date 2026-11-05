@@ -109,6 +109,22 @@ service cloud.firestore {
         allow create, update: if isOwner(uid) && validGroup(request.resource.data);
       }
 
+      // Streak share cards: a base64 PNG (<= 850k chars, see
+      // StreakShareLimits) plus the numbers it shows. Created by the owner,
+      // never edited.
+      match /sharedStreaks/{id} {
+        allow read, delete: if isOwner(uid);
+        allow create: if isOwner(uid)
+                      && request.resource.data.keys().hasOnly(['image', 'streak', 'record', 'milestone', 'createdAt'])
+                      && request.resource.data.keys().hasAll(['image', 'streak', 'record', 'milestone', 'createdAt'])
+                      && request.resource.data.image is string
+                      && request.resource.data.image.size() <= 850000
+                      && request.resource.data.streak is int
+                      && request.resource.data.record is int
+                      && request.resource.data.milestone is int
+                      && request.resource.data.createdAt is timestamp;
+      }
+
       match /stickers/{month} {
         allow read: if isOwner(uid);
         allow create, update: if isOwner(uid)

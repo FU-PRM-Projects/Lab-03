@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -7,6 +8,7 @@ import '../../widgets/add_note_fab.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_top_bar.dart';
 import 'note_kind_sheet.dart';
+import 'notification_inbox.dart';
 
 /// Một lối đi tới màn khác, dùng khi màn còn ở dạng khung.
 class SkeletonLink {
@@ -71,7 +73,7 @@ class ScreenSkeleton extends StatelessWidget {
 
 /// Khung chung của 4 màn tab: hàng đầu (tiêu đề + chuông + avatar), nội dung,
 /// và nút nổi + khi [showAddNote].
-class TabScaffold extends StatelessWidget {
+class TabScaffold extends ConsumerWidget {
   const TabScaffold({
     required this.title,
     required this.body,
@@ -84,7 +86,7 @@ class TabScaffold extends StatelessWidget {
   final bool showAddNote;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       body: SafeArea(
         bottom: false,
@@ -93,7 +95,7 @@ class TabScaffold extends StatelessWidget {
           children: <Widget>[
             TabHeader(
               title: title,
-              onNotifications: () => context.push(AppRoutes.settings),
+              onNotifications: () => openNotificationInbox(context, ref),
               onProfile: () => context.push(AppRoutes.settings),
             ),
             Expanded(child: body),

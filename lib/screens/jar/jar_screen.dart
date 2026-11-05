@@ -45,6 +45,9 @@ class JarScreen extends ConsumerWidget {
             SnackBar(
               content: const Text('Đã xoá nốt · còn 5 giây'),
               duration: NoteDeleter.undoWindow,
+              // Có action thì Flutter mặc định giữ SnackBar mãi; cần tự tắt
+              // cùng lúc với hết giờ hoàn tác.
+              persist: false,
               action: SnackBarAction(
                 label: 'Hoàn tác',
                 onPressed: ref.read(noteDeleterProvider.notifier).undo,
