@@ -60,6 +60,22 @@ void main() {
       expect(s.jarNotes.first, NoteType.tuChu);
       expect(s.fallenNote, isNull);
       expect(s.pendingSync, isFalse);
+      expect(s.streak.current, 1);
+      expect(s.streak.todayCount, 2);
+    });
+
+    test('chuỗi ngày: nối từ hôm qua và chỉ ra mốc kế tiếp', () async {
+      notes.notes.addAll(<Note>[
+        sampleNote('a', DateTime(2026, 10, 24, 8)),
+        sampleNote('b', DateTime(2026, 10, 23, 8)),
+        sampleNote('c', DateTime(2026, 10, 22, 8)),
+      ]);
+      final s = await summary(makeContainer());
+      expect(s.streak.current, 3);
+      expect(s.streak.record, 3);
+      expect(s.streak.activeToday, isTrue);
+      expect(s.streak.nextMilestone, 7);
+      expect(s.streak.daysToNext, 4);
     });
 
     test('hôm qua Mệt: một chiến thắng cũ rơi ra khỏi hũ (P6)', () async {
@@ -162,6 +178,35 @@ void main() {
       expect(s.progress, closeTo(2 / 25, 1e-9));
       expect(s.savedToday, isTrue);
     });
+
+    test(
+      'nốt đầu tiên trong ngày nối chuỗi và đánh dấu firstNoteToday',
+      () async {
+        notes.notes.addAll(<Note>[
+          sampleNote('a', DateTime(2026, 10, 23, 21)),
+          sampleNote('b', DateTime(2026, 10, 24, 21)),
+        ]);
+        final s = ((await load(
+          makeContainer(),
+          'b',
+        )) as Data<SavedNoteSummary>).value;
+        expect(s.firstNoteToday, isTrue);
+        expect(s.streak.current, 2);
+        expect(s.streak.nextMilestone, 3);
+
+        final second = await notes.add(
+          const NoteDraft(mood: Mood.on, title: 'Thêm một nốt'),
+          createdAt: DateTime(2026, 10, 24, 22),
+        );
+        final again = ((await load(
+          makeContainer(),
+          second.id,
+        )) as Data<SavedNoteSummary>).value;
+        expect(again.streak.current, 2);
+        expect(again.streak.todayCount, 2);
+        expect(again.firstNoteToday, isFalse);
+      },
+    );
 
     test('chạm mốc tháng: Gắn vào hũ lưu nhãn dán', () async {
       notes.notes.addAll(<Note>[

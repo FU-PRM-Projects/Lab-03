@@ -5,12 +5,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/first_group.dart';
 import '../models/note.dart';
 import '../models/note_type.dart';
+import '../models/streak.dart';
+import '../services/analytics_events.dart';
+import '../services/analytics_service.dart';
 import '../services/clock.dart';
 import '../services/group_repository.dart';
 import '../services/note_repository.dart';
 import '../utils/dates.dart';
+import '../utils/streak_stats.dart';
 import 'error_messages.dart';
-import 'today_view_model.dart';
 import 'view_state.dart';
 
 /// Nội dung S04 · Nốt đã vào hũ.
@@ -19,6 +22,7 @@ class SavedNoteSummary {
     required this.note,
     required this.monthCount,
     required this.milestone,
+    required this.streak,
     this.savedToday = true,
     this.jarNotes = const <NoteType>[],
     this.group,
@@ -26,6 +30,9 @@ class SavedNoteSummary {
   });
 
   final Note note;
+
+  /// Chuỗi ngày sau khi lưu nốt này.
+  final StreakSummary streak;
 
   /// Số nốt của tháng chứa [note], tính cả nốt này ("Nốt thứ 24 tháng này").
   final int monthCount;
@@ -59,6 +66,9 @@ class SavedNoteSummary {
 
   /// Ô "?" cuối bộ sưu tập: tháng kế tiếp, chưa mở.
   DateTime get nextStickerMonth => Dates.startOfNextMonth(note.createdAt);
+
+  /// Nốt đầu tiên trong hôm nay: chuỗi vừa được nối thêm một ngày.
+  bool get firstNoteToday => savedToday && streak.todayCount == 1;
 
   /// Nốt đầu tiên của một nhóm: biến thể "Lần đầu tiên!" (khi không trùng
   /// với mốc tháng, vì mốc tháng cần bấm "Gắn vào hũ").
@@ -96,6 +106,9 @@ class NoteSavedViewModel extends Notifier<ViewState<SavedNoteSummary>> {
 
   final String noteId;
 
+  /// Chỉ ghi `streak_extended` một lần cho mỗi lần mở S04.
+  bool _streakLogged = false;
+
   NoteRepository get _notes => ref.read(noteRepositoryProvider);
 
   @override
@@ -122,9 +135,18 @@ class NoteSavedViewModel extends Notifier<ViewState<SavedNoteSummary>> {
           group = FirstGroups.systemById(id);
         }
       }
+      // Đủ nốt để tính chuỗi và kỷ lục, đồng thời vẫn lấy được 8 tờ cho hũ.
       final recent = await _notes.list(
         before: Dates.startOfNextMonth(note.createdAt),
-        limit: TodayViewModel.jarCapacity,
+        limit: 400,
+      );
+      final streakNotes = recent
+          .where((n) => !n.createdAt.isAfter(note.createdAt))
+          .toList();
+      final streak = StreakStats.summary(streakNotes, note.createdAt);
+      final savedToday = Dates.sameDay(
+        note.createdAt,
+        ref.read(clockProvider).now(),
       );
       List<DateTime> stickers;
       try {
@@ -143,10 +165,8 @@ class NoteSavedViewModel extends Notifier<ViewState<SavedNoteSummary>> {
           // Bộ nhớ đệm có thể chưa thấy nốt vừa ghi; nốt này luôn được tính.
           monthCount: count < 1 ? 1 : count,
           milestone: ref.read(monthlyMilestoneProvider),
-          savedToday: Dates.sameDay(
-            note.createdAt,
-            ref.read(clockProvider).now(),
-          ),
+          streak: streak,
+          savedToday: savedToday,
           jarNotes: <NoteType>[
             for (final n in recent)
               if (!n.createdAt.isBefore(monthStart)) n.type,
@@ -155,6 +175,20 @@ class NoteSavedViewModel extends Notifier<ViewState<SavedNoteSummary>> {
           stickers: stickers,
         ),
       );
+      if (!_streakLogged && savedToday && streak.todayCount == 1) {
+        _streakLogged = true;
+        unawaited(
+          ref.read(analyticsServiceProvider).track(
+            AnalyticsEvents.streakExtended,
+            <String, Object>{
+              AnalyticsParams.streakLength: streak.current,
+              AnalyticsParams.streakMilestone: streak.isMilestone
+                  ? streak.current
+                  : 0,
+            },
+          ),
+        );
+      }
     } on Object catch (error) {
       if (ref.mounted) state = ErrorMessages.failure(error);
     }

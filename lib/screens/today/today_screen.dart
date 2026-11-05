@@ -18,8 +18,10 @@ import '../../widgets/note_tile.dart';
 import '../../widgets/offline_banner.dart';
 import '../../widgets/shortcut_button.dart';
 import '../../widgets/state_views.dart';
+import '../../widgets/streak_card.dart';
 import '../common/note_kind_sheet.dart';
 import '../common/screen_skeleton.dart';
+import '../streak/streak_share_page.dart';
 
 /// S02 · Hôm nay (tab 1).
 class TodayScreen extends ConsumerWidget {
@@ -55,6 +57,14 @@ class TodayScreen extends ConsumerWidget {
             onOpenJar: () => context.go(AppRoutes.jar),
             onRetry: ref.read(todayViewModelProvider.notifier).retry,
           ),
+          if (summary case final summary?) ...<Widget>[
+            const SizedBox(height: AppSpace.s16),
+            StreakCard(
+              streak: summary.streak,
+              // Mở Hành trình ở tab Thống kê để xem chuỗi và kỷ lục.
+              onTap: () => context.go(AppRoutes.journeyTab('stats')),
+            ),
+          ],
           if (summary?.fallenNote case final note?) ...<Widget>[
             const SizedBox(height: AppSpace.s16),
             _FallenNote(note: note),
@@ -75,33 +85,77 @@ class TodayScreen extends ConsumerWidget {
                 ? () => context.push(AppRoutes.newNote())
                 : () => openNoteKindSheet(context),
           ),
-          // Figma: khoảng đệm 16 + 2 khoảng cách 16 giữa nút và lối tắt.
-          const SizedBox(height: AppSpace.s16 * 3),
+          // Thẻ chuỗi ở trên đã chiếm một khối; giữ 32 để hàng lối tắt vẫn
+          // chạm được trên màn 360 × 800 (thanh tab nổi bắt đầu ở 718).
+          const SizedBox(height: AppSpace.s16 * 2),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
+            // Mỗi lối tắt chia đều chiều rộng để thêm nút "Chia sẻ" vẫn vừa
+            // màn 360.
             children: <Widget>[
               // Icon nói đúng hành động (bàn tay dừng, luồng gió, lá cờ như
               // tab Thử thách) kèm dòng phụ nói mục đích (deviation D-25).
-              ShortcutButton(
-                iconAsset: 'assets/icons/hand-stop.svg',
-                label: 'Dừng lại',
-                caption: 'ghi 1 lần tự chủ',
-                onTap: () => context.push(AppRoutes.selfControl),
+              Expanded(
+                child: Center(
+                  child: ShortcutButton(
+                    iconAsset: 'assets/icons/hand-stop.svg',
+                    label: 'Dừng lại',
+                    caption: 'ghi 1 lần tự chủ',
+                    onTap: () => context.push(AppRoutes.selfControl),
+                  ),
+                ),
               ),
-              ShortcutButton(
-                iconAsset: 'assets/icons/wind.svg',
-                // Đọc liền thành câu: "Stress? Thở 90 giây để thả lỏng".
-                label: 'Stress?',
-                caption: 'Thở 90 giây để thả lỏng',
-                onTap: () => context.push(AppRoutes.breathe),
+              Expanded(
+                child: Center(
+                  child: ShortcutButton(
+                    iconAsset: 'assets/icons/wind.svg',
+                    // Đọc liền thành câu: "Stress? Thở 90 giây để thả lỏng".
+                    label: 'Stress?',
+                    caption: 'Thở 90 giây để thả lỏng',
+                    onTap: () => context.push(AppRoutes.breathe),
+                  ),
+                ),
               ),
-              ShortcutButton(
-                iconAsset: 'assets/icons/tab-flag.svg',
-                label: 'Thử thách',
-                caption: 'thẻ hôm nay',
-                onTap: () => context.go(AppRoutes.challenges),
+              Expanded(
+                child: Center(
+                  child: ShortcutButton(
+                    iconAsset: 'assets/icons/tab-flag.svg',
+                    label: 'Thử thách',
+                    caption: 'thẻ hôm nay',
+                    onTap: () => context.go(AppRoutes.challenges),
+                  ),
+                ),
               ),
+              if (summary case final summary?)
+                Expanded(
+                  child: Center(
+                    child: ShortcutButton(
+                      iconAsset: 'assets/icons/share.svg',
+                      label: 'Chia sẻ',
+                      caption: 'khoe chuỗi ngày',
+                      onTap: () {
+                        if (summary.streak.current <= 0) {
+                          ScaffoldMessenger.of(context)
+                            ..hideCurrentSnackBar()
+                            ..showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Ghi nốt đầu tiên để mở chuỗi, rồi chia sẻ nhé.',
+                                ),
+                              ),
+                            );
+                          return;
+                        }
+                        Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) =>
+                                StreakSharePage(streak: summary.streak),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
             ],
           ),
         ],

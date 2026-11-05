@@ -38,8 +38,8 @@ class ShortcutButton extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppRadius.card),
         child: ConstrainedBox(
-          constraints: const BoxConstraints.tightFor(width: 96)
-              .copyWith(minHeight: 72),
+          // Tối đa 96; hàng 4 nút trên màn hẹp thì co lại cho vừa.
+          constraints: const BoxConstraints(maxWidth: 96, minHeight: 72),
           child: Padding(
             padding: const EdgeInsets.all(AppSpace.s4),
             child: Column(

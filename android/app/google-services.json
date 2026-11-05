@@ -12,7 +12,20 @@
           "package_name": "com.quanphungg.lab03"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1069128102779-pn65nbb88ird4mig461m7030ndldipja.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.quanphungg.lab03",
+            "certificate_hash": "ece39bb870aba39f65c833c505d15dc8667b84f5"
+          }
+        },
+        {
+          "client_id": "1069128102779-qi5ku9jr35nlktu3232ibnavp6jnvei2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDNyg2R9szEMsPPictUtVMh9zrmk51LhBI"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1069128102779-qi5ku9jr35nlktu3232ibnavp6jnvei2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

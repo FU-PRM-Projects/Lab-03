@@ -11,6 +11,8 @@ abstract final class AnalyticsEvents {
   static const String challengeOpened = 'challenge_opened';
   static const String noteViewed = 'note_viewed';
   static const String selfControlLogged = 'self_control_logged';
+  static const String streakExtended = 'streak_extended';
+  static const String streakShared = 'streak_shared';
   static const String screenView = 'screen_view';
 }
 
@@ -24,5 +26,7 @@ abstract final class AnalyticsParams {
   static const String minutes = 'minutes';
   static const String format = 'format';
   static const String hasHabit = 'has_habit';
+  static const String streakLength = 'streak_length';
+  static const String streakMilestone = 'streak_milestone';
   static const String screenName = 'firebase_screen';
 }

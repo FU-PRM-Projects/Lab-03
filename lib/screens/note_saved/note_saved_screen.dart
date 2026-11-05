@@ -17,7 +17,9 @@ import '../../widgets/mascot.dart';
 import '../../widgets/milestone_sticker.dart';
 import '../../widgets/note_tile.dart';
 import '../../widgets/offline_banner.dart';
+import '../../widgets/streak_celebration.dart';
 import '../common/view_state_view.dart';
+import '../streak/streak_share_page.dart';
 
 /// S04 · Nốt đã vào hũ.
 class NoteSavedScreen extends ConsumerWidget {
@@ -116,127 +118,143 @@ class _SavedContent extends StatelessWidget {
 
     // Figma: nội dung căn giữa giữa hai khoảng đệm co giãn, các khối cách
     // nhau 16; màn thấp hoặc chữ phóng to thì cuộn được.
-    return CustomScrollView(
-      slivers: <Widget>[
-        SliverFillRemaining(
-          hasScrollBody: false,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpace.screen,
-              AppSpace.s16,
-              AppSpace.screen,
-              AppSpace.s24,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                if (note.pendingSync) ...<Widget>[
-                  const OfflineBanner(),
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: constraints.maxHeight),
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpace.screen,
+                AppSpace.s16,
+                AppSpace.screen,
+                AppSpace.s24,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  if (note.pendingSync) ...<Widget>[
+                    const OfflineBanner(),
+                    const SizedBox(height: AppSpace.s16),
+                  ],
+                  if (milestone)
+                    _MilestoneCelebration(month: month)
+                  else
+                    _Celebration(jarNotes: summary.jarNotes),
                   const SizedBox(height: AppSpace.s16),
-                ],
-                const Spacer(),
-                if (milestone)
-                  _MilestoneCelebration(month: month)
-                else
-                  _Celebration(jarNotes: summary.jarNotes),
-                const SizedBox(height: AppSpace.s16),
-                Semantics(
-                  header: true,
-                  liveRegion: true,
-                  child: Text(
-                    title,
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      letterSpacing: -0.56,
+                  Semantics(
+                    header: true,
+                    liveRegion: true,
+                    child: Text(
+                      title,
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        letterSpacing: -0.56,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpace.s8),
+                  Text(
+                    subtitle,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                     textAlign: TextAlign.center,
                   ),
-                ),
-                const SizedBox(height: AppSpace.s8),
-                Text(
-                  subtitle,
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: AppSpace.s16),
-                if (milestone)
-                  _StickerCollection(summary: summary)
-                else ...<Widget>[
-                  // Tờ nốt 220 × 120 nghiêng 3° như vừa thả vào hũ.
-                  Center(
-                    child: Transform.rotate(
-                      angle: 3 * math.pi / 180,
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(
-                          minWidth: 220,
-                          maxWidth: 220,
-                          minHeight: 120,
+                  const SizedBox(height: AppSpace.s16),
+                  if (summary.firstNoteToday) ...<Widget>[
+                    StreakCelebration(
+                      streak: summary.streak,
+                      onShare: () => Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) =>
+                              StreakSharePage(streak: summary.streak),
                         ),
-                        child: IntrinsicHeight(
-                          child: NoteTile(
-                            type: note.type,
-                            title: note.title,
-                            dateLabel: dateLabel,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpace.s16),
+                  ],
+                  if (milestone)
+                    _StickerCollection(summary: summary)
+                  else ...<Widget>[
+                    // Tờ nốt 220 × 120 nghiêng 3° như vừa thả vào hũ.
+                    Center(
+                      child: Transform.rotate(
+                        angle: 3 * math.pi / 180,
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(
+                            minWidth: 220,
+                            maxWidth: 220,
+                            minHeight: 120,
+                          ),
+                          child: IntrinsicHeight(
+                            child: NoteTile(
+                              type: note.type,
+                              title: note.title,
+                              dateLabel: dateLabel,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
+                    const SizedBox(height: AppSpace.s16),
+                    if (first)
+                      _GroupProgress(
+                        name: group!.name,
+                        count: summary.groupCount,
+                      )
+                    else
+                      _MilestoneProgress(summary: summary, month: month),
+                  ],
                   const SizedBox(height: AppSpace.s16),
-                  if (first)
-                    _GroupProgress(name: group!.name, count: summary.groupCount)
-                  else
-                    _MilestoneProgress(summary: summary, month: month),
+                  if (milestone) ...<Widget>[
+                    AppButton(
+                      label: 'Gắn vào hũ',
+                      expand: true,
+                      onPressed: onPin,
+                    ),
+                    const SizedBox(height: AppSpace.s16),
+                    AppButton(
+                      label: 'Để sau',
+                      variant: AppButtonVariant.text,
+                      expand: true,
+                      onPressed: onDone,
+                    ),
+                  ] else if (first) ...<Widget>[
+                    AppButton(
+                      label: 'Xem nhóm ${group!.name}',
+                      expand: true,
+                      onPressed: () =>
+                          context.go(AppRoutes.groupDetail(group.id)),
+                    ),
+                    const SizedBox(height: AppSpace.s16),
+                    AppButton(
+                      label: 'Về Hôm nay',
+                      variant: AppButtonVariant.text,
+                      expand: true,
+                      onPressed: onDone,
+                    ),
+                  ] else ...<Widget>[
+                    AppButton(
+                      label: 'Về Hôm nay',
+                      expand: true,
+                      onPressed: onDone,
+                    ),
+                    const SizedBox(height: AppSpace.s16),
+                    AppButton(
+                      label: 'Viết thêm',
+                      variant: AppButtonVariant.text,
+                      expand: true,
+                      onPressed: onWriteMore,
+                    ),
+                  ],
                 ],
-                const Spacer(),
-                const SizedBox(height: AppSpace.s16),
-                if (milestone) ...<Widget>[
-                  AppButton(
-                    label: 'Gắn vào hũ',
-                    expand: true,
-                    onPressed: onPin,
-                  ),
-                  const SizedBox(height: AppSpace.s16),
-                  AppButton(
-                    label: 'Để sau',
-                    variant: AppButtonVariant.text,
-                    expand: true,
-                    onPressed: onDone,
-                  ),
-                ] else if (first) ...<Widget>[
-                  AppButton(
-                    label: 'Xem nhóm ${group!.name}',
-                    expand: true,
-                    onPressed: () =>
-                        context.go(AppRoutes.groupDetail(group.id)),
-                  ),
-                  const SizedBox(height: AppSpace.s16),
-                  AppButton(
-                    label: 'Về Hôm nay',
-                    variant: AppButtonVariant.text,
-                    expand: true,
-                    onPressed: onDone,
-                  ),
-                ] else ...<Widget>[
-                  AppButton(
-                    label: 'Về Hôm nay',
-                    expand: true,
-                    onPressed: onDone,
-                  ),
-                  const SizedBox(height: AppSpace.s16),
-                  AppButton(
-                    label: 'Viết thêm',
-                    variant: AppButtonVariant.text,
-                    expand: true,
-                    onPressed: onWriteMore,
-                  ),
-                ],
-              ],
+              ),
             ),
           ),
         ),
-      ],
+      ),
     );
   }
 }

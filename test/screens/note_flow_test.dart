@@ -33,6 +33,7 @@ void main() {
       (tester) async {
         final services = await pumpApp(tester, size: size);
         expect(find.text('Thứ Bảy, 24/10'), findsOneWidget);
+        expect(find.text('Bắt đầu chuỗi ngày'), findsOneWidget);
         await openComposer(tester);
         expect(find.text('Bước 1/3'), findsOneWidget);
 
@@ -51,6 +52,7 @@ void main() {
 
         expect(find.byType(NoteSavedScreen), findsOneWidget);
         expect(find.text('Đã vào hũ!'), findsOneWidget);
+        expect(find.text('Chuỗi đã bắt đầu!'), findsOneWidget);
         expect(find.text('Nốt thứ 1 tháng này.'), findsOneWidget);
         expect(find.text('Mốc tháng 10'), findsOneWidget);
         expect(find.text('1/25 nốt'), findsOneWidget);
@@ -63,6 +65,7 @@ void main() {
         await tester.tap(find.text('Về Hôm nay'));
         await tester.pumpAndSettle();
         expect(find.byType(TodayScreen), findsOneWidget);
+        expect(find.text('Chuỗi 1 ngày'), findsOneWidget);
         expect(
           find.bySemanticsLabel(RegExp('Hũ chiến thắng, 1 nốt tháng này')),
           findsOneWidget,

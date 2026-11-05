@@ -4,10 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/note.dart';
 import '../models/note_type.dart';
+import '../models/streak.dart';
 import '../services/clock.dart';
 import '../services/draft_store.dart';
 import '../services/note_repository.dart';
 import '../utils/dates.dart';
+import '../utils/streak_stats.dart';
 import 'auth_view_model.dart';
 import 'error_messages.dart';
 import 'view_state.dart';
@@ -18,6 +20,7 @@ class TodaySummary {
     required this.todayCount,
     required this.monthCount,
     required this.jarNotes,
+    required this.streak,
     this.fallenNote,
     this.pendingSync = false,
   });
@@ -27,6 +30,9 @@ class TodaySummary {
 
   /// Các nốt mới nhất của tháng, để vẽ tờ nốt trong hình hũ.
   final List<NoteType> jarNotes;
+
+  /// Chuỗi ngày ghi nốt và tiến độ tới mốc kế tiếp.
+  final StreakSummary streak;
 
   /// Nốt cũ "rơi ra" khi hôm qua có tâm trạng Mệt hoặc Rối (S02, P6).
   final Note? fallenNote;
@@ -72,9 +78,11 @@ class TodayViewModel extends Notifier<ViewState<TodaySummary>> {
     _fallenLoaded = false;
 
     final now = ref.read(clockProvider).now();
-    final monthStart = Dates.startOfMonth(now);
-    final yesterday = Dates.startOfYesterday(now);
-    final since = yesterday.isBefore(monthStart) ? yesterday : monthStart;
+    // Đủ dài để chuỗi ngày và kỷ lục không bị cắt giữa chừng; hũ và số nốt
+    // tháng vẫn lọc lại theo tháng ở _onNotes. Cùng cửa sổ với S11.
+    final yearStart = DateTime(now.year);
+    final sixtyDays = DateTime(now.year, now.month, now.day - 60);
+    final since = sixtyDays.isBefore(yearStart) ? sixtyDays : yearStart;
 
     final timeout = Timer(loadTimeout, () {
       if (state is Loading<TodaySummary>) {
@@ -113,6 +121,7 @@ class TodayViewModel extends Notifier<ViewState<TodaySummary>> {
         todayCount: notes.where((n) => Dates.sameDay(n.createdAt, now)).length,
         monthCount: month.length,
         jarNotes: month.take(jarCapacity).map((n) => n.type).toList(),
+        streak: StreakStats.summary(notes, now),
         fallenNote: hadLowDay ? _fallenNote : null,
         pendingSync: notes.any((n) => n.pendingSync),
       ),
