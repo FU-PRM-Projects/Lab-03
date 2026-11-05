@@ -1325,26 +1325,26 @@ export default function App() {
 
         <Page
           dense
-          title="ARTEMIS: not covered yet"
-          line="Five parts of the brief have no E2E case yet; each has a reason and a next step"
-          notes="We are open about the gaps. Sign-in: every case starts already signed in, because the Google account picker shows a real name and email and we did not want the agent to touch it; the next step is a case with an email test account. Sign-out: not written yet; it must run last, since it ends the session for the other cases. Export and upload: the Storage bucket needs the Blaze plan, so the upload cannot succeed on the real project. Analytics: the agent only sees the screen, not the events; today the events are checked by unit tests and by DebugView, and the next step is to read adb logcat after a case. Exploratory: the 15 to 30 minute session with the Pro profile has not been run, so there is no list of found bugs yet."
+          title="ARTEMIS: written, not run yet"
+          line="Five parts of the brief now have a case in e2e_test/, but no run result yet"
+          notes="We are open about the gaps. These five cases are written in e2e_test/test_main_flows.py but have not run, so the result table does not include them. T13: the agent saves a note, then the test reads adb logcat for note_saved and its parameters, because the agent only sees the screen. T14: exports the weekly card; until the Storage bucket exists (Blaze plan) it expects the error message with Thử lại instead of an upload. T15 and T16: sign out, then sign in with an email test account, once with a wrong password; Google sign-in is avoided because the account picker shows a real name and email. They run last because they change the session. X01: the 15 to 30 minute exploratory session with the Pro profile; its bug list will go into docs/test-plan.md."
         >
           <div className="gap">
             {[
-              ['Sign-in', 'Cases start signed in: the Google picker shows a real name and email', 'Add a case with an email test account'],
-              ['Sign-out', 'Not written yet; it ends the session for the other cases', 'Add it as the last case of the run'],
-              ['Export and upload', 'Storage bucket needs the Blaze plan, so the upload cannot succeed', 'Run after the bucket exists'],
-              ['Analytics event logged', 'The agent sees the screen, not events. Checked by unit tests and DebugView instead', 'After T02, read adb logcat for note_saved'],
-              ['Exploratory session', 'The 15–30 min session (Pro profile) was not run, so no bug list yet', 'pytest -m exploratory, then list the bugs'],
+              ['T15 · Sign-out, sign-in', 'Sign out, then sign in with an email test account (not Google: its picker shows a real name and email)', 'Needs a test account'],
+              ['T16 · Wrong password', 'Error message under the field, then sign in with the right password', 'Needs a test account'],
+              ['T14 · Export and upload', 'Weekly card PDF: upload and link, or the error message + Thử lại while there is no bucket', 'Upload part needs Blaze'],
+              ['T13 · Analytics event', 'Save a note, then the test reads adb logcat: note_saved with mood, note_type, no note text', 'Needs the OpenRouter key'],
+              ['X01 · Exploratory', '15–30 min, Pro profile; the agent explores and returns BUG lines or NO_BUGS', 'Not run: no bug list yet'],
             ].map(([what, why, next]) => (
               <div key={what} className="gap-row">
                 <b>{what}</b>
                 <span>{why}</span>
-                <span className="gap-next">→ {next}</span>
+                <span className="gap-next">{next}</span>
               </div>
             ))}
           </div>
-          <p className="foot">docs/test-plan.md §1 out of scope · §6 limits</p>
+          <p className="foot">e2e_test/test_main_flows.py · docs/test-plan.md §4, §6</p>
         </Page>
 
         <Page

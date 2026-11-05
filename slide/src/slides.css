@@ -1670,7 +1670,7 @@ html, body, #root, .stage {
 }
 .gap-row {
   display: grid;
-  grid-template-columns: 200px 1fr 320px;
+  grid-template-columns: 260px 1fr 230px;
   gap: 16px;
   padding: 10px 14px;
   border-left: 4px solid #e03131;
@@ -1679,7 +1679,8 @@ html, body, #root, .stage {
   align-items: center;
 }
 .gap-next {
-  color: #2f6f3e;
+  color: #c92a2a;
+  font-weight: 600;
 }
 .sem-wrap {
   display: grid;
