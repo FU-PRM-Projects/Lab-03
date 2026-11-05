@@ -11,10 +11,20 @@ import os
 import shutil
 import subprocess
 
+import pytest
+
 NOTE_TEXT = "E2E test note"
 ADB = shutil.which("adb") or os.path.join(
     os.environ.get("LOCALAPPDATA", ""), "Android", "Sdk", "platform-tools", "adb.exe"
 )
+SERIAL = os.environ.get("ARTEMIS_DEVICE_SERIAL")
+
+
+def adb(*args: str) -> str:
+    """Chạy một lệnh adb trên đúng thiết bị ARTEMIS đang dùng, trả về stdout."""
+    cmd = [ADB, *(["-s", SERIAL] if SERIAL else []), *args]
+    done = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
+    return done.stdout
 
 # Chỉ dẫn chung: không đăng xuất, không đổi cài đặt, trả lời đúng định dạng.
 RULES = (
@@ -79,6 +89,32 @@ async def test_t06_f1_offline_note_is_kept_on_device(ask) -> None:
             [ADB, "shell", "cmd", "connectivity", "airplane-mode", "disable"], check=False
         )
     assert "OFFLINE_BANNER" in answer, f"{answer!r} (trace {result.trace_id})"
+
+
+async def test_t13_analytics_note_saved_is_logged(ask) -> None:
+    """Analytics: lưu nốt xong thì sự kiện `note_saved` được ghi (đọc từ logcat).
+
+    Agent chỉ thấy màn hình, nên test bật log chi tiết của Firebase Analytics
+    (tag FA, FA-SVC) rồi tự đọc logcat. Bản chạy Emulator in `[analytics]` với tag
+    flutter. Chạy trước T03 vì T03 xoá nốt `E2E test note`.
+    """
+    for tag in ("FA", "FA-SVC"):
+        adb("shell", "setprop", f"log.tag.{tag}", "VERBOSE")
+    adb("logcat", "-c")
+    answer, result = await ask(
+        "Ở màn Hôm nay, bấm 'Ghi nốt'. Chọn ghi một điều làm được (không phải nhật ký), "
+        f"chọn một tâm trạng bất kỳ, gõ đúng chữ '{NOTE_TEXT}' vào ô nội dung, bỏ qua "
+        "phần kể thêm rồi bấm lưu. Trả lời SAVED nếu màn xác nhận đã lưu hiện ra, ngược "
+        "lại FAILED." + RULES,
+        "SAVED hoặc FAILED",
+    )
+    assert "SAVED" in answer, f"{answer!r} (trace {result.trace_id})"
+    log = adb("logcat", "-d", "-s", "FA", "FA-SVC", "flutter")
+    events = [line for line in log.splitlines() if "note_saved" in line]
+    assert events, f"không thấy note_saved trong logcat (trace {result.trace_id})"
+    # Tham số theo docs/analytics-plan.md §4; không có nội dung nốt.
+    assert any("mood" in line and "note_type" in line for line in events), events[-1]
+    assert not any(NOTE_TEXT in line for line in events), "nội dung nốt bị gửi lên Analytics"
 
 
 async def test_t03_jar_open_and_delete_note(ask) -> None:
@@ -174,3 +210,102 @@ async def test_t12_native_home_and_return(ask) -> None:
         locked=False,
     )
     assert "LOGGED_IN" in answer, f"{answer!r} (trace {result.trace_id})"
+
+
+# --- Xuất và tải thẻ tuần lên Cloud Storage --------------------------------
+
+#: Đặt E2E_STORAGE_READY=1 khi project đã có Storage bucket (cần gói Blaze).
+STORAGE_READY = os.environ.get("E2E_STORAGE_READY") == "1"
+
+
+async def test_t14_export_weekly_card(ask) -> None:
+    """S11b: tạo PDF thẻ tuần và tải lên Storage.
+
+    Có bucket: phải thấy link tải về. Chưa có bucket: phải thấy câu báo lỗi kèm
+    nút 'Thử lại' (app không treo, không đóng).
+    """
+    answer, result = await ask(
+        "Mở tab 'Hành trình' và mở 'Thẻ tuần' (có thể phải cuộn xuống). Bấm 'Lưu thẻ "
+        "tuần (PDF)' rồi chờ tối đa 60 giây. Trả lời UPLOADED nếu hiện 'Đã lưu thẻ tuần "
+        "lên đám mây.' kèm một link, ERROR_MESSAGE nếu hiện câu báo lỗi kèm nút 'Thử "
+        "lại', STUCK nếu vẫn đang chạy sau 60 giây, CRASHED nếu app bị đóng. Rồi đóng "
+        "màn Thẻ tuần." + RULES,
+        "UPLOADED, ERROR_MESSAGE, STUCK hoặc CRASHED",
+    )
+    expected = "UPLOADED" if STORAGE_READY else "ERROR_MESSAGE"
+    assert expected in answer, f"{answer!r} (trace {result.trace_id})"
+
+
+# --- Đăng xuất và đăng nhập (chạy cuối vì đổi phiên đăng nhập) --------------
+
+#: Tài khoản email chỉ dùng cho test. Mật khẩu đi qua model của agent, nên
+#: không dùng tài khoản thật.
+TEST_EMAIL = os.environ.get("E2E_EMAIL", "")
+TEST_PASSWORD = os.environ.get("E2E_PASSWORD", "")
+needs_account = pytest.mark.skipif(
+    not (TEST_EMAIL and TEST_PASSWORD),
+    reason="đặt E2E_EMAIL và E2E_PASSWORD (tài khoản email chỉ dùng cho test)",
+)
+
+
+@needs_account
+async def test_t15_sign_out_then_sign_in(ask) -> None:
+    """Đăng xuất về màn chào, rồi đăng nhập lại bằng email về màn Hôm nay."""
+    answer, result = await ask(
+        "Mở 'Cài đặt' (ở màn Hôm nay), cuộn xuống bấm 'Đăng xuất' và xác nhận "
+        "'Đăng xuất'. Ghi lại màn hiện ra: OUT_WELCOME nếu là màn chào có nút 'Tiếp tục "
+        "với Google', OUT_OTHER nếu khác. Sau đó bấm 'Đăng nhập bằng email', gõ email "
+        f"'{TEST_EMAIL}' vào ô 'Email' và '{TEST_PASSWORD}' vào ô 'Mật khẩu', bấm "
+        "'Đăng nhập'. Ghi lại: IN_TODAY nếu vào màn Hôm nay, IN_FAILED nếu không. Trả "
+        "lời hai từ khoá cách nhau dấu cách, ví dụ 'OUT_WELCOME IN_TODAY'. Không đổi "
+        "cài đặt nào khác, không thêm chữ nào khác.",
+        "OUT_WELCOME|OUT_OTHER và IN_TODAY|IN_FAILED",
+    )
+    assert "OUT_WELCOME" in answer, f"đăng xuất: {answer!r} (trace {result.trace_id})"
+    assert "IN_TODAY" in answer, f"đăng nhập: {answer!r} (trace {result.trace_id})"
+
+
+@needs_account
+async def test_t16_sign_in_wrong_password_shows_error(ask) -> None:
+    """Nhánh lỗi đăng nhập: sai mật khẩu thì báo lỗi dưới ô, rồi đăng nhập đúng."""
+    answer, result = await ask(
+        "Mở 'Cài đặt', cuộn xuống bấm 'Đăng xuất' và xác nhận. Ở màn chào bấm 'Đăng "
+        f"nhập bằng email', gõ '{TEST_EMAIL}' và mật khẩu 'sai-mat-khau-e2e', bấm "
+        "'Đăng nhập'. Ghi lại: ERROR_SHOWN nếu hiện câu 'Email hoặc mật khẩu chưa "
+        "đúng.' (hoặc câu báo lỗi khác), NO_ERROR nếu vào được app. Sau đó xoá ô mật "
+        f"khẩu, gõ '{TEST_PASSWORD}' và bấm 'Đăng nhập'. Ghi lại: IN_TODAY nếu vào màn "
+        "Hôm nay, IN_FAILED nếu không. Trả lời hai từ khoá cách nhau dấu cách, ví dụ "
+        "'ERROR_SHOWN IN_TODAY'. Không thêm chữ nào khác.",
+        "ERROR_SHOWN|NO_ERROR và IN_TODAY|IN_FAILED",
+    )
+    assert "ERROR_SHOWN" in answer, f"lỗi đăng nhập: {answer!r} (trace {result.trace_id})"
+    assert "IN_TODAY" in answer, f"đăng nhập lại: {answer!r} (trace {result.trace_id})"
+
+
+# --- Phiên khám phá (chỉ chạy với `-m exploratory`) -------------------------
+
+
+@pytest.mark.exploratory
+async def test_x01_exploratory_session(client, app_id: str, attempt: int, reported) -> None:
+    """Phiên khám phá 15–30 phút, profile Pro: agent tự đi khắp app và liệt kê lỗi.
+
+    Chạy một lần: `uv run pytest -m exploratory --runs 1 -s`. Danh sách lỗi in ra
+    được chép vào docs/test-plan.md mục 6.
+    """
+    result = await client.run(
+        "Khám phá app Nốt khoảng 20 phút như một người dùng mới tò mò: đi qua mọi tab "
+        "(Hôm nay, Hũ, Thử thách, Hành trình), mở Cài đặt, thử ghi nốt, mở nốt, thử "
+        "thách, nhóm, màn thở, nhập dữ liệu lạ (rất dài, emoji, để trống), xoay màn "
+        "hình, bấm Back nhiều lần. Không đăng xuất, không xoá tài khoản, không gửi gì ra "
+        "ngoài app. Ghi lại mọi lỗi thấy được: app đóng, màn trắng, chữ bị cắt, nút "
+        "không phản hồi, câu báo lỗi khó hiểu. Cuối cùng trả lời danh sách, mỗi lỗi một "
+        "dòng dạng 'BUG: <màn> | <bước> | <thấy gì>', hoặc đúng một dòng 'NO_BUGS'.",
+        profile="pro",
+        locked_app_package=app_id,
+        expected_output="các dòng BUG: ... hoặc NO_BUGS",
+        timeout=40 * 60,
+    )
+    assert result.succeeded, f"[run{attempt}] {result.error or result.status}"
+    answer = (await reported(result)).strip()
+    print(f"\n--- exploratory (trace {result.trace_id}) ---\n{answer}")
+    assert "BUG:" in answer.upper() or "NO_BUGS" in answer.upper(), answer

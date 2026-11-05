@@ -11,10 +11,13 @@ nhánh lỗi và một tương tác Android gốc.
 
 | Trong phạm vi | Ngoài phạm vi (và lý do) |
 |---|---|
-| F1 ghi nốt: nhánh chính, nội dung trống, thoát giữa chừng, mất mạng | Đăng nhập Google: trình chọn tài khoản hiện tên và email thật, agent không nên thao tác |
-| F2 tự chủ: màn tự chủ, thở 90 giây | Thông báo FCM, xuất PDF: cần Storage bucket (chưa tạo) và token thiết bị |
-| F3 thử thách: mở thẻ, để mai | Phiên khám phá 15–30 phút: chưa chạy (xem mục 6) |
+| F1 ghi nốt: nhánh chính, nội dung trống, thoát giữa chừng, mất mạng | Đăng nhập Google: trình chọn tài khoản hiện tên và email thật, agent không nên thao tác (T15, T16 dùng đăng nhập email thay thế) |
+| F2 tự chủ: màn tự chủ, thở 90 giây | Thông báo FCM: cần token thiết bị và gửi từ Console |
+| F3 thử thách: mở thẻ, để mai | |
 | Tab, Cài đặt (cờ Remote Config), Home rồi mở lại app | |
+| Analytics: `note_saved` được ghi (T13), xuất và tải thẻ tuần (T14) | |
+| Đăng xuất, đăng nhập email, sai mật khẩu (T15, T16) | |
+| Phiên khám phá 15–30 phút, profile Pro (X01) | |
 
 ## 2. Môi trường
 
@@ -55,6 +58,16 @@ Ca ghi dữ liệu dùng nốt `E2E test note`; ca T03 xoá mọi nốt đó sau
 | T10 | Điều hướng | Bấm lần lượt bốn tab | `ALL_TABS` |
 | T11 | Cài đặt, Remote Config | Đọc dòng phụ của hàng Remote Config | chứa "Cờ tính năng" |
 | T12 | Android gốc | Home → kéo thanh thông báo → mở lại app từ launcher | `LOGGED_IN` (giữ màn đang xem) |
+| T13 | Analytics | Bật log `FA` qua `adb`, ghi nốt như T02, test tự đọc `adb logcat` | `SAVED`, và logcat có `note_saved` kèm `mood`, `note_type`, không có nội dung nốt |
+| T14 | Xuất và tải lên | Tab Hành trình → Thẻ tuần → 'Lưu thẻ tuần (PDF)' | `UPLOADED` khi có bucket (`E2E_STORAGE_READY=1`), ngược lại `ERROR_MESSAGE` (câu lỗi + 'Thử lại') |
+| T15 | Đăng xuất, đăng nhập | Cài đặt → Đăng xuất → 'Đăng nhập bằng email' với tài khoản test | `OUT_WELCOME IN_TODAY` |
+| T16 | Đăng nhập lỗi | Đăng xuất → email đúng, mật khẩu sai → rồi mật khẩu đúng | `ERROR_SHOWN IN_TODAY` |
+| X01 | Khám phá | Profile Pro, khoảng 20 phút, agent tự đi khắp app | Danh sách `BUG: màn \| bước \| thấy gì` hoặc `NO_BUGS` |
+
+T13 chạy trước T03 vì T03 xoá nốt `E2E test note`. T15 và T16 đổi phiên đăng nhập nên
+đặt cuối file và cần `E2E_EMAIL`, `E2E_PASSWORD` (bỏ qua nếu thiếu). Mật khẩu đi qua model
+của agent, nên chỉ dùng tài khoản email tạo riêng cho test. X01 chỉ chạy với
+`-m exploratory`.
 
 T06 và T12 dùng thao tác ngoài app (chế độ máy bay, nút Home, thanh thông báo); T12 chạy
 không khoá vào gói app.
@@ -111,7 +124,10 @@ mong muốn, không phải để che lỗi của app.
 
 ## 6. Hạn chế và việc chưa làm
 
-- **Phiên khám phá 15–30 phút chưa chạy** (`pytest -m exploratory`, profile Pro).
+- **T13–T16 và X01 đã viết nhưng chưa chạy**, nên bảng ở mục 5 chưa có các ca này.
+  Chạy: `uv run pytest -k "t13 or t14 or t15 or t16"` và
+  `uv run pytest -m exploratory --runs 1 -s` (in danh sách lỗi để chép vào đây).
+- T14 chỉ kiểm tra nhánh lỗi cho tới khi có Storage bucket (gói Blaze).
 - Agent là mô hình ngôn ngữ nên kết quả có thể thay đổi giữa các lần; 3 lần mỗi ca chỉ cho
   ước lượng thô về độ ổn định.
 - Chỉ có một model (DeepSeek) và một thiết bị ảo; chưa thử điện thoại thật.
