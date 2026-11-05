@@ -1,4 +1,5 @@
 import 'challenge.dart';
+import 'image_ref.dart';
 import 'mood.dart';
 import 'note_type.dart';
 
@@ -15,6 +16,7 @@ class Note {
     this.challenge,
     this.groupId,
     this.isFirst = false,
+    this.image,
   });
 
   final String id;
@@ -41,6 +43,9 @@ class Note {
   /// Nốt đầu tiên của nhóm [groupId]: S04 hiện "Lần đầu tiên!".
   final bool isFirst;
 
+  /// Ảnh đính kèm trên Cloudinary, nếu có.
+  final ImageRef? image;
+
   @override
   bool operator ==(Object other) =>
       other is Note &&
@@ -53,7 +58,8 @@ class Note {
       other.pendingSync == pendingSync &&
       other.challenge == challenge &&
       other.groupId == groupId &&
-      other.isFirst == isFirst;
+      other.isFirst == isFirst &&
+      other.image == image;
 
   @override
   int get hashCode => Object.hash(
@@ -67,6 +73,7 @@ class Note {
     challenge,
     groupId,
     isFirst,
+    image,
   );
 }
 
@@ -80,6 +87,7 @@ class NoteDraft {
     this.challenge,
     this.groupId,
     this.isFirst = false,
+    this.image,
   });
 
   final NoteType type;
@@ -92,6 +100,9 @@ class NoteDraft {
   final String? groupId;
   final bool isFirst;
 
+  /// Ảnh đã tải lên Cloudinary, gắn vào nốt khi lưu.
+  final ImageRef? image;
+
   /// Có gì đáng giữ khi người dùng thoát giữa chừng.
   bool get hasInput =>
       mood != null || title.trim().isNotEmpty || body.trim().isNotEmpty;
@@ -101,6 +112,8 @@ class NoteDraft {
     Mood? mood,
     String? title,
     String? body,
+    ImageRef? image,
+    bool clearImage = false,
   }) => NoteDraft(
     type: type ?? this.type,
     mood: mood ?? this.mood,
@@ -109,6 +122,7 @@ class NoteDraft {
     challenge: challenge,
     groupId: groupId,
     isFirst: isFirst,
+    image: clearImage ? null : (image ?? this.image),
   );
 
   @override
@@ -117,10 +131,11 @@ class NoteDraft {
       other.type == type &&
       other.mood == mood &&
       other.title == title &&
-      other.body == body;
+      other.body == body &&
+      other.image == image;
 
   @override
-  int get hashCode => Object.hash(type, mood, title, body);
+  int get hashCode => Object.hash(type, mood, title, body, image);
 }
 
 /// Giới hạn độ dài do handout đặt (deviation D-02).

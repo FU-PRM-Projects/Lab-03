@@ -2,15 +2,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../models/image_ref.dart';
 import '../../models/mood.dart';
 import '../../models/note.dart';
 import '../../router/app_routes.dart';
 import '../../theme/app_tokens.dart';
 import '../../theme/app_typography.dart';
 import '../../utils/vi_date_format.dart';
+import '../../viewmodels/image_upload_view_model.dart';
 import '../../viewmodels/note_composer_view_model.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_dialog.dart';
+import '../../widgets/app_image_picker.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/app_top_bar.dart';
 import '../../widgets/mood_option.dart';
@@ -165,6 +168,8 @@ class _NoteComposerScreenState extends ConsumerState<NoteComposerScreen> {
                                 _ => _JournalStep(
                                   controller: _body,
                                   onChanged: _viewModel.setBody,
+                                  image: state.draft.image,
+                                  onRemoveImage: _viewModel.removeImage,
                                 ),
                               },
                             ),
@@ -508,15 +513,28 @@ class _GroupBadge extends StatelessWidget {
   }
 }
 
-class _JournalStep extends StatelessWidget {
-  const _JournalStep({required this.controller, required this.onChanged});
+class _JournalStep extends ConsumerWidget {
+  const _JournalStep({
+    required this.controller,
+    required this.onChanged,
+    required this.image,
+    required this.onRemoveImage,
+  });
 
   final TextEditingController controller;
   final ValueChanged<String> onChanged;
 
+  /// Ảnh đã đính kèm vào nháp.
+  final ImageRef? image;
+  final VoidCallback onRemoveImage;
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final upload = ref.watch(imageUploadViewModelProvider(ImageFolder.note));
+    final uploadViewModel = ref.read(
+      imageUploadViewModelProvider(ImageFolder.note).notifier,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -539,6 +557,15 @@ class _JournalStep extends StatelessWidget {
             fontWeight: FontWeight.w400,
             color: theme.colorScheme.onSurfaceVariant,
           ),
+        ),
+        Text('Đính ảnh (không bắt buộc)', style: theme.textTheme.labelLarge),
+        AppImagePicker(
+          upload: upload,
+          image: image,
+          previewLabel: 'Ảnh đính kèm của nốt',
+          onPick: uploadViewModel.pickAndUpload,
+          onCancel: uploadViewModel.cancel,
+          onRemove: onRemoveImage,
         ),
       ],
     );

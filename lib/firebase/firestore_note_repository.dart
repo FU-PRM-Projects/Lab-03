@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../models/challenge.dart';
+import '../models/image_ref.dart';
 import '../models/mood.dart';
 import '../models/note.dart';
 import '../models/note_type.dart';
@@ -59,6 +60,7 @@ class FirestoreNoteRepository implements NoteRepository {
       challenge: _toChallenge(data),
       groupId: data['groupId'] as String?,
       isFirst: data['isFirst'] == true,
+      image: ImageRef.fromMap(data['image']),
     );
   }
 
@@ -187,6 +189,7 @@ class FirestoreNoteRepository implements NoteRepository {
             'mood': ?draft.mood?.id,
             'createdAt': Timestamp.fromDate(createdAt),
             'groupId': ?draft.groupId,
+            'image': ?draft.image?.toMap(),
             if (draft.groupId != null && draft.isFirst) 'isFirst': true,
             if (draft.challenge case final c?) ...<String, Object?>{
               'challengeId': c.challengeId,
@@ -209,6 +212,7 @@ class FirestoreNoteRepository implements NoteRepository {
           challenge: draft.challenge,
           groupId: draft.groupId,
           isFirst: draft.groupId != null && draft.isFirst,
+          image: draft.image,
         );
       });
 
@@ -238,6 +242,7 @@ class FirestoreNoteRepository implements NoteRepository {
       challenge: before.challenge,
       groupId: before.groupId,
       isFirst: before.isFirst,
+      image: before.image,
     );
   });
 

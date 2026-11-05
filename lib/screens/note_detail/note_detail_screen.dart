@@ -13,6 +13,7 @@ import '../../viewmodels/note_detail_view_model.dart';
 import '../../viewmodels/view_state.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_dialog.dart';
+import '../../widgets/app_network_image.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/app_top_bar.dart';
 import '../../widgets/mascot.dart';
@@ -289,6 +290,11 @@ class _ReadView extends StatelessWidget {
                 ),
               ),
             ),
+            if (note.image != null)
+              AppNetworkImage.wide(
+                image: note.image,
+                semanticLabel: 'Ảnh đính kèm của nốt',
+              ),
             if (note.body.isNotEmpty)
               Text(
                 note.body,

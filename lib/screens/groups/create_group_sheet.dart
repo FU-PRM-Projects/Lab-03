@@ -2,10 +2,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../models/first_group.dart';
+import '../../models/image_ref.dart';
 import '../../theme/app_tokens.dart';
 import '../../viewmodels/error_messages.dart';
 import '../../viewmodels/groups_view_model.dart';
+import '../../viewmodels/image_upload_view_model.dart';
 import '../../widgets/app_button.dart';
+import '../../widgets/app_image_picker.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/quick_win_chip.dart';
 
@@ -30,6 +33,7 @@ class _CreateGroupSheet extends ConsumerStatefulWidget {
 class _CreateGroupSheetState extends ConsumerState<_CreateGroupSheet> {
   final _name = TextEditingController();
   GroupIdea _idea = GroupIdea.chienThang;
+  ImageRef? _image;
   bool _saving = false;
   String? _error;
 
@@ -47,7 +51,7 @@ class _CreateGroupSheetState extends ConsumerState<_CreateGroupSheet> {
     try {
       final group = await ref
           .read(groupsViewModelProvider.notifier)
-          .create(_name.text, _idea);
+          .create(_name.text, _idea, image: _image);
       if (mounted) Navigator.of(context).pop(group);
     } on Object catch (error) {
       if (!mounted) return;
@@ -61,6 +65,20 @@ class _CreateGroupSheetState extends ConsumerState<_CreateGroupSheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final upload = ref.watch(imageUploadViewModelProvider(ImageFolder.group));
+    final uploadViewModel = ref.read(
+      imageUploadViewModelProvider(ImageFolder.group).notifier,
+    );
+    // Ảnh vừa tải xong: giữ trong sheet, đưa khối chọn ảnh về đầu.
+    ref.listen(imageUploadViewModelProvider(ImageFolder.group), (previous, next) {
+      final image = next.image;
+      if (next.phase == ImageUploadPhase.done &&
+          image != null &&
+          previous?.phase != ImageUploadPhase.done) {
+        setState(() => _image = image);
+        uploadViewModel.reset();
+      }
+    });
     final check = ref.read(groupsViewModelProvider.notifier).check(_name.text);
     final (fieldError, primaryLabel) = switch (check) {
       GroupNameTaken(:final group) => (
@@ -74,7 +92,10 @@ class _CreateGroupSheetState extends ConsumerState<_CreateGroupSheet> {
       _ => (_error, 'Tạo nhóm'),
     };
     final canSubmit =
-        !_saving && check is! GroupNameEmpty && check is! GroupNameTooLong;
+        !_saving &&
+        !upload.busy &&
+        check is! GroupNameEmpty &&
+        check is! GroupNameTooLong;
 
     // Figma `Bottom sheet · Tạo nhóm lần đầu`: lề 16, các khối cách 16.
     return Padding(
@@ -126,6 +147,16 @@ class _CreateGroupSheetState extends ConsumerState<_CreateGroupSheet> {
                       onSelected: (_) => setState(() => _idea = idea),
                     ),
                 ],
+              ),
+              Text('Ảnh nhóm (không bắt buộc)', style: theme.textTheme.labelLarge),
+              AppImagePicker(
+                upload: upload,
+                image: _image,
+                previewLabel: 'Ảnh nhóm',
+                circle: true,
+                onPick: uploadViewModel.pickAndUpload,
+                onCancel: uploadViewModel.cancel,
+                onRemove: () => setState(() => _image = null),
               ),
               AppButton(
                 label: primaryLabel,
