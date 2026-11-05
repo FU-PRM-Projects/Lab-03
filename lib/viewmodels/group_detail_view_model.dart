@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/first_group.dart';
 import '../models/note.dart';
+import '../services/analytics_events.dart';
+import '../services/analytics_service.dart';
 import '../services/group_repository.dart';
 import '../services/note_repository.dart';
 import 'error_messages.dart';
@@ -53,6 +55,10 @@ class GroupDetailViewModel extends Notifier<ViewState<GroupDetail>> {
   GroupRepository get _groups => ref.read(groupRepositoryProvider);
   NoteRepository get _notes => ref.read(noteRepositoryProvider);
 
+  /// Màn tải lại mỗi khi danh sách nhóm đổi; chỉ ghi `group_viewed` một lần
+  /// cho mỗi lần mở.
+  bool _viewLogged = false;
+
   @override
   ViewState<GroupDetail> build() {
     final sub = _groups.watchAll().listen((_) => unawaited(_load()));
@@ -70,7 +76,22 @@ class GroupDetailViewModel extends Notifier<ViewState<GroupDetail>> {
       }
       final notes = await _notes.listByGroup(groupId);
       if (!ref.mounted) return;
-      state = Data<GroupDetail>(GroupDetail(group: group, notes: notes));
+      final detail = GroupDetail(group: group, notes: notes);
+      state = Data<GroupDetail>(detail);
+      if (!_viewLogged) {
+        _viewLogged = true;
+        // Chỉ loại nhóm và số nốt; không gửi tên nhóm (người dùng tự đặt).
+        unawaited(
+          ref.read(analyticsServiceProvider).track(
+            AnalyticsEvents.groupViewed,
+            <String, Object>{
+              AnalyticsParams.groupSource: group.source.id,
+              AnalyticsParams.groupIdea: group.idea.id,
+              AnalyticsParams.noteCount: detail.count,
+            },
+          ),
+        );
+      }
     } on Object catch (error) {
       if (ref.mounted) state = ErrorMessages.failure(error);
     }

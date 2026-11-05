@@ -10,6 +10,7 @@ abstract final class AnalyticsEvents {
   static const String reportExported = 'report_exported';
   static const String challengeOpened = 'challenge_opened';
   static const String noteViewed = 'note_viewed';
+  static const String groupViewed = 'group_viewed';
   static const String selfControlLogged = 'self_control_logged';
   static const String screenView = 'screen_view';
 }
@@ -24,5 +25,8 @@ abstract final class AnalyticsParams {
   static const String minutes = 'minutes';
   static const String format = 'format';
   static const String hasHabit = 'has_habit';
+  static const String groupSource = 'group_source';
+  static const String groupIdea = 'group_idea';
+  static const String noteCount = 'note_count';
   static const String screenName = 'firebase_screen';
 }
