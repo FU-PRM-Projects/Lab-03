@@ -4,6 +4,9 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lab03/firebase/cloudinary_image_service.dart';
+import 'package:lab03/firebase/device_image_picker_service.dart';
+import 'package:lab03/services/image_service.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'app.dart';
@@ -19,6 +22,7 @@ import 'firebase/firebase_remote_config_service.dart';
 import 'firebase/firestore_challenge_repository.dart';
 import 'firebase/firestore_group_repository.dart';
 import 'firebase/firestore_note_repository.dart';
+import 'firebase/firestore_profile_photo_repository.dart';
 import 'firebase/firestore_self_control.dart';
 import 'firebase/firestore_user_repository.dart';
 import 'firebase/local_nudge_service.dart';
@@ -35,6 +39,7 @@ import 'services/group_repository.dart';
 import 'services/messaging_service.dart';
 import 'services/note_repository.dart';
 import 'services/nudge_service.dart';
+import 'services/profile_photo_repository.dart';
 import 'services/remote_config_service.dart';
 import 'services/report_services.dart';
 import 'services/self_control_services.dart';
@@ -45,6 +50,14 @@ import 'services/user_repository.dart';
 /// google-services.json.
 const String _googleServerClientId = String.fromEnvironment(
   'GOOGLE_SERVER_CLIENT_ID',
+);
+const String _cloudinaryCloudName = String.fromEnvironment(
+  'CLOUDINARY_CLOUD_NAME',
+  defaultValue: 't7crbqj0',
+);
+const String _cloudinaryUploadPreset = String.fromEnvironment(
+  'CLOUDINARY_UPLOAD_PRESET',
+  defaultValue: 'PRM_Lab3',
 );
 
 /// Composition root: khởi tạo Firebase và gắn hiện thực Firebase vào từng
@@ -95,6 +108,21 @@ Future<void> main() async {
         ),
         storageServiceProvider.overrideWithValue(
           FirebaseStorageService(currentUid: uid),
+        ),
+        imagePickerServiceProvider.overrideWithValue(
+          DeviceImagePickerService(),
+        ),
+        imageServiceProvider.overrideWithValue(
+          CloudinaryImageService(
+            currentUid: uid,
+            cloudName: _cloudinaryCloudName,
+            uploadPreset: _cloudinaryUploadPreset,
+          ),
+        ),
+        // Không override thì dùng bản Noop: lưu avatar "thành công" nhưng không
+        // ghi gì vào `users/{uid}.photo`.
+        profilePhotoRepositoryProvider.overrideWithValue(
+          FirestoreProfilePhotoRepository(currentUid: uid),
         ),
         challengeRepositoryProvider.overrideWithValue(
           FirestoreChallengeRepository(currentUid: uid),

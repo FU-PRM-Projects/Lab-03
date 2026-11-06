@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/first_group.dart';
+import '../models/image_ref.dart';
 import '../models/mood.dart';
 import '../models/note.dart';
 import '../models/note_type.dart';
@@ -15,6 +16,7 @@ import '../services/group_repository.dart';
 import '../services/note_repository.dart';
 import '../services/remote_config_service.dart';
 import 'error_messages.dart';
+import 'image_upload_view_model.dart';
 import 'today_view_model.dart';
 
 /// Việc màn S03 làm khi người dùng bấm Back (handout mục 3).
@@ -113,6 +115,21 @@ class NoteComposerViewModel extends Notifier<NoteComposerState> {
   @override
   NoteComposerState build() {
     _openedAt = ref.read(clockProvider).now();
+    // Ảnh vừa tải lên xong: gắn vào nháp rồi đưa khối chọn ảnh về đầu.
+    ref.listen(imageUploadViewModelProvider(ImageFolder.note), (
+      previous,
+      next,
+    ) {
+      final image = next.image;
+      if (next.phase == ImageUploadPhase.done &&
+          image != null &&
+          previous?.phase != ImageUploadPhase.done) {
+        state = state.copyWith(draft: state.draft.copyWith(image: image));
+        ref
+            .read(imageUploadViewModelProvider(ImageFolder.note).notifier)
+            .reset();
+      }
+    });
     unawaited(_restoreDraft());
     if (args.groupId case final id?) unawaited(_loadGroup(id));
     return NoteComposerState(
@@ -164,6 +181,10 @@ class NoteComposerViewModel extends Notifier<NoteComposerState> {
   void setBody(String body) =>
       state = state.copyWith(draft: state.draft.copyWith(body: body));
 
+  /// "Gỡ ảnh": nốt lưu không kèm ảnh (ảnh cũ vẫn nằm trên Cloudinary).
+  void removeImage() =>
+      state = state.copyWith(draft: state.draft.copyWith(clearImage: true));
+
   void next() {
     if (!state.canContinue || state.step >= 3) return;
     state = state.copyWith(step: state.step + 1);
@@ -199,6 +220,9 @@ class NoteComposerViewModel extends Notifier<NoteComposerState> {
   /// (bước 3): lưu với nhật ký rỗng.
   Future<void> save({bool skipJournal = false}) async {
     if (state.saving || state.savedNoteId != null) return;
+    // Ảnh còn đang tải: `draft.image` chưa có, lưu lúc này sẽ tạo nốt không
+    // ảnh rồi rời màn hình làm huỷ luôn lần tải. Chờ tải xong (hoặc huỷ).
+    if (ref.read(imageUploadViewModelProvider(ImageFolder.note)).busy) return;
     final title = state.draft.title.trim();
     if (state.draft.mood == null ||
         title.isEmpty ||
@@ -214,6 +238,7 @@ class NoteComposerViewModel extends Notifier<NoteComposerState> {
       body: skipJournal ? '' : state.draft.body.trim(),
       groupId: group?.id,
       isFirst: group != null && group.noteCount == 0,
+      image: state.draft.image,
     );
 
     state = state.copyWith(saving: true, message: () => null);

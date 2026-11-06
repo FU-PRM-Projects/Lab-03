@@ -15,6 +15,7 @@ abstract final class AnalyticsEvents {
   static const String streakExtended = 'streak_extended';
   static const String streakShared = 'streak_shared';
   static const String screenView = 'screen_view';
+  static const String imageUploaded = 'image_uploaded';
 }
 
 abstract final class AnalyticsParams {
@@ -33,4 +34,6 @@ abstract final class AnalyticsParams {
   static const String groupIdea = 'group_idea';
   static const String noteCount = 'note_count';
   static const String screenName = 'firebase_screen';
+  static const String imageFolder = 'image_folder';
+  static const String fileSizeKb = 'file_size_kb';
 }

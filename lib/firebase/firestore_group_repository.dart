@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../models/first_group.dart';
+import '../models/image_ref.dart';
 import '../models/note.dart';
 import '../services/app_exception.dart';
 import '../services/group_repository.dart';
@@ -52,6 +53,7 @@ class FirestoreGroupRepository implements GroupRepository {
       firstAt: _date(data['firstAt']),
       lastAt: _date(data['lastAt']),
       createdAt: _date(data['createdAt']),
+      image: ImageRef.fromMap(data['image']),
     );
   }
 
@@ -59,6 +61,7 @@ class FirestoreGroupRepository implements GroupRepository {
     'name': group.name,
     'idea': group.idea.id,
     'source': group.source.id,
+    'image': ?group.image?.toMap(),
   };
 
   static Future<void> _write(Future<void> write) async {

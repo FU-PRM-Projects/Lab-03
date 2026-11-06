@@ -1,3 +1,5 @@
+import 'image_ref.dart';
+
 /// Ý của Nốt mà một nhóm lần đầu thuộc về (chip "Thuộc ý nào của Nốt?").
 enum GroupIdea {
   chienThang('chien_thang', 'Chiến thắng nhỏ'),
@@ -49,6 +51,7 @@ class FirstGroup {
     this.firstAt,
     this.lastAt,
     this.createdAt,
+    this.image,
   });
 
   final String id;
@@ -70,6 +73,9 @@ class FirstGroup {
   /// `null` khi nhóm hệ thống chưa được dùng (chỉ là gợi ý trên kệ).
   final DateTime? createdAt;
 
+  /// Ảnh nhóm trên Cloudinary (chọn lúc tạo nhóm), nếu có.
+  final ImageRef? image;
+
   /// Nhóm gợi ý chưa có nốt nào: thẻ viền đứt trên kệ.
   bool get isSuggestion => noteCount == 0;
 
@@ -84,6 +90,7 @@ class FirstGroup {
     firstAt: firstAt,
     lastAt: lastAt,
     createdAt: createdAt,
+    image: image,
   );
 
   @override
@@ -98,7 +105,8 @@ class FirstGroup {
       other.firstNoteTitle == firstNoteTitle &&
       other.firstAt == firstAt &&
       other.lastAt == lastAt &&
-      other.createdAt == createdAt;
+      other.createdAt == createdAt &&
+      other.image == image;
 
   @override
   int get hashCode => Object.hash(
@@ -112,6 +120,7 @@ class FirstGroup {
     firstAt,
     lastAt,
     createdAt,
+    image,
   );
 }
 

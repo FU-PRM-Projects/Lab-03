@@ -2,8 +2,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../models/first_group.dart';
+import '../models/image_ref.dart';
 import '../theme/app_tokens.dart';
 import '../utils/vi_date_format.dart';
+import 'app_network_image.dart';
 
 /// Component `Card/Nhóm lần đầu` (S05): Có nốt / Gợi ý / Tạo mới.
 ///
@@ -54,21 +56,31 @@ class GroupCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: AppSpace.s8,
         children: <Widget>[
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: scheme.primaryContainer,
-              borderRadius: BorderRadius.circular(10),
+          if (g?.image case final ImageRef image)
+            AppNetworkImage.square(
+              image: image,
+              semanticLabel: 'Ảnh nhóm',
+              size: 40,
+            )
+          else
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: scheme.primaryContainer,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              alignment: Alignment.center,
+              child: SvgPicture.asset(
+                create ? 'assets/icons/plus.svg' : 'assets/icons/phase.svg',
+                width: 20,
+                height: 20,
+                colorFilter: ColorFilter.mode(
+                  scheme.onSurface,
+                  BlendMode.srcIn,
+                ),
+              ),
             ),
-            alignment: Alignment.center,
-            child: SvgPicture.asset(
-              create ? 'assets/icons/plus.svg' : 'assets/icons/phase.svg',
-              width: 20,
-              height: 20,
-              colorFilter: ColorFilter.mode(scheme.onSurface, BlendMode.srcIn),
-            ),
-          ),
           Text(
             _title,
             style: theme.textTheme.bodyMedium?.copyWith(

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/image_ref.dart';
 import '../models/mood.dart';
 import '../models/note.dart';
 import '../models/note_type.dart';
@@ -30,6 +31,8 @@ class PrefsDraftStore implements DraftStore {
         mood: Mood.fromId(json['mood'] as String?),
         title: json['title'] as String? ?? '',
         body: json['body'] as String? ?? '',
+        // Nháp cũ chưa có khoá `image` → null, vẫn đọc được bình thường.
+        image: ImageRef.fromMap(json['image']),
       );
       return draft.hasInput ? draft : null;
     } on FormatException {
@@ -49,6 +52,7 @@ class PrefsDraftStore implements DraftStore {
       'mood': draft.mood?.id,
       'title': draft.title,
       'body': draft.body,
+      'image': draft.image?.toMap(),
     }),
   );
 

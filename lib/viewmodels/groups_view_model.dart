@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/first_group.dart';
+import '../models/image_ref.dart';
 import '../services/group_repository.dart';
 import 'auth_view_model.dart';
 import 'error_messages.dart';
@@ -119,7 +120,11 @@ class GroupsViewModel extends Notifier<ViewState<GroupShelfData>> {
 
   /// Tạo nhóm người dùng đặt tên. Trả nhóm vừa tạo, hoặc nhóm trùng tên có
   /// sẵn (không tạo thêm).
-  Future<FirstGroup> create(String name, GroupIdea idea) async {
+  Future<FirstGroup> create(
+    String name,
+    GroupIdea idea, {
+    ImageRef? image,
+  }) async {
     switch (check(name)) {
       case GroupNameTaken(:final group):
         return group;
@@ -135,6 +140,7 @@ class GroupsViewModel extends Notifier<ViewState<GroupShelfData>> {
       name: trimmed,
       idea: idea,
       source: GroupSource.user,
+      image: image,
     );
     await _groups.create(group);
     return group;

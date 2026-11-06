@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../models/image_ref.dart';
 import '../../models/self_control.dart';
 import '../../router/app_routes.dart';
 import '../../services/crash_reporter.dart';
@@ -11,10 +12,13 @@ import '../../services/remote_config_service.dart';
 import '../../theme/app_tokens.dart';
 import '../../utils/vi_date_format.dart';
 import '../../viewmodels/auth_view_model.dart';
+import '../../viewmodels/image_upload_view_model.dart';
+import '../../viewmodels/profile_photo_view_model.dart';
 import '../../viewmodels/settings_view_model.dart';
 import '../../viewmodels/view_state.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_dialog.dart';
+import '../../widgets/app_image_picker.dart';
 import '../../widgets/setting_row.dart';
 import '../../widgets/state_views.dart';
 import '../common/notification_inbox.dart';
@@ -60,6 +64,12 @@ class SettingsScreen extends ConsumerWidget {
         if (next.message != null && previous?.message != next.message) {
           snack(next.message!);
           viewModel.clearMessage();
+        }
+      })
+      ..listen(profilePhotoViewModelProvider, (previous, next) {
+        if (next.message != null && previous?.message != next.message) {
+          snack(next.message!);
+          ref.read(profilePhotoViewModelProvider.notifier).clearMessage();
         }
       });
 
@@ -179,6 +189,11 @@ class SettingsScreen extends ConsumerWidget {
               AppSpace.s24,
             ),
             children: <Widget>[
+              const SettingGroup(
+                label: 'ẢNH ĐẠI DIỆN',
+                children: <Widget>[_AvatarSection()],
+              ),
+              const SizedBox(height: AppSpace.s16),
               for (final section in settingsSection) ...<Widget>[
                 section,
                 const SizedBox(height: AppSpace.s16),
@@ -282,6 +297,39 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Khối đổi ảnh đại diện ở S12: chọn ảnh, tải lên Cloudinary rồi lưu vào hồ
+/// sơ (việc lưu do `ProfilePhotoViewModel` làm khi tải xong).
+class _AvatarSection extends ConsumerWidget {
+  const _AvatarSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final upload = ref.watch(imageUploadViewModelProvider(ImageFolder.avatar));
+    final uploadViewModel = ref.read(
+      imageUploadViewModelProvider(ImageFolder.avatar).notifier,
+    );
+    final profile = ref.watch(profilePhotoViewModelProvider);
+
+    return Material(
+      color: Theme.of(context).colorScheme.surfaceContainerLow,
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpace.s16),
+        child: AppImagePicker(
+          upload: upload,
+          image: profile.photo,
+          previewLabel: 'Ảnh đại diện hiện tại',
+          circle: true,
+          onPick: uploadViewModel.pickAndUpload,
+          onCancel: uploadViewModel.cancel,
+          onRemove: profile.saving
+              ? null
+              : ref.read(profilePhotoViewModelProvider.notifier).remove,
         ),
       ),
     );

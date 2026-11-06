@@ -4,6 +4,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../router/app_routes.dart';
 import '../../theme/app_tokens.dart';
+import '../../viewmodels/profile_photo_view_model.dart';
 import '../../widgets/add_note_fab.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_top_bar.dart';
@@ -87,6 +88,9 @@ class TabScaffold extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final photo = ref.watch(
+      profilePhotoViewModelProvider.select((state) => state.photo),
+    );
     return Scaffold(
       body: SafeArea(
         bottom: false,
@@ -97,6 +101,7 @@ class TabScaffold extends ConsumerWidget {
               title: title,
               onNotifications: () => openNotificationInbox(context, ref),
               onProfile: () => context.push(AppRoutes.settings),
+              photo: photo,
             ),
             Expanded(child: body),
           ],
