@@ -1694,3 +1694,26 @@ html, body, #root, .stage {
 .sem-why li {
   margin-bottom: 12px;
 }
+
+/* Cloudinary and streak slides: code shot next to a short list */
+.cld-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 24px;
+  align-items: start;
+  margin-top: 12px;
+}
+.cld-row figure {
+  margin: 0;
+}
+.cld-row figcaption {
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+.cld-row ul {
+  margin: 22px 0 0;
+  font-size: 19px;
+}
+.cld-row li {
+  margin-bottom: 10px;
+}

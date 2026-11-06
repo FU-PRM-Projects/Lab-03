@@ -31,6 +31,9 @@ const all = [
   ['sem-mood', 'widgets/mood_option.dart', 28, 34],
   ['sem-shortcut', 'widgets/shortcut_button.dart', 32, 36],
   ['sem-offline', 'widgets/offline_banner.dart', 22, 23],
+  // Ảnh trên Cloudinary và chuỗi ngày (PR #43, #46).
+  ['cld-upload', 'firebase/cloudinary_image_service.dart', 73, 86],
+  ['streak-count', 'utils/journey_stats.dart', 103, 113],
   // Bản xoá hộp thư FCM khi đăng xuất (736453a) đang ở nhánh này.
   ['signout', 'viewmodels/auth_view_model.dart', 120, 127, 'chore/submission-files'],
 ];

@@ -10,7 +10,7 @@ import {
   Tag,
   Bug,
   ChartColumn,
-  CloudUpload,
+  ImageUp,
   Database,
   KeyRound,
   SlidersHorizontal,
@@ -574,7 +574,7 @@ export default function App() {
           dense
           title="Overview"
           line="From the Lab 2 design to a cloud-connected Flutter app"
-          notes="Read left to right, this is how Lab 3 was built. One: start from the Lab 2 Figma design, all 12 screens and flows F1 to F3, including error states. Two: keep MVVM with Riverpod, so screens talk to ViewModels, ViewModels to services, and only lib/firebase imports the SDK. Three: wire in seven Firebase services, Auth, Firestore, Storage, Analytics, Crashlytics, Remote Config and Cloud Messaging, and tell the user in plain words when something fails. Four: back every claim with evidence someone else can check: Console screenshots, logs, ARTEMIS runs, all in evidence/."
+          notes="Read left to right, this is how Lab 3 was built. One: start from the Lab 2 Figma design, all 12 screens and flows F1 to F3, including error states. Two: keep MVVM with Riverpod, so screens talk to ViewModels, ViewModels to services, and only lib/firebase imports the SDK. Three: wire in the Firebase services, Auth, Firestore, Analytics, Crashlytics, Remote Config and Cloud Messaging; photos go to Cloudinary because Firebase Storage needs the paid Blaze plan; and tell the user in plain words when something fails. Four: back every claim with evidence someone else can check: Console screenshots, logs, ARTEMIS runs, all in evidence/."
         >
           <div className="stages">
             <figure className="st">
@@ -620,7 +620,7 @@ export default function App() {
                     [
                       [KeyRound, 'Auth'],
                       [Database, 'Firestore'],
-                      [CloudUpload, 'Storage'],
+                      [ImageUp, 'Cloudinary'],
                     ] as const
                   ).map(([Icon, name]) => (
                     <i key={name}>
@@ -632,7 +632,7 @@ export default function App() {
               </div>
               <figcaption>
                 <b><em>3</em> Firebase, round 1</b>
-                <span>Sign-in, notes in Firestore, weekly PDF to Storage</span>
+                <span>Sign-in, notes in Firestore, photos on Cloudinary</span>
               </figcaption>
             </figure>
 
@@ -940,6 +940,88 @@ export default function App() {
             </div>
           </div>
           <p className="foot">firebase/storage.rules · lib/firebase/report_impl.dart</p>
+        </Page>
+
+        <Page
+          dense
+          title="Photos on Cloudinary"
+          line="Why: Firebase Storage needs the paid Blaze plan, so profile, note and group photos are uploaded to Cloudinary"
+          notes="Firebase Storage now needs the Blaze plan to create a bucket, so we moved photo uploads to Cloudinary's free plan. Three places take a photo: the profile picture in Settings, a photo attached to a note in step 3, and a photo for a first-time group. The weekly PDF card still uses Firebase Storage and is covered on the previous slide. The app uploads with an unsigned upload preset, so no API secret is in the app; the format and size limits are set on the preset, and the app also refuses files over 5 MB. Each upload gets a random public id under not/avatars, not/notes or not/groups, so it cannot be guessed or overwritten. The upload streams its progress, as in the first screenshot, and can be cancelled. Firestore only keeps the reference, url and publicId; firestore.rules accepts it only as exactly those two keys with a secure URL on res.cloudinary.com (validImage, PR 47, tests R-16 to R-18). Errors show a message: no network, expired session, wrong file type or size. A successful upload logs image_uploaded with the folder and size."
+        >
+          <Gallery
+            cols={4}
+            height={300}
+            items={[
+              { src: 'app/cld-uploading.png', alt: 'Note step 3 uploading a photo at 0 percent with a cancel button', caption: '1 · Uploading, with progress' },
+              { src: 'app/cld-attached.png', alt: 'Photo attached to the note, loaded from Cloudinary', caption: '2 · Attached to the note' },
+              { src: 'app/cld-note.png', alt: 'Note detail showing the attached photo', caption: '3 · Saved note with its photo' },
+              { src: 'app/cld-avatar.png', alt: 'Settings with the new profile photo', caption: '4 · Profile photo in Settings' },
+            ]}
+          />
+          <div className="cld-row">
+            <figure>
+              <figcaption>
+                <b>Upload</b> · unsigned preset, random id <code>cloudinary_image_service.dart</code>
+              </figcaption>
+              <Crop src="code/cld-upload.png" alt="Upload form with upload_preset and a random public_id, posted to the Cloudinary upload API with send progress" natural={620} y={22} w={620} h={284} scale={0.56} />
+            </figure>
+            <ul>
+              <li>
+                <b>No secret in the app:</b> only the cloud name and an unsigned preset
+              </li>
+              <li>
+                <b>Firestore keeps the link only:</b> <code>{'{url, publicId}'}</code>, checked by <code>validImage</code> in the rules
+              </li>
+              <li>
+                <b>When it fails:</b> no Wi-Fi, expired session, wrong type or over 5 MB each show a message
+              </li>
+              <li>
+                <b>Not on Cloudinary:</b> the weekly PDF still goes to Firebase Storage
+              </li>
+            </ul>
+          </div>
+          <p className="foot">lib/firebase/cloudinary_image_service.dart · firebase/firestore.rules · evidence/cloudinary/</p>
+        </Page>
+
+        <Page
+          dense
+          title="Streak of days"
+          line="Counted from the notes themselves: no extra data in Firestore, so editing or deleting a note keeps it right"
+          notes="A new feature on top of the Lab 2 design, logged as deviation D-31. Today shows a streak card under the jar: the current streak, the record, the last seven days and how far the next milestone is. The milestones are 3, 7, 14, 30, 60, 100 and 365 days. When the first note of the day extends the streak, the saved screen celebrates; here it was the third day, so it says Mốc 3 ngày. The share button builds an image of the streak and opens the system share sheet. The streak is computed from the notes, by the same function as the statistics screen; if today has no note yet, it counts up to yesterday, so the streak does not break before the day ends. Two Analytics events: streak_extended and streak_shared. The shared image is also kept privately in users/uid/sharedStreaks."
+        >
+          <Gallery
+            cols={4}
+            height={300}
+            items={[
+              { src: 'app/streak-today.png', alt: 'Today with the streak card: 3 days, record 3, 4 days to the 7-day milestone', caption: '1 · Streak card on Today' },
+              { src: 'app/streak-milestone.png', alt: 'Saved screen celebrating the 3-day milestone', caption: '2 · Milestone on the saved screen' },
+              { src: 'app/streak-share.png', alt: 'Share screen with the streak image', caption: '3 · Share as an image' },
+              { src: 'app/streak-sharesheet.png', alt: 'Android share sheet with the streak image and text', caption: '4 · Android share sheet' },
+            ]}
+          />
+          <div className="cld-row">
+            <figure>
+              <figcaption>
+                <b>Counting the streak</b> <code>utils/journey_stats.dart</code>
+              </figcaption>
+              <Crop src="code/streak-count.png" alt="streak counts consecutive days with a note, starting from yesterday when today has none" natural={620} y={22} w={620} h={226} scale={0.56} />
+            </figure>
+            <ul>
+              <li>
+                <b>Milestones:</b> 3 · 7 · 14 · 30 · 60 · 100 · 365 days
+              </li>
+              <li>
+                <b>No penalty:</b> no note yet today still counts up to yesterday
+              </li>
+              <li>
+                <b>Same number everywhere:</b> Today, the saved screen and Statistics share one function
+              </li>
+              <li>
+                <b>Analytics:</b> <code>streak_extended</code>, <code>streak_shared</code> · deviation D-31
+              </li>
+            </ul>
+          </div>
+          <p className="foot">lib/utils/streak_stats.dart · lib/widgets/streak_card.dart · docs/design-traceability.md D-31 · evidence/streak/</p>
         </Page>
 
         <Page
