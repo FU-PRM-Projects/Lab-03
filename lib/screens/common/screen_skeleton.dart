@@ -9,6 +9,7 @@ import '../../widgets/add_note_fab.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_top_bar.dart';
 import 'note_kind_sheet.dart';
+import 'notification_inbox.dart';
 
 /// Một lối đi tới màn khác, dùng khi màn còn ở dạng khung.
 class SkeletonLink {
@@ -98,7 +99,7 @@ class TabScaffold extends ConsumerWidget {
           children: <Widget>[
             TabHeader(
               title: title,
-              onNotifications: () => context.push(AppRoutes.settings),
+              onNotifications: () => openNotificationInbox(context, ref),
               onProfile: () => context.push(AppRoutes.settings),
               photo: photo,
             ),

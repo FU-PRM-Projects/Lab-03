@@ -28,6 +28,7 @@ import 'firebase/firestore_user_repository.dart';
 import 'firebase/local_nudge_service.dart';
 import 'firebase/prefs_draft_store.dart';
 import 'firebase/report_impl.dart';
+import 'firebase/streak_share_impl.dart';
 import 'services/analytics_service.dart';
 import 'services/auth_service.dart';
 import 'services/challenge_repository.dart';
@@ -42,6 +43,7 @@ import 'services/profile_photo_repository.dart';
 import 'services/remote_config_service.dart';
 import 'services/report_services.dart';
 import 'services/self_control_services.dart';
+import 'services/streak_share_service.dart';
 import 'services/user_repository.dart';
 
 /// Web client ID (OAuth) cho Google Sign-In; để trống thì plugin đọc từ
@@ -101,6 +103,9 @@ Future<void> main() async {
         ),
         draftStoreProvider.overrideWithValue(PrefsDraftStore()),
         reportServiceProvider.overrideWithValue(const PdfReportService()),
+        streakShareServiceProvider.overrideWithValue(
+          FirebaseStreakShareService(currentUid: uid),
+        ),
         storageServiceProvider.overrideWithValue(
           FirebaseStorageService(currentUid: uid),
         ),

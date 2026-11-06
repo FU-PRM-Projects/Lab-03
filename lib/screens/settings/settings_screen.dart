@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart' show kReleaseMode;
+﻿import 'package:flutter/foundation.dart' show kReleaseMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
@@ -21,6 +21,7 @@ import '../../widgets/app_dialog.dart';
 import '../../widgets/app_image_picker.dart';
 import '../../widgets/setting_row.dart';
 import '../../widgets/state_views.dart';
+import '../common/notification_inbox.dart';
 import '../common/screen_skeleton.dart';
 
 /// S12 · Cài đặt (+ khu demo Firebase, deviation D-01).
@@ -80,33 +81,6 @@ class SettingsScreen extends ConsumerWidget {
         confirmLabel: 'Đăng xuất',
       );
       if (confirmed ?? false) await authViewModel.signOut();
-    }
-
-    Future<void> openInbox() async {
-      final service = ref.read(messagingServiceProvider);
-      var granted = await service.permission();
-      if (granted == NotificationPermission.notAsked) {
-        granted = await service.requestPermission();
-        ref.invalidate(notificationPermissionProvider);
-      }
-      if (!context.mounted) return;
-      if (granted == NotificationPermission.denied) {
-        final open = await showAppDialog(
-          context: context,
-          title: 'Nốt cần quyền thông báo',
-          message: 'Bạn đã tắt thông báo. Mở cài đặt của máy để bật lại.',
-          confirmLabel: 'Mở cài đặt',
-        );
-        if (open ?? false) await service.openSystemSettings();
-        return;
-      }
-      ref.invalidate(inboxProvider);
-      if (!context.mounted) return;
-      await showModalBottomSheet<void>(
-        context: context,
-        showDragHandle: true,
-        builder: (_) => const _InboxSheet(),
-      );
     }
 
     Future<void> pickReminder(UserSettings settings) async {
@@ -266,7 +240,7 @@ class SettingsScreen extends ConsumerWidget {
                         _ => 'Chạm để cho phép thông báo',
                       },
                       value: '',
-                      onTap: openInbox,
+                      onTap: () => openNotificationInbox(context, ref),
                     ),
                     SettingRow.value(
                       title: 'Remote Config',
@@ -323,73 +297,6 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Hộp thư các thông báo FCM đã nhận, mới nhất trước.
-class _InboxSheet extends ConsumerWidget {
-  const _InboxSheet();
-
-  static String _origin(MessageOrigin origin) => switch (origin) {
-    MessageOrigin.foreground => 'Đang mở app',
-    MessageOrigin.background => 'Từ nền',
-    MessageOrigin.terminated => 'App đã tắt',
-  };
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final inbox = ref.watch(inboxProvider);
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          AppSpace.s20,
-          0,
-          AppSpace.s20,
-          AppSpace.s20,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              'Thông báo đã nhận',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: AppSpace.s12),
-            ...switch (inbox) {
-              AsyncData(:final value) when value.isEmpty => <Widget>[
-                const Text(
-                  'Chưa có thông báo nào. Gửi thử từ Firebase Console.',
-                ),
-              ],
-              AsyncData(:final value) => <Widget>[
-                for (final item in value.take(6))
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: AppSpace.s12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          item.title.isEmpty
-                              ? '(không có tiêu đề)'
-                              : item.title,
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        Text(item.body),
-                        Text(
-                          '${_origin(item.origin)} · ${ViDateFormat.time(item.receivedAt)}',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  ),
-              ],
-              _ => const <Widget>[Text('Đang tải…')],
-            },
-          ],
         ),
       ),
     );

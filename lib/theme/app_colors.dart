@@ -92,6 +92,8 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.warning,
     required this.success,
     required this.switchOff,
+    required this.streak,
+    required this.streakContainer,
     required this.tintGray,
     required this.tintLavender,
     required this.moods,
@@ -105,6 +107,8 @@ class AppColors extends ThemeExtension<AppColors> {
     warning: AppPalette.warning,
     success: AppPalette.success,
     switchOff: AppPalette.switchOff,
+    streak: AppPalette.heat4,
+    streakContainer: AppPalette.tintOrange,
     tintGray: AppPalette.tintGray,
     tintLavender: AppPalette.tintLavender,
     moods: <Mood, Color>{
@@ -135,6 +139,12 @@ class AppColors extends ThemeExtension<AppColors> {
   final Color success;
   final Color switchOff;
 
+  /// Ngọn lửa và vòng ngày đã ghi của chuỗi ngày.
+  final Color streak;
+
+  /// Nền thẻ chuỗi ngày.
+  final Color streakContainer;
+
   /// Nền trạng thái lỗi và banner offline.
   final Color tintGray;
 
@@ -164,6 +174,8 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? warning,
     Color? success,
     Color? switchOff,
+    Color? streak,
+    Color? streakContainer,
     Color? tintGray,
     Color? tintLavender,
     Map<Mood, Color>? moods,
@@ -176,6 +188,8 @@ class AppColors extends ThemeExtension<AppColors> {
       warning: warning ?? this.warning,
       success: success ?? this.success,
       switchOff: switchOff ?? this.switchOff,
+      streak: streak ?? this.streak,
+      streakContainer: streakContainer ?? this.streakContainer,
       tintGray: tintGray ?? this.tintGray,
       tintLavender: tintLavender ?? this.tintLavender,
       moods: moods ?? this.moods,
