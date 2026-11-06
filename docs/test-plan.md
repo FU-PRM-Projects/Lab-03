@@ -91,8 +91,10 @@ Lượt chạy đầy đủ (36 lần, 62 phút): 31 đạt, 5 lỗi. Hai nhóm 
 | T10 | đạt | đạt | đạt | 3/3 | 33–40 s |
 | T11 | đạt | đạt | đạt | 3/3 | 13–19 s |
 | T12 | đạt (chạy lại) | đạt (chạy lại) | đạt (chạy lại) | 3/3 | 32–39 s |
+| T13 | đạt (chạy lại) | đạt (chạy lại) | đạt (chạy lại) | 3/3 | 66–119 s |
+| T14 | đạt | đạt | đạt | 3/3 | 41–71 s |
 
-Tổng: **35/36 lần đạt (97%)**. File kết quả: `evidence/artemis/junit-full-run.xml` và
+Tổng: **41/42 lần đạt (98%)**. T13 và T14 chạy ngày 06/11 (máy, model và profile như mục 2). File kết quả: `evidence/artemis/junit-full-run.xml`, `junit-t13-t14.xml`, `junit-rerun-t13.xml` và
 `junit-rerun-t05-t12.xml`.
 
 ### Các ca không đạt hoặc không ổn định
@@ -110,6 +112,40 @@ Tổng: **35/36 lần đạt (97%)**. File kết quả: `evidence/artemis/junit-
 Hai thay đổi khẳng định ở trên được làm sau khi thấy kết quả; chúng làm test đúng với hành vi
 mong muốn, không phải để che lỗi của app.
 
+- **T13 lần 1 (lỗi của fixture):** agent đã báo `SAVED` (bước cuối của phiên `05807d72`), nhưng
+  fixture `reported` đọc danh sách bước ngay khi phiên vừa xong, lúc bước cuối chưa được lưu, nên
+  nhận chuỗi rỗng. Thêm vòng thử lại (5 lần, cách 2 giây) rồi chạy lại T13 đủ 3 lần: 3/3. Lần
+  chạy đầu (2/3 cho T13) vẫn giữ trong `junit-t13-t14.xml`.
+- **T14:** chưa có Storage bucket nên kết quả đúng là câu báo lỗi kèm "Thử lại" (3/3). Khi có
+  bucket, đặt `E2E_STORAGE_READY=1` để T14 đòi tải lên thành công.
+
+### Phiên khám phá X01
+
+Chạy một lần ngày 06/11, profile Pro, 25 phút 38 giây, 112 bước (63 chạm, 12 vuốt, 10 phím,
+5 lần nhập chữ). Phiên `44655b9a`. Agent kết thúc ở màn Hôm nay, vẫn đăng nhập.
+
+Profile Pro không gọi `report_task_status`; câu trả lời nằm sau "Final answer:" trong phần suy
+nghĩ của bước cuối. Fixture chưa xử lý trường hợp này nên `junit-x01.xml` ghi lỗi
+`AttributeError`, dù phiên đã hoàn thành. Danh sách lỗi dưới đây chép nguyên văn từ server
+(`evidence/artemis/x01-bugs.txt`); fixture đã được sửa để đọc được câu trả lời này.
+
+| # | Màn | Agent báo | Nhóm đã kiểm tra chưa |
+|---|---|---|---|
+| X-01 | Mở lại app | Back ở Hôm nay để thoát rồi mở lại: hộp "Lab 03 isn't responding", phải bấm Wait | Chưa. Có thể do bản debug chạy JIT trên emulator |
+| X-02 | Hũ, xoay ngang | Nút "+" che chữ "Xem tất cả" | Chưa |
+| X-03 | Hôm nay, xoay ngang | Thẻ chuỗi ngày bị thanh tab che, hũ chiếm gần hết màn | Chưa |
+| X-04 | Hũ và Hôm nay | Số nốt tháng không khớp (22 và 21) cùng lúc | Chưa. Có thể do hai màn đếm khác thời điểm |
+| X-05 | Danh sách nhóm | Hai tên thẻ bị cắt "…" | Chưa. Thẻ nhóm hiện tên 1 dòng theo D-23 |
+| X-06 | Viết nhật ký | Ô trống hay chỉ khoảng trắng: nút "Xong" mờ, không giải thích; bộ đếm tính cả khoảng trắng | Chưa |
+| X-07 | Hũ | Chạm hình hũ không có phản hồi | Chưa |
+| X-08 | Sau khi lưu (thử thách, nhật ký, thở, nhóm) | Màn trắng chỉ có chữ "Đang tải" vài giây | Chưa |
+| X-09 | Hành trình, Lịch | Chú giải màu tâm trạng không ghi mức nào ứng với màu nào | Chưa |
+| X-10 | Hành trình, Năm | Lưới 12 tháng không có tên tháng, ô rất nhỏ | Chưa |
+
+Đây là những gì agent báo; nhóm chưa kiểm tra lại từng lỗi, nên chưa sửa lỗi nào. Trong phiên,
+agent đã tạo thêm vài nốt trên tài khoản test (số nốt tháng 11 tăng lên 21–22), dù mục tiêu chỉ
+cấm đăng xuất, xoá tài khoản và gửi ra ngoài app.
+
 ### Quan sát khi chạy
 
 - Trước khi tắt thanh viết tay của Gboard, agent bấm nhầm vào thanh này nên không gõ được chữ
@@ -120,13 +156,12 @@ mong muốn, không phải để che lỗi của app.
   vẫn đạt vì chỉ khẳng định màn đầu tiên.
 - Server không quay được video (thiếu `scrcpy`), nên trace không có video; bằng chứng là ảnh
   chụp emulator định kỳ và trang Workspace của ARTEMIS.
-- Chưa tìm thấy lỗi nào của app qua các ca này.
+- T01–T14 không tìm thấy lỗi nào của app; X01 báo 10 lỗi (ở trên), chưa kiểm tra lại.
 
 ## 6. Hạn chế và việc chưa làm
 
-- **T13–T16 và X01 đã viết nhưng chưa chạy**, nên bảng ở mục 5 chưa có các ca này.
-  Chạy: `uv run pytest -k "t13 or t14 or t15 or t16"` và
-  `uv run pytest -m exploratory --runs 1 -s` (in danh sách lỗi để chép vào đây).
+- **T15 và T16 chưa chạy**: cần một tài khoản email chỉ dùng cho test.
+  Đặt `E2E_EMAIL`, `E2E_PASSWORD` rồi chạy `uv run pytest -k "t15 or t16"`.
 - T14 chỉ kiểm tra nhánh lỗi cho tới khi có Storage bucket (gói Blaze).
 - Agent là mô hình ngôn ngữ nên kết quả có thể thay đổi giữa các lần; 3 lần mỗi ca chỉ cho
   ước lượng thô về độ ổn định.

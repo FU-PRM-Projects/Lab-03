@@ -1,0 +1,14 @@
+ARTEMIS X01 exploratory session 44655b9a-d26d-4218-b17e-2ea5e17aff9e
+Profile: pro, 2026-11-06, 25 min 38 s, 112 steps (63 taps, 12 swipes, 10 key presses, 5 text inputs)
+Agent final answer (verbatim):
+
+BUG: Màn khởi động app | Bấm BACK ở tab Hôm nay (root) để thoát app rồi mở lại app | App treo, hệ thống hiện hộp thoại "Lab 03 isn't responding" (Close app / Wait) — không render được màn hình sau cold start, phải bấm "Wait" mới hồi phục
+BUG: Màn Hũ (xoay ngang) | Xoay màn hình sang ngang khi đang ở tab Hũ | Nút FAB "+" (Ghi nốt) đè lên link "Xem tất cả" — chỉ đọc được "Xem", phần "tất cả" bị FAB che
+BUG: Màn Hôm nay (xoay ngang) | Xoay màn hình sang ngang khi đang ở tab Hôm nay | Thẻ "Chuỗi 3 ngày / Kỷ lục 3" nằm dưới thanh điều hướng dưới, mép trên bị bottom bar che; hũ phóng to chiếm gần hết viewport khiến các thẻ bên dưới gần như không dùng được
+BUG: Màn Hũ vs tab Hôm nay | So sánh bộ đếm nốt tháng ở 2 màn cùng thời điểm | Số nốt không khớp: "Hũ của bạn" ghi "22 nốt tháng 11" nhưng thẻ hũ ở tab Hôm nay ghi "21 nốt tháng này"
+BUG: Màn "Nhóm lần đầu" (danh sách nhóm) | Mở danh sách nhóm từ màn nhóm "Bắt chuyện" | 2 tiêu đề thẻ bị cắt bằng "..." ("Lên tiếng tron…", "Vận động một …") trong khi các thẻ khác hiện đủ chữ
+BUG: Editor "Viết nhật ký" | Bấm "Xong" khi ô nhập để trống hoặc chỉ có khoảng trắng | Không có phản hồi và không có câu báo lỗi giải thích lý do; counter vẫn đếm khoảng trắng (8/2000) trong khi nút "Xong" vẫn disabled — người dùng không biết vì sao không lưu được
+BUG: Màn Hũ | Bấm vào hình minh hoạ hũ | Không có phản hồi gì (không mở chi tiết hũ, không đổi trạng thái) — hình trông như bấm được nhưng là nút chết
+BUG: Nhiều màn sau khi lưu nốt (thử thách / nhật ký / thở / nhóm) | Bấm nút lưu | Hiện màn trắng toàn màn hình chỉ có chữ "Đang tải", không có app bar/bottom bar, kéo dài vài giây trước khi ra màn kết quả
+BUG: Hành trình → sub-tab "Lịch" | Xem chú giải màu cảm xúc dưới lịch tháng | Chú giải chỉ có nhãn chữ ở 2 đầu, không ghi rõ mức nào ứng với màu nào — khó hiểu khi đọc lịch
+BUG: Hành trình → toggle "Năm" | Xem lưới 12 tháng | Lưới tháng không có tên/số tháng, các ô rất nhỏ nên gần như không đọc được tháng nào là tháng nào

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="6" time="633.632" timestamp="2026-11-06T13:39:36.953482+07:00" hostname="LAPTOP-LMIGRD44"><testcase classname="test_main_flows" name="test_t13_analytics_note_saved_is_logged[run1]" time="250.127"><failure message="AssertionError: '' (trace 05807d72-af42-451e-8cbe-b3b7864fc996)&#10;assert 'SAVED' in ''">ask = &lt;function ask.&lt;locals&gt;.run at 0x000001DB2F884300&gt;
+
+    async def test_t13_analytics_note_saved_is_logged(ask) -&gt; None:
+        """Analytics: lưu nốt xong thì sự kiện `note_saved` được ghi (đọc từ logcat).
+    
+        Agent chỉ thấy màn hình, nên test bật log chi tiết của Firebase Analytics
+        (tag FA, FA-SVC) rồi tự đọc logcat. Bản chạy Emulator in `[analytics]` với tag
+        flutter. Chạy trước T03 vì T03 xoá nốt `E2E test note`.
+        """
+        for tag in ("FA", "FA-SVC"):
+            adb("shell", "setprop", f"log.tag.{tag}", "VERBOSE")
+        adb("logcat", "-c")
+        answer, result = await ask(
+            "Ở màn Hôm nay, bấm 'Ghi nốt'. Chọn ghi một điều làm được (không phải nhật ký), "
+            f"chọn một tâm trạng bất kỳ, gõ đúng chữ '{NOTE_TEXT}' vào ô nội dung, bỏ qua "
+            "phần kể thêm rồi bấm lưu. Trả lời SAVED nếu màn xác nhận đã lưu hiện ra, ngược "
+            "lại FAILED." + RULES,
+            "SAVED hoặc FAILED",
+        )
+&gt;       assert "SAVED" in answer, f"{answer!r} (trace {result.trace_id})"
+E       AssertionError: '' (trace 05807d72-af42-451e-8cbe-b3b7864fc996)
+E       assert 'SAVED' in ''
+
+test_main_flows.py:111: AssertionError</failure></testcase><testcase classname="test_main_flows" name="test_t13_analytics_note_saved_is_logged[run2]" time="103.422" /><testcase classname="test_main_flows" name="test_t13_analytics_note_saved_is_logged[run3]" time="114.848" /><testcase classname="test_main_flows" name="test_t14_export_weekly_card[run1]" time="70.653" /><testcase classname="test_main_flows" name="test_t14_export_weekly_card[run2]" time="41.188" /><testcase classname="test_main_flows" name="test_t14_export_weekly_card[run3]" time="52.593" /></testsuite></testsuites>
