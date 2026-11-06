@@ -1498,7 +1498,7 @@ export default function App() {
           dense
           title="ARTEMIS: exploratory session"
           line="X01 · Pro profile · 25 min 38 s · 112 steps · the agent reported 10 issues; we have not checked them yet"
-          notes="X01 is the free exploratory session. The agent got one goal: explore Nốt for about 20 minutes like a curious new user, try odd input, rotate the screen, press Back a lot, and list every problem as a BUG line. It ran with the Pro profile for 25 minutes 38 seconds and 112 steps, and ended on Today, still signed in. These are the agent's reports, copied from the server; we have not verified or fixed them yet, so they are candidates, not confirmed bugs. Some have likely explanations: the not responding dialog may come from the debug build on the emulator, the count mismatch from two screens loading at different moments, and the cut group names from the one-line design in D-23. Two things went wrong on our side: the Pro profile does not call report_task_status, so our fixture failed to read the answer and the JUnit file shows an error although the session completed; the fixture now reads the final answer. And the agent created several notes on the test account although that was not forbidden in the goal. Full list: docs/test-plan.md section 5 and evidence/artemis/x01-bugs.txt."
+          notes="X01 is the free exploratory session. The agent got one goal: explore Nốt for about 20 minutes like a curious new user, try odd input, rotate the screen, press Back a lot, and list every problem as a BUG line. It ran with the Pro profile for 25 minutes 38 seconds and 112 steps, and ended on Today, still signed in. These are the agent's reports, copied from the server; we have not verified or fixed them yet, so they are candidates, not confirmed bugs. Some have likely explanations: the not responding dialog may come from the debug build on the emulator, the count mismatch from two screens loading at different moments, and the cut group names from the one-line design in D-23. Two things went wrong on our side: the Pro profile does not call report_task_status, so our fixture failed to read the answer and the JUnit file shows an error although the session completed; the fixture now reads the final answer. And the agent created several notes on the test account although that was not forbidden in the goal; together with two notes left by T13 they were deleted afterwards, first with T03 and then by hand, so the jar is back to the 9 notes it had before testing. Full list: docs/test-plan.md section 5 and evidence/artemis/x01-bugs.txt."
         >
           <div className="x01">
             <table>
@@ -1548,6 +1548,10 @@ export default function App() {
               <p>
                 <b>Our side:</b> the Pro profile answers without <code>report_task_status</code>, so the
                 JUnit file shows a fixture error; the fixture now reads the final answer.
+              </p>
+              <p>
+                <b>Clean-up:</b> the runs left 7 test notes on the account; T03 and a manual pass
+                removed them (back to 9 notes this month).
               </p>
             </div>
           </div>

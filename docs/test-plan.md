@@ -144,7 +144,7 @@ nghĩ của bước cuối. Fixture chưa xử lý trường hợp này nên `ju
 
 Đây là những gì agent báo; nhóm chưa kiểm tra lại từng lỗi, nên chưa sửa lỗi nào. Trong phiên,
 agent đã tạo thêm vài nốt trên tài khoản test (số nốt tháng 11 tăng lên 21–22), dù mục tiêu chỉ
-cấm đăng xuất, xoá tài khoản và gửi ra ngoài app.
+cấm đăng xuất, xoá tài khoản và gửi ra ngoài app. Sau khi chạy, T03 xoá các nốt `E2E test note`; 7 nốt test còn lại (5 của X01, 2 của T13 mà agent đặt tên bằng chip gợi ý) được xoá tay, nên hũ tháng 11 về lại 9 nốt như trước khi test. Thẻ nhóm "Bắt chuyện" vẫn ghi 1 nốt vì số đếm của nhóm không giảm khi xoá nốt.
 
 ### Quan sát khi chạy
 
