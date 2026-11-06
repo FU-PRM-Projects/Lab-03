@@ -8,13 +8,25 @@ service cloud.firestore {
     }
     function isAdmin() { return signedIn() && roleOf(request.auth.uid) == 'admin'; }
 
+    // An image uploaded to Cloudinary (ImageRef): exactly a secure URL on
+    // res.cloudinary.com and its public id. The bytes live on Cloudinary;
+    // Firestore only keeps the reference.
+    function validImage(image) {
+      return image is map
+        && image.keys().hasOnly(['url', 'publicId'])
+        && image.keys().hasAll(['url', 'publicId'])
+        && image.url is string && image.url.size() <= 500
+        && image.url.matches('https://res[.]cloudinary[.]com/.+')
+        && image.publicId is string && image.publicId.size() >= 1 && image.publicId.size() <= 200;
+    }
+
     // A valid note: known type and mood, title 1-120 chars, journal <= 2000
     // chars (handout limits, deviation D-02).
     function validNote(note) {
       return note.keys().hasAll(['type', 'title', 'createdAt'])
         && note.keys().hasOnly(['type', 'title', 'body', 'mood', 'createdAt',
                                 'challengeId', 'subtype', 'outcome', 'anxietyBefore', 'anxietyAfter', 'minutes',
-                                'groupId', 'isFirst'])
+                                'groupId', 'isFirst', 'image'])
         && note.type in ['chien_thang', 'tu_chu', 'thu_thach', 'nhat_ky']
         && note.title is string && note.title.size() >= 1 && note.title.size() <= 120
         && (!('body' in note) || (note.body is string && note.body.size() <= 2000))
@@ -26,7 +38,8 @@ service cloud.firestore {
         && (!('anxietyAfter' in note) || (note.anxietyAfter is int && note.anxietyAfter >= 1 && note.anxietyAfter <= 5))
         && (!('minutes' in note) || (note.minutes is int && note.minutes >= 0 && note.minutes <= 600))
         && (!('groupId' in note) || (note.groupId is string && note.groupId.size() >= 1 && note.groupId.size() <= 64))
-        && (!('isFirst' in note) || note.isFirst is bool);
+        && (!('isFirst' in note) || note.isFirst is bool)
+        && (!('image' in note) || validImage(note.image));
     }
 
     // A "first time" group: name 1-24 chars, one of Not's five ideas, a
@@ -34,12 +47,13 @@ service cloud.firestore {
     function validGroup(group) {
       return group.keys().hasAll(['name', 'idea', 'source', 'noteCount'])
         && group.keys().hasOnly(['name', 'idea', 'source', 'noteCount', 'firstNoteId',
-                                 'firstNoteTitle', 'firstAt', 'lastAt', 'createdAt'])
+                                 'firstNoteTitle', 'firstAt', 'lastAt', 'createdAt', 'image'])
         && group.name is string && group.name.size() >= 1 && group.name.size() <= 24
         && group.idea in ['chien_thang', 'nhat_ky', 'tu_chu', 'nguoi_la', 'van_dong']
         && group.source in ['system', 'user', 'ai_suggested']
         && group.noteCount is int && group.noteCount >= 0
-        && (!('firstNoteTitle' in group) || (group.firstNoteTitle is string && group.firstNoteTitle.size() <= 120));
+        && (!('firstNoteTitle' in group) || (group.firstNoteTitle is string && group.firstNoteTitle.size() <= 120))
+        && (!('image' in group) || validImage(group.image));
     }
 
     // Challenge catalog: read-only for signed-in users; staff manage it from
@@ -52,9 +66,15 @@ service cloud.firestore {
     match /users/{uid} {
       allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
       allow create: if signedIn() && request.auth.uid == uid
-                    && request.resource.data.role == 'user';
-      allow update: if isAdmin()
-                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['role']);
+                    && request.resource.data.role == 'user'
+                    && (!('photo' in request.resource.data) || validImage(request.resource.data.photo));
+      // Admin changes the role; the owner changes only their profile photo
+      // (set or removed), never the role.
+      allow update: if (isAdmin()
+                       && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['role']))
+                    || (isOwner(uid)
+                       && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['photo'])
+                       && (!('photo' in request.resource.data) || validImage(request.resource.data.photo)));
 
       match /notes/{noteId} {
         allow read, delete: if isOwner(uid);

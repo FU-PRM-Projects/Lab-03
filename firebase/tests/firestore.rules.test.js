@@ -6,7 +6,7 @@ const {
   assertSucceeds,
   assertFails,
 } = require('@firebase/rules-unit-testing');
-const { doc, getDoc, setDoc, updateDoc, deleteDoc, Timestamp } = require('firebase/firestore');
+const { doc, getDoc, setDoc, updateDoc, deleteDoc, deleteField, Timestamp } = require('firebase/firestore');
 
 let env;
 before(async () => {
@@ -140,4 +140,40 @@ test('R-14 user keeps "first time" groups; names and ideas are checked', async (
   await assertSucceeds(setDoc(doc(db, 'users/alice/notes/g1'), note({ groupId: 'bat-chuyen', isFirst: true })));
   await assertFails(setDoc(doc(db, 'users/alice/notes/g2'), note({ groupId: '', isFirst: true })));
   await assertSucceeds(deleteDoc(doc(db, 'users/alice/groups/bat-chuyen')));
+});
+
+// Images uploaded to Cloudinary are stored as an ImageRef { url, publicId }.
+const image = (extra = {}) => ({
+  url: 'https://res.cloudinary.com/t7crbqj0/image/upload/v1/not/notes/abc123.jpg',
+  publicId: 'not/notes/abc123',
+  ...extra,
+});
+
+test('R-16 notes may carry a Cloudinary image; other images are rejected', async () => {
+  const db = env.authenticatedContext('alice').firestore();
+  await assertSucceeds(setDoc(doc(db, 'users/alice/notes/i1'), note({ image: image() })));
+  await assertFails(setDoc(doc(db, 'users/alice/notes/i2'), note({ image: image({ url: 'https://evil.example/x.jpg' }) })));
+  await assertFails(setDoc(doc(db, 'users/alice/notes/i3'), note({ image: image({ extra: 1 }) })));
+  await assertFails(setDoc(doc(db, 'users/alice/notes/i4'), note({ image: 'https://res.cloudinary.com/x.jpg' })));
+  await assertFails(setDoc(doc(env.authenticatedContext('bob').firestore(), 'users/alice/notes/i5'), note({ image: image() })));
+});
+test('R-17 groups may carry a Cloudinary image', async () => {
+  const db = env.authenticatedContext('alice').firestore();
+  const group = (extra = {}) => ({ name: 'Leo núi', idea: 'van_dong', source: 'user', noteCount: 0, ...extra });
+  await assertSucceeds(setDoc(doc(db, 'users/alice/groups/leo-nui'), group({ image: image({ publicId: 'not/groups/g1' }) })));
+  await assertFails(setDoc(doc(db, 'users/alice/groups/leo-nui-2'), group({ image: image({ publicId: '' }) })));
+});
+test('R-18 owner sets and removes own profile photo, but cannot touch role or others', async () => {
+  const alice = env.authenticatedContext('alice').firestore();
+  await env.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), 'users/erin'), { role: 'user' }));
+  const erin = env.authenticatedContext('erin').firestore();
+  const photo = image({ publicId: 'not/avatars/p1' });
+  await assertSucceeds(updateDoc(doc(erin, 'users/erin'), { photo }));
+  await assertSucceeds(updateDoc(doc(erin, 'users/erin'), { photo: deleteField() }));
+  await assertFails(updateDoc(doc(erin, 'users/erin'), { photo, role: 'admin' }));
+  await assertFails(updateDoc(doc(erin, 'users/erin'), { photo: image({ url: 'http://res.cloudinary.com/x.jpg' }) }));
+  await assertFails(updateDoc(doc(alice, 'users/erin'), { photo }));
+  // First sign-in failed earlier: the app creates the profile with the photo.
+  const frank = env.authenticatedContext('frank').firestore();
+  await assertSucceeds(setDoc(doc(frank, 'users/frank'), { role: 'user', photo }));
 });
