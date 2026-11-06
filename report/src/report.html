@@ -7,16 +7,16 @@
 <style>
   @page {
     size: A4;
-    margin: 16mm 16mm 16mm 16mm;
+    margin: 13mm 14mm 14mm 14mm;
     @bottom-right { content: counter(page) ' / ' counter(pages); font: 9pt 'Segoe UI', sans-serif; color: #777; }
     @bottom-left { content: 'PRM393 Lab 3 · Nốt · Final report · SE190992'; font: 9pt 'Segoe UI', sans-serif; color: #777; }
   }
   @page :first { @bottom-left { content: none; } @bottom-right { content: none; } }
   :root { --ink: #1f2330; --muted: #5d6475; --line: #dfe2ea; --brand: #4f46e5; --soft: #f4f5fb; --bad: #c92a2a; }
   * { box-sizing: border-box; }
-  body { font: 10pt/1.48 'Segoe UI', 'Be Vietnam Pro', sans-serif; color: var(--ink); margin: 0; text-align: justify; hyphens: auto; }
+  body { font: 9.5pt/1.42 'Segoe UI', 'Be Vietnam Pro', sans-serif; color: var(--ink); margin: 0; text-align: justify; hyphens: auto; }
   h1 { font-size: 21pt; margin: 0 0 4px; }
-  h2 { font-size: 14pt; margin: 18px 0 6px; padding-bottom: 3px; border-bottom: 2px solid var(--brand); break-after: avoid; text-align: left; }
+  h2 { font-size: 13.5pt; margin: 14px 0 5px; padding-bottom: 3px; border-bottom: 2px solid var(--brand); break-after: avoid; text-align: left; }
   h3 { font-size: 11pt; margin: 12px 0 4px; break-after: avoid; text-align: left; }
   p { margin: 4px 0 7px; }
   ul, ol { margin: 4px 0 7px; padding-left: 18px; }
@@ -34,8 +34,8 @@
   figcaption { font-size: 8.4pt; color: var(--muted); margin-top: 3px; text-align: left; }
   .row { display: flex; gap: 10px; align-items: flex-start; break-inside: avoid; }
   .row > figure { flex: 1; min-width: 0; }
-  .phone img { height: 210px; width: auto; margin: 0 auto; }
-  .phone.sm img { height: 170px; }
+  .phone img { height: 185px; width: auto; margin: 0 auto; }
+  .phone.sm img { height: 145px; }
   .note { background: var(--soft); border-left: 4px solid var(--brand); padding: 6px 10px; margin: 6px 0 9px; font-size: 9.3pt; break-inside: avoid; }
   .warn { border-left-color: var(--bad); background: #fff5f5; }
   .fail td { color: var(--bad); }
@@ -115,11 +115,11 @@
   <tr><td><b>F2</b> Self-control</td><td>S02 → S09 → S04; when it is hard to stop: "Stress?" → S10 90-second breathing → S04</td><td>"Mình lỡ lướt quá đà" (I scrolled too much) is a recovery branch, not a failure; the habit list can be locked behind <code>local_auth</code></td></tr>
   <tr><td><b>F3</b> Challenges</td><td>S07 card deck → S08 detail → S04 → S07</td><td>Switch to an easier card; postpone (nothing is lost); an outcome "Không như ý" (did not go well) still counts as having tried</td></tr>
 </table>
-<p>Besides F1–F3 the traceability file tracks eight supporting flows (P1–P8: first sign-in, email sign-up, exercise log, long journal, view/edit/delete a note, a bad week, notification deep link, settings) and three state flows (T1 empty jar, T2 offline or load error, T3 loading). Their status is in <code>docs/design-traceability.md</code> §2; two are partial (P4 keeps no draft when the app is killed; P7 and P8 depend on FCM, done in Stage 5). The code base has <b>240 unit and widget tests</b>, all passing, and <code>flutter analyze</code> reports no issues; CI runs both on every pull request (<code>.github/workflows/</code>).</p>
+<p>Besides F1–F3 the traceability file tracks eight supporting flows (P1–P8: first sign-in, email sign-up, exercise log, long journal, view/edit/delete a note, a bad week, notification deep link, settings) and three state flows (T1 empty jar, T2 offline or load error, T3 loading). Their status is in <code>docs/design-traceability.md</code> §2; two are partial (P4 keeps no draft when the app is killed; P7 and P8 depend on FCM, done in Stage 5). After Lab 2 the team added two things: <b>photos</b> on notes, groups and the profile, stored on Cloudinary (§5.4), and a <b>streak of days</b> that rewards writing a note every day (§2.1). The code base has <b>250 unit and widget tests</b>, all passing, and <code>flutter analyze</code> reports no issues; CI runs both on every pull request (<code>.github/workflows/</code>).</p>
 
 <!-- ============================== 2 ============================== -->
 <h2>2. Design traceability and deviations</h2>
-<p><code>docs/design-traceability.md</code> is the matrix between the Lab 2 design and the code. Section 1 maps each of the 12 screens (plus their dialogs, sheets and states) to a route, a screen widget, a ViewModel and a data source. Section 2 maps flows to screens and tests, section 3 maps each Figma component on page "05 Components" to a widget, and section 4 maps each token to the theme. Section 5 is the list of deviations: <b>30 entries, D-01 to D-30</b>, each with the Lab 2 design, what the app does, the reason and whether the Figma file has been updated.</p>
+<p><code>docs/design-traceability.md</code> is the matrix between the Lab 2 design and the code. Section 1 maps each of the 12 screens (plus their dialogs, sheets and states) to a route, a screen widget, a ViewModel and a data source. Section 2 maps flows to screens and tests, section 3 maps each Figma component on page "05 Components" to a widget, and section 4 maps each token to the theme. Section 5 is the list of deviations: <b>31 entries, D-01 to D-31</b>, each with the Lab 2 design, what the app does, the reason and whether the Figma file has been updated.</p>
 <p>The deviations fall into four groups:</p>
 <table>
   <tr><th style="width:24%">Group</th><th style="width:22%">Entries</th><th>Example and reason</th></tr>
@@ -133,6 +133,14 @@
   <figure class="phone sm"><img src="../../slide/public/app/s03b.png" alt="S03b app" /><figcaption>S03b in the app: D-28 label, D-02 counter</figcaption></figure>
   <figure class="phone sm"><img src="../../slide/public/figma/s11b.png" alt="S11b Figma" /><figcaption>S11b in Figma</figcaption></figure>
   <figure class="phone sm"><img src="../../slide/public/app/s11b.png" alt="S11b app" /><figcaption>S11b in the app: previous 30 days (D-18), chart fits the card (D-09)</figcaption></figure>
+</div>
+<h3>2.1 Added after Lab 2: streak of days (D-31)</h3>
+<p>Lab 2 only showed a "streak" number inside the statistics screen, where the persona rarely looks. Because the streak is what brings Minh back each evening, it moved to the places he sees every day. Today (S02) has a streak card under the jar with the current streak, the record, the last seven days and the distance to the next milestone (3, 7, 14, 30, 60, 100, 365 days). When the first note of the day extends the streak, the saved screen (S04) celebrates, and the streak can be shared as an image through the Android share sheet. Nothing new is stored for the streak: it is computed from the notes by the same function as the statistics screen (<code>JourneyStats.streak</code>), so editing or deleting a note keeps it right. If today has no note yet, it counts up to yesterday, so the streak never breaks before the day is over (no penalty, as <code>DESIGN.md</code> asks). Only the shared image is kept, privately, in <code>users/{uid}/sharedStreaks</code>.</p>
+<div class="row">
+  <figure class="phone sm"><img src="../../evidence/streak/streak-today.png" alt="" /><figcaption>S02 streak card: 3 days, 4 to the next milestone</figcaption></figure>
+  <figure class="phone sm"><img src="../../evidence/streak/streak-milestone.png" alt="" /><figcaption>S04 after the third day: "Mốc 3 ngày!"</figcaption></figure>
+  <figure class="phone sm"><img src="../../evidence/streak/streak-share.png" alt="" /><figcaption>Share screen with the streak image</figcaption></figure>
+  <figure class="phone sm"><img src="../../evidence/streak/streak-sharesheet.png" alt="" /><figcaption>Android share sheet. <code>evidence/streak/</code></figcaption></figure>
 </div>
 <p>Two things are not built: the AI free-tell on S03b (planned with Nốt AI) and group merging (D-23). Most deviations are still marked "Cần cập nhật" (Figma needs updating): the code and this matrix are up to date, the Figma file is not yet.</p>
 
@@ -158,10 +166,7 @@
   <div><b>S04</b>"Đã vào hũ!", offline banner if pending</div>
 </div>
 <p>If the server does not answer within two seconds the repository returns the note with <code>pendingSync = true</code>: the write is already in Firestore's offline cache and is sent when the network returns, so the screen never hangs offline. The note uses the device time instead of <code>serverTimestamp</code>, because a server timestamp is <code>null</code> until it syncs and an offline note would then be missing from date queries. If the write fails, the repository throws an <code>AppException</code>, the ViewModel returns to editing with a message, keeps the draft and records a Crashlytics non-fatal.</p>
-<div class="row">
-  <figure><img src="../../slide/public/code/viewmodel.png" alt="TodayViewModel" /><figcaption><code>todayViewModelProvider</code>: a <code>NotifierProvider</code> whose state is <code>ViewState&lt;TodaySummary&gt;</code></figcaption></figure>
-  <figure><img src="../../slide/public/code/main.png" alt="main.dart overrides" /><figcaption><code>main.dart</code> overrides <code>noteRepositoryProvider</code> with the Firestore implementation</figcaption></figure>
-</div>
+<p class="ev">The layers in code, with red boxes on the relevant lines, are on slides 7–8 (<code>slide/public/code/</code>).</p>
 <h3>3.2 Errors and testing</h3>
 <p>Services translate SDK exceptions into one <code>AppException</code> with a kind (<code>network</code>, <code>permissionDenied</code>, <code>cancelled</code>, <code>notFound</code>, <code>unknown</code>), so ViewModels never depend on Firebase types. ViewModels turn the kind into a short Vietnamese message in the Lab 2 tone, for example "Chưa tải được hũ. Kiểm tra Wi-Fi rồi thử lại." (could not load the jar, check Wi-Fi and retry). Loads longer than 10 seconds become an error state with a retry button. Because every dependency is injected, each ViewModel is tested with fakes from <code>test/support/fakes.dart</code>; for example <code>test/viewmodels/group_detail_view_model_test.dart</code> checks that opening a group logs <code>group_viewed</code> exactly once with the right parameters.</p>
 
@@ -181,12 +186,13 @@
 
 <!-- ============================== 5 ============================== -->
 <h2>5. Firebase design and failure handling</h2>
-<p>Seven Firebase services are used. Each one sits behind an interface, so the rest of the app is unaffected by how it is implemented or whether it is available. The table summarises what the user sees when each service fails; the subsections give the design.</p>
+<p>Seven Firebase services are used, plus Cloudinary for photos. Each one sits behind an interface, so the rest of the app is unaffected by how it is implemented or whether it is available. The table summarises what the user sees when each service fails; the subsections give the design.</p>
 <table>
   <tr><th style="width:16%">Service</th><th>Failure</th><th style="width:40%">What the user sees / what the app does</th></tr>
   <tr><td>Authentication</td><td>Google chooser cancelled · wrong email password · other error</td><td>"Bạn đã huỷ đăng nhập." · "Email hoặc mật khẩu chưa đúng." under the field · "Không đăng nhập được. Thử lại."</td></tr>
   <tr><td>Firestore</td><td>Offline write · load error · load over 10 s · permission denied</td><td>Saved on the device + offline banner · error state with "Thử lại" · same · message, draft kept, non-fatal recorded</td></tr>
   <tr><td>Storage</td><td>Offline · session expired · any other error</td><td>"Chưa tải lên được: kiểm tra Wi-Fi" · asked to sign in again · "Chưa tạo được thẻ tuần. Thử lại nhé." with a retry; non-fatal recorded</td></tr>
+  <tr><td>Cloudinary photos</td><td>Offline · session expired · wrong type or over 5 MB · other error</td><td>"Chưa tải ảnh lên được: kiểm tra Wi-Fi rồi thử lại." · sign in again · "Ảnh chưa hợp lệ (JPG, PNG hoặc WebP, tối đa 5 MB)" · "Chưa tải được ảnh. Thử lại nhé."; the upload can be cancelled</td></tr>
   <tr><td>FCM</td><td>Permission denied · unknown route in a message · start-up error</td><td>Dialog with "Mở cài đặt" (open settings) · opens Today · logged, app keeps running</td></tr>
   <tr><td>Remote Config</td><td>Fetch fails or returns nothing · broken JSON value</td><td>In-app defaults (every feature on) · default list; a manual refresh shows "Cấu hình chưa có gì mới."</td></tr>
   <tr><td>Analytics</td><td>Logging throws</td><td><code>SafeAnalytics.track</code> catches and skips it; the user's action never fails</td></tr>
@@ -203,14 +209,15 @@
 <h3>5.2 Cloud Firestore: data model and Security Rules</h3>
 <table>
   <tr><th style="width:33%">Path</th><th>Content</th><th style="width:30%">Rule</th></tr>
-  <tr><td><code>users/{uid}</code></td><td>Profile and <code>role</code></td><td>Owner reads; created only with <code>role == 'user'</code>; only an admin may change <code>role</code></td></tr>
-  <tr><td><code>users/{uid}/notes/{id}</code></td><td>type, title, body, mood, createdAt; challenge result fields; groupId</td><td>Owner only; <code>validNote</code> checks keys, enums and lengths</td></tr>
-  <tr><td><code>users/{uid}/groups/{id}</code></td><td>"First time" groups: name, idea, source, noteCount</td><td>Owner only; <code>validGroup</code></td></tr>
+  <tr><td><code>users/{uid}</code></td><td>Profile, <code>role</code>, optional <code>photo</code></td><td>Owner reads; created only with <code>role == 'user'</code>; only an admin may change <code>role</code>; the owner may change only <code>photo</code></td></tr>
+  <tr><td><code>users/{uid}/notes/{id}</code></td><td>type, title, body, mood, createdAt; challenge result fields; groupId; optional <code>image</code></td><td>Owner only; <code>validNote</code> checks keys, enums and lengths</td></tr>
+  <tr><td><code>users/{uid}/groups/{id}</code></td><td>"First time" groups: name, idea, source, noteCount; optional <code>image</code></td><td>Owner only; <code>validGroup</code></td></tr>
   <tr><td><code>users/{uid}/private/habits</code>, <code>/settings</code></td><td>Habits to cut down, reminder times, lock</td><td>Owner only; fixed set of keys, list sizes capped</td></tr>
   <tr><td><code>users/{uid}/challengeProgress/{topic}</code></td><td>Level and completed cards per topic</td><td>Owner only</td></tr>
+  <tr><td><code>users/{uid}/sharedStreaks/{id}</code></td><td>Shared streak image (base64 PNG, at most 850 000 characters) and its numbers</td><td>Owner only; created, never edited</td></tr>
   <tr><td><code>challenges/{id}</code></td><td>Catalogue, managed by staff or the seed script</td><td>Read for signed-in users; no client writes</td></tr>
 </table>
-<p><code>firebase/firestore.rules</code> is deny-by-default: anything not matched is refused, and there is no <code>if true</code>. <code>validNote</code> accepts only known keys, a type and mood from fixed lists, a title of 1–120 characters, a journal of at most 2 000 characters and challenge values in range (anxiety 1–5, minutes 0–600). The rules are tested on the Emulator with <code>@firebase/rules-unit-testing</code> (<code>npm run test:rules</code> in <code>firebase/</code>): 15 cases, each with an allowed and a denied request.</p>
+<p><code>firebase/firestore.rules</code> is deny-by-default: anything not matched is refused, and there is no <code>if true</code>. <code>validNote</code> accepts only known keys, a type and mood from fixed lists, a title of 1–120 characters, a journal of at most 2 000 characters and challenge values in range (anxiety 1–5, minutes 0–600). The rules are tested on the Emulator with <code>@firebase/rules-unit-testing</code> (<code>npm run test:rules</code> in <code>firebase/</code>): 18 cases, each with an allowed and a denied request. Photos are stored as a reference <code>{url, publicId}</code>, and <code>validImage</code> accepts exactly those two keys with a secure URL on <code>res.cloudinary.com</code>.</p>
 <table>
   <tr><th style="width:8%">ID</th><th>Case</th><th style="width:8%">ID</th><th>Case</th></tr>
   <tr><td>R-01</td><td>User cannot change own role</td><td>R-09</td><td>Invalid notes are rejected</td></tr>
@@ -220,15 +227,25 @@
   <tr><td>R-05</td><td>Profile created with role <code>user</code></td><td>R-13</td><td>Challenge result fields within range</td></tr>
   <tr><td>R-06</td><td>Cannot create a profile as admin or for someone else</td><td>R-14</td><td>Group names and ideas are checked</td></tr>
   <tr><td>R-07</td><td>Write, read and delete own notes</td><td>R-15</td><td>Own challenge cards, privately</td></tr>
-  <tr><td>R-08</td><td>Cannot read or write someone else's notes</td><td></td><td></td></tr>
+  <tr><td>R-08</td><td>Cannot read or write someone else's notes</td><td>R-16</td><td>Notes accept a Cloudinary image only</td></tr>
+  <tr><td>R-17</td><td>Groups accept a Cloudinary image</td><td>R-18</td><td>Owner sets or removes own photo, never the role</td></tr>
 </table>
-<figure style="width:62%"><img src="../../evidence/deploy/firestore-rules.png" alt="Rules in Console" /><figcaption>The deployed rules in the Console (not test mode). <code>evidence/deploy/firestore-rules.png</code></figcaption></figure>
+<div class="note"><b>A rules bug found on the device.</b> When photos were added, <code>validNote</code> and <code>validGroup</code> still listed their allowed keys without <code>image</code>, and only an admin could update <code>users/{uid}</code>. Unit tests passed because they use fakes, but on the real project saving a note with a photo was denied. PR #47 added <code>validImage</code> and tests R-16 to R-18; after it was deployed, the same note saved and the 3-day milestone appeared (§2.1). The deployed rules are in the Console, not in test mode (<code>evidence/deploy/firestore-rules.png</code>).</div>
 
 <h3>5.3 Cloud Storage</h3>
 <p>The weekly card on S11b is a one-page PDF built on the device with the <code>pdf</code> package, with Be Vietnam Pro embedded. <code>FirebaseStorageService</code> uploads it to <code>reports/{uid}/weekly-&lt;ISO week&gt;.pdf</code>, emits progress events that the screen shows as a percentage bar, and returns the download URL, shown with a copy button before the share sheet opens. <code>firebase/storage.rules</code> allows a user to read and write only their own folder, and only files with content type <code>application/pdf</code> under 5 MB. The weekly card was chosen because it is the one file the persona would want to keep or send; Storage was chosen over a Firestore field because PDFs are binary and can be larger than the 1 MB document limit.</p>
-<div class="note warn"><b>Limitation.</b> The project is on the Spark plan, and Firebase now requires the Blaze plan to create a Storage bucket. The upload was tested end to end on the Firebase Emulator only. On the real project the upload fails, the user sees the error message with a retry (figure in §7.1), and a non-fatal reaches Crashlytics. For the same reason there is no Console screenshot of an uploaded file and <code>report_exported</code> has not appeared in DebugView.</div>
+<div class="note warn"><b>Limitation, and why photos use Cloudinary.</b> The project is on the Spark plan, and Firebase now requires the Blaze plan to create a Storage bucket. The upload was tested end to end on the Firebase Emulator only. On the real project the upload fails, the user sees the error message with a retry (figure in §7.1), and a non-fatal reaches Crashlytics. For the same reason there is no Console screenshot of an uploaded file and <code>report_exported</code> has not appeared in DebugView. The same limit is why photos were moved to Cloudinary (§5.4).</div>
 
-<h3>5.4 Cloud Messaging</h3>
+<h3>5.4 Photos on Cloudinary</h3>
+<p>Photos can be attached in three places: a note (step 3 of F1), a "first time" group, and the profile picture in Settings. Because Firebase Storage needs the paid Blaze plan, they are uploaded to <b>Cloudinary</b>'s free plan; only the weekly PDF stays on Firebase Storage. <code>CloudinaryImageService</code> (<code>lib/firebase/cloudinary_image_service.dart</code>) implements the <code>ImageService</code> interface, so ViewModels do not know which provider is used. It posts the image to the Cloudinary upload API with an <b>unsigned upload preset</b>: the app contains only the cloud name and the preset name, no API secret, and the format and size limits are set on the preset (the app also refuses files over 5 MB). Each upload gets a random public id under <code>not/avatars</code>, <code>not/notes</code> or <code>not/groups</code>, so it cannot be guessed or overwritten. The upload streams its progress, which the screen shows with a cancel button; the result is a reference <code>{url, publicId}</code> stored in Firestore and checked by the rules (§5.2). A successful upload logs <code>image_uploaded</code> with the folder and file size. Because an unsigned client cannot delete from Cloudinary, removing a photo only removes the reference.</p>
+<div class="row">
+  <figure class="phone sm"><img src="../../evidence/cloudinary/cld-uploading.png" alt="" /><figcaption>Uploading, with progress and "Huỷ"</figcaption></figure>
+  <figure class="phone sm"><img src="../../evidence/cloudinary/cld-attached.png" alt="" /><figcaption>Photo loaded back from Cloudinary</figcaption></figure>
+  <figure class="phone sm"><img src="../../evidence/cloudinary/cld-note.png" alt="" /><figcaption>Saved note with its photo</figcaption></figure>
+  <figure class="phone sm"><img src="../../evidence/cloudinary/cld-avatar.png" alt="" /><figcaption>Profile photo in Settings. <code>evidence/cloudinary/</code></figcaption></figure>
+</div>
+
+<h3>5.5 Cloud Messaging</h3>
 <p><code>FirebaseMessagingService</code> requests <code>POST_NOTIFICATIONS</code> on Android 13+ at the first moment a reminder matters, not at launch. If the user refuses, Settings explains why notifications help and offers "Mở cài đặt", which opens the system page. A message is received in all three app states. In the background and when the app is terminated, Android shows it in the system tray. In the foreground Android shows nothing, so the app displays it with <code>flutter_local_notifications</code> and passes the target route as the payload. Every message is saved to an inbox on the device with the state it arrived in; the inbox is in the Firebase demo area. A message may carry data <code>route</code>; <code>routeFromData</code> accepts only an allow-list of internal routes, and an unknown route opens Today. Test messages were sent from Console → Messaging → "Send test message" and through the FCM HTTP v1 API to the device token from the debug log; the token is not stored in the repository.</p>
 <div class="row">
   <div style="flex:2.3">
@@ -241,12 +258,12 @@
 </div>
 <p>Two reminders do not need a server and are scheduled locally instead (D-27): the evening note reminder (default 21:30, opens S03a) and the "Giờ tỉnh" (wake-up hour) nudge at the start of the late-night window (default 23:00, opens S09). Both are rescheduled when the time changes and cancelled on sign-out.</p>
 
-<h3>5.5 Remote Config, Analytics, Crashlytics</h3>
+<h3>5.6 Remote Config, Analytics, Crashlytics</h3>
 <p>Remote Config is used for feature flags and content (§7.2). Analytics and Crashlytics are described with their evidence in §6 and §7.1. All three are wrapped so that a failure never reaches the user: Remote Config falls back to in-app defaults, Analytics calls go through <code>SafeAnalytics.track</code>, and Crashlytics is replaced by a no-op on the Emulator and on web, where it is not supported.</p>
 
 <!-- ============================== 6 ============================== -->
 <h2>6. Analytics event plan and DebugView evidence</h2>
-<p><code>docs/analytics-plan.md</code> is the plan. Each event answers a product question tied to a Lab 2 flow; events are sent by ViewModels through <code>AnalyticsService</code>, never by widgets. Naming follows the Analytics limits: snake_case, at most 40 characters, no reserved prefixes, booleans sent as <code>'true'</code>/<code>'false'</code> strings. No parameter contains a note title or text, an email, a name or a group name. The user ID is set with <code>setUserId</code> after sign-in or when a session is restored at start-up, and cleared on sign-out. There are <b>9 custom events</b> (the minimum is 7) plus <code>screen_view</code>, sent by the router with the route pattern (for example <code>/note/saved/:id</code>, never an id).</p>
+<p><code>docs/analytics-plan.md</code> is the plan. Each event answers a product question tied to a Lab 2 flow; events are sent by ViewModels through <code>AnalyticsService</code>, never by widgets. Naming follows the Analytics limits: snake_case, at most 40 characters, no reserved prefixes, booleans sent as <code>'true'</code>/<code>'false'</code> strings. No parameter contains a note title or text, an email, a name or a group name. The user ID is set with <code>setUserId</code> after sign-in or when a session is restored at start-up, and cleared on sign-out. There are <b>12 custom events</b> in the code (the minimum is 7) plus <code>screen_view</code>, sent by the router with the route pattern (for example <code>/note/saved/:id</code>, never an id).</p>
 <table>
   <tr><th style="width:26%">Event</th><th style="width:30%">Parameters</th><th>Sent by · question it answers</th></tr>
   <tr><td><code>login</code>, <code>logout</code></td><td><code>method</code></td><td><code>AuthViewModel</code> · which sign-in method do users choose?</td></tr>
@@ -257,8 +274,11 @@
   <tr><td><code>self_control_logged</code></td><td><code>has_habit</code></td><td><code>SelfControlViewModel</code> · do users track a specific habit or log in general?</td></tr>
   <tr><td><code>group_viewed</code></td><td><code>group_source, group_idea, note_count</code></td><td><code>GroupDetailViewModel</code> · which "first time" groups are reopened?</td></tr>
   <tr><td><code>report_exported</code></td><td><code>format</code></td><td><code>WeeklyReportViewModel</code> · does anyone export the weekly card?</td></tr>
+  <tr><td><code>streak_extended</code></td><td><code>streak_length, streak_milestone</code></td><td><code>NoteSavedViewModel</code> · do users keep their streak, and which milestone keeps them?</td></tr>
+  <tr><td><code>streak_shared</code></td><td><code>streak_length, streak_milestone, method</code></td><td><code>StreakShareViewModel</code> · do users share their streak?</td></tr>
+  <tr><td><code>image_uploaded</code></td><td><code>image_folder, file_size_kb</code></td><td><code>ImageUploadViewModel</code> · where do users add photos? (not yet in <code>analytics-plan.md</code>)</td></tr>
 </table>
-<p><b>How it was verified.</b> Analytics has no emulator, so the app ran against the real project with debug mode enabled on the emulator (<code>adb shell setprop debug.firebase.analytics.app com.quanphungg.lab03</code>), which makes events appear in DebugView within seconds. One account signed in with Google, saved a note, logged self-control, opened a challenge and a group, and signed out. The same run was captured three ways: DebugView in the Console (figure), <code>adb logcat</code> (<code>evidence/analytics/logcat-events.txt</code>, for example <code>note_saved {duration_ms=7990, mood=vui, note_type=chien_thang, has_journal=false}</code>), and unit tests that assert the exact name and parameters of each event. Every event was observed except <code>report_exported</code>, which is only sent after a successful upload (§5.3).</p>
+<p><b>How it was verified.</b> Analytics has no emulator, so the app ran against the real project with debug mode enabled on the emulator (<code>adb shell setprop debug.firebase.analytics.app com.quanphungg.lab03</code>), which makes events appear in DebugView within seconds. One account signed in with Google, saved a note, logged self-control, opened a challenge and a group, and signed out. The same run was captured three ways: DebugView in the Console (figure), <code>adb logcat</code> (<code>evidence/analytics/logcat-events.txt</code>, for example <code>note_saved {duration_ms=7990, mood=vui, note_type=chien_thang, has_journal=false}</code>), and unit tests that assert the exact name and parameters of each event. Of the first nine events, every one was observed except <code>report_exported</code>, which is only sent after a successful upload (§5.3). The three newer events (<code>streak_extended</code>, <code>streak_shared</code>, <code>image_uploaded</code>) were added after this DebugView run and have not been captured there yet.</p>
 <div class="row">
   <figure><img src="../../slide/public/app/console-analytics.png" alt="DebugView" /><figcaption>DebugView: event stream and top events of the run</figcaption></figure>
   <figure><img src="../../slide/public/app/dv-params.png" alt="DebugView parameters" /><figcaption>Parameter values cut from the DebugView panels. Full screenshots: <code>evidence/analytics/debugview-*.webp</code></figcaption></figure>
@@ -376,7 +396,8 @@ They need an OpenRouter key on the test machine and an email test account. No ap
 <!-- ============================== 10 ============================== -->
 <h2>10. Challenges encountered</h2>
 <p><b>Analytics and Crashlytics have no emulator.</b> Stages 3 and 4 were built against the Firebase Emulator Suite, which made rules and data easy to test. Stage 5 could not be checked that way: Analytics and Crashlytics only work against a real project. We kept a console logger and a no-op reporter for the Emulator and web, and verified Stage 5 on the real project with DebugView and the Crashlytics dashboard.</p>
-<p><b>Cloud Storage needs the Blaze plan.</b> The project is on the free Spark plan, which can no longer create a bucket. Rather than fake a successful upload, we kept the real failure: the user sees a message with a retry, and the error is the non-fatal shown in §7.1. The complete upload was tested only on the Emulator.</p>
+<p><b>Cloud Storage needs the Blaze plan.</b> The project is on the free Spark plan, which can no longer create a bucket. Rather than fake a successful upload, we kept the real failure: the user sees a message with a retry, and the error is the non-fatal shown in §7.1. The complete upload was tested only on the Emulator. For photos the team switched to Cloudinary's free plan, which needed no billing and no server.</p>
+<p><b>New fields against old rules.</b> Adding photos changed the shape of notes, groups and profiles, but the rules still described the old shape. All 250 tests passed, because they replace Firestore with fakes; the problem only showed on the device, as a refused save. It also exposed a misleading message: the app reported the permission error as "phiên đăng nhập đã hết" (session expired). The rules were fixed and tested (PR #47); the message is not fixed yet.</p>
 <p><b>Google Sign-In on a new machine.</b> On a second development machine Google Sign-In failed with "Không đăng nhập được". There were three causes: no Google account on the emulator, the machine's debug SHA-1 was not registered, and the committed <code>google-services.json</code> had no OAuth client. Adding the fingerprint in the Console and committing the regenerated file fixed it.</p>
 <p><b>An AI agent as the tester.</b> The agent's answers vary from run to run, it sometimes tapped controls the goal told it not to touch, and the keyboard and leftover processes interfered. Fixed keywords in the answers made the results checkable, and analysing each failure showed that most of them were in our tests, not in the app.</p>
 <p><b>Lab 2 documents that disagree.</b> Two Lab 2 documents gave different limits (D-11), and some Lab 2 labels confused users (D-28). Each case needed a decision and a log entry instead of a silent change.</p>
@@ -390,6 +411,7 @@ They need an OpenRouter key on the test machine and an email test account. No ap
   <li><b>Rename what users misread.</b> Changing one label (D-28) removed a misunderstanding that more explanation would not have fixed.</li>
   <li><b>Check the AI tester as well as the app.</b> Four of the five failures in the first ARTEMIS run came from our own assertions; only one (T06) is a real problem. A failing test is a question, not a verdict.</li>
   <li><b>Read AI review before merging.</b> CodeRabbit was right 51 times out of 52, but most findings were read after merge. Its severity labels still need human judgement.</li>
+  <li><b>Change the rules with the data.</b> A new field needs a rules change and a rules test in the same pull request; unit tests with fakes will not catch it.</li>
   <li><b>Say what is not done.</b> Storage, the unrun ARTEMIS cases and the exploratory session are written down as gaps with reasons, which is more useful to a reviewer than a claim that cannot be checked.</li>
 </ol>
 
