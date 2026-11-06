@@ -1778,3 +1778,35 @@ html, body, #root, .stage {
   width: auto;
   height: 220px;
 }
+
+/* ARTEMIS exploratory session */
+.x01 {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 22px;
+  align-items: start;
+}
+.x01 table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 16px;
+}
+.x01 th,
+.x01 td {
+  padding: 6px 8px;
+  border-bottom: 1px solid #e5e5e5;
+  text-align: left;
+}
+.x01 th {
+  font-size: 13px;
+  color: #666;
+  border-bottom: 2px solid #ccc;
+}
+.x01-side p {
+  font-size: 16px;
+  margin: 8px 0 0;
+}
+.x01 td:first-child,
+.x01 td:nth-child(2) {
+  white-space: nowrap;
+}

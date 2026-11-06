@@ -1315,7 +1315,7 @@ export default function App() {
         <Page
           dense
           title="ARTEMIS E2E"
-          notes="ARTEMIS drives the real app on the Android 15 emulator through ADB. Model: deepseek-v4.1-flash via OpenRouter, Flash profile. 12 cases (T01 to T12) cover F1 write a note (main path, empty note, leave with a draft, offline), F2 self-control and breathing, F3 challenges, the four tabs, Settings (feature flags) and a native Android case (Home, notification shade, relaunch). Each case ran 3 times and asserts on the value the agent reports, not only on success. First full run: 31 of 36. Two failures came from wrong assertions in our tests (T05 run 3 accepted only an answer starting with DIALOG; T12 demanded the Today screen although the app correctly restores the previous screen). We fixed those and re-ran T05 and T12: 6 of 6. T06 run 3 timed out after 420 seconds in the offline case and stays a failure. Final: 35 of 36. Not done: the 15 to 30 minute exploratory session. Details and the table: docs/test-plan.md (branch feat/e2e-artemis); proofs in evidence/artemis/."
+          notes="ARTEMIS drives the real app on the Android 15 emulator through ADB. Model: deepseek-v4.1-flash via OpenRouter, Flash profile. 14 cases (T01 to T14) cover F1 write a note (main path, empty note, leave with a draft, offline), F2 self-control and breathing, F3 challenges, the four tabs, Settings (feature flags) and a native Android case (Home, notification shade, relaunch). Each case ran 3 times and asserts on the value the agent reports, not only on success. First full run: 31 of 36. Two failures came from wrong assertions in our tests (T05 run 3 accepted only an answer starting with DIALOG; T12 demanded the Today screen although the app correctly restores the previous screen). We fixed those and re-ran T05 and T12: 6 of 6. T06 run 3 timed out after 420 seconds in the offline case and stays a failure. T13 (analytics event read from adb logcat) and T14 (weekly card export) were added later: 6 of 6 after a fixture fix. Final: 41 of 42. The exploratory session ran for 25 minutes with the Pro profile and reported 10 issues; the sign-in cases need an email test account. Details and the table: docs/test-plan.md (branch feat/e2e-artemis); proofs in evidence/artemis/."
         >
           <div className="half">
             <Gallery
@@ -1331,17 +1331,17 @@ export default function App() {
               </p>
               <ul>
                 <li>
-                  <b>12 cases:</b> F1 save, empty, draft dialog, offline · F2 · F3 · tabs · flags ·
-                  native Home and relaunch
+                  <b>14 cases:</b> F1 save, empty, draft dialog, offline · F2 · F3 · tabs · flags ·
+                  native Home and relaunch · analytics event · weekly card export
                 </li>
                 <li>
-                  <b>35 of 36 runs pass.</b> T06 (offline) timed out once.
+                  <b>41 of 42 runs pass.</b> T06 (offline) timed out once.
                 </li>
                 <li>
-                  First run was 31 of 36: two assertions in our tests were wrong (fixed, re-run
-                  6 of 6).
+                  Three test bugs, not app bugs, were found on the way: two wrong assertions and a
+                  fixture that read the answer too early (fixed, re-run).
                 </li>
-                <li>Not done yet: the 15 to 30 minute exploratory session.</li>
+                <li>Exploratory session (25 min, Pro): the agent reported 10 issues. Not run: sign-in and sign-out cases.</li>
               </ul>
             </div>
           </div>
@@ -1362,8 +1362,8 @@ export default function App() {
         <Page
           dense
           title="ARTEMIS: result per case"
-          line="12 cases × 3 runs · 35 of 36 pass (97%) · full run 62 minutes"
-          notes="This is the table from docs/test-plan.md section 5. Each case ran three times; time is the range of one run. T04, T05 and T06 are error paths: empty note, leaving with a draft, and no network. T06 and T12 act outside the app: airplane mode over adb, the Home button and the notification shade. T06 run 3 is a real failure: it timed out after 420 seconds and the agent reported nothing; we have not found the root cause and have no evidence it is an app bug. T05 run 3 and all of T12 failed first because our own assertions were wrong, so we fixed the assertions, said so in the test plan, and re-ran both cases: 6 of 6. JUnit files: evidence/artemis/junit-full-run.xml and junit-rerun-t05-t12.xml."
+          line="14 cases × 3 runs · 41 of 42 pass (98%) · T01–T12 full run 62 minutes"
+          notes="This is the table from docs/test-plan.md section 5. Each case ran three times; time is the range of one run. T04, T05 and T06 are error paths: empty note, leaving with a draft, and no network. T06 and T12 act outside the app: airplane mode over adb, the Home button and the notification shade. T06 run 3 is a real failure: it timed out after 420 seconds and the agent reported nothing; we have not found the root cause and have no evidence it is an app bug. T05 run 3 and all of T12 failed first because our own assertions were wrong, so we fixed the assertions, said so in the test plan, and re-ran both cases: 6 of 6. T13 and T14 were added later. T13 checks Analytics: the agent saves a note and the test reads adb logcat for note_saved with mood and note_type and without the note text. Its first run failed although the agent had answered SAVED: our fixture read the steps before the last one was stored, so we added a retry and re-ran T13: 3 of 3. T14 exports the weekly card; with no Storage bucket the correct result is the error message with Thử lại: 3 of 3. JUnit files: evidence/artemis/junit-full-run.xml, junit-rerun-t05-t12.xml, junit-t13-t14.xml and junit-rerun-t13.xml."
         >
           <div className="rt">
             <table>
@@ -1390,6 +1390,8 @@ export default function App() {
                   ['T10', 'Four tabs', 'ALL_TABS', '3/3', '33–40 s'],
                   ['T11', 'Settings: Remote Config row', '“Cờ tính năng”', '3/3', '13–19 s'],
                   ['T12', 'Native: Home, shade, relaunch', 'LOGGED_IN', '3/3 *', '32–39 s'],
+                  ['T13', 'Analytics: note_saved in logcat', 'SAVED + event', '3/3 *', '66–119 s'],
+                  ['T14', 'Export the weekly card', 'ERROR_MESSAGE', '3/3', '41–71 s'],
                 ].map(([id, flow, expect, pass, time]) => (
                   <tr key={id} className={pass === '2/3' ? 'rt-fail' : undefined}>
                     <td>
@@ -1411,17 +1413,21 @@ export default function App() {
                 cause not found; no sign it is an app bug.
               </p>
               <p>
-                <b>* T05 run 3, T12:</b> our assertions were wrong (the app was right). Fixed the
-                assertion, re-ran both: 6 of 6.
+                <b>* T05 run 3, T12:</b> our assertions were wrong (the app was right). Fixed, re-ran: 6 of 6.
+                <br />
+                <b>* T13 run 1:</b> the agent said SAVED, but our fixture read it before the last step was
+                stored. Fixed (retry), re-ran: 3 of 3.
               </p>
               <p>
                 <b>Error paths:</b> T04, T05, T06
                 <br />
                 <b>Outside the app:</b> T06, T12
+                <br />
+                <b>T14:</b> no Storage bucket, so the expected result is the error message + Thử lại
               </p>
             </div>
           </div>
-          <p className="foot">docs/test-plan.md §5 · evidence/artemis/junit-full-run.xml · junit-rerun-t05-t12.xml</p>
+          <p className="foot">docs/test-plan.md §5 · evidence/artemis/ junit-full-run · junit-rerun-t05-t12 · junit-t13-t14 · junit-rerun-t13</p>
         </Page>
 
         <Page
@@ -1469,17 +1475,14 @@ export default function App() {
 
         <Page
           dense
-          title="ARTEMIS: written, not run yet"
-          line="Five parts of the brief now have a case in e2e_test/, but no run result yet"
-          notes="We are open about the gaps. These five cases are written in e2e_test/test_main_flows.py but have not run, so the result table does not include them. T13: the agent saves a note, then the test reads adb logcat for note_saved and its parameters, because the agent only sees the screen. T14: exports the weekly card; until the Storage bucket exists (Blaze plan) it expects the error message with Thử lại instead of an upload. T15 and T16: sign out, then sign in with an email test account, once with a wrong password; Google sign-in is avoided because the account picker shows a real name and email. They run last because they change the session. X01: the 15 to 30 minute exploratory session with the Pro profile; its bug list will go into docs/test-plan.md."
+          title="ARTEMIS: not run yet"
+          line="Every other case has a result; these two need an email account made only for tests"
+          notes="We are open about the gaps. Every other case has a result, including the exploratory session on the next slide. T15 and T16 sign out, then sign in with an email test account, once with a wrong password; Google sign-in is avoided because the account picker shows a real name and email. They need an email account made only for tests, so they have not run."
         >
           <div className="gap">
             {[
               ['T15 · Sign-out, sign-in', 'Sign out, then sign in with an email test account (not Google: its picker shows a real name and email)', 'Needs a test account'],
               ['T16 · Wrong password', 'Error message under the field, then sign in with the right password', 'Needs a test account'],
-              ['T14 · Export and upload', 'Weekly card PDF: upload and link, or the error message + Thử lại while there is no bucket', 'Upload part needs Blaze'],
-              ['T13 · Analytics event', 'Save a note, then the test reads adb logcat: note_saved with mood, note_type, no note text', 'Needs the OpenRouter key'],
-              ['X01 · Exploratory', '15–30 min, Pro profile; the agent explores and returns BUG lines or NO_BUGS', 'Not run: no bug list yet'],
             ].map(([what, why, next]) => (
               <div key={what} className="gap-row">
                 <b>{what}</b>
@@ -1489,6 +1492,66 @@ export default function App() {
             ))}
           </div>
           <p className="foot">e2e_test/test_main_flows.py · docs/test-plan.md §4, §6</p>
+        </Page>
+
+        <Page
+          dense
+          title="ARTEMIS: exploratory session"
+          line="X01 · Pro profile · 25 min 38 s · 112 steps · the agent reported 10 issues; we have not checked them yet"
+          notes="X01 is the free exploratory session. The agent got one goal: explore Nốt for about 20 minutes like a curious new user, try odd input, rotate the screen, press Back a lot, and list every problem as a BUG line. It ran with the Pro profile for 25 minutes 38 seconds and 112 steps, and ended on Today, still signed in. These are the agent's reports, copied from the server; we have not verified or fixed them yet, so they are candidates, not confirmed bugs. Some have likely explanations: the not responding dialog may come from the debug build on the emulator, the count mismatch from two screens loading at different moments, and the cut group names from the one-line design in D-23. Two things went wrong on our side: the Pro profile does not call report_task_status, so our fixture failed to read the answer and the JUnit file shows an error although the session completed; the fixture now reads the final answer. And the agent created several notes on the test account although that was not forbidden in the goal. Full list: docs/test-plan.md section 5 and evidence/artemis/x01-bugs.txt."
+        >
+          <div className="x01">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Where</th>
+                  <th>What the agent saw</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  ['X-01', 'Relaunch', 'Back from Today, reopen: “Lab 03 isn’t responding”, recovers after Wait'],
+                  ['X-02', 'Jar, landscape', 'The + button covers “Xem tất cả”'],
+                  ['X-03', 'Today, landscape', 'Tab bar covers the streak card; jar fills the screen'],
+                  ['X-04', 'Jar vs Today', 'Notes this month: 22 on one, 21 on the other'],
+                  ['X-05', 'Group list', 'Two group names cut with “…”'],
+                  ['X-06', 'Journal editor', 'Empty or spaces only: Xong disabled, no reason shown'],
+                  ['X-07', 'Jar', 'Tapping the jar picture does nothing'],
+                  ['X-08', 'After saving', 'Blank “Đang tải” screen for a few seconds'],
+                  ['X-09', 'Journey · Calendar', 'Mood legend does not say which colour is which'],
+                  ['X-10', 'Journey · Year', '12-month grid has no month names, cells tiny'],
+                ].map(([id, where, what]) => (
+                  <tr key={id}>
+                    <td>
+                      <b>{id}</b>
+                    </td>
+                    <td>{where}</td>
+                    <td>{what}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div className="x01-side">
+              <Gallery
+                cols={2}
+                height={250}
+                items={[
+                  { src: 'app/x01-anr.jpg', alt: 'Lab 03 isn’t responding dialog after relaunch', caption: 'X-01 · step 100' },
+                  { src: 'app/x01-loading.jpg', alt: 'Blank loading screen after saving', caption: 'X-08 · step 13' },
+                ]}
+              />
+              <p>
+                <b>Not checked yet.</b> These are candidates from the agent. Some may have a reason
+                (debug build, two screens loading at different times, one-line names in D-23).
+              </p>
+              <p>
+                <b>Our side:</b> the Pro profile answers without <code>report_task_status</code>, so the
+                JUnit file shows a fixture error; the fixture now reads the final answer.
+              </p>
+            </div>
+          </div>
+          <p className="foot">docs/test-plan.md §5 · evidence/artemis/x01-bugs.txt · evidence/artemis/x01/ · junit-x01.xml</p>
         </Page>
 
         <Page
