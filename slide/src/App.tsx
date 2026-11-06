@@ -899,6 +899,68 @@ export default function App() {
 
         <Page
           dense
+          title="Cloud Firestore"
+          line="When it fails: offline → saved on the device + banner · load error or over 10 s → error state + Thử lại · denied → message, draft kept"
+          notes="Firestore holds all the app's data. Everything private lives under users/{uid}: notes, first-time groups, habits and settings, challenge progress and shared streak images; the challenge catalogue is a shared read-only collection seeded from firebase/seed/challenges.json. Photos are not stored here, only their Cloudinary link. The repository writes a note with doc.set and waits at most two seconds for the server; offline, the write stays in Firestore's offline cache, the screen shows Đã lưu trên máy and Firestore sends it when the network returns. The note uses the device time, not serverTimestamp, so an offline note still appears in today's list. The rules deny by default: a user only reads and writes their own data, and validNote checks the keys, the type and mood lists and the lengths. 18 rules tests run on the Emulator with npm run test:rules, all passing; the output is in evidence/firestore/rules-tests.txt."
+        >
+          <div className="fs">
+            <div className="fs-col">
+              <h3>Data model</h3>
+              <table>
+                <tbody>
+                  {[
+                    ['users/{uid}', 'role, photo'],
+                    ['…/notes/{id}', 'type, title, body, mood, createdAt, image'],
+                    ['…/groups/{id}', 'first-time groups'],
+                    ['…/private/*', 'habits, settings'],
+                    ['…/challengeProgress', 'level per topic'],
+                    ['…/sharedStreaks', 'shared streak image'],
+                    ['challenges/{id}', 'catalogue, read-only'],
+                  ].map(([path, what]) => (
+                    <tr key={path}>
+                      <td>
+                        <code>{path}</code>
+                      </td>
+                      <td>{what}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div className="fs-tests">
+                <b>18 / 18</b> rules tests pass
+                <small>Emulator · npm run test:rules · R-01 … R-18</small>
+              </div>
+            </div>
+            <div className="fs-col">
+              <figure>
+                <figcaption>
+                  <b>Write a note</b> <code>firestore_note_repository.dart</code>
+                </figcaption>
+                <Crop src="code/fs-add.png" alt="add() writes type, title, body, mood, createdAt, groupId and image with doc.set" natural={620} y={22} w={620} h={226} scale={0.62} />
+              </figure>
+              <figure>
+                <figcaption>
+                  <b>Only the owner, only valid notes</b> <code>firestore.rules</code>
+                </figcaption>
+                <Crop src="code/fs-validnote.png" alt="validNote: required and allowed keys, type list, title 1 to 120, body up to 2000, mood list" natural={620} y={22} w={620} h={186} scale={0.62} />
+              </figure>
+            </div>
+            <div className="fs-col fs-ev">
+              <figure>
+                <img className="fs-phone" src="app/artemis-offline.jpg" alt="Note saved offline with the Đã lưu trên máy banner" />
+                <figcaption>Offline: "Đã lưu trên máy"</figcaption>
+              </figure>
+              <figure>
+                <img src="evidence/firestore-challenges.png" alt="Firestore console with the challenges collection" />
+                <figcaption>Console · seeded challenges</figcaption>
+              </figure>
+            </div>
+          </div>
+          <p className="foot">firebase/firestore.rules · lib/firebase/firestore_note_repository.dart · evidence/firestore/ · evidence/deploy/</p>
+        </Page>
+
+        <Page
+          dense
           title="Cloud Storage"
           line="When it fails: offline → “Chưa tải lên được: kiểm tra Wi-Fi” · signed out → “đăng nhập lại” · any other error → “Chưa tạo được thẻ tuần” + Thử lại"
           notes="The weekly card (S11b) is built as a PDF on the device and uploaded to reports/{uid}/ in Cloud Storage. The upload streams its progress, which the screen shows as a percentage bar, and then returns the download URL, shown with a copy button. storage.rules lets each user read and write only their own folder, and only PDFs under 5 MB. Failures never crash: no network, an expired session and any other error each show a message with a retry, and the error is also sent to Crashlytics as a non-fatal. The project is on the Spark plan, and Firebase now needs the Blaze plan to create a Storage bucket, so on the real project the upload currently fails and shows the error on the left; the full flow was tested on the Firebase Emulator."

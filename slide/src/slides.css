@@ -1717,3 +1717,64 @@ html, body, #root, .stage {
 .cld-row li {
   margin-bottom: 10px;
 }
+
+/* Cloud Firestore slide */
+.fs {
+  display: grid;
+  grid-template-columns: 1fr auto 0.95fr;
+  gap: 22px;
+  align-items: start;
+}
+.fs h3 {
+  font-size: 18px;
+  margin: 0 0 6px;
+}
+.fs table {
+  border-collapse: collapse;
+  font-size: 16px;
+  width: 100%;
+}
+.fs td {
+  padding: 4px 6px;
+  border-bottom: 1px solid #e5e5e5;
+}
+.fs td code {
+  font-size: 13px;
+}
+.fs figure {
+  margin: 0 0 10px;
+}
+.fs figcaption {
+  font-size: 13px;
+  margin-bottom: 3px;
+}
+.fs-tests {
+  margin-top: 14px;
+  padding: 10px 14px;
+  border-left: 4px solid #2f9e44;
+  background: #ebfbee;
+  font-size: 17px;
+}
+.fs-tests small {
+  display: block;
+  font-size: 12px;
+  color: #555;
+}
+.fs-ev {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: end;
+}
+.fs-ev figure:last-child {
+  grid-column: 1 / -1;
+}
+.fs-ev img {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+.fs-ev img.fs-phone {
+  width: auto;
+  height: 220px;
+}

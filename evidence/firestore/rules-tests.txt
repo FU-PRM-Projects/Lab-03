@@ -1,0 +1,21 @@
+✔ R-01 user cannot change own role
+✔ R-02 admin can change a role
+✔ R-03 user reads own profile; unauthenticated denied
+✔ R-04 unknown collection denied by default
+✔ R-05 user creates own profile with role user (first sign-in)
+✔ R-06 user cannot create own profile as admin or for someone else
+✔ R-07 user writes, reads and deletes own notes
+✔ R-08 user cannot read or write someone else's notes
+✔ R-09 invalid notes are rejected
+✔ R-10 user saves own month sticker only under its own id
+✔ R-11 user keeps private habits and settings; others cannot read them
+✔ R-12 challenge catalog is read-only; progress is private
+✔ R-13 challenge notes keep their result fields within range
+✔ R-15 user adds and deletes their own challenge cards, privately
+✔ R-14 user keeps "first time" groups; names and ideas are checked
+✔ R-16 notes may carry a Cloudinary image; other images are rejected
+✔ R-17 groups may carry a Cloudinary image
+✔ R-18 owner sets and removes own profile photo, but cannot touch role or others
+ℹ tests 18
+ℹ pass 18
+ℹ fail 0
