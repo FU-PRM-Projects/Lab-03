@@ -7,7 +7,23 @@
 - **Persona:** Minh, 22 tuổi, sinh viên năm 4.
 - **Tiêu chí thành công:** ghi xong một chiến thắng nhỏ (tâm trạng + 1 chiến thắng) trong dưới 30 giây kể từ khi chạm thông báo buổi tối.
 - **Nguồn dữ liệu:** Cloud Firestore (dữ liệu của chính người dùng).
-- **Nền tảng:** Android và Web.
+- **Nền tảng:** Android, Web và Discord DM Bot (Rust / Poise).
+
+## Hướng dẫn sử dụng hệ thống
+
+1. **Đăng nhập & Khởi tạo:** Mở ứng dụng **Nốt** (Android hoặc Web tại `https://prm393-not-lab3.web.app`), đăng nhập bằng Google hoặc Email/Mật khẩu.
+2. **Ghi Nốt mỗi ngày (Tab Hôm nay & Hũ):**
+   - Chọn tâm trạng và ghi lại một **Chiến thắng nhỏ**, **Nhật ký**, **Tự chủ**, hoặc **Thử thách** trong chưa đầy 30 giây.
+   - Đính kèm ảnh kỷ niệm, phân loại vào kệ **Nhóm lần đầu**, và xem lại toàn bộ nốt trong **Hũ**.
+3. **Thử thách & Tự chủ (Tab Thử thách):**
+   - Thực hiện các thẻ thử thách theo cấp độ (*Dũng cảm*, *Vận động*) hoặc tự tạo thẻ riêng.
+   - Ghi nhận những lần dừng lại thành công và tập thở ở màn **Tự chủ** (hỗ trợ khoá sinh trắc học/PIN).
+4. **Hành trình & Thẻ tuần (Tab Hành trình):**
+   - Theo dõi chuỗi ngày (streak), lịch tâm trạng, biểu đồ năng lượng, chia sẻ ảnh thẻ streak hoặc xuất báo cáo **Thẻ tuần (PDF)**.
+5. **Kết nối Discord Bot (Remote Agent qua DM):**
+   - Nhắn tin riêng (DM) cho **Nốt Bot** trên Discord với lệnh `/connect` (hoặc `!connect`) để nhận mã liên kết 6 ký tự (hiệu lực 10 phút).
+   - Trong ứng dụng Nốt, vào **Cài đặt → Cộng đồng → Liên kết Discord** (hoặc **Phòng trò chuyện → Liên kết tài khoản Discord**) và nhập mã 6 ký tự.
+   - Hệ thống đảm bảo ràng buộc **1-1**: mỗi tài khoản Nốt chỉ liên kết với duy nhất 1 tài khoản Discord.
 
 ## Tiến độ theo stage
 
@@ -74,6 +90,24 @@ Console còn phải làm (một lần):
 2. **Crashlytics**: mở dashboard và làm theo hướng dẫn; số liệu xuất hiện sau crash thử đầu tiên.
 3. **Authentication**: bật **Google** và **Email/Password**.
 4. Thêm SHA-1 của debug keystore (`cd android; ./gradlew signingReport`) vào Project settings → Android app để Google Sign-In chạy trên máy thật.
+
+### Discord Bot (`discord_bot/`)
+
+Bot trợ lý viết bằng **Rust** (framework **Poise**), chỉ hoạt động qua tin nhắn riêng (DM) và giao tiếp trực tiếp với Cloud Firestore REST API:
+
+- `src/main.rs`: Khởi tạo bot với `DIRECT_MESSAGES` intent.
+- `src/firebase.rs`: Lớp client mỏng gọi Cloud Firestore (`discordConnectCodes` và `discordLinks`).
+- `src/commands/`: Các lệnh DM (`/connect`, `/ping`).
+
+Chạy local:
+
+```sh
+cd discord_bot
+cp .env.example .env        # điền DISCORD_TOKEN và FIREBASE_PROJECT_ID
+cargo run
+```
+
+Triển khai trên VPS (Dokploy) bằng Docker Compose với file `compose.dokploy.yml`.
 
 ## CI/CD
 
