@@ -250,4 +250,57 @@ void main() {
     expect(find.byType(ChallengeDetailScreen), findsNothing);
     expect(services.notes.notes, isEmpty);
   });
+
+  testWidgets(
+    'liên kết Discord bằng mã 6 ký tự từ bot DM (ràng buộc 1-1) và ngắt kết nối',
+    (tester) async {
+      final services = await pumpApp(tester);
+      routerOf(tester).go(AppRoutes.settings);
+      await tester.pumpAndSettle();
+
+      await tester.scrollUntilVisible(find.text('Liên kết Discord'), 100);
+      await tester.ensureVisible(find.text('Liên kết Discord'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Liên kết Discord'));
+      await tester.pumpAndSettle();
+
+      // Nhập mã sai -> báo lỗi
+      await tester.enterText(findField('Mã kết nối'), 'WRONG1');
+      await tester.pump();
+      await tester.tap(find.text('Kết nối'));
+      await tester.pumpAndSettle();
+      expect(
+        find.textContaining('Mã không tồn tại hoặc đã được sử dụng'),
+        findsOneWidget,
+      );
+
+      // Nhập mã đúng ABC123 -> liên kết thành công 1-1
+      await tester.enterText(findField('Mã kết nối'), 'abc123');
+      await tester.pump();
+      await tester.tap(find.text('Kết nối'));
+      await tester.pumpAndSettle();
+
+      expect(services.discord.link?.discordId, '123456789012345678');
+      expect(
+        find.text('Đã liên kết với Discord: Minh (@minh_discord)'),
+        findsOneWidget,
+      );
+      expect(find.text('Minh (@minh_discord)'), findsOneWidget);
+      expect(find.text('Đã kết nối'), findsOneWidget);
+
+      // Mở lại sheet -> hiện thông tin đã liên kết và cho phép ngắt liên kết
+      await tester.tap(find.text('Liên kết Discord'));
+      await tester.pumpAndSettle();
+      expect(find.text('Đã liên kết Discord'), findsOneWidget);
+      expect(find.text('Discord ID: 123456789012345678'), findsOneWidget);
+
+      await tester.tap(find.text('Ngắt liên kết'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Ngắt liên kết').last);
+      await tester.pumpAndSettle();
+
+      expect(services.discord.link, isNull);
+      expect(find.text('Đã ngắt liên kết Discord.'), findsOneWidget);
+    },
+  );
 }

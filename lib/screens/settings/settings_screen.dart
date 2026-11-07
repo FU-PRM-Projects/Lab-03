@@ -1,4 +1,4 @@
-﻿import 'package:flutter/foundation.dart' show kReleaseMode;
+import 'package:flutter/foundation.dart' show kReleaseMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
@@ -7,6 +7,7 @@ import '../../models/image_ref.dart';
 import '../../models/self_control.dart';
 import '../../router/app_routes.dart';
 import '../../services/crash_reporter.dart';
+import '../../services/discord_service.dart';
 import '../../services/messaging_service.dart';
 import '../../services/remote_config_service.dart';
 import '../../theme/app_tokens.dart';
@@ -23,6 +24,7 @@ import '../../widgets/setting_row.dart';
 import '../../widgets/state_views.dart';
 import '../common/notification_inbox.dart';
 import '../common/screen_skeleton.dart';
+import '../discord/discord_connect_sheet.dart';
 
 /// S12 · Cài đặt (+ khu demo Firebase, deviation D-01).
 ///
@@ -208,6 +210,19 @@ class SettingsScreen extends ConsumerWidget {
                       subtitle: 'Gặp người cũng đang tập, trên Discord',
                       value: '',
                       onTap: () => context.push(AppRoutes.rooms),
+                    ),
+                    SettingRow.value(
+                      title: 'Liên kết Discord',
+                      subtitle:
+                          ref
+                              .watch(discordLinkProvider)
+                              .value
+                              ?.discordUsername ??
+                          'Nhập mã từ lệnh /connect trong DM với bot',
+                      value: ref.watch(discordLinkProvider).value != null
+                          ? 'Đã kết nối'
+                          : 'Nhập mã',
+                      onTap: () => showDiscordConnectSheet(context),
                     ),
                   ],
                 ),

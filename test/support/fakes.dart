@@ -602,6 +602,20 @@ class FakeDiscordService implements DiscordService {
   bool appWorks = true;
   bool seen = false;
 
+  DiscordLink? link;
+  final _linkChanges = StreamController<DiscordLink?>.broadcast();
+
+  /// Các mã 6 ký tự hợp lệ đang chờ kết nối: `code -> DiscordLink`.
+  final Map<String, DiscordLink> pendingCodes = <String, DiscordLink>{
+    'ABC123': const DiscordLink(
+      discordId: '123456789012345678',
+      discordUsername: 'Minh (@minh_discord)',
+    ),
+  };
+
+  /// Các Discord ID đã được liên kết với tài khoản Nốt khác (để test 1-1).
+  final Set<String> linkedDiscordIds = <String>{};
+
   @override
   Future<bool> open(String url, {bool inBrowser = false}) async {
     if (!inBrowser && !appWorks) return false;
@@ -614,6 +628,54 @@ class FakeDiscordService implements DiscordService {
 
   @override
   Future<void> markRulesSeen() async => seen = true;
+
+  @override
+  Stream<DiscordLink?> watchLink() => Stream<DiscordLink?>.multi((controller) {
+    controller.add(link);
+    final sub = _linkChanges.stream.listen(controller.add);
+    controller.onCancel = sub.cancel;
+  });
+
+  @override
+  Future<DiscordLink> connectWithCode(String rawCode) async {
+    final code = rawCode.trim().toUpperCase();
+    if (code.length != 6) {
+      throw const AppException(
+        AppErrorKind.invalidInput,
+        code: 'invalid-code-format',
+      );
+    }
+    if (link != null) {
+      throw const AppException(
+        AppErrorKind.invalidInput,
+        code: 'account-already-linked',
+      );
+    }
+    final target = pendingCodes[code];
+    if (target == null) {
+      throw const AppException(AppErrorKind.notFound, code: 'code-not-found');
+    }
+    if (linkedDiscordIds.contains(target.discordId)) {
+      throw const AppException(
+        AppErrorKind.invalidInput,
+        code: 'discord-already-linked',
+      );
+    }
+    pendingCodes.remove(code);
+    linkedDiscordIds.add(target.discordId);
+    link = target;
+    _linkChanges.add(link);
+    return target;
+  }
+
+  @override
+  Future<void> disconnect() async {
+    if (link != null) {
+      linkedDiscordIds.remove(link!.discordId);
+      link = null;
+      _linkChanges.add(null);
+    }
+  }
 }
 
 /// Kho thẻ mẫu: 2 chủ đề × 2 cấp × [perLevel] thẻ, id dạng `dc-1-1`, `vd-2-3`.

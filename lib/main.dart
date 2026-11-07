@@ -136,7 +136,9 @@ Future<void> main() async {
         localAuthServiceProvider.overrideWithValue(DeviceLocalAuthService()),
         screenGuardProvider.overrideWithValue(const MethodChannelScreenGuard()),
         nudgeServiceProvider.overrideWithValue(LocalNudgeService()),
-        discordServiceProvider.overrideWithValue(const DeviceDiscordService()),
+        discordServiceProvider.overrideWithValue(
+          DeviceDiscordService(currentUid: uid),
+        ),
         crashReporterProvider.overrideWithValue(
           crashEnabled
               ? const FirebaseCrashReporter()

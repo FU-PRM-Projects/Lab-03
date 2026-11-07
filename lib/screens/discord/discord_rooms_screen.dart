@@ -1,11 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../services/discord_service.dart';
 import '../../theme/app_tokens.dart';
 import '../../viewmodels/discord_rooms_view_model.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_top_bar.dart';
 import '../../widgets/setting_row.dart';
+import 'discord_connect_sheet.dart';
 import 'discord_launcher.dart';
 
 /// S14 · Phòng trò chuyện (Discord): Nốt chỉ mở link, không đọc tin nhắn.
@@ -67,6 +69,25 @@ class DiscordRoomsScreen extends ConsumerWidget {
                         SettingGroup(
                           label: 'PHÒNG CHUNG',
                           children: rows(data.shared),
+                        ),
+                        SettingGroup(
+                          label: 'BOT TRỢ LÝ (DM)',
+                          children: <Widget>[
+                            SettingRow.value(
+                              title: 'Liên kết tài khoản Discord',
+                              subtitle:
+                                  ref
+                                      .watch(discordLinkProvider)
+                                      .value
+                                      ?.discordUsername ??
+                                  'Nhắn /connect cho bot trong DM để lấy mã',
+                              value:
+                                  ref.watch(discordLinkProvider).value != null
+                                  ? 'Đã kết nối'
+                                  : 'Nhập mã',
+                              onTap: () => showDiscordConnectSheet(context),
+                            ),
+                          ],
                         ),
                         const Spacer(),
                         AppButton(
