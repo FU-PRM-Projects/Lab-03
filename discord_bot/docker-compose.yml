@@ -1,0 +1,13 @@
+services:
+  discord_bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID:-prm393-not-lab3}
+      - FIREBASE_API_KEY=${FIREBASE_API_KEY:-}
+      - FIRESTORE_EMULATOR_HOST=${FIRESTORE_EMULATOR_HOST:-}
