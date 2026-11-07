@@ -17,12 +17,14 @@ pub type Context<'a> = poise::Context<'a, Data, Error>;
 async fn main() {
     let _ = dotenvy::dotenv();
 
-    let token = std::env::var("DISCORD_TOKEN").expect("Missing DISCORD_TOKEN environment variable");
+    let token = std::env::var("DISCORD_TOKEN")
+        .expect("Missing DISCORD_TOKEN environment variable")
+        .trim()
+        .to_string();
     let firebase = FirebaseClient::from_env();
 
-    // Only subscribe to DM messages and basic non-privileged events
-    let intents = serenity::GatewayIntents::DIRECT_MESSAGES
-        | serenity::GatewayIntents::MESSAGE_CONTENT;
+    // Only subscribe to DM messages (non-privileged; does not require enabling Privileged Intents in Discord Portal)
+    let intents = serenity::GatewayIntents::DIRECT_MESSAGES;
 
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
