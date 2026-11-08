@@ -338,6 +338,10 @@ const Color _primaryEdge = Color(0xFF252F80);
 const Color _lockedEdge = Color(0xFFBDBFC7);
 
 /// Figma `Banner chặng`: nền primary bo 20, bóng đặc 4, chữ trắng.
+///
+/// Chạm banner mở S08 của thẻ đang làm (giống chạm nút trên con đường); nút sổ
+/// tay bên phải mở tab Thử thách để xem cả danh sách thẻ. Xong hết chặng thì
+/// không còn thẻ đang làm, cả banner mở Thử thách.
 class _StageBanner extends StatelessWidget {
   const _StageBanner({required this.stage});
 
@@ -349,15 +353,17 @@ class _StageBanner extends StatelessWidget {
     final scheme = theme.colorScheme;
     final onPrimary = scheme.onPrimary;
     final total = stage.nodes.length;
-    final title = stage.current?.challenge.title ?? 'Đã xong chặng này';
+    final current = stage.current;
+    final title = current?.challenge.title ?? 'Đã xong chặng này';
     final radius = BorderRadius.circular(20);
+    void openList() => context.go(AppRoutes.challenges);
+    final VoidCallback open = current == null
+        ? openList
+        : () => context.push(AppRoutes.challengeDetail(current.challenge.id));
 
     return Semantics(
-      button: true,
-      label:
-          'Chặng ${stage.level}, ${stage.topic.label}: $title, '
-          'đã làm ${stage.done} trên $total. Mở Thử thách',
-      excludeSemantics: true,
+      container: true,
+      explicitChildNodes: true,
       child: DecoratedBox(
         decoration: BoxDecoration(
           borderRadius: radius,
@@ -370,7 +376,7 @@ class _StageBanner extends StatelessWidget {
           borderRadius: radius,
           child: InkWell(
             borderRadius: radius,
-            onTap: () => context.go(AppRoutes.challenges),
+            onTap: open,
             child: Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpace.s16,
@@ -380,54 +386,76 @@ class _StageBanner extends StatelessWidget {
                 spacing: AppSpace.s12,
                 children: <Widget>[
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: AppSpace.s6,
-                      children: <Widget>[
-                        Text(
-                          'ĐANG LEO · ${stage.topic.label.toUpperCase()}',
-                          style: AppTextStyles.of(context).overline.copyWith(
-                            color: onPrimary.withValues(alpha: 0.8),
-                            letterSpacing: 0.72,
+                    child: Semantics(
+                      button: true,
+                      label:
+                          'Đang leo ${stage.topic.label}: $title, '
+                          'đã làm ${stage.done} trên $total. '
+                          '${current == null ? 'Mở Thử thách' : 'Mở thẻ'}',
+                      onTap: open,
+                      excludeSemantics: true,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        spacing: AppSpace.s6,
+                        children: <Widget>[
+                          Text(
+                            'ĐANG LEO · ${stage.topic.label.toUpperCase()}',
+                            style: AppTextStyles.of(context).overline.copyWith(
+                              color: onPrimary.withValues(alpha: 0.8),
+                              letterSpacing: 0.72,
+                            ),
                           ),
-                        ),
-                        Text(
-                          title,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: onPrimary,
-                            letterSpacing: -0.18,
+                          Text(
+                            title,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: onPrimary,
+                              letterSpacing: -0.18,
+                            ),
                           ),
-                        ),
-                        Row(
-                          spacing: AppSpace.s8,
-                          children: <Widget>[
-                            Expanded(
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(
-                                  AppRadius.r4,
-                                ),
-                                child: LinearProgressIndicator(
-                                  value: total == 0 ? 0 : stage.done / total,
-                                  minHeight: AppSpace.s8,
-                                  color: onPrimary,
-                                  backgroundColor: onPrimary.withValues(
-                                    alpha: 0.3,
+                          Row(
+                            spacing: AppSpace.s8,
+                            children: <Widget>[
+                              Expanded(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(
+                                    AppRadius.r4,
+                                  ),
+                                  child: LinearProgressIndicator(
+                                    value: total == 0 ? 0 : stage.done / total,
+                                    minHeight: AppSpace.s8,
+                                    color: onPrimary,
+                                    backgroundColor: onPrimary.withValues(
+                                      alpha: 0.3,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            Text(
-                              '${stage.done}/$total',
-                              style: theme.textTheme.labelMedium?.copyWith(
-                                color: onPrimary,
+                              Text(
+                                '${stage.done}/$total',
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  color: onPrimary,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  const _NotebookBadge(),
+                  Semantics(
+                    button: true,
+                    label: 'Danh sách thẻ. Mở Thử thách',
+                    onTap: openList,
+                    excludeSemantics: true,
+                    child: Material(
+                      type: MaterialType.transparency,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(14),
+                        onTap: openList,
+                        child: const _NotebookBadge(),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

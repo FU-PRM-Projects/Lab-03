@@ -3,6 +3,7 @@ import 'package:lab03/models/challenge.dart';
 import 'package:lab03/models/mood.dart';
 import 'package:lab03/models/note.dart';
 import 'package:lab03/screens/challenge_detail/challenge_detail_screen.dart';
+import 'package:lab03/screens/challenges/challenges_screen.dart';
 import 'package:lab03/screens/journey/journey_screen.dart';
 import 'package:lab03/screens/journey/weekly_card_page.dart';
 import 'package:lab03/screens/note_detail/note_detail_screen.dart';
@@ -81,6 +82,30 @@ void main() {
     await tester.tap(find.text('Dũng cảm cấp 1 thẻ 2 · 4 phút'));
     await tester.pumpAndSettle();
     expect(find.byType(ChallengeDetailScreen), findsOneWidget);
+  });
+
+  testWidgets('chạm banner mở S08 của thẻ đang làm', (tester) async {
+    final services = TestServices();
+    services.challenges.progress[ChallengeTopic.dungCam] =
+        const ChallengeProgress(completed: <String>{'dc-1-1'});
+    await pumpApp(tester, services: services);
+    await tester.tap(findTab('Hành trình'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(
+      find.bySemanticsLabel(RegExp(r'^Đang leo Dũng cảm: .*Mở thẻ$')),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byType(ChallengeDetailScreen), findsOneWidget);
+  });
+
+  testWidgets('nút sổ tay trên banner mở tab Thử thách', (tester) async {
+    await pumpApp(tester, services: TestServices());
+    await tester.tap(findTab('Hành trình'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel('Danh sách thẻ. Mở Thử thách'));
+    await tester.pumpAndSettle();
+    expect(find.byType(ChallengesScreen), findsOneWidget);
   });
 
   testWidgets('con đường leo lên: thẻ đã xong ở dưới, đích ở đỉnh', (
