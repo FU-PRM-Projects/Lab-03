@@ -83,6 +83,54 @@ void main() {
     expect(find.byType(ChallengeDetailScreen), findsOneWidget);
   });
 
+  testWidgets('con đường leo lên: thẻ đã xong ở dưới, đích ở đỉnh', (
+    tester,
+  ) async {
+    final services = TestServices();
+    services.challenges.progress[ChallengeTopic.dungCam] =
+        const ChallengeProgress(completed: <String>{'dc-1-1'});
+    await pumpApp(tester, services: services);
+    await tester.tap(findTab('Hành trình'));
+    await tester.pumpAndSettle();
+
+    // Thẻ đã xong nằm thấp hơn thẻ đang làm (leo từ dưới lên).
+    final done = tester.getCenter(find.bySemanticsLabel(RegExp(r', đã xong$')));
+    final current = tester.getCenter(
+      find.bySemanticsLabel(RegExp(r', đang làm$')),
+    );
+    expect(done.dy, greaterThan(current.dy));
+
+    // Cuộn lên tới đỉnh: đích là huy hiệu chủ đề và mở chặng sau.
+    final summit = find.bySemanticsLabel(
+      RegExp(r'^Đỉnh · huy hiệu Dũng cảm\. Chặng 2 · mở khi xong \d+ thẻ$'),
+    );
+    await tester.scrollUntilVisible(
+      summit,
+      -300,
+      scrollable: find.byType(Scrollable).last,
+    );
+    expect(summit, findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('làm thẻ không theo thứ tự: thẻ đã xong vẫn ở dưới', (
+    tester,
+  ) async {
+    final services = TestServices();
+    // Chỉ xong thẻ thứ 3 của Dũng cảm: thẻ đầu vẫn là thẻ đang làm.
+    services.challenges.progress[ChallengeTopic.dungCam] =
+        const ChallengeProgress(completed: <String>{'dc-1-3'});
+    await pumpApp(tester, services: services);
+    await tester.tap(findTab('Hành trình'));
+    await tester.pumpAndSettle();
+
+    final done = tester.getCenter(find.bySemanticsLabel(RegExp(r', đã xong$')));
+    final current = tester.getCenter(
+      find.bySemanticsLabel(RegExp(r', đang làm$')),
+    );
+    expect(done.dy, greaterThan(current.dy));
+  });
+
   testWidgets('Con đường: chip chủ đề, mỗi lần chỉ hiện một đường', (
     tester,
   ) async {
