@@ -73,7 +73,7 @@ class StreakCard extends StatelessWidget {
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              spacing: AppSpace.s8,
+              spacing: AppSpace.s6,
               children: <Widget>[
                 Row(
                   spacing: AppSpace.s12,
@@ -121,7 +121,7 @@ class StreakCard extends StatelessWidget {
                 // Bảy ô tròn chia đều; mốc kế tiếp ghi ngay dưới.
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
-                  spacing: AppSpace.s4,
+                  spacing: AppSpace.s2,
                   children: <Widget>[
                     _WeekStrip(days: streak.days),
                     Text(
@@ -175,15 +175,15 @@ class _RecordPill extends StatelessWidget {
 }
 
 /// Dải 7 ngày gần nhất: 7 ô tròn chia đều hết chiều ngang để không bị sát
-/// nhau. Mọi ô đều ghi chữ thứ (T2…CN), chỉ đổi màu: ngày có nốt là ô primary
-/// chữ trắng, ngày trống là ô trắng chữ nhạt, hôm nay chưa ghi có viền primary.
+/// nhau. Ngày có nốt là ô primary có dấu tích trắng; ngày trống là ô trắng ghi
+/// chữ thứ (T2…CN); hôm nay có thêm vòng primary bên ngoài.
 class _WeekStrip extends StatelessWidget {
   const _WeekStrip({required this.days});
 
   final List<StreakDay> days;
 
-  /// Đường kính ô; đủ chỗ cho "CN" mà thẻ vẫn thấp như trước.
-  static const double _dot = 26;
+  /// Đường kính ô.
+  static const double _dot = 30;
 
   @override
   Widget build(BuildContext context) {
@@ -201,22 +201,39 @@ class _WeekStrip extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: day.hasNote ? scheme.primary : scheme.surface,
-              border: day.isToday && !day.hasNote
-                  ? Border.all(color: scheme.primary, width: 1.5)
+              border: day.isToday
+                  ? Border.all(
+                      color: day.hasNote
+                          ? scheme.primaryContainer
+                          : scheme.primary,
+                      width: 2,
+                      strokeAlign: day.hasNote
+                          ? BorderSide.strokeAlignOutside
+                          : BorderSide.strokeAlignInside,
+                    )
                   : null,
             ),
-            child: Text(
-              ViDateFormat.weekdayShort[day.day.weekday - 1],
-              style: theme.textTheme.labelSmall?.copyWith(
-                height: 1,
-                fontWeight: day.isToday ? FontWeight.w700 : null,
-                color: day.hasNote
-                    ? scheme.onPrimary
-                    : day.isToday
-                    ? scheme.primary
-                    : scheme.onSurfaceVariant,
-              ),
-            ),
+            child: day.hasNote
+                ? SvgPicture.asset(
+                    'assets/icons/check-bold.svg',
+                    width: 14,
+                    height: 14,
+                    colorFilter: ColorFilter.mode(
+                      scheme.onPrimary,
+                      BlendMode.srcIn,
+                    ),
+                    excludeFromSemantics: true,
+                  )
+                : Text(
+                    ViDateFormat.weekdayShort[day.day.weekday - 1],
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      height: 1,
+                      fontWeight: day.isToday ? FontWeight.w700 : null,
+                      color: day.isToday
+                          ? scheme.primary
+                          : scheme.onSurfaceVariant,
+                    ),
+                  ),
           ),
       ],
     );
