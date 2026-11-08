@@ -199,6 +199,45 @@ class _ClimbViewState extends State<_ClimbView> {
           );
         }
 
+        // Mép trên của cảnh mờ dần vào nền màn, không cắt ngang dưới banner.
+        return ShaderMask(
+          blendMode: BlendMode.dstIn,
+          shaderCallback: (rect) => LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: const <Color>[Color(0x00000000), Color(0xFF000000)],
+            stops: <double>[0, (_fade / rect.height).clamp(0.0, 1.0)],
+          ).createShader(rect),
+          child: _scroll(
+            stage,
+            nodes,
+            points,
+            start,
+            summit,
+            reached,
+            width,
+            height,
+          ),
+        );
+      },
+    );
+  }
+
+  /// Độ cao dải mờ ở mép trên khung cuộn.
+  static const double _fade = 48;
+
+  Widget _scroll(
+    PathStage stage,
+    List<PathNode> nodes,
+    List<Offset> points,
+    Offset start,
+    Offset summit,
+    int reached,
+    double width,
+    double height,
+  ) {
+    return Builder(
+      builder: (context) {
         return SingleChildScrollView(
           key: ValueKey<String>(stage.topic.id),
           controller: _controller,
@@ -217,6 +256,7 @@ class _ClimbViewState extends State<_ClimbView> {
                       summit: summit,
                       reached: reached,
                       primary: Theme.of(context).colorScheme.primary,
+                      backdrop: Theme.of(context).scaffoldBackgroundColor,
                     ),
                   ),
                 ),
