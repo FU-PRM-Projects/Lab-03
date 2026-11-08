@@ -256,7 +256,6 @@ class _ClimbViewState extends State<_ClimbView> {
                       summit: summit,
                       reached: reached,
                       primary: Theme.of(context).colorScheme.primary,
-                      backdrop: Theme.of(context).scaffoldBackgroundColor,
                     ),
                   ),
                 ),

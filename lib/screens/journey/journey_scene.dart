@@ -19,11 +19,7 @@ class JourneyScenePainter extends CustomPainter {
     required this.summit,
     required this.reached,
     required this.primary,
-    required this.backdrop,
   });
-
-  /// Màu nền màn (scaffold): trời ở đỉnh cảnh tan vào màu này.
-  final Color backdrop;
 
   final ChallengeTopic topic;
   final List<Offset> points;
@@ -50,50 +46,20 @@ class JourneyScenePainter extends CustomPainter {
   void _paintMountain(Canvas canvas, Size size) {
     final w = size.width;
     final h = size.height;
-    _sky(canvas, size, AppPalette.tintBlue);
-    _sun(canvas, Offset(w * 0.84, 56), const Color(0xFFFFE9A8));
+    canvas.drawRect(Offset.zero & size, Paint()..color = AppPalette.tintBlue);
+    _sun(canvas, Offset(w * 0.84, 56), const Color(0xFFFFE08A));
     _cloud(canvas, Offset(w * 0.2, 90), 1);
-    _cloud(canvas, Offset(w * 0.8, h * 0.34), 0.8);
+    _cloud(canvas, Offset(w * 0.78, h * 0.32), 0.8);
+    _cloud(canvas, Offset(w * 0.18, h * 0.55), 0.7);
 
-    // Dãy núi mờ phía sau, rất nhạt để không giành chỗ với nút.
-    final back = Paint()..color = const Color(0xFFE8ECFB);
-    canvas
-      ..drawPath(
-        Path()
-          ..moveTo(-w * 0.3, h)
-          ..lineTo(w * 0.1, h * 0.42)
-          ..lineTo(w * 0.5, h)
-          ..close(),
-        back,
-      )
-      ..drawPath(
-        Path()
-          ..moveTo(w * 0.5, h)
-          ..lineTo(w * 0.92, h * 0.38)
-          ..lineTo(w * 1.3, h)
-          ..close(),
-        back,
-      );
-
-    // Núi chính: một đỉnh ngay dưới điểm đích, mặt phải sáng hơn cho có khối.
+    // Núi xa: một đỉnh lớn ngay dưới điểm đích.
     final peak = Offset(summit.dx, summit.dy - 8);
-    canvas
-      ..drawPath(
-        Path()
-          ..moveTo(-w * 0.1, h)
-          ..lineTo(peak.dx, peak.dy)
-          ..lineTo(w * 1.1, h)
-          ..close(),
-        Paint()..color = const Color(0xFFDDE2F8),
-      )
-      ..drawPath(
-        Path()
-          ..moveTo(peak.dx, peak.dy)
-          ..lineTo(w * 1.1, h)
-          ..lineTo(peak.dx + w * 0.12, h)
-          ..close(),
-        Paint()..color = const Color(0xFFE6EAFA),
-      );
+    final far = Path()
+      ..moveTo(-w * 0.1, h)
+      ..lineTo(peak.dx, peak.dy)
+      ..lineTo(w * 1.1, h)
+      ..close();
+    canvas.drawPath(far, Paint()..color = const Color(0xFFC9D0F5));
     // Mũ tuyết.
     final capH = math.min(110.0, h * 0.14);
     final capW = capH * 0.62;
@@ -107,15 +73,26 @@ class JourneyScenePainter extends CustomPainter {
       ..close();
     canvas.drawPath(cap, Paint()..color = Colors.white);
 
-    // Đồi thấp nhạt rồi thảm cỏ và rừng thông ở chân núi.
-    final foothill = Path()
-      ..moveTo(0, h)
-      ..lineTo(0, h - 210)
-      ..quadraticBezierTo(w * 0.3, h - 250, w * 0.6, h - 205)
-      ..quadraticBezierTo(w * 0.85, h - 170, w, h - 215)
-      ..lineTo(w, h)
-      ..close();
-    canvas.drawPath(foothill, Paint()..color = AppPalette.tintGreen);
+    // Hai sườn núi gần, thấp hơn.
+    final mid = Paint()..color = const Color(0xFFADB7EE);
+    canvas.drawPath(
+      Path()
+        ..moveTo(-w * 0.35, h)
+        ..lineTo(w * 0.12, h * 0.48)
+        ..lineTo(w * 0.62, h)
+        ..close(),
+      mid,
+    );
+    canvas.drawPath(
+      Path()
+        ..moveTo(w * 0.4, h)
+        ..lineTo(w * 0.92, h * 0.55)
+        ..lineTo(w * 1.4, h)
+        ..close(),
+      mid,
+    );
+
+    // Chân núi: thảm cỏ và rừng thông.
     final ground = Path()
       ..moveTo(0, h)
       ..lineTo(0, h - 120)
@@ -123,7 +100,7 @@ class JourneyScenePainter extends CustomPainter {
       ..quadraticBezierTo(w * 0.75, h - 106, w, h - 136)
       ..lineTo(w, h)
       ..close();
-    canvas.drawPath(ground, Paint()..color = _softGrass);
+    canvas.drawPath(ground, Paint()..color = AppPalette.heat2);
     for (final (x, s) in <(double, double)>[
       (0.06, 1),
       (0.14, 0.75),
@@ -140,8 +117,11 @@ class JourneyScenePainter extends CustomPainter {
   void _paintGarden(Canvas canvas, Size size) {
     final w = size.width;
     final h = size.height;
-    _sky(canvas, size, const Color(0xFFFFF6E5));
-    _sun(canvas, Offset(w * 0.16, 54), const Color(0xFFFFE08A));
+    canvas.drawRect(
+      Offset.zero & size,
+      Paint()..color = const Color(0xFFFFF6E5),
+    );
+    _sun(canvas, Offset(w * 0.16, 54), AppPalette.heat3);
     _cloud(canvas, Offset(w * 0.78, 84), 0.9);
 
     // Đồi xếp lớp, càng xuống càng đậm.
@@ -159,7 +139,7 @@ class JourneyScenePainter extends CustomPainter {
     hill(summit.dy + 70, AppPalette.tintGreen, 26);
     hill(h * 0.45, const Color(0xFFC6EEDC), 24);
     hill(h * 0.7, const Color(0xFFA5E4C8), 20);
-    hill(h - 130, _softGrass, 18);
+    hill(h - 130, AppPalette.heat2, 18);
 
     // Cây hai bên lối đi, thưa dần lên đồi.
     final rnd = math.Random(7);
@@ -238,29 +218,6 @@ class JourneyScenePainter extends CustomPainter {
   }
 
   // ------------------------------------------------------- chi tiết nhỏ
-
-  /// Cỏ chân cảnh: heat2 pha trắng cho dịu, không chói hơn nút primary.
-  static final Color _softGrass = Color.lerp(
-    AppPalette.heat2,
-    Colors.white,
-    0.3,
-  )!;
-
-  /// Trời chuyển dần từ nền app ([backdrop]) ở đỉnh sang [color] ở giữa cảnh,
-  /// nên phần trên cảnh liền với màn thay vì có một mép cắt.
-  void _sky(Canvas canvas, Size size, Color color) {
-    final rect = Offset.zero & size;
-    canvas.drawRect(
-      rect,
-      Paint()
-        ..shader = LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: <Color>[backdrop, color],
-          stops: const <double>[0, 0.35],
-        ).createShader(rect),
-    );
-  }
 
   static void _sun(Canvas canvas, Offset c, Color color) =>
       canvas.drawCircle(c, 22, Paint()..color = color);
@@ -355,7 +312,6 @@ class JourneyScenePainter extends CustomPainter {
       old.summit != summit ||
       old.start != start ||
       old.primary != primary ||
-      old.backdrop != backdrop ||
       !_samePoints(old.points, points);
 
   static bool _samePoints(List<Offset> a, List<Offset> b) {
