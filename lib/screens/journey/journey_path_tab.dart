@@ -142,8 +142,11 @@ class _ClimbViewState extends State<_ClimbView> {
   /// Từ mép trên tới nút cao nhất (đích + khoảng thở dưới đỉnh).
   static const double _summitSpace = _summitY + 70;
 
-  /// Nút đầu tiên nằm trên thanh tab nổi và chân cảnh.
-  static const double _bottomInset = AppSpace.tabContentBottom + 24;
+  /// Nút đầu tiên nằm trên thanh tab nổi, biển chặng và chân cảnh.
+  static const double _bottomInset = AppSpace.tabContentBottom + 72;
+
+  /// Biển "Chặng N" ở chân đường, ngay trên thanh tab nổi.
+  static const double _startSignBottom = AppSpace.tabContentBottom + 8;
 
   /// Độ lệch ngang của nút thứ [i] so với giữa màn (Figma: 0, +56, +28…).
   static double _zigzag(int i) =>
@@ -266,6 +269,12 @@ class _ClimbViewState extends State<_ClimbView> {
                   ),
                 ),
                 _Summit(stage: stage, top: _summitLabelTop),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: _startSignBottom,
+                  child: Center(child: _StartSign(stage: stage)),
+                ),
                 for (final (i, node) in nodes.indexed)
                   node.status == PathNodeStatus.current
                       ? _CurrentNode(node: node, at: points[i], dx: _zigzag(i))
@@ -376,8 +385,7 @@ class _StageBanner extends StatelessWidget {
                       spacing: AppSpace.s6,
                       children: <Widget>[
                         Text(
-                          'CHẶNG ${stage.level} · '
-                          '${stage.topic.label.toUpperCase()}',
+                          'ĐANG LEO · ${stage.topic.label.toUpperCase()}',
                           style: AppTextStyles.of(context).overline.copyWith(
                             color: onPrimary.withValues(alpha: 0.8),
                             letterSpacing: 0.72,
@@ -757,22 +765,27 @@ class _Summit extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final place = stage.topic == ChallengeTopic.dungCam ? 'Đỉnh' : 'Cây lớn';
-    final title = '$place · huy hiệu ${stage.topic.label}';
+    final place = stage.topic == ChallengeTopic.dungCam
+        ? 'Lên đỉnh'
+        : 'Tới cây lớn';
     final total = stage.nodes.length;
     final conquered = total > 0 && stage.done == total;
+    final badge = 'huy hiệu ${stage.topic.label}';
+    // Đỉnh là cửa sang chặng sau: chặng này ở chân đường, chặng sau ở trên.
+    final title = stage.hasNextLevel
+        ? 'Chặng ${stage.level + 1} · ${stage.topic.label}'
+        : 'Đích · ${stage.topic.label}';
     final subtitle = conquered
-        ? 'Đã chinh phục chặng này'
-        : stage.hasNextLevel
-        ? 'Chặng ${stage.level + 1} · mở khi xong $total thẻ'
-        : null;
+        ? 'Đã chinh phục · nhận $badge'
+        : '$place nhận $badge · xong $total thẻ để mở';
+    final locked = !conquered && stage.hasNextLevel;
 
     return Positioned(
       left: AppSpace.screen,
       right: AppSpace.screen,
       top: top,
       child: Semantics(
-        label: <String>[title, ?subtitle].join('. '),
+        label: <String>[title, if (locked) 'chưa mở', subtitle].join('. '),
         excludeSemantics: true,
         child: Column(
           children: <Widget>[
@@ -793,11 +806,13 @@ class _Summit extends StatelessWidget {
                       spacing: AppSpace.s6,
                       children: <Widget>[
                         Icon(
-                          conquered
-                              ? Icons.emoji_events_rounded
-                              : Icons.emoji_events_outlined,
+                          locked
+                              ? Icons.lock_rounded
+                              : Icons.emoji_events_rounded,
                           size: 18,
-                          color: AppPalette.heat4,
+                          color: locked
+                              ? scheme.onSurfaceVariant
+                              : AppPalette.heat4,
                         ),
                         Flexible(
                           child: Text(
@@ -810,18 +825,64 @@ class _Summit extends StatelessWidget {
                         ),
                       ],
                     ),
-                    if (subtitle != null)
-                      Text(
-                        subtitle,
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: scheme.onSurfaceVariant,
-                        ),
+                    Text(
+                      subtitle,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
                       ),
+                    ),
                   ],
                 ),
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Biển "Chặng N · xuất phát" ở chân đường: chặng đang leo nằm dưới, chặng
+/// sau nằm trên đỉnh, nên thứ tự chặng đọc từ dưới lên như con đường.
+class _StartSign extends StatelessWidget {
+  const _StartSign({required this.stage});
+
+  final PathStage stage;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final label = 'Chặng ${stage.level} · xuất phát';
+
+    return Semantics(
+      label: label,
+      excludeSemantics: true,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: scheme.primary,
+          borderRadius: BorderRadius.circular(AppRadius.full),
+          boxShadow: const <BoxShadow>[
+            BoxShadow(color: _primaryEdge, offset: Offset(0, 3)),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpace.s12,
+            vertical: AppSpace.s6,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            spacing: AppSpace.s6,
+            children: <Widget>[
+              Icon(Icons.flag_rounded, size: 16, color: scheme.onPrimary),
+              Text(
+                label.toUpperCase(),
+                style: AppTextStyles.of(context).overline
+                    .copyWith(color: scheme.onPrimary, letterSpacing: 0.72),
+              ),
+            ],
+          ),
         ),
       ),
     );

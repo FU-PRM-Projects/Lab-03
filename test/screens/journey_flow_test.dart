@@ -47,7 +47,7 @@ void main() {
       tester,
     ) async {
       await openJourney(tester, notes: monthOfNotes(), size: size);
-      expect(find.text('CHẶNG 1 · DŨNG CẢM'), findsOneWidget);
+      expect(find.text('ĐANG LEO · DŨNG CẢM'), findsOneWidget);
 
       await openTab(tester, 'Thống kê');
       expect(find.text('Nốt tuần này'), findsOneWidget);
@@ -100,9 +100,15 @@ void main() {
     );
     expect(done.dy, greaterThan(current.dy));
 
-    // Cuộn lên tới đỉnh: đích là huy hiệu chủ đề và mở chặng sau.
+    // Chặng đang leo ở chân đường, dưới thẻ đã xong.
+    final sign = tester.getCenter(find.bySemanticsLabel('Chặng 1 · xuất phát'));
+    expect(sign.dy, greaterThan(done.dy));
+
+    // Cuộn lên tới đỉnh: chặng sau (đang khóa) và huy hiệu chủ đề ở trên.
     final summit = find.bySemanticsLabel(
-      RegExp(r'^Đỉnh · huy hiệu Dũng cảm\. Chặng 2 · mở khi xong \d+ thẻ$'),
+      RegExp(
+        r'^Chặng 2 · Dũng cảm\. chưa mở\. Lên đỉnh nhận huy hiệu Dũng cảm · xong \d+ thẻ để mở$',
+      ),
     );
     await tester.scrollUntilVisible(
       summit,
@@ -140,8 +146,8 @@ void main() {
     await pumpApp(tester, services: services);
     await tester.tap(findTab('Hành trình'));
     await tester.pumpAndSettle();
-    expect(find.text('CHẶNG 1 · DŨNG CẢM'), findsOneWidget);
-    expect(find.text('CHẶNG 1 · VẬN ĐỘNG'), findsNothing);
+    expect(find.text('ĐANG LEO · DŨNG CẢM'), findsOneWidget);
+    expect(find.text('ĐANG LEO · VẬN ĐỘNG'), findsNothing);
     expect(find.textContaining('Dũng cảm · 1/'), findsOneWidget);
 
     // Hàng chip cuộn ngang: chip sau có thể nằm ngoài mép phải.
@@ -149,15 +155,15 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.textContaining('Vận động · 0/'));
     await tester.pumpAndSettle();
-    expect(find.text('CHẶNG 1 · VẬN ĐỘNG'), findsOneWidget);
-    expect(find.text('CHẶNG 1 · DŨNG CẢM'), findsNothing);
+    expect(find.text('ĐANG LEO · VẬN ĐỘNG'), findsOneWidget);
+    expect(find.text('ĐANG LEO · DŨNG CẢM'), findsNothing);
 
     // Đổi tab rồi quay lại: vẫn ở chủ đề vừa chọn.
     await tester.tap(find.text('Thống kê'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Con đường'));
     await tester.pumpAndSettle();
-    expect(find.text('CHẶNG 1 · VẬN ĐỘNG'), findsOneWidget);
+    expect(find.text('ĐANG LEO · VẬN ĐỘNG'), findsOneWidget);
   });
 
   testWidgets('ít dữ liệu: biểu đồ thay bằng lời nhắc', (tester) async {
