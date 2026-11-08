@@ -133,8 +133,14 @@ class _ClimbViewState extends State<_ClimbView> {
   /// Khoảng cách dọc giữa hai nút.
   static const double _step = 140;
 
-  /// Chỗ cho đích ở đỉnh (huy hiệu, cờ / cây lớn).
-  static const double _summitSpace = 200;
+  /// Mép trên của nhãn đích: nằm dưới dải mờ đầu khung cuộn.
+  static const double _summitLabelTop = 64;
+
+  /// Đỉnh núi / gốc cây lớn: chừa chỗ cho nhãn đích, cờ và tán cây phía trên.
+  static const double _summitY = 230;
+
+  /// Từ mép trên tới nút cao nhất (đích + khoảng thở dưới đỉnh).
+  static const double _summitSpace = _summitY + 70;
 
   /// Nút đầu tiên nằm trên thanh tab nổi và chân cảnh.
   static const double _bottomInset = AppSpace.tabContentBottom + 24;
@@ -172,7 +178,7 @@ class _ClimbViewState extends State<_ClimbView> {
           for (var i = 0; i < nodes.length; i++)
             Offset(width / 2 + _zigzag(i), height - _bottomInset - i * _step),
         ];
-        final summit = Offset(width / 2, 140);
+        final summit = Offset(width / 2, _summitY);
         final start = Offset(width / 2 - 40, height - 30);
         final reached = nodes
             .takeWhile((n) => n.status == PathNodeStatus.done)
@@ -259,7 +265,7 @@ class _ClimbViewState extends State<_ClimbView> {
                     ),
                   ),
                 ),
-                _Summit(stage: stage),
+                _Summit(stage: stage, top: _summitLabelTop),
                 for (final (i, node) in nodes.indexed)
                   node.status == PathNodeStatus.current
                       ? _CurrentNode(node: node, at: points[i], dx: _zigzag(i))
@@ -740,9 +746,12 @@ class _CurrentNode extends StatelessWidget {
 /// Đích ở đỉnh: huy hiệu của chủ đề, và chặng sau mở khi xong mọi thẻ. Núi có
 /// cờ cắm trên đỉnh; vườn có cây lớn (vẽ ở nền).
 class _Summit extends StatelessWidget {
-  const _Summit({required this.stage});
+  const _Summit({required this.stage, required this.top});
 
   final PathStage stage;
+
+  /// Khoảng cách từ mép trên nội dung tới nhãn.
+  final double top;
 
   @override
   Widget build(BuildContext context) {
@@ -761,7 +770,7 @@ class _Summit extends StatelessWidget {
     return Positioned(
       left: AppSpace.screen,
       right: AppSpace.screen,
-      top: AppSpace.s12,
+      top: top,
       child: Semantics(
         label: <String>[title, ?subtitle].join('. '),
         excludeSemantics: true,
@@ -812,42 +821,9 @@ class _Summit extends StatelessWidget {
                 ),
               ),
             ),
-            if (stage.topic == ChallengeTopic.dungCam)
-              const Padding(
-                padding: EdgeInsets.only(top: AppSpace.s4),
-                child: CustomPaint(size: Size(28, 40), painter: _FlagPainter()),
-              ),
           ],
         ),
       ),
     );
   }
-}
-
-/// Cờ cắm trên đỉnh núi.
-class _FlagPainter extends CustomPainter {
-  const _FlagPainter();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    canvas
-      ..drawLine(
-        Offset(size.width * 0.3, 0),
-        Offset(size.width * 0.3, size.height),
-        Paint()
-          ..color = AppPalette.onSurface
-          ..strokeWidth = 2.5,
-      )
-      ..drawPath(
-        Path()
-          ..moveTo(size.width * 0.3, 2)
-          ..lineTo(size.width, 9)
-          ..lineTo(size.width * 0.3, 16)
-          ..close(),
-        Paint()..color = AppPalette.heat4,
-      );
-  }
-
-  @override
-  bool shouldRepaint(_FlagPainter old) => false;
 }

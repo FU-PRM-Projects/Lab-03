@@ -47,8 +47,9 @@ class JourneyScenePainter extends CustomPainter {
     final w = size.width;
     final h = size.height;
     canvas.drawRect(Offset.zero & size, Paint()..color = AppPalette.tintBlue);
-    _sun(canvas, Offset(w * 0.84, 56), const Color(0xFFFFE08A));
-    _cloud(canvas, Offset(w * 0.2, 90), 1);
+    // Mặt trời, mây nằm dưới nhãn đích, hai bên đỉnh: không đè lên chữ.
+    _sun(canvas, Offset(w * 0.86, summit.dy - 60), const Color(0xFFFFE08A));
+    _cloud(canvas, Offset(w * 0.16, summit.dy - 50), 1);
     _cloud(canvas, Offset(w * 0.78, h * 0.32), 0.8);
     _cloud(canvas, Offset(w * 0.18, h * 0.55), 0.7);
 
@@ -72,6 +73,7 @@ class JourneyScenePainter extends CustomPainter {
       ..lineTo(peak.dx - capW, peak.dy + capH)
       ..close();
     canvas.drawPath(cap, Paint()..color = Colors.white);
+    _flag(canvas, peak);
 
     // Hai sườn núi gần, thấp hơn.
     final mid = Paint()..color = const Color(0xFFADB7EE);
@@ -121,8 +123,8 @@ class JourneyScenePainter extends CustomPainter {
       Offset.zero & size,
       Paint()..color = const Color(0xFFFFF6E5),
     );
-    _sun(canvas, Offset(w * 0.16, 54), AppPalette.heat3);
-    _cloud(canvas, Offset(w * 0.78, 84), 0.9);
+    _sun(canvas, Offset(w * 0.13, summit.dy - 60), AppPalette.heat3);
+    _cloud(canvas, Offset(w * 0.84, summit.dy - 45), 0.9);
 
     // Đồi xếp lớp, càng xuống càng đậm.
     void hill(double top, Color color, double wave) {
@@ -218,6 +220,27 @@ class JourneyScenePainter extends CustomPainter {
   }
 
   // ------------------------------------------------------- chi tiết nhỏ
+
+  /// Cờ cắm ngay trên đỉnh: chân cột chạm đỉnh núi.
+  static void _flag(Canvas canvas, Offset peak) {
+    const pole = 40.0;
+    canvas
+      ..drawLine(
+        peak,
+        peak - const Offset(0, pole),
+        Paint()
+          ..color = AppPalette.onSurface
+          ..strokeWidth = 2.5,
+      )
+      ..drawPath(
+        Path()
+          ..moveTo(peak.dx, peak.dy - pole + 2)
+          ..lineTo(peak.dx + 20, peak.dy - pole + 9)
+          ..lineTo(peak.dx, peak.dy - pole + 16)
+          ..close(),
+        Paint()..color = AppPalette.heat4,
+      );
+  }
 
   static void _sun(Canvas canvas, Offset c, Color color) =>
       canvas.drawCircle(c, 22, Paint()..color = color);
