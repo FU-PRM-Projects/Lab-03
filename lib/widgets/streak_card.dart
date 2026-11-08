@@ -5,16 +5,15 @@ import '../models/streak.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_tokens.dart';
 import '../utils/vi_date_format.dart';
-import 'mascot.dart';
 
 /// Thẻ chuỗi ngày ở S02: số ngày liền có nốt, kỷ lục, 7 ngày gần nhất và
 /// tiến độ tới mốc kế tiếp. Chạm để mở Thống kê (S11b).
 ///
-/// Theo phong cách của app (góp ý của giảng viên): nền lavender như hũ ở trên,
-/// Tụi Nốt (đổi nét mặt theo chuỗi) thay cho icon lửa của Material, dải 7 ngày có nhãn thứ như lịch
-/// S11c, và chỉ dùng màu primary cho phần "đã làm" để thẻ không lệch tông cam
-/// với nút Ghi nốt bên dưới. Thẻ vẫn gọn để các lối tắt còn với tới trên màn
-/// 360 × 800.
+/// Theo phong cách của app (góp ý của giảng viên): nền lavender như hũ ở trên;
+/// ngọn lửa vẽ phẳng trong ô trắng (xám khi chưa có chuỗi) thay cho icon lửa
+/// của Material, không trùng mascot ở hũ ngay phía trên; 7 ô ngày chia đều;
+/// màu primary cho phần "đã làm" để thẻ không lệch tông với nút Ghi nốt. Thẻ
+/// vẫn gọn để các lối tắt còn với tới trên màn 360 × 800.
 class StreakCard extends StatelessWidget {
   const StreakCard({required this.streak, this.onTap, super.key});
 
@@ -40,13 +39,11 @@ class StreakCard extends StatelessWidget {
     final milestone = next == null
         ? 'Đã qua mốc ${StreakMilestones.days.last} ngày'
         : 'Còn $daysToNext ngày tới mốc $next ngày';
-    // Nét mặt theo chuỗi: chưa có thì Nốt ngủ chờ, hôm nay đã ghi thì Nốt vui,
-    // chưa ghi thì Nốt đợi. Không dùng Nốt Cháy (mặt nhăn, dễ hiểu là kiệt sức).
-    final face = switch ((streak.current, streak.activeToday)) {
-      (0, _) => MascotState.ngu,
-      (_, true) => MascotState.xong,
-      _ => MascotState.doi,
-    };
+    // Ngọn lửa vẽ phẳng theo bảng màu app (heat4 / heat3); chưa có chuỗi thì
+    // lửa xám, "đã tắt".
+    final flame = streak.current == 0
+        ? 'assets/icons/streak-flame-off.svg'
+        : 'assets/icons/streak-flame.svg';
 
     return Semantics(
       button: onTap != null,
@@ -78,7 +75,23 @@ class StreakCard extends StatelessWidget {
                 Row(
                   spacing: AppSpace.s12,
                   children: <Widget>[
-                    Mascot(state: face, size: 36),
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: scheme.surface,
+                      ),
+                      child: SizedBox.square(
+                        dimension: 36,
+                        child: Center(
+                          child: SvgPicture.asset(
+                            flame,
+                            width: 20,
+                            height: 24,
+                            excludeFromSemantics: true,
+                          ),
+                        ),
+                      ),
+                    ),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
