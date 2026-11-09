@@ -302,8 +302,7 @@ class SettingsScreen extends ConsumerWidget {
                     if (!kReleaseMode)
                       SettingRow.value(
                         title: 'Crash thật (tắt app)',
-                        subtitle:
-                            'App sập ngay; mở lại để gửi báo cáo lên Crashlytics',
+                        subtitle: 'App sập ngay; mở lại để gửi báo cáo lên Crashlytics',
                         value: '',
                         onTap: () async {
                           final confirmed = await showAppDialog(
