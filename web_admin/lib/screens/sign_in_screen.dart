@@ -54,17 +54,10 @@ class SignInScreen extends ConsumerWidget {
             'Quản lý kho thẻ thử thách, duyệt thẻ người dùng gửi và gửi '
             'thông báo tới app. Dành cho staff và admin.',
         children: <Widget>[
-          FilledButton.icon(
-            onPressed: signIn.busy ? null : vm.signIn,
-            icon: signIn.busy
-                ? const SizedBox.square(
-                    dimension: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.login),
-            label: Text(
-              signIn.busy ? 'Đang mở Google…' : 'Đăng nhập với Google',
-            ),
+          GoogleSignInButton(
+            label: 'Đăng nhập với Google',
+            loading: signIn.busy,
+            onPressed: vm.signIn,
           ),
           if (useFirebaseEmulator) const _EmulatorEmailSignIn(),
           if (signIn.error != null)
