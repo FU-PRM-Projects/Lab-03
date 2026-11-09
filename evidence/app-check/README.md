@@ -15,6 +15,7 @@ Chụp ngày 10/11/2026, sau Deploy #87 (lần build đầu tiên có
 | [`apps-registered.webp`](apps-registered.webp) | Firebase → App Check → Apps: `lab03 (web)` **Registered** với Fraud Defense. `lab03 (android)` chưa đăng ký (xem phần "Chưa Enforce"). |
 | [`firestore-metrics.webp`](firestore-metrics.webp) | App Check → APIs → Cloud Firestore, 7 ngày: **43 request Verified** (bắt đầu từ 10/11, đúng ngày deploy), 641 "outdated client", **0 unknown origin, 0 invalid**. Trạng thái **Monitoring**. |
 | [`fraud-defense-key.webp`](fraud-defense-key.webp) | Google Cloud → Security → Fraud Defense → Keys: key Website `Not PRM web App Check` cho `prm393-not-lab3.web.app` và `prm393-not-lab3.firebaseapp.com`. |
+| [`deploy-run.webp`](deploy-run.webp) | GitHub Actions → Deploy #87 (chạy tay trên `main`, commit `325d560`): build web admin kèm site key và deploy thành công. |
 | [`admin-dashboard.webp`](admin-dashboard.webp) | Web admin vẫn đăng nhập (vai trò Admin) và đọc Firestore bình thường khi App Check đã bật. |
 
 ## Đọc số liệu Firestore
