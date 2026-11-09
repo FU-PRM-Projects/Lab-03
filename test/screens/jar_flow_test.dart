@@ -1,4 +1,6 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lab03/app.dart';
 import 'package:lab03/models/mood.dart';
 import 'package:lab03/models/note.dart';
 import 'package:lab03/models/note_type.dart';
@@ -6,12 +8,28 @@ import 'package:lab03/screens/jar/jar_screen.dart';
 import 'package:lab03/screens/note_composer/note_composer_screen.dart';
 import 'package:lab03/screens/note_detail/note_detail_screen.dart';
 import 'package:lab03/services/app_exception.dart';
+import 'package:lab03/viewmodels/note_wall_view_model.dart';
 import 'package:lab03/widgets/note_card.dart';
 import 'package:lab03/widgets/note_tile.dart';
+import 'package:lab03/widgets/shake_jar.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../support/fakes.dart';
 import '../support/pump.dart';
+
+class _TestWall extends NoteWallViewModel {
+  _TestWall(this.pins);
+
+  final Map<String, DateTime> pins;
+
+  @override
+  Future<Map<String, DateTime>> build() async => pins;
+
+  @override
+  Future<void> release(String id, DateTime expires) async {
+    state = AsyncData(Map.of(pins)..remove(id));
+  }
+}
 
 /// Flow P4, P5, T1, T2: Hũ (S05) và Chi tiết nốt (S06).
 void main() {
@@ -59,6 +77,53 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(JarScreen), findsOneWidget);
   }
+
+  testWidgets('chạm hũ làm bật nốt để đọc lại', (tester) async {
+    await pumpApp(tester, services: withNotes([sample.first]));
+    await openJar(tester);
+
+    await tester.tap(find.byType(ShakeJar));
+    await tester.pump(const Duration(milliseconds: 350));
+    await tester.pumpAndSettle();
+    expect(find.text('Một nốt bật ra!'), findsOneWidget);
+
+    await tester.tap(find.text('Chạm để đọc lại'));
+    await tester.pumpAndSettle();
+    expect(find.byType(NoteDetailScreen), findsOneWidget);
+  });
+
+  testWidgets('nốt hết hạn rời tường và xuất hiện lại trong hũ', (
+    tester,
+  ) async {
+    final services = withNotes([sample.first]);
+    final expiry = services.clock.current.add(const Duration(days: 2));
+    setScreenSize(tester, phone360);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...services.overrides,
+          noteWallProvider.overrideWith(
+            () => _TestWall({sample.first.id: expiry}),
+          ),
+        ],
+        child: const NotApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 900));
+    await tester.pumpAndSettle();
+    expect(find.text('Tường nốt'), findsOneWidget);
+    expect(find.text('Đang dán trên tường'), findsOneWidget);
+
+    services.clock.current = expiry;
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pumpAndSettle();
+    expect(find.text('Tường nốt'), findsNothing);
+
+    await openJar(tester);
+    expect(find.text(sample.first.title), findsOneWidget);
+  });
 
   for (final size in <Size>[phone360, phone412]) {
     testWidgets('lưới tờ nốt ở ${size.width.toInt()} dp, mới nhất trước', (

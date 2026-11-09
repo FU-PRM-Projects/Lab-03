@@ -10,15 +10,16 @@ import '../../utils/jar_sections.dart';
 import '../../utils/vi_date_format.dart';
 import '../../viewmodels/jar_view_model.dart';
 import '../../viewmodels/note_deleter.dart';
+import '../../viewmodels/note_wall_view_model.dart';
 import '../../viewmodels/today_view_model.dart';
 import '../../viewmodels/view_state.dart';
 import '../../widgets/app_button.dart';
-import '../../widgets/jar_illustration.dart';
 import '../../widgets/mascot.dart';
 import '../../widgets/milestone_sticker.dart';
 import '../../widgets/note_card.dart';
 import '../../widgets/note_tile.dart';
 import '../../widgets/offline_banner.dart';
+import '../../widgets/shake_jar.dart';
 import '../../widgets/state_views.dart';
 import '../common/screen_skeleton.dart';
 import '../groups/group_shelf.dart';
@@ -99,6 +100,7 @@ class JarScreen extends ConsumerWidget {
             onRefresh: () async => viewModel.refresh(),
             child: _JarGrid(
               data: value,
+              pins: ref.watch(noteWallProvider).asData?.value ?? const {},
               now: ref.watch(todayDateProvider),
               onRetryMore: viewModel.loadMore,
               filter: ref.watch(jarFilterProvider),
@@ -116,6 +118,7 @@ class JarScreen extends ConsumerWidget {
 class _JarGrid extends StatelessWidget {
   const _JarGrid({
     required this.data,
+    required this.pins,
     required this.now,
     required this.onRetryMore,
     required this.filter,
@@ -125,6 +128,7 @@ class _JarGrid extends StatelessWidget {
   });
 
   final JarData data;
+  final Map<String, DateTime> pins;
   final DateTime now;
   final VoidCallback onRetryMore;
 
@@ -135,10 +139,6 @@ class _JarGrid extends StatelessWidget {
   final bool listMode;
   final ValueChanged<NoteType?> onFilter;
   final ValueChanged<bool> onListMode;
-
-  /// Hũ nhỏ trên đầu lưới (S02 dùng hũ lớn 240).
-  /// `Illustration/Hũ chiến thắng` cỡ vừa của S05 (126 × 147).
-  static const double _jarHeight = 147;
 
   /// 2 cột trên điện thoại, 3 cột từ 600 dp, 4 cột từ 840 dp (handout S05).
   static int _columns(double width) => width >= 840
@@ -152,8 +152,11 @@ class _JarGrid extends StatelessWidget {
     final theme = Theme.of(context);
     final columns = _columns(MediaQuery.sizeOf(context).width);
     final count = data.monthCount;
+    final available = data.notes
+        .where((note) => !pins.containsKey(note.id))
+        .toList();
     final sections = JarSections.group(<Note>[
-      for (final note in data.notes)
+      for (final note in available)
         if (filter == null || note.type == filter) note,
     ], now);
 
@@ -178,10 +181,10 @@ class _JarGrid extends StatelessWidget {
               Row(
                 spacing: AppSpace.s16,
                 children: <Widget>[
-                  JarIllustration(
-                    notes: data.jarTypes,
-                    height: _jarHeight,
-                    semanticLabel: 'Hũ chiến thắng',
+                  ShakeJar(
+                    notes: available,
+                    onOpenNote: (note) =>
+                        context.push(AppRoutes.noteDetail(note.id)),
                   ),
                   Expanded(
                     child: Column(
@@ -204,6 +207,11 @@ class _JarGrid extends StatelessWidget {
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
+                        if (available.isNotEmpty)
+                          Text(
+                            'Lắc điện thoại hoặc chạm hũ',
+                            style: theme.textTheme.bodySmall,
+                          ),
                         if (data.stickers.isNotEmpty)
                           TextButton(
                             onPressed: () =>
@@ -244,7 +252,9 @@ class _JarGrid extends StatelessWidget {
             padding: const EdgeInsets.all(AppSpace.screen),
             sliver: SliverToBoxAdapter(
               child: Text(
-                'Chưa có nốt ${filter!.label} nào trong phần đã tải.',
+                filter == null
+                    ? 'Chưa có nốt nào trong hũ.'
+                    : 'Chưa có nốt ${filter!.label} nào trong phần đã tải.',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),

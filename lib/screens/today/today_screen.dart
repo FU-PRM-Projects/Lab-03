@@ -15,6 +15,7 @@ import '../../widgets/app_button.dart';
 import '../../widgets/jar_illustration.dart';
 import '../../widgets/mascot.dart';
 import '../../widgets/note_tile.dart';
+import '../../widgets/note_wall.dart';
 import '../../widgets/offline_banner.dart';
 import '../../widgets/shortcut_button.dart';
 import '../../widgets/state_views.dart';
@@ -57,6 +58,7 @@ class TodayScreen extends ConsumerWidget {
             onOpenJar: () => context.go(AppRoutes.jar),
             onRetry: ref.read(todayViewModelProvider.notifier).retry,
           ),
+          const NoteWall(),
           if (summary case final summary?) ...<Widget>[
             const SizedBox(height: AppSpace.s16),
             StreakCard(

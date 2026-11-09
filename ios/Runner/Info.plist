@@ -66,6 +66,8 @@
 			<string>UIInterfaceOrientationLandscapeLeft</string>
 			<string>UIInterfaceOrientationLandscapeRight</string>
 		</array>
+		<key>NSMotionUsageDescription</key>
+		<string>Nốt dùng chuyển động để bạn lắc hũ và đọc lại một nốt.</string>
 		<key>NSCameraUsageDescription</key>
 		<string>Not needs camera access so you can take a photo to attach to a note or set as your
 			profile picture.</string>

@@ -35,6 +35,7 @@ dependencies:
     path: packages/core
   share_plus: ^13.3.1
   shared_preferences: ^2.5.6
+  sensors_plus: ^7.1.1
   timezone: ^0.11.2
   url_launcher: ^6.3.3
 

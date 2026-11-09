@@ -136,8 +136,10 @@ void main() {
 
     expect(find.byType(NoteSavedScreen), findsOneWidget);
     expect(find.text('Offline · đã lưu trên máy'), findsOneWidget);
+    await tester.ensureVisible(find.text('Về Hôm nay'));
     await tester.tap(find.text('Về Hôm nay'));
     await tester.pumpAndSettle();
+    expect(find.byType(TodayScreen), findsOneWidget);
     expect(find.text('Offline · đã lưu trên máy'), findsOneWidget);
   });
 
