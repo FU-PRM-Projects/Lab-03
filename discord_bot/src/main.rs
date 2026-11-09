@@ -1,6 +1,11 @@
 mod commands;
 mod firebase;
 
+use std::{
+    collections::HashMap,
+    sync::{Arc, Mutex},
+};
+
 use poise::serenity_prelude as serenity;
 
 use crate::firebase::FirebaseClient;
@@ -8,6 +13,8 @@ use crate::firebase::FirebaseClient;
 /// Shared bot state accessible across all commands
 pub struct Data {
     pub firebase: FirebaseClient,
+    /// Background tasks (keyed by Discord user id) waiting for a connect code to be redeemed in the app.
+    pub link_watchers: Arc<Mutex<HashMap<String, tokio::task::JoinHandle<()>>>>,
 }
 
 pub type Error = Box<dyn std::error::Error + Send + Sync>;
@@ -41,7 +48,10 @@ async fn main() {
             Box::pin(async move {
                 println!("Logged in as {} (DM-only Remote Agent)", ready.user.name);
                 poise::builtins::register_globally(ctx, &framework.options().commands).await?;
-                Ok(Data { firebase })
+                Ok(Data {
+                    firebase,
+                    link_watchers: Arc::new(Mutex::new(HashMap::new())),
+                })
             })
         })
         .build();
