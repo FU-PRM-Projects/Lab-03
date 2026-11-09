@@ -1,0 +1,35 @@
+name: not_admin
+description: Nốt web admin for staff and admin (PRM393 Final Assignment).
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.13.0
+  flutter: '>=3.47.0'
+
+dependencies:
+  cloud_firestore: ^7.1.0
+  firebase_analytics: ^13.0.1
+  firebase_auth: ^7.0.1
+  firebase_core: ^5.1.0
+  firebase_remote_config: ^7.0.1
+  fl_chart: ^1.3.0
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^3.4.3
+  flutter_svg: ^2.3.0
+  go_router: ^18.1.1
+  google_fonts: ^6.3.3
+  material_ui: ^1.8.0
+  not_core:
+    path: ../packages/core
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/mascot/

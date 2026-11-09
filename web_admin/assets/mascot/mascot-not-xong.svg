@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -8 96 108" width="120" height="135" role="img" aria-label="Nốt Xong">
+<circle cx="12" cy="4" r="3" fill="#FFD24A"></circle>
+<circle cx="46" cy="-1" r="2.5" fill="#4FB7E8"></circle>
+<rect x="84" y="0" width="6" height="6" rx="1" fill="#F0524B" transform="rotate(20 87 3)"></rect>
+<path d="M36 82v9M60 82v9M14 52l-8-11M82 52l8-11" stroke="#1B1D2A" stroke-width="4" stroke-linecap="round" fill="none"></path>
+<path d="M22 14H60L82 36V74Q82 82 74 82H22Q14 82 14 74V22Q14 14 22 14Z" fill="#3CC48A"></path>
+<path d="M60 14V30Q60 36 66 36H82Z" fill="#1F9D63"></path>
+<path d="M31 54q5-7 10 0M53 54q5-7 10 0" stroke="#1B1D2A" stroke-width="3" stroke-linecap="round" fill="none"></path>
+<path d="M40 61h14q0 9-7 9t-7-9z" fill="#1B1D2A"></path>
+</svg>
