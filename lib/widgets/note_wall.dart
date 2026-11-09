@@ -48,6 +48,13 @@ class _NoteWallState extends ConsumerState<NoteWall> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AppRadius.card),
           border: Border.all(color: scheme.primary.withValues(alpha: 0.16)),
+          boxShadow: [
+            BoxShadow(
+              color: scheme.primary.withValues(alpha: 0.06),
+              offset: const Offset(0, 2),
+              blurRadius: 7,
+            ),
+          ],
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -236,9 +243,9 @@ class _PinnedPaper extends StatelessWidget {
                 borderRadius: BorderRadius.circular(AppRadius.card),
                 boxShadow: [
                   BoxShadow(
-                    color: scheme.shadow.withValues(alpha: 0.19),
-                    offset: const Offset(2, 5),
-                    blurRadius: 9,
+                    color: scheme.shadow.withValues(alpha: 0.09),
+                    offset: const Offset(1, 3),
+                    blurRadius: 6,
                   ),
                 ],
               ),
@@ -258,7 +265,7 @@ class _PinnedPaper extends StatelessWidget {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: scheme.shadow.withValues(alpha: 0.27),
+                        color: scheme.shadow.withValues(alpha: 0.16),
                         offset: const Offset(1, 3),
                         blurRadius: 3,
                       ),
