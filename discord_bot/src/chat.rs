@@ -11,6 +11,15 @@ use rig_core::message::Message;
 
 use crate::{Data, Error, agent, cloudinary::Photo};
 
+/// Shown instead of an AI reply when the guardrail flags the conversation; `/clear` resets it.
+const GUARD_REJECTION: &str = "Có lỗi xảy ra, hãy /clear để tiếp tục chat với bot của chúng tôi";
+
+/// One message of the DM conversation (`bot` = sent by the bot).
+pub struct Turn {
+    bot: bool,
+    text: String,
+}
+
 const DISCORD_LIMIT: usize = 1900;
 const COOLDOWN: Duration = Duration::from_secs(3);
 
@@ -40,7 +49,7 @@ async fn load_history(
     ctx: &serenity::Context,
     msg: &serenity::Message,
     cutoff: Option<serenity::Timestamp>,
-) -> Result<Vec<Message>, Error> {
+) -> Result<Vec<Turn>, Error> {
     let mut recent = msg
         .channel_id
         .messages(
@@ -70,11 +79,11 @@ async fn load_history(
                 return None;
             }
             if m.author.bot {
-                Some(Message::assistant(text))
+                Some(Turn { bot: true, text })
             } else if text.starts_with('!') {
                 None // prefix commands are not conversation
             } else {
-                Some(Message::user(text))
+                Some(Turn { bot: false, text })
             }
         })
         .collect())
@@ -135,6 +144,42 @@ pub async fn event_handler(
 
     let _typing = msg.channel_id.start_typing(&ctx.http);
 
+    let cutoff = data
+        .cleared_at
+        .lock()
+        .expect("cleared_at lock poisoned")
+        .get(&msg.author.id)
+        .copied();
+    let turns = load_history(ctx, msg, cutoff).await.unwrap_or_else(|e| {
+        eprintln!("history load failed: {e}");
+        Vec::new()
+    });
+
+    let prompt = match (text.is_empty(), image.is_some()) {
+        (true, true) => "(Mình vừa gửi một ảnh)".to_string(),
+        (false, true) => format!("{text}\n(Kèm theo một ảnh)"),
+        _ => text.to_string(),
+    };
+
+    // Guardrail: if anything in the context sent to the AI is abusive, refuse until the user runs /clear.
+    // Fails open (logged) so an outage of the decision model does not lock everyone out.
+    if let Some(guard) = &data.guard {
+        let mut conversation: String = turns
+            .iter()
+            .map(|t| format!("{}: {}\n", if t.bot { "Assistant" } else { "User" }, t.text))
+            .collect();
+        conversation.push_str(&format!("User: {prompt}"));
+        match guard.is_abusive(&conversation).await {
+            Ok(true) => {
+                eprintln!("guard: blocked conversation of user {}", msg.author.id);
+                msg.channel_id.say(&ctx.http, GUARD_REJECTION).await?;
+                return Ok(());
+            }
+            Ok(false) => {}
+            Err(e) => eprintln!("guard error (allowing message): {e}"),
+        }
+    }
+
     // A photo in this message: upload it now so a later "create note" can attach it.
     if let Some(attachment) = image {
         match data.cloudinary.upload_from_url(&attachment.url).await {
@@ -180,22 +225,16 @@ pub async fn event_handler(
     let had_photo = pending.is_some();
     let slot: agent::PhotoSlot = Arc::new(Mutex::new(pending));
 
-    let cutoff = data
-        .cleared_at
-        .lock()
-        .expect("cleared_at lock poisoned")
-        .get(&msg.author.id)
-        .copied();
-    let history = load_history(ctx, msg, cutoff).await.unwrap_or_else(|e| {
-        eprintln!("history load failed: {e}");
-        Vec::new()
-    });
-
-    let prompt = match (text.is_empty(), image.is_some()) {
-        (true, true) => "(Mình vừa gửi một ảnh)".to_string(),
-        (false, true) => format!("{text}\n(Kèm theo một ảnh)"),
-        _ => text.to_string(),
-    };
+    let history: Vec<Message> = turns
+        .into_iter()
+        .map(|t| {
+            if t.bot {
+                Message::assistant(t.text)
+            } else {
+                Message::user(t.text)
+            }
+        })
+        .collect();
 
     let reply = match agent::run(history, &data.firebase, &uid, model, &prompt, slot.clone()).await
     {

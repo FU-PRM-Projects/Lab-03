@@ -3,6 +3,7 @@ mod chat;
 mod cloudinary;
 mod commands;
 mod firebase;
+mod guard;
 
 use std::{
     collections::HashMap,
@@ -18,6 +19,8 @@ pub struct Data {
     pub firebase: FirebaseClient,
     /// OpenRouter model id for the AI agent; `None` when `OPENROUTER_API_KEY` is not set.
     pub ai_model: Option<String>,
+    /// Abuse guardrail (decision model); `None` when the AI is off or `GUARD_MODEL=off`.
+    pub guard: Option<guard::Guard>,
     /// Last AI call per Discord user (cooldown).
     pub last_ai_call: Mutex<HashMap<serenity::UserId, std::time::Instant>>,
     /// `/clear` cutoff per user: older DM messages are not given to the AI.
@@ -55,6 +58,15 @@ async fn main() {
         None => println!("AI agent disabled (OPENROUTER_API_KEY not set)"),
     }
 
+    let guard = std::env::var("OPENROUTER_API_KEY")
+        .ok()
+        .filter(|k| !k.trim().is_empty())
+        .and_then(|key| guard::Guard::from_env(key.trim()));
+    match &guard {
+        Some(g) => println!("Guardrail enabled (model: {})", g.model()),
+        None => println!("Guardrail disabled"),
+    }
+
     // Only subscribe to DM messages (non-privileged; does not require enabling Privileged Intents in Discord Portal)
     let intents = serenity::GatewayIntents::DIRECT_MESSAGES;
 
@@ -83,6 +95,7 @@ async fn main() {
                 Ok(Data {
                     firebase,
                     ai_model,
+                    guard,
                     last_ai_call: Mutex::new(HashMap::new()),
                     cleared_at: Mutex::new(HashMap::new()),
                     pending_photos: Mutex::new(HashMap::new()),
