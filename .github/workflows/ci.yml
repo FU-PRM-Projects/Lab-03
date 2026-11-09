@@ -35,8 +35,13 @@ jobs:
       - name: Show tool versions
         run: flutter --version
 
+      # `flutter analyze` ở gốc cũng phân tích packages/core và web_admin, nên
+      # cần pub get cho cả ba.
       - name: Install dependencies
-        run: flutter pub get
+        run: |
+          flutter pub get
+          (cd packages/core && flutter pub get)
+          (cd web_admin && flutter pub get)
 
       - name: Verify formatting
         run: dart format --output=none --set-exit-if-changed .
@@ -46,6 +51,15 @@ jobs:
 
       - name: Run tests
         run: flutter test --coverage
+
+      # Package dùng chung và web admin (Final Assignment).
+      - name: Test packages/core
+        working-directory: packages/core
+        run: flutter test
+
+      - name: Test web admin
+        working-directory: web_admin
+        run: flutter test
 
       - name: Upload coverage
         uses: actions/upload-artifact@v7
@@ -75,6 +89,12 @@ jobs:
 
       - name: Build release web bundle
         run: flutter build web --release
+
+      - name: Build web admin
+        working-directory: web_admin
+        run: |
+          flutter pub get
+          flutter build web --release --base-href /admin/
 
       - name: Upload web build
         uses: actions/upload-artifact@v7
