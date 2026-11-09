@@ -9,6 +9,7 @@ import 'package:lab03/screens/note_composer/note_composer_screen.dart';
 import 'package:lab03/screens/note_detail/note_detail_screen.dart';
 import 'package:lab03/services/app_exception.dart';
 import 'package:lab03/viewmodels/note_wall_view_model.dart';
+import 'package:lab03/widgets/jar_illustration.dart';
 import 'package:lab03/widgets/note_card.dart';
 import 'package:lab03/widgets/note_tile.dart';
 import 'package:lab03/widgets/shake_jar.dart';
@@ -83,7 +84,16 @@ void main() {
     await openJar(tester);
 
     await tester.tap(find.byType(ShakeJar));
+    final illustration = find.descendant(
+      of: find.byType(ShakeJar),
+      matching: find.byType(JarIllustration),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    final moving = tester.widget<JarIllustration>(illustration);
+    expect(moving.paperPoses!.single, isNot(JarIllustration.restPose(0)));
     await tester.pump(const Duration(milliseconds: 350));
+    expect(tester.widget<JarIllustration>(illustration).ejection, isNotNull);
     await tester.pumpAndSettle();
     expect(find.text('Một nốt bật ra!'), findsOneWidget);
 

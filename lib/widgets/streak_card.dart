@@ -57,6 +57,8 @@ class StreakCard extends StatelessWidget {
       excludeSemantics: true,
       child: Material(
         color: colors.tintLavender,
+        elevation: 1,
+        shadowColor: scheme.primary.withValues(alpha: 0.16),
         borderRadius: radius,
         child: InkWell(
           onTap: onTap,
