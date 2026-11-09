@@ -123,11 +123,18 @@ class _BreathingBuddyState extends State<BreathingBuddy>
         alignment: Alignment.center,
         clipBehavior: Clip.none,
         children: <Widget>[
-          // Nền vòng ngoài.
+          // Quầng sáng phía sau quả cầu.
           Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppPalette.mono1,
+              gradient: RadialGradient(
+                colors: [
+                  scheme.primaryContainer.withValues(alpha: 0.8),
+                  scheme.primaryContainer.withValues(alpha: 0.35),
+                  scheme.primaryContainer.withValues(alpha: 0),
+                ],
+                stops: const [0.35, 0.76, 1],
+              ),
             ),
           ),
           // Vòng tiến độ của nhịp hiện tại.
@@ -164,12 +171,14 @@ class _BreathingBuddyState extends State<BreathingBuddy>
             tween: Tween<double>(end: _innerTarget * scale),
             duration: grow,
             curve: Curves.easeInOut,
-            builder: (context, d, child) => Container(
+            builder: (context, d, child) => SizedBox(
               width: d,
               height: d,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: scheme.primaryContainer,
+              child: CustomPaint(
+                painter: _BreathOrbPainter(
+                  light: scheme.primaryContainer,
+                  depth: scheme.primary,
+                ),
               ),
             ),
           ),
@@ -182,7 +191,7 @@ class _BreathingBuddyState extends State<BreathingBuddy>
                 painter: _ParticlePainter(
                   t: _idle.value,
                   inward: widget.phase != BreathPhase.exhale,
-                  // Màu "heat" của Figma: xanh, lục, vàng, cam.
+                  orbitColor: scheme.primary,
                   colors: const <Color>[
                     AppPalette.heat1,
                     AppPalette.heat2,
@@ -190,6 +199,16 @@ class _BreathingBuddyState extends State<BreathingBuddy>
                     AppPalette.heat4,
                   ],
                 ),
+              ),
+            ),
+          // Luồng gió ngang miệng, phía sau Nốt.
+          if (_motion && !widget.done && widget.phase != BreathPhase.hold)
+            CustomPaint(
+              size: Size.square(widget.size),
+              painter: _BreathWindPainter(
+                animation: _idle,
+                inward: widget.phase == BreathPhase.inhale,
+                color: scheme.primary,
               ),
             ),
           // Nốt: phồng / xẹp theo nhịp, nhún và lắc nhẹ liên tục.
@@ -208,6 +227,9 @@ class _BreathingBuddyState extends State<BreathingBuddy>
                     : widget.phase == BreathPhase.hold
                     ? wave * 0.08
                     : wave * 0.04;
+                final yaw = _motion && !widget.done
+                    ? math.cos(_idle.value * 2 * math.pi) * 0.16
+                    : 0.0;
                 // Nén ngang một chút khi phồng, để Nốt trông "hít căng".
                 final squash = 1 + (s - 1) * 0.35;
                 return Transform.translate(
@@ -216,11 +238,10 @@ class _BreathingBuddyState extends State<BreathingBuddy>
                     angle: tilt,
                     child: Transform(
                       alignment: Alignment.bottomCenter,
-                      transform: Matrix4.diagonal3Values(
-                        s / squash,
-                        s * squash,
-                        1,
-                      ),
+                      transform:
+                          Matrix4.diagonal3Values(s / squash, s * squash, 1)
+                            ..setEntry(3, 2, 0.002)
+                            ..rotateY(yaw),
                       child: child,
                     ),
                   ),
@@ -244,6 +265,128 @@ class _BreathingBuddyState extends State<BreathingBuddy>
       ),
     );
   }
+}
+
+class _BreathWindPainter extends CustomPainter {
+  _BreathWindPainter({
+    required this.animation,
+    required this.inward,
+    required this.color,
+  }) : super(repaint: animation);
+
+  final Animation<double> animation;
+  final bool inward;
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final t = animation.value;
+    final scale = size.width / 240;
+    final center = size.center(Offset.zero);
+    final mouthY = center.dy + 15 * scale + math.sin(t * 2 * math.pi) * 6;
+    final stroke = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    // Khi hít, gió từ hai bên hội tụ. Khi thở, luồng gió mở rộng sang phải.
+    for (final side in inward ? const [-1, 1] : const [1]) {
+      for (var i = 0; i < 3; i++) {
+        final progress = (t * 2 + i * 0.24) % 1;
+        final distance = inward ? 1 - progress : progress;
+        final x = center.dx + side * (38 + 42 * distance) * scale;
+        final y = mouthY + (i - 1) * (5 + 9 * distance) * scale;
+        final length = side * (14 + 10 * distance) * scale;
+        final bend = (i.isEven ? -5 : 5) * scale;
+        final trail = Path()
+          ..moveTo(x, y)
+          ..cubicTo(
+            x + length * 0.3,
+            y + bend,
+            x + length * 0.7,
+            y - bend,
+            x + length,
+            y,
+          );
+        stroke
+          ..strokeWidth = (i == 1 ? 2.6 : 1.8) * scale
+          ..color = color.withValues(
+            alpha: math.sin(progress * math.pi) * (i == 1 ? 0.72 : 0.45),
+          );
+        canvas.drawPath(trail, stroke);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_BreathWindPainter old) =>
+      old.animation != animation || old.inward != inward || old.color != color;
+}
+
+class _BreathOrbPainter extends CustomPainter {
+  const _BreathOrbPainter({required this.light, required this.depth});
+
+  final Color light;
+  final Color depth;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final bounds = Offset.zero & size;
+    final center = bounds.center;
+    final radius = size.width / 2;
+
+    final body = Paint()
+      ..shader = RadialGradient(
+        center: const Alignment(-0.44, -0.52),
+        radius: 1.12,
+        colors: [
+          Color.lerp(light, Colors.white, 0.88)!,
+          Color.lerp(light, Colors.white, 0.35)!,
+          light,
+          Color.lerp(light, depth, 0.58)!,
+        ],
+        stops: const [0, 0.28, 0.64, 1],
+      ).createShader(bounds);
+    canvas.drawCircle(center, radius, body);
+
+    final rim = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = radius * 0.025
+      ..shader = LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          Colors.white.withValues(alpha: 0.92),
+          Colors.white.withValues(alpha: 0.08),
+          light.withValues(alpha: 0.72),
+        ],
+      ).createShader(bounds);
+    canvas.drawCircle(center, radius - rim.strokeWidth / 2, rim);
+
+    // Phản chiếu mềm ở phía trên trái, cùng hướng với nguồn sáng.
+    canvas.save();
+    canvas.translate(center.dx - radius * 0.31, center.dy - radius * 0.46);
+    canvas.rotate(-0.45);
+    final highlight = Rect.fromCenter(
+      center: Offset.zero,
+      width: radius * 0.9,
+      height: radius * 0.36,
+    );
+    canvas.drawOval(
+      highlight,
+      Paint()
+        ..shader = RadialGradient(
+          colors: [
+            Colors.white.withValues(alpha: 0.78),
+            Colors.white.withValues(alpha: 0),
+          ],
+        ).createShader(highlight),
+    );
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(_BreathOrbPainter old) =>
+      old.light != light || old.depth != depth;
 }
 
 class _PhaseArcPainter extends CustomPainter {
@@ -309,11 +452,13 @@ class _ParticlePainter extends CustomPainter {
   _ParticlePainter({
     required this.t,
     required this.inward,
+    required this.orbitColor,
     required this.colors,
   });
 
   final double t;
   final bool inward;
+  final Color orbitColor;
   final List<Color> colors;
 
   static const int _count = 10;
@@ -323,25 +468,44 @@ class _ParticlePainter extends CustomPainter {
     final center = size.center(Offset.zero);
     final outer = size.width / 2 - 10;
     final inner = size.width * 0.22;
+    canvas.save();
+    canvas.translate(center.dx, center.dy);
+    canvas.rotate(-0.36);
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset.zero,
+        width: size.width * 0.95,
+        height: size.height * 0.36,
+      ),
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.2
+        ..color = orbitColor.withValues(alpha: 0.17),
+    );
+    final drift = math.sin(t * 2 * math.pi) * 0.18;
     for (var i = 0; i < _count; i++) {
       final seed = i / _count;
-      final angle = seed * 2 * math.pi + t * 0.6;
+      final angle = seed * 2 * math.pi + drift;
       // Mỗi hạt lệch pha nhau để không bay cùng lúc.
       var p = (t + seed) % 1;
       if (inward) p = 1 - p;
       final r = inner + (outer - inner) * p;
       final fade = math.sin(p * math.pi);
+      final depth = (math.sin(angle) + 1) / 2;
       final paint = Paint()
-        ..color = colors[i % colors.length].withValues(alpha: 0.9 * fade);
+        ..color = colors[i % colors.length].withValues(
+          alpha: fade * (0.44 + 0.48 * depth),
+        );
       canvas.drawCircle(
-        center + Offset(math.cos(angle) * r, math.sin(angle) * r),
-        2.5 + 2.5 * fade,
+        Offset(math.cos(angle) * r, math.sin(angle) * r * 0.42),
+        (2 + 2.5 * fade) * (0.75 + 0.45 * depth),
         paint,
       );
     }
+    canvas.restore();
   }
 
   @override
   bool shouldRepaint(_ParticlePainter old) =>
-      old.t != t || old.inward != inward;
+      old.t != t || old.inward != inward || old.orbitColor != orbitColor;
 }
