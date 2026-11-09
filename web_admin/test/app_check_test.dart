@@ -7,9 +7,9 @@ void main() {
     expect(webAppCheckProvider(siteKey: '', debugToken: ''), isNull);
   });
 
-  test('có site key: dùng reCAPTCHA v3', () {
+  test('có site key: dùng reCAPTCHA Enterprise', () {
     final provider = webAppCheckProvider(siteKey: 'site-key', debugToken: '');
-    expect(provider, isA<ReCaptchaV3Provider>());
+    expect(provider, isA<ReCaptchaEnterpriseProvider>());
     expect(provider!.siteKey, 'site-key');
   });
 

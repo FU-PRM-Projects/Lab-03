@@ -100,8 +100,9 @@ jobs:
       - name: Build web admin
         if: steps.credentials.outputs.enabled == 'true'
         working-directory: web_admin
-        # Site key reCAPTCHA v3 của App Check (biến repo, không phải secret:
-        # site key nằm công khai trong trang). Chưa đặt thì build không App Check.
+        # Site key reCAPTCHA Enterprise (Fraud Defense) của App Check. Biến repo,
+        # không phải secret: site key nằm công khai trong trang. Chưa đặt thì
+        # build không có App Check.
         env:
           RECAPTCHA_SITE_KEY: ${{ vars.RECAPTCHA_SITE_KEY }}
         run: |
@@ -167,8 +168,9 @@ jobs:
       - name: Build web admin
         if: steps.credentials.outputs.enabled == 'true'
         working-directory: web_admin
-        # Site key reCAPTCHA v3 của App Check (biến repo, không phải secret:
-        # site key nằm công khai trong trang). Chưa đặt thì build không App Check.
+        # Site key reCAPTCHA Enterprise (Fraud Defense) của App Check. Biến repo,
+        # không phải secret: site key nằm công khai trong trang. Chưa đặt thì
+        # build không có App Check.
         env:
           RECAPTCHA_SITE_KEY: ${{ vars.RECAPTCHA_SITE_KEY }}
         run: |

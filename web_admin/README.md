@@ -64,13 +64,16 @@ npm run seed:submissions -- user@example.test   # thêm 3 thẻ chờ duyệt m�
 
 ## App Check
 
-Web admin bật App Check (reCAPTCHA v3) cho Firestore khi build có site key.
-Không có key thì chạy bình thường, chỉ không có App Check; bản Emulator luôn
-bỏ qua App Check.
+Web admin bật App Check (reCAPTCHA Enterprise, Console gọi là **Fraud
+Defense**) cho Firestore khi build có site key. Không có key thì chạy bình
+thường, chỉ không có App Check; bản Emulator luôn bỏ qua App Check.
+reCAPTCHA v3 "Classic" (key tạo ở google.com/recaptcha/admin) Firebase không
+còn nhận nữa.
 
-1. Firebase Console → App Check → Apps → web app → đăng ký **reCAPTCHA v3**
-   (tạo key ở Google reCAPTCHA admin, domain `prm393-not-lab3.web.app`,
-   `prm393-not-lab3.firebaseapp.com`; dán secret key vào Console).
+1. Firebase Console → App Check → Apps → web app → **Fraud Defense** → tạo
+   hoặc chọn key loại Website (domain `prm393-not-lab3.web.app`,
+   `prm393-not-lab3.firebaseapp.com`, `localhost`; không dùng checkbox
+   challenge) → Save. Enterprise chỉ cần site key, không có secret key.
 2. GitHub → Settings → Secrets and variables → Actions → **Variables** → thêm
    `RECAPTCHA_SITE_KEY` = site key. Workflow Deploy truyền nó vào build.
 3. Chạy trên máy với Firebase thật: Console → App Check → web app → Manage

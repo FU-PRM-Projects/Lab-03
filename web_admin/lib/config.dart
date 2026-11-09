@@ -2,7 +2,7 @@
 /// `firebase/` (cổng khớp `firebase.json`) và hiện đăng nhập email để test.
 const bool useFirebaseEmulator = bool.fromEnvironment('USE_FIREBASE_EMULATOR');
 
-/// Site key reCAPTCHA v3 của App Check
+/// Site key reCAPTCHA Enterprise (Fraud Defense) của App Check
 /// (`--dart-define=RECAPTCHA_SITE_KEY=...`). Site key là khoá công khai (nằm
 /// trong trang), không phải bí mật. Trống thì web admin chạy không App Check.
 const String recaptchaSiteKey = String.fromEnvironment('RECAPTCHA_SITE_KEY');

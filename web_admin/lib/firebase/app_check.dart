@@ -4,13 +4,14 @@ import 'package:flutter/foundation.dart';
 import '../config.dart';
 
 /// Provider App Check cho web admin: debug token (chạy trên máy) được ưu tiên,
-/// sau đó reCAPTCHA v3; không có cả hai thì `null` (không bật App Check).
+/// sau đó reCAPTCHA Enterprise (Console gọi là Fraud Defense; reCAPTCHA v3
+/// "Classic" đã bị Firebase ngừng nhận). Không có cả hai thì `null`.
 WebProvider? webAppCheckProvider({
   required String siteKey,
   required String debugToken,
 }) {
   if (debugToken.isNotEmpty) return WebDebugProvider(debugToken: debugToken);
-  if (siteKey.isNotEmpty) return ReCaptchaV3Provider(siteKey);
+  if (siteKey.isNotEmpty) return ReCaptchaEnterpriseProvider(siteKey);
   return null;
 }
 
