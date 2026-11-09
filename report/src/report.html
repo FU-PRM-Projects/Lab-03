@@ -14,7 +14,7 @@
   @page :first { @bottom-left { content: none; } @bottom-right { content: none; } }
   :root { --ink: #1f2330; --muted: #5d6475; --line: #dfe2ea; --brand: #4f46e5; --soft: #f4f5fb; --bad: #c92a2a; }
   * { box-sizing: border-box; }
-  body { font: 9.5pt/1.42 'Segoe UI', 'Be Vietnam Pro', sans-serif; color: var(--ink); margin: 0; text-align: justify; hyphens: auto; }
+  body { font: 9.3pt/1.38 'Segoe UI', 'Be Vietnam Pro', sans-serif; color: var(--ink); margin: 0; text-align: justify; hyphens: auto; }
   h1 { font-size: 21pt; margin: 0 0 4px; }
   h2 { font-size: 13.5pt; margin: 14px 0 5px; padding-bottom: 3px; border-bottom: 2px solid var(--brand); break-after: avoid; text-align: left; }
   h3 { font-size: 11pt; margin: 12px 0 4px; break-after: avoid; text-align: left; }
@@ -34,8 +34,8 @@
   figcaption { font-size: 8.4pt; color: var(--muted); margin-top: 3px; text-align: left; }
   .row { display: flex; gap: 10px; align-items: flex-start; break-inside: avoid; }
   .row > figure { flex: 1; min-width: 0; }
-  .phone img { height: 185px; width: auto; margin: 0 auto; }
-  .phone.sm img { height: 145px; }
+  .phone img { height: 165px; width: auto; margin: 0 auto; }
+  .phone.sm img { height: 130px; }
   .note { background: var(--soft); border-left: 4px solid var(--brand); padding: 6px 10px; margin: 6px 0 9px; font-size: 9.3pt; break-inside: avoid; }
   .warn { border-left-color: var(--bad); background: #fff5f5; }
   .fail td { color: var(--bad); }
@@ -249,8 +249,7 @@
 <p><code>FirebaseMessagingService</code> requests <code>POST_NOTIFICATIONS</code> on Android 13+ at the first moment a reminder matters, not at launch. If the user refuses, Settings explains why notifications help and offers "Mở cài đặt", which opens the system page. A message is received in all three app states. In the background and when the app is terminated, Android shows it in the system tray. In the foreground Android shows nothing, so the app displays it with <code>flutter_local_notifications</code> and passes the target route as the payload. Every message is saved to an inbox on the device with the state it arrived in; the inbox is in the Firebase demo area. A message may carry data <code>route</code>; <code>routeFromData</code> accepts only an allow-list of internal routes, and an unknown route opens Today. Test messages were sent from Console → Messaging → "Send test message" and through the FCM HTTP v1 API to the device token from the debug log; the token is not stored in the repository.</p>
 <div class="row">
   <div style="flex:2.3">
-    <figure><img src="../../slide/public/app/fcm-foreground.png" alt="Foreground" /><figcaption>Foreground: shown by the app</figcaption></figure>
-    <figure><img src="../../slide/public/app/fcm-terminated.png" alt="Terminated" /><figcaption>Terminated: system tray (background looks the same; <code>evidence/fcm/background.png</code>)</figcaption></figure>
+    <figure><img src="../../slide/public/app/fcm-foreground.png" alt="Foreground" /><figcaption>Foreground: shown by the app (background and terminated: system tray, <code>evidence/fcm/</code>)</figcaption></figure>
     <figure><img src="../../slide/public/app/fcm-console.png" alt="Console test message" /><figcaption>Test message sent from the Firebase Console</figcaption></figure>
   </div>
   <figure class="phone"><img src="../../slide/public/app/fcm-inbox.png" alt="Inbox" style="height:auto;width:100%" /><figcaption>Inbox with the arrival state of each message</figcaption></figure>
@@ -341,22 +340,34 @@
   <tr><td>T10</td><td>Four tabs</td><td><code>ALL_TABS</code></td><td>3/3</td><td>33–40 s</td></tr>
   <tr><td>T11</td><td>Settings: Remote Config row</td><td>contains "Cờ tính năng"</td><td>3/3</td><td>13–19 s</td></tr>
   <tr><td>T12</td><td>Native: Home, notification shade, relaunch</td><td><code>LOGGED_IN</code></td><td>3/3 *</td><td>32–39 s</td></tr>
+  <tr><td>T13</td><td>Analytics: <code>note_saved</code> in logcat</td><td><code>SAVED</code> + event</td><td>3/3 *</td><td>66–119 s</td></tr>
+  <tr><td>T14</td><td>Export the weekly card (no bucket)</td><td><code>ERROR_MESSAGE</code></td><td>3/3</td><td>41–71 s</td></tr>
 </table>
-<p><b>Results: 35 of 36 runs pass (97 %).</b> Error paths are covered by T04, T05 and T06; T06 and T12 act outside the app (airplane mode through <code>adb</code>; the Home button and the notification shade, with the agent not locked to the app package). The first full run took 62 minutes and passed 31 of 36. We analysed each failure before changing anything:</p>
+<p><b>Results: 41 of 42 runs pass (98 %).</b> Error paths are covered by T04, T05 and T06; T06 and T12 act outside the app (airplane mode through <code>adb</code>; the Home button and the notification shade, with the agent not locked to the app package). The first full run took 62 minutes and passed 31 of 36. We analysed each failure before changing anything:</p>
 <ul>
   <li><b>T05 run 3, assertion error.</b> The keep-draft dialog did appear, but the agent answered with a sentence that did not start with <code>DIALOG</code>. The check became "contains <code>DIALOG</code> and not <code>NO_DIALOG</code>".</li>
   <li><b>T12, all runs, assertion error.</b> The test required the Today screen, but the app correctly reopens the screen the user was on (Settings) and stays signed in. The expected keyword became <code>LOGGED_IN</code>. Both changes were made after seeing the results; they make the test match the intended behaviour and do not hide an app bug. T05 and T12 were re-run: 6 of 6.</li>
   <li><b>T06 run 3, real failure, kept.</b> The run hit the 420-second timeout without an answer. T06 is also the slowest case after T03 (264–289 s when it passes), so the agent probably got stuck while the device was offline. The root cause has not been investigated, and there is no evidence that it is an app bug.</li>
 </ul>
-<p class="ev">JUnit reports: <code>evidence/artemis/junit-full-run.xml</code>, <code>junit-rerun-t05-t12.xml</code>; device screenshots and the Workspace page: <code>evidence/artemis/</code>.</p>
-<div class="note warn"><b>Not run yet.</b> Five more cases are written in <code>e2e_test/test_main_flows.py</code> but have no results, so they are not in the table above and the requirement they cover is not yet met:
-<ul style="margin-bottom:0">
-  <li><b>T13 Analytics.</b> Saves a note, then the test enables verbose Firebase logging and reads <code>adb logcat</code>: it must find <code>note_saved</code> with <code>mood</code> and <code>note_type</code>, and must not find the note text.</li>
-  <li><b>T14 Export and upload.</b> Expects the upload and link when <code>E2E_STORAGE_READY=1</code>, otherwise the error message with "Thử lại".</li>
-  <li><b>T15 and T16 Sign-out and sign-in.</b> Sign out, then sign in with an email test account, once with a wrong password first. Google sign-in is not driven by the agent because the chooser shows a real name and email.</li>
-  <li><b>X01 Exploratory session.</b> 15–30 minutes with the Pro profile; the agent explores freely and returns bug lines. It has not been run, so <b>there is no list of bugs found by exploration</b>.</li>
+<ul>
+  <li><b>T13 run 1, fixture error.</b> T13 and T14 were run later (6 November). In T13 run 1 the agent did report <code>SAVED</code>, as its last step on the server shows, but our fixture read the steps before the last one was stored and got an empty answer. The fixture now retries up to five times; T13 was re-run: 3 of 3, and logcat had <code>note_saved</code> with <code>mood</code> and <code>note_type</code> and no note text. T14 passed 3 of 3; without a bucket the correct result is the error message with "Thử lại".</li>
 </ul>
-They need an OpenRouter key on the test machine and an email test account. No app bug was found by T01–T12.</div>
+<p class="ev">JUnit reports: <code>evidence/artemis/junit-full-run.xml</code>, <code>junit-rerun-t05-t12.xml</code>, <code>junit-t13-t14.xml</code>, <code>junit-rerun-t13.xml</code>; device screenshots and the Workspace page: <code>evidence/artemis/</code>.</p>
+<p><b>Exploratory session (X01).</b> The agent received one goal: explore Nốt for about 20 minutes like a curious new user, try odd input, rotate the screen, press Back many times, and list every problem as a <code>BUG</code> line. With the Pro profile it ran for 25 min 38 s and 112 steps (63 taps, 12 swipes, 10 key presses, 5 text inputs) and ended on Today, still signed in. It reported ten issues (verbatim in <code>evidence/artemis/x01-bugs.txt</code>, screenshots in <code>evidence/artemis/x01/</code>):</p>
+<table>
+  <tr><th style="width:7%">#</th><th style="width:20%">Where</th><th>What the agent saw</th></tr>
+  <tr><td>X-01</td><td>Relaunch</td><td>Back from Today, reopen: "Lab 03 isn't responding", recovers after Wait</td></tr>
+  <tr><td>X-02</td><td>Jar, landscape</td><td>The + button covers "Xem tất cả"</td></tr>
+  <tr><td>X-03</td><td>Today, landscape</td><td>The tab bar covers the streak card; the jar fills the screen</td></tr>
+  <tr><td>X-04</td><td>Jar and Today</td><td>Notes this month: 22 on one screen, 21 on the other</td></tr>
+  <tr><td>X-05</td><td>Group list</td><td>Two group names cut with "…"</td></tr>
+  <tr><td>X-06</td><td>Journal editor</td><td>Empty or spaces only: "Xong" disabled with no reason; the counter counts spaces</td></tr>
+  <tr><td>X-07</td><td>Jar</td><td>Tapping the jar picture does nothing</td></tr>
+  <tr><td>X-08</td><td>After saving</td><td>A blank "Đang tải" screen for a few seconds</td></tr>
+  <tr><td>X-09</td><td>Journey, calendar</td><td>The mood legend does not say which colour is which</td></tr>
+  <tr><td>X-10</td><td>Journey, year</td><td>The 12-month grid has no month names and tiny cells</td></tr>
+</table>
+<div class="note warn"><b>Not checked, not fixed.</b> These are the agent's reports, not confirmed bugs. Some may have a reason: X-01 may come from the debug build on the emulator, X-04 from two screens loading at different moments, X-05 from the one-line names of D-23. On our side, the Pro profile does not call <code>report_task_status</code>, so the fixture could not read the answer and <code>junit-x01.xml</code> shows an error although the session completed; the answer above was read from the server and the fixture now handles it. The agent also created several notes on the test account. <b>T15 and T16</b> (sign-out, sign-in, wrong password) have still not run: they need an email account made only for tests. No app bug was found by T01–T14.</div>
 <p><b>Observations.</b> Gboard's handwriting toolbar intercepted taps on the text field until it was turned off (<code>stylus_handwriting_enabled</code>), which made T02 time out early on. Restarting the ARTEMIS server during a run left orphan agent processes that held the emulator. <code>scrcpy</code> was not installed, so traces have periodic screenshots instead of video.</p>
 
 <!-- ============================== 9 ============================== -->
@@ -388,10 +399,7 @@ They need an OpenRouter key on the test machine and an email test account. No ap
   <tr><td>38-3c797d6d<br />Minor</td><td>Missing <code>context.mounted</code> check after the Remote Config refresh in Settings.</td><td><b>Right, not fixed yet.</b> The method above it has the check; this one does not.</td></tr>
 </table>
 <p>What we learned about the tool: it is precise about the lines it reads (51 of 52 findings were technically right) and it found two bugs that broke requirements, but its severity labels are not reliable, and it missed a bigger issue in a script it reviewed (a hard-coded path from one developer's machine in <code>evidence/artemis/capture_loop.sh</code>). Most of the real findings were read only after the pull request had been merged; only one of the 40 real bugs was fixed before merge.</p>
-<div class="row">
-  <figure><img src="../../slide/public/review/proof-review.png" alt="CodeRabbit review" style="max-height:180px;object-fit:cover;object-position:top" /><figcaption>CodeRabbit's review on PR #38</figcaption></figure>
-  <figure><img src="../../slide/public/review/proof-commit-736453a.png" alt="Fix commit" style="max-height:180px;object-fit:cover;object-position:top" /><figcaption>The fix commit names the finding it addresses</figcaption></figure>
-</div>
+<p class="ev">Screenshots of the review on PR #38, the verdicts and the fix commits are on slides 24–26 and in <code>slide/public/review/</code>.</p>
 
 <!-- ============================== 10 ============================== -->
 <h2>10. Challenges encountered</h2>
@@ -409,10 +417,10 @@ They need an OpenRouter key on the test machine and an email test account. No ap
   <li><b>Test against the real project early.</b> The Emulator covers rules and data, but not Analytics, Crashlytics or FCM. Several issues appeared only on the real project.</li>
   <li><b>Design documents can disagree.</b> Pick one, explain the choice and log it as a deviation; the next reader then knows it was a decision.</li>
   <li><b>Rename what users misread.</b> Changing one label (D-28) removed a misunderstanding that more explanation would not have fixed.</li>
-  <li><b>Check the AI tester as well as the app.</b> Four of the five failures in the first ARTEMIS run came from our own assertions; only one (T06) is a real problem. A failing test is a question, not a verdict.</li>
+  <li><b>Check the AI tester as well as the app.</b> Four of the five failures in the first ARTEMIS run came from our own assertions, and later two more came from our fixture; only one (T06) is a real problem. A failing test is a question, not a verdict.</li>
   <li><b>Read AI review before merging.</b> CodeRabbit was right 51 times out of 52, but most findings were read after merge. Its severity labels still need human judgement.</li>
   <li><b>Change the rules with the data.</b> A new field needs a rules change and a rules test in the same pull request; unit tests with fakes will not catch it.</li>
-  <li><b>Say what is not done.</b> Storage, the unrun ARTEMIS cases and the exploratory session are written down as gaps with reasons, which is more useful to a reviewer than a claim that cannot be checked.</li>
+  <li><b>Say what is not done.</b> Storage, the two unrun sign-in cases and the unchecked exploratory findings are written down with reasons, which is more useful to a reviewer than a claim that cannot be checked.</li>
 </ol>
 
 <!-- ============================== 12 ============================== -->
