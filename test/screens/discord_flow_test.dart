@@ -11,6 +11,7 @@ import 'package:lab03/models/note_type.dart';
 import 'package:lab03/router/app_routes.dart';
 import 'package:lab03/screens/challenge_detail/challenge_detail_screen.dart';
 import 'package:lab03/screens/challenge_detail/greeting_screen.dart';
+import 'package:lab03/screens/discord/discord_connect_sheet.dart';
 import 'package:lab03/screens/discord/discord_rooms_screen.dart';
 import 'package:lab03/screens/note_saved/note_saved_screen.dart';
 import 'package:lab03/services/remote_config_service.dart';
@@ -264,9 +265,17 @@ void main() {
       await tester.tap(find.text('Liên kết Discord'));
       await tester.pumpAndSettle();
 
+      // Hướng dẫn cài bot: nút mở link cài đặt User Install
+      expect(find.textContaining('Thêm Nốt Bot vào tài khoản'), findsOneWidget);
+      await tester.tap(find.text('Thêm Nốt Bot vào Discord'));
+      await tester.pumpAndSettle();
+      expect(services.discord.opened, <String>[kDiscordBotInstallUrl]);
+
       // Nhập mã sai -> báo lỗi
       await tester.enterText(findField('Mã kết nối'), 'WRONG1');
       await tester.pump();
+      await tester.ensureVisible(find.text('Kết nối'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Kết nối'));
       await tester.pumpAndSettle();
       expect(
@@ -277,6 +286,8 @@ void main() {
       // Nhập mã đúng ABC123 -> liên kết thành công 1-1
       await tester.enterText(findField('Mã kết nối'), 'abc123');
       await tester.pump();
+      await tester.ensureVisible(find.text('Kết nối'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Kết nối'));
       await tester.pumpAndSettle();
 
