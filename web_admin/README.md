@@ -62,6 +62,30 @@ npm run role:emulator -- staff@example.test admin
 npm run seed:submissions -- user@example.test   # thêm 3 thẻ chờ duyệt mẫu
 ```
 
+## App Check
+
+Web admin bật App Check (reCAPTCHA Enterprise, Console gọi là **Fraud
+Defense**) cho Firestore khi build có site key. Không có key thì chạy bình
+thường, chỉ không có App Check; bản Emulator luôn bỏ qua App Check.
+reCAPTCHA v3 "Classic" (key tạo ở google.com/recaptcha/admin) Firebase không
+còn nhận nữa.
+
+1. Firebase Console → App Check → Apps → web app → **Fraud Defense** → tạo
+   hoặc chọn key loại Website (domain `prm393-not-lab3.web.app`,
+   `prm393-not-lab3.firebaseapp.com`, `localhost`; không dùng checkbox
+   challenge) → Save. Enterprise chỉ cần site key, không có secret key.
+2. GitHub → Settings → Secrets and variables → Actions → **Variables** → thêm
+   `RECAPTCHA_SITE_KEY` = site key. Workflow Deploy truyền nó vào build.
+3. Chạy trên máy với Firebase thật: Console → App Check → web app → Manage
+   debug tokens → thêm token, rồi
+
+   ```bash
+   flutter run -d chrome --dart-define=APP_CHECK_DEBUG_TOKEN=<token>
+   ```
+
+4. Xem tab App Check → Firestore: khi gần như mọi request là "Verified" thì
+   bấm **Enforce**. Trước khi Enforce, request không có token vẫn qua.
+
 ## Admin đầu tiên
 
 Rules chỉ cho admin đổi vai trò, nên admin đầu tiên phải đặt bằng quyền quản

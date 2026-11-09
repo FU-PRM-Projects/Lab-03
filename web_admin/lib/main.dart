@@ -8,6 +8,7 @@ import 'package:not_core/not_core.dart';
 
 import 'app.dart';
 import 'config.dart';
+import 'firebase/app_check.dart';
 import 'firebase/firebase_admin_services.dart';
 import 'firebase_options.dart';
 import 'services/admin_services.dart';
@@ -15,6 +16,7 @@ import 'services/admin_services.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.web);
+  await activateAppCheck();
   if (useFirebaseEmulator) {
     await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
     FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
