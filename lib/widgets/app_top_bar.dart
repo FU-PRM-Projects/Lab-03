@@ -93,11 +93,15 @@ class TabHeader extends StatelessWidget {
     required this.onNotifications,
     required this.onProfile,
     this.photo,
+    this.unread = 0,
     super.key,
   });
 
   final String title;
   final VoidCallback onNotifications;
+
+  /// Số tin riêng chưa đọc trong hộp thư (chấm đỏ trên chuông).
+  final int unread;
   final VoidCallback onProfile;
 
   /// Ảnh đại diện; `null` thì dùng avatar mặc định.
@@ -137,18 +141,22 @@ class TabHeader extends StatelessWidget {
             ),
             IconButton(
               onPressed: onNotifications,
-              tooltip: 'Nhắc nhở',
+              tooltip: unread > 0 ? 'Hộp thư, $unread tin mới' : 'Hộp thư',
               style: IconButton.styleFrom(
                 backgroundColor: scheme.surfaceContainerHighest,
                 fixedSize: const Size.square(AppSize.minTouch),
               ),
-              icon: SvgPicture.asset(
-                'assets/icons/bell.svg',
-                width: 22,
-                height: 22,
-                colorFilter: ColorFilter.mode(
-                  scheme.onSurface,
-                  BlendMode.srcIn,
+              icon: Badge(
+                isLabelVisible: unread > 0,
+                label: Text('$unread'),
+                child: SvgPicture.asset(
+                  'assets/icons/bell.svg',
+                  width: 22,
+                  height: 22,
+                  colorFilter: ColorFilter.mode(
+                    scheme.onSurface,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
             ),

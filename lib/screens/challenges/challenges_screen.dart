@@ -2,12 +2,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import 'package:not_core/not_core.dart'
+    show ChallengeSubmission, SubmissionStatus;
+
 import '../../models/note_type.dart';
 import '../../router/app_routes.dart';
 import '../../services/remote_config_service.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_tokens.dart';
 import '../../viewmodels/challenges_view_model.dart';
+import '../../viewmodels/community_view_model.dart';
 import '../../viewmodels/view_state.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/mascot.dart';
@@ -89,6 +93,47 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen> {
     }
   }
 
+  Future<void> _submit(DeckCard card) async {
+    final challenge = card.challenge;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Gửi thẻ cho mọi người?'),
+        content: Text(
+          '“${challenge.title}” sẽ được gửi tới staff của Nốt. Nếu được duyệt, '
+          'thẻ vào kho chung và ai cũng nhận được. Chỉ tên thẻ, số phút và mẹo '
+          'được gửi đi.',
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Để sau'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Gửi'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    try {
+      await ref.read(communityActionsProvider).submit(challenge);
+      if (mounted) _snack('Đã gửi. Kết quả sẽ có trong hộp thư.');
+    } on Object {
+      if (mounted) _snack('Chưa gửi được thẻ. Thử lại nhé.');
+    }
+  }
+
+  Future<void> _withdraw(ChallengeSubmission submission) async {
+    try {
+      await ref.read(communityActionsProvider).withdraw(submission);
+      if (mounted) _snack('Đã rút lại thẻ.');
+    } on Object {
+      if (mounted) _snack('Chưa rút lại được. Thử lại nhé.');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(challengesViewModelProvider);
@@ -103,9 +148,13 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen> {
     });
 
     // Remote Config `custom_challenges_enabled`: tắt thì ẩn nút tự thêm thẻ.
-    final canAdd = ref
-        .watch(remoteConfigServiceProvider)
-        .customChallengesEnabled;
+    final remoteConfig = ref.watch(remoteConfigServiceProvider);
+    final canAdd = remoteConfig.customChallengesEnabled;
+    // Remote Config `challenge_submissions_enabled`: tắt thì ẩn nút gửi thẻ
+    // lên kho chung (thẻ đã gửi vẫn hiện trạng thái). Độc lập với cờ tự thêm
+    // thẻ: thẻ đã thêm từ trước vẫn gửi được.
+    final canSubmit = remoteConfig.challengeSubmissionsEnabled;
+    final submissions = ref.watch(submissionByCardProvider);
 
     return TabScaffold(
       title: 'Thử thách',
@@ -142,6 +191,9 @@ class _ChallengesScreenState extends ConsumerState<ChallengesScreen> {
           onGoTo: _goTo,
           onAdd: canAdd ? _add : null,
           onDelete: _delete,
+          submissions: submissions,
+          onSubmit: canSubmit ? _submit : null,
+          onWithdraw: _withdraw,
         ),
       },
     );
@@ -157,9 +209,15 @@ class _Deck extends StatelessWidget {
     required this.onGoTo,
     required this.onAdd,
     required this.onDelete,
+    required this.submissions,
+    required this.onSubmit,
+    required this.onWithdraw,
   });
 
   final List<DeckCard> cards;
+  final Map<String, ChallengeSubmission> submissions;
+  final ValueChanged<DeckCard>? onSubmit;
+  final ValueChanged<ChallengeSubmission> onWithdraw;
   final int page;
   final PageController controller;
   final ValueChanged<int> onPageChanged;
@@ -261,6 +319,11 @@ class _Deck extends StatelessWidget {
                     itemBuilder: (context, i) => _ChallengeCard(
                       card: cards[i],
                       onDelete: () => onDelete(cards[i]),
+                      submission: submissions[cards[i].challenge.id],
+                      onSubmit: onSubmit == null
+                          ? null
+                          : () => onSubmit!(cards[i]),
+                      onWithdraw: onWithdraw,
                     ),
                   ),
                 ),
@@ -390,10 +453,23 @@ class _BackCard extends StatelessWidget {
 /// Figma `thẻ chính`: nền tint xanh lá, bo 24, lề 24, nội dung căn giữa cách
 /// nhau 12 (mascot, nhãn chủ đề, tên thử thách, nút).
 class _ChallengeCard extends StatelessWidget {
-  const _ChallengeCard({required this.card, required this.onDelete});
+  const _ChallengeCard({
+    required this.card,
+    required this.onDelete,
+    this.submission,
+    this.onSubmit,
+    this.onWithdraw,
+  });
 
   final DeckCard card;
   final VoidCallback onDelete;
+
+  /// Lần gửi thẻ tự thêm này lên kho chung (nếu có).
+  final ChallengeSubmission? submission;
+
+  /// `null` khi Remote Config tắt việc gửi thẻ.
+  final VoidCallback? onSubmit;
+  final ValueChanged<ChallengeSubmission>? onWithdraw;
 
   @override
   Widget build(BuildContext context) {
@@ -448,6 +524,12 @@ class _ChallengeCard extends StatelessWidget {
                   context.push(AppRoutes.challengeDetail(challenge.id)),
             ),
             if (challenge.mine)
+              _ShareRow(
+                submission: submission,
+                onSubmit: onSubmit,
+                onWithdraw: onWithdraw,
+              ),
+            if (challenge.mine)
               AppButton(
                 label: 'Xoá thẻ này',
                 variant: AppButtonVariant.text,
@@ -458,5 +540,73 @@ class _ChallengeCard extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+/// Trạng thái gửi thẻ tự thêm lên kho chung: nút gửi, đang chờ duyệt (rút
+/// lại được), đã vào kho chung, hoặc chưa được duyệt kèm lý do (gửi lại
+/// được). Cập nhật ngay khi staff duyệt trên web admin.
+class _ShareRow extends StatelessWidget {
+  const _ShareRow({this.submission, this.onSubmit, this.onWithdraw});
+
+  final ChallengeSubmission? submission;
+  final VoidCallback? onSubmit;
+  final ValueChanged<ChallengeSubmission>? onWithdraw;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = AppColors.of(context);
+    final s = submission;
+
+    Widget status(String text, Color color) => Semantics(
+      liveRegion: true,
+      child: Text(
+        text,
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: color,
+          fontWeight: FontWeight.w600,
+        ),
+        textAlign: TextAlign.center,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+
+    return switch (s?.status) {
+      null when onSubmit != null => AppButton(
+        label: 'Gửi cho mọi người',
+        variant: AppButtonVariant.outlined,
+        expand: true,
+        onPressed: onSubmit,
+      ),
+      null => const SizedBox.shrink(),
+      SubmissionStatus.pending => Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Flexible(child: status('Đang chờ duyệt', colors.warning)),
+          if (onWithdraw != null)
+            TextButton(
+              onPressed: () => onWithdraw!(s!),
+              child: const Text('Rút lại'),
+            ),
+        ],
+      ),
+      SubmissionStatus.approved => status(
+        'Đã vào kho chung ✓ Ai cũng nhận được thẻ này',
+        colors.success,
+      ),
+      SubmissionStatus.rejected => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          status(
+            'Chưa được duyệt${s!.reason.isEmpty ? '' : ': ${s.reason}'}',
+            theme.colorScheme.error,
+          ),
+          if (onSubmit != null)
+            TextButton(onPressed: onSubmit, child: const Text('Gửi lại')),
+        ],
+      ),
+    };
   }
 }
