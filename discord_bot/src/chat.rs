@@ -50,10 +50,12 @@ pub async fn event_handler(
         .get_linked_uid(&msg.author.id.to_string())
         .await?
     else {
+        // Not linked yet: fixed reply, no AI call.
         msg.channel_id
             .say(
                 &ctx.http,
-                "🔗 Bạn cần liên kết tài khoản Nốt trước. Gõ `/connect` để lấy mã nhé!",
+                "🔗 Bạn cần liên kết tài khoản Nốt trước khi trò chuyện với mình. \
+                Gõ `/connect` để lấy mã kết nối nhé!",
             )
             .await?;
         return Ok(());
