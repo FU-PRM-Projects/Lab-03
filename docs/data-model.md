@@ -30,6 +30,7 @@ người dùng từ Lab 3 (`notes`, `private/*`, `challengeProgress`, `groups`,
 | `challenges/{id}` | `topic` (`dung_cam`/`van_dong`), `level` (1–10), `order` (0–999), `title` (1–80), `minutes` (1–600), `tip` (≤120), `script` (≤300), `discordRoom`?, `status` (`active`/`archived`), `source` (`seed`/`staff`/`community`), `submissionId`?, `updatedBy`, `updatedAt` | Staff, admin (kèm `updatedBy` = mình, `updatedAt` = giờ server) | Mọi người đã đăng nhập (app ẩn thẻ `archived`) | Staff, admin, cùng điều kiện | — (lưu trữ thay vì xoá) | App: Thử thách, chi tiết thẻ. Web: Kho thẻ, Tổng quan |
 | `challengeSubmissions/{id}` | `uid`, `topic`, `title` (1–80), `minutes` (1–600), `tip` (≤120), `customId`?, `status` (`pending`/`approved`/`rejected`), `reason` (≤200), `createdAt`, `reviewedBy`, `reviewedAt`, `challengeId`? | Người dùng, cho chính mình, `status = pending`, `createdAt` = giờ server | Người gửi; staff, admin | Staff, admin: chỉ `pending → approved` hoặc `pending → rejected` (cần `reason`), chỉ các trường duyệt, `reviewedBy` = mình | Người gửi, khi còn `pending` | App: thẻ tự thêm ("Gửi cho mọi người", trạng thái). Web: Hàng chờ duyệt, Tổng quan |
 | `users/{uid}/inbox/{id}` | `kind` (`submission_approved`/`submission_rejected`), `title` (1–80), `body` (1–500), `submissionId`?, `read` (bool), `createdAt` | Staff, admin, `read = false`, `createdAt` = giờ server | Chủ hộp thư | Chủ hộp thư: chỉ `read` | Chủ hộp thư | App: hộp thư (chuông). Web: tạo khi duyệt / từ chối |
+| `users/{uid}/private/onboarding` | `strangerLevel` (1–4 hoặc null), `habits` (≤ 20), `move` (`it_khi`/`thinh_thoang`/`thuong_xuyen`/null), `freeSlot` (`sang`/`chieu`/`toi`/`khuya`/null), `goals` (≤ 2), `profileLabel` (≤ 30), `planSource` (`ai`/`rules`), `done` (true), `completedAt` | Chủ tài khoản | Chủ tài khoản | Chủ tài khoản, cùng điều kiện | — | App: S13a–g, S12 "Làm lại khảo sát" |
 | `announcements/{id}` | `title` (1–80), `body` (1–1000), `authorUid`, `createdAt` | Staff, admin, `authorUid` = mình, `createdAt` = giờ server | Mọi người đã đăng nhập | — | Staff, admin | App: hộp thư. Web: Thông báo, Tổng quan |
 
 ### Bước chuyển trạng thái
@@ -74,6 +75,8 @@ ca được phép và một ca bị cấm:
 | R-25 | `announcements` | staff / user | staff gửi, xoá; user đọc | Cho phép |
 | R-25 | `announcements` | user / staff | chưa đăng nhập đọc; user gửi; `authorUid` người khác; nội dung rỗng; sửa; user xoá | Cấm |
 | R-26 | `users` | staff | đọc hồ sơ người khác | Cho phép |
+| R-27 | `users/{uid}/private/onboarding` | user | chủ ghi và đọc; bước bỏ qua để null | Cho phép |
+| R-27 | `users/{uid}/private/onboarding` | user | người khác đọc / ghi; mức ngại 9; 3 mục tiêu; giá trị lạ; trường thêm (email) | Cấm |
 | R-26 | `users` | user / staff / admin | user đọc hồ sơ staff; staff đổi vai trò; tự nâng vai trò; admin đổi vai trò của mình; vai trò lạ | Cấm |
 
-Kết quả lần chạy gần nhất (9/11/2026): 26/26 pass.
+Kết quả lần chạy gần nhất (9/11/2026): 27/27 pass.

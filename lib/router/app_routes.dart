@@ -14,6 +14,7 @@ abstract final class AppRoutes {
   static const String breathe = '/breathe';
   static const String journey = '/journey';
   static const String settings = '/settings';
+  static const String onboarding = '/onboarding';
 
   /// Thư viện component để đối chiếu với Figma (không có ở bản release).
   static const String componentGallery = '/dev/components';

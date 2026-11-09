@@ -9,6 +9,7 @@ import '../../router/app_routes.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_tokens.dart';
 import '../../utils/vi_date_format.dart';
+import '../../viewmodels/onboarding_view_model.dart';
 import '../../viewmodels/today_view_model.dart';
 import '../../viewmodels/view_state.dart';
 import '../../widgets/app_button.dart';
@@ -31,6 +32,10 @@ class TodayScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    // Lần đầu đăng nhập (chưa làm quen): mở S13a một lần (flow A2).
+    ref.listen(needsOnboardingProvider, (previous, next) {
+      if (next.value ?? false) context.push(AppRoutes.onboarding);
+    });
     final state = ref.watch(todayViewModelProvider);
     final hasDraft = ref.watch(hasDraftProvider).value ?? false;
     final summary = switch (state) {

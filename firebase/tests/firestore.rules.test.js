@@ -291,3 +291,20 @@ test('R-26 staff read user profiles; only an admin changes roles, never their ow
   await assertFails(updateDoc(doc(env.authenticatedContext('root').firestore(), 'users/root'), { role: 'user' }));
   await assertFails(updateDoc(doc(env.authenticatedContext('root').firestore(), 'users/uma'), { role: 'owner' }));
 });
+
+test('R-27 onboarding answers are private and limited to known values', async () => {
+  const alice = env.authenticatedContext('alice').firestore();
+  const answers = (extra = {}) => ({
+    strangerLevel: 2, habits: ['Video ngắn'], move: 'it_khi', freeSlot: 'toi', goals: ['bot_ngai'],
+    profileLabel: 'Người mới tập bắt chuyện', planSource: 'rules', done: true, completedAt: serverTimestamp(), ...extra,
+  });
+  await assertSucceeds(setDoc(doc(alice, 'users/alice/private/onboarding'), answers()));
+  await assertSucceeds(setDoc(doc(alice, 'users/alice/private/onboarding'), answers({ strangerLevel: null, move: null, goals: [] })));
+  await assertSucceeds(getDoc(doc(alice, 'users/alice/private/onboarding')));
+  await assertFails(getDoc(doc(env.authenticatedContext('bob').firestore(), 'users/alice/private/onboarding')));
+  await assertFails(setDoc(doc(env.authenticatedContext('bob').firestore(), 'users/alice/private/onboarding'), answers()));
+  await assertFails(setDoc(doc(alice, 'users/alice/private/onboarding'), answers({ strangerLevel: 9 })));
+  await assertFails(setDoc(doc(alice, 'users/alice/private/onboarding'), answers({ goals: ['a', 'b', 'c'] })));
+  await assertFails(setDoc(doc(alice, 'users/alice/private/onboarding'), answers({ move: 'bay' })));
+  await assertFails(setDoc(doc(alice, 'users/alice/private/onboarding'), answers({ email: 'a@b.c' })));
+});
