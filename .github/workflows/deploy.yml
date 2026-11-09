@@ -1,7 +1,7 @@
 name: Deploy
 
 # Tự động đưa bản web mới lên Firebase Hosting và cập nhật Security Rules khi
-# merge vào `main`. Mỗi pull request có một bản preview riêng (URL comment vào PR).
+# merge vào `main` (app ở `/`, web admin ở `/admin/`). Mỗi pull request có một bản preview riêng (URL comment vào PR).
 #
 # Cần secret `FIREBASE_SERVICE_ACCOUNT` (JSON của service account có quyền
 # Firebase Develop Admin). Nếu chưa đặt, job chỉ cảnh báo và bỏ qua — CI vẫn xanh.
@@ -13,6 +13,8 @@ on:
       - lib/**
       - web/**
       - assets/**
+      - packages/**
+      - web_admin/**
       - pubspec.yaml
       - pubspec.lock
       - firebase/**
@@ -24,6 +26,8 @@ on:
       - lib/**
       - web/**
       - assets/**
+      - packages/**
+      - web_admin/**
       - pubspec.yaml
       - pubspec.lock
       - firebase/**
@@ -90,6 +94,16 @@ jobs:
         if: steps.credentials.outputs.enabled == 'true'
         run: flutter build web --release
 
+      # Web admin (staff, admin) ở `/admin/` của cùng site Hosting.
+      - name: Build web admin
+        if: steps.credentials.outputs.enabled == 'true'
+        working-directory: web_admin
+        run: |
+          flutter pub get
+          flutter build web --release --base-href /admin/
+          rm -rf ../build/web/admin
+          cp -r build/web ../build/web/admin
+
       - name: Install Firebase CLI
         if: steps.credentials.outputs.enabled == 'true'
         run: npm install --global firebase-tools@15
@@ -142,6 +156,16 @@ jobs:
       - name: Build web
         if: steps.credentials.outputs.enabled == 'true'
         run: flutter build web --release
+
+      # Web admin (staff, admin) ở `/admin/` của cùng site Hosting.
+      - name: Build web admin
+        if: steps.credentials.outputs.enabled == 'true'
+        working-directory: web_admin
+        run: |
+          flutter pub get
+          flutter build web --release --base-href /admin/
+          rm -rf ../build/web/admin
+          cp -r build/web ../build/web/admin
 
       - name: Deploy preview channel
         if: steps.credentials.outputs.enabled == 'true'

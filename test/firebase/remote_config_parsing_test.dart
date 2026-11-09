@@ -55,6 +55,7 @@ void main() {
       'quick_win_chips': jsonEncode(config.quickWinChips),
       'groups_enabled': '${config.groupsEnabled}',
       'custom_challenges_enabled': '${config.customChallengesEnabled}',
+      'challenge_submissions_enabled': '${config.challengeSubmissionsEnabled}',
       'discord_enabled': '${config.discordEnabled}',
       'discord_invite_url': config.discordInviteUrl,
       'discord_channel_map': jsonEncode(config.discordChannels),

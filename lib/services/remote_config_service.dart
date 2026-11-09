@@ -14,6 +14,10 @@ abstract interface class RemoteConfigService {
   /// Cho người dùng tự thêm thẻ thử thách ở S07 (`custom_challenges_enabled`).
   bool get customChallengesEnabled;
 
+  /// Cho gửi thẻ tự thêm lên kho chung để staff duyệt
+  /// (`challenge_submissions_enabled`, luồng liên vai trò của Final).
+  bool get challengeSubmissionsEnabled;
+
   /// Bật phòng Discord (`discord_enabled`): tắt thì ẩn S14, dòng phòng ở
   /// S05e, lối vào ở S12 và thẻ thử thách cấp 3 trên Discord.
   bool get discordEnabled;
@@ -64,6 +68,9 @@ class InAppRemoteConfig implements RemoteConfigService {
 
   @override
   bool get customChallengesEnabled => true;
+
+  @override
+  bool get challengeSubmissionsEnabled => true;
 
   @override
   bool get discordEnabled => true;

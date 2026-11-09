@@ -54,6 +54,7 @@ class FirebaseRemoteConfigService implements RemoteConfigService {
         'quick_win_chips': jsonEncode(InAppRemoteConfig.defaultQuickWinChips),
         'groups_enabled': true,
         'custom_challenges_enabled': true,
+        'challenge_submissions_enabled': true,
         'discord_enabled': true,
         'discord_invite_url': InAppRemoteConfig.defaultDiscordInviteUrl,
         'discord_channel_map': '{}',
@@ -90,6 +91,10 @@ class FirebaseRemoteConfigService implements RemoteConfigService {
   @override
   bool get customChallengesEnabled =>
       _config.getBool('custom_challenges_enabled');
+
+  @override
+  bool get challengeSubmissionsEnabled =>
+      _config.getBool('challenge_submissions_enabled');
 
   @override
   bool get discordEnabled => _config.getBool('discord_enabled');

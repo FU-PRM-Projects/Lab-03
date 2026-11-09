@@ -20,6 +20,13 @@
       },
       "valueType": "BOOLEAN",
       "description": "Cờ: hiện khu demo Firebase ở S12"
+    },
+    "challenge_submissions_enabled": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "valueType": "BOOLEAN",
+      "description": "Cờ: cho gửi thẻ tự thêm lên kho chung để staff duyệt (luồng liên vai trò)"
     }
   }
 }

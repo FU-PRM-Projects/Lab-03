@@ -55,13 +55,20 @@ class FirestoreChallengeRepository implements ChallengeRepository {
   Future<List<Challenge>> catalog() async {
     try {
       final snapshot = await _firestore.collection('challenges').get();
-      return snapshot.docs.map(_toChallenge).nonNulls.toList()..sort(
-        (a, b) => a.topic.index != b.topic.index
-            ? a.topic.index.compareTo(b.topic.index)
-            : a.level != b.level
-            ? a.level.compareTo(b.level)
-            : a.order.compareTo(b.order),
-      );
+      return snapshot.docs
+          // Staff lưu trữ thẻ trên web admin: ẩn khỏi chồng thẻ, nhưng `get`
+          // vẫn đọc được để nốt cũ trỏ tới thẻ vẫn mở.
+          .where((doc) => doc.data()['status'] != 'archived')
+          .map(_toChallenge)
+          .nonNulls
+          .toList()
+        ..sort(
+          (a, b) => a.topic.index != b.topic.index
+              ? a.topic.index.compareTo(b.topic.index)
+              : a.level != b.level
+              ? a.level.compareTo(b.level)
+              : a.order.compareTo(b.order),
+        );
     } on FirebaseException catch (e) {
       throw firestoreException(e);
     }

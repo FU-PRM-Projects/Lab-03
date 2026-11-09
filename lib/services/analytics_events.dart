@@ -16,6 +16,12 @@ abstract final class AnalyticsEvents {
   static const String streakShared = 'streak_shared';
   static const String screenView = 'screen_view';
   static const String imageUploaded = 'image_uploaded';
+
+  /// Gửi thẻ tự thêm lên kho chung (luồng liên vai trò).
+  static const String challengeSubmitted = 'challenge_submitted';
+
+  /// Mở hộp thư có tin từ web admin.
+  static const String inboxOpened = 'inbox_opened';
 }
 
 abstract final class AnalyticsParams {

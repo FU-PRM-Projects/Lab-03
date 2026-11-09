@@ -8,6 +8,11 @@ import 'package:lab03/firebase/cloudinary_image_service.dart';
 import 'package:lab03/firebase/device_image_picker_service.dart';
 import 'package:lab03/services/image_service.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:not_core/not_core.dart'
+    show
+        FirestoreAnnouncementRepository,
+        FirestoreInboxRepository,
+        FirestoreSubmissionRepository;
 
 import 'app.dart';
 import 'firebase/crash_handlers.dart';
@@ -32,6 +37,7 @@ import 'firebase/streak_share_impl.dart';
 import 'services/analytics_service.dart';
 import 'services/auth_service.dart';
 import 'services/challenge_repository.dart';
+import 'services/community_services.dart';
 import 'services/crash_reporter.dart';
 import 'services/discord_service.dart';
 import 'services/draft_store.dart';
@@ -127,6 +133,13 @@ Future<void> main() async {
         challengeRepositoryProvider.overrideWithValue(
           FirestoreChallengeRepository(currentUid: uid),
         ),
+        submissionRepositoryProvider.overrideWithValue(
+          FirestoreSubmissionRepository(),
+        ),
+        announcementRepositoryProvider.overrideWithValue(
+          FirestoreAnnouncementRepository(),
+        ),
+        inboxRepositoryProvider.overrideWithValue(FirestoreInboxRepository()),
         habitRepositoryProvider.overrideWithValue(
           FirestoreHabitRepository(currentUid: uid),
         ),
