@@ -71,7 +71,6 @@ class _Breathing extends StatelessWidget {
   final BreathingState state;
   final BreathingViewModel viewModel;
 
-
   void _choosePattern(BuildContext context) {
     showModalBottomSheet<void>(
       context: context,
