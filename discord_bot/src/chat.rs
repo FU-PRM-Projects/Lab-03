@@ -9,10 +9,11 @@ use std::{
 use poise::serenity_prelude as serenity;
 use rig_core::message::Message;
 
-use crate::{Data, Error, agent, cloudinary::Photo};
+use crate::{Data, Error, agent, cloudinary::Photo, guard::Verdict};
 
 /// Shown instead of an AI reply when the guardrail flags the conversation; `/clear` resets it.
 const GUARD_REJECTION: &str = "Có lỗi xảy ra, hãy /clear để tiếp tục chat với bot của chúng tôi";
+
 
 /// One message of the DM conversation (`bot` = sent by the bot).
 pub struct Turn {
@@ -169,13 +170,18 @@ pub async fn event_handler(
             .map(|t| format!("{}: {}\n", if t.bot { "Assistant" } else { "User" }, t.text))
             .collect();
         conversation.push_str(&format!("User: {prompt}"));
-        match guard.is_abusive(&conversation).await {
-            Ok(true) => {
-                eprintln!("guard: blocked conversation of user {}", msg.author.id);
+        match guard.check(&conversation).await {
+            Ok(Verdict::Abusive) => {
+                eprintln!("guard: blocked abusive conversation of user {}", msg.author.id);
                 msg.channel_id.say(&ctx.http, GUARD_REJECTION).await?;
                 return Ok(());
             }
-            Ok(false) => {}
+            Ok(Verdict::OffTopic) => {
+                eprintln!("guard: blocked off-topic conversation of user {}", msg.author.id);
+                msg.channel_id.say(&ctx.http, GUARD_REJECTION).await?;
+                return Ok(());
+            }
+            Ok(Verdict::Allowed) => {}
             Err(e) => eprintln!("guard error (allowing message): {e}"),
         }
     }
