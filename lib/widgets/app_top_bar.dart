@@ -94,6 +94,7 @@ class TabHeader extends StatelessWidget {
     required this.onProfile,
     this.photo,
     this.unread = 0,
+    this.raised = false,
     super.key,
   });
 
@@ -102,6 +103,7 @@ class TabHeader extends StatelessWidget {
 
   /// Số tin riêng chưa đọc trong hộp thư (chấm đỏ trên chuông).
   final int unread;
+  final bool raised;
   final VoidCallback onProfile;
 
   /// Ảnh đại diện; `null` thì dùng avatar mặc định.
@@ -139,45 +141,51 @@ class TabHeader extends StatelessWidget {
                 ),
               ),
             ),
-            IconButton(
-              onPressed: onNotifications,
-              tooltip: unread > 0 ? 'Hộp thư, $unread tin mới' : 'Hộp thư',
-              style: IconButton.styleFrom(
-                backgroundColor: scheme.surfaceContainerHighest,
-                fixedSize: const Size.square(AppSize.minTouch),
-              ),
-              icon: Badge(
-                isLabelVisible: unread > 0,
-                label: Text('$unread'),
-                child: SvgPicture.asset(
-                  'assets/icons/bell.svg',
-                  width: 22,
-                  height: 22,
-                  colorFilter: ColorFilter.mode(
-                    scheme.onSurface,
-                    BlendMode.srcIn,
+            _actionSurface(
+              context,
+              IconButton(
+                onPressed: onNotifications,
+                tooltip: unread > 0 ? 'Hộp thư, $unread tin mới' : 'Hộp thư',
+                style: IconButton.styleFrom(
+                  backgroundColor: scheme.surfaceContainerHighest,
+                  fixedSize: const Size.square(AppSize.minTouch),
+                ),
+                icon: Badge(
+                  isLabelVisible: unread > 0,
+                  label: Text('$unread'),
+                  child: SvgPicture.asset(
+                    'assets/icons/bell.svg',
+                    width: 22,
+                    height: 22,
+                    colorFilter: ColorFilter.mode(
+                      scheme.onSurface,
+                      BlendMode.srcIn,
+                    ),
                   ),
                 ),
               ),
             ),
-            Tooltip(
-              message: 'Cài đặt',
-              child: Semantics(
-                button: true,
-                label: 'Cài đặt',
-                excludeSemantics: true,
-                child: InkWell(
-                  onTap: onProfile,
-                  customBorder: const CircleBorder(),
-                  child: AppNetworkImage.square(
-                    image: photo,
-                    semanticLabel: 'Ảnh đại diện',
-                    size: AppSize.minTouch,
-                    circle: true,
-                    fallback: SvgPicture.asset(
-                      'assets/icons/avatar.svg',
-                      width: AppSize.minTouch,
-                      height: AppSize.minTouch,
+            _actionSurface(
+              context,
+              Tooltip(
+                message: 'Cài đặt',
+                child: Semantics(
+                  button: true,
+                  label: 'Cài đặt',
+                  excludeSemantics: true,
+                  child: InkWell(
+                    onTap: onProfile,
+                    customBorder: const CircleBorder(),
+                    child: AppNetworkImage.square(
+                      image: photo,
+                      semanticLabel: 'Ảnh đại diện',
+                      size: AppSize.minTouch,
+                      circle: true,
+                      fallback: SvgPicture.asset(
+                        'assets/icons/avatar.svg',
+                        width: AppSize.minTouch,
+                        height: AppSize.minTouch,
+                      ),
                     ),
                   ),
                 ),
@@ -188,4 +196,15 @@ class TabHeader extends StatelessWidget {
       ),
     );
   }
+
+  Widget _actionSurface(BuildContext context, Widget child) => raised
+      ? Material(
+          type: MaterialType.circle,
+          color: Theme.of(context).colorScheme.surface,
+          elevation: 1,
+          shadowColor: Theme.of(context).colorScheme.primary
+              .withValues(alpha: 0.15),
+          child: child,
+        )
+      : child;
 }

@@ -16,6 +16,16 @@
 ✔ R-16 notes may carry a Cloudinary image; other images are rejected
 ✔ R-17 groups may carry a Cloudinary image
 ✔ R-18 owner sets and removes own profile photo, but cannot touch role or others
-ℹ tests 18
-ℹ pass 18
+✔ R-19 staff create, edit and archive catalog cards; users and bad cards are denied
+✔ R-20 user submits a pending card for themselves only
+✔ R-21 owner and staff read a submission; other users do not
+✔ R-22 only staff move pending to approved or rejected; a rejection needs a reason
+✔ R-23 owner withdraws a pending submission but not a reviewed one
+✔ R-24 staff write inbox messages; the owner reads and marks them read
+✔ R-25 staff post announcements that every signed-in user reads
+✔ R-26 staff read user profiles; only an admin changes roles, never their own
+✔ R-27 onboarding answers are private and limited to known values
+✔ R-28 owner saves weekly card PDF metadata; the shape must match the week
+ℹ tests 28
+ℹ pass 28
 ℹ fail 0

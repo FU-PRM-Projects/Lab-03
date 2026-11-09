@@ -11,6 +11,8 @@ import '../support/fakes.dart';
 import '../support/pump.dart';
 
 /// Flow F1 Ghi nốt buổi tối trên cả app, gồm nhánh thay thế và nhánh lỗi.
+///
+/// Luồng 3 bước: chụp khoảnh khắc (tuỳ chọn) → chiến thắng → vài dòng.
 void main() {
   Future<void> openComposer(WidgetTester tester) async {
     await tester.tap(find.text('Ghi nốt'));
@@ -20,10 +22,8 @@ void main() {
     expect(find.byType(NoteComposerScreen), findsOneWidget);
   }
 
-  Future<void> pickMoodAndContinue(WidgetTester tester, Mood mood) async {
-    await tester.tap(find.bySemanticsLabel('Tâm trạng ${mood.label}'));
-    await tester.pump();
-    await tester.tap(find.text('Tiếp'));
+  Future<void> skipPhoto(WidgetTester tester) async {
+    await tester.tap(find.text('Bỏ qua'));
     await tester.pumpAndSettle();
   }
 
@@ -36,14 +36,16 @@ void main() {
         expect(find.text('Bắt đầu chuỗi ngày'), findsOneWidget);
         await openComposer(tester);
         expect(find.text('Bước 1/3'), findsOneWidget);
+        expect(find.text('Chụp lại khoảnh khắc'), findsOneWidget);
 
-        await pickMoodAndContinue(tester, Mood.vui);
+        await skipPhoto(tester);
         expect(find.text('Bước 2/3'), findsOneWidget);
         await tester.enterText(find.byType(TextField), 'Dọn bàn học');
         await tester.pump();
         await tester.tap(find.text('Tiếp'));
         await tester.pumpAndSettle();
 
+        expect(find.text('Bước 3/3'), findsOneWidget);
         expect(find.text('Viết thêm vài dòng?'), findsOneWidget);
         await tester.enterText(find.byType(TextField), 'Nhẹ hơn hôm qua.');
         await tester.pump();
@@ -61,6 +63,8 @@ void main() {
         final saved = services.notes.notes.single;
         expect(saved.title, 'Dọn bàn học');
         expect(saved.body, 'Nhẹ hơn hôm qua.');
+        expect(saved.mood, isNull);
+        expect(saved.image, isNull);
 
         await tester.tap(find.text('Về Hôm nay'));
         await tester.pumpAndSettle();
@@ -74,37 +78,60 @@ void main() {
     );
   }
 
-  testWidgets('Back ở bước 2 → "Giữ nốt đang ghi?" → Giữ nháp', (tester) async {
+  testWidgets(
+    'bước ảnh: có Chụp ảnh / Thư viện / Bỏ qua, Tiếp khoá khi chưa có ảnh',
+    (tester) async {
+      await pumpApp(tester);
+      await openComposer(tester);
+
+      expect(find.text('Chụp ảnh'), findsOneWidget);
+      expect(find.text('Thư viện'), findsOneWidget);
+      expect(find.text('Bỏ qua'), findsOneWidget);
+      final next = tester.widget<ButtonStyleButton>(
+        find.ancestor(
+          of: find.text('Tiếp'),
+          matching: find.bySubtype<ButtonStyleButton>(),
+        ),
+      );
+      expect(next.onPressed, isNull);
+    },
+  );
+
+  testWidgets(
+    'Back ở bước 2 về bước ảnh, rồi hỏi "Giữ nốt đang ghi?" → Giữ nháp',
+    (tester) async {
+      final services = await pumpApp(tester);
+      await openComposer(tester);
+      await skipPhoto(tester);
+      await tester.enterText(find.byType(TextField), 'Đi bộ 20 phút');
+      await tester.pump();
+
+      // Back lần 1: lùi về bước ảnh. Back lần 2: có dữ liệu nên hỏi giữ nháp.
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(find.text('Chụp lại khoảnh khắc'), findsOneWidget);
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(find.text('Giữ nốt đang ghi?'), findsOneWidget);
+      await tester.tap(find.text('Giữ nháp'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(TodayScreen), findsOneWidget);
+      expect(services.drafts.draft?.title, 'Đi bộ 20 phút');
+      expect(find.text('Tiếp tục ghi nốt'), findsOneWidget);
+
+      // Mở lại: nháp được điền sẵn.
+      await tester.tap(find.text('Tiếp tục ghi nốt'));
+      await tester.pumpAndSettle();
+      await skipPhoto(tester);
+      expect(find.text('Đi bộ 20 phút'), findsOneWidget);
+    },
+  );
+
+  testWidgets('Back có nháp → Bỏ: xoá nháp, về S02', (tester) async {
     final services = await pumpApp(tester);
+    services.drafts.draft = const NoteDraft(title: 'cũ');
     await openComposer(tester);
-    await pickMoodAndContinue(tester, Mood.on);
-    await tester.enterText(find.byType(TextField), 'Đi bộ 20 phút');
-    await tester.pump();
-
-    await tester.binding.handlePopRoute();
-    await tester.pumpAndSettle();
-    expect(find.text('Giữ nốt đang ghi?'), findsOneWidget);
-    await tester.tap(find.text('Giữ nháp'));
-    await tester.pumpAndSettle();
-
-    expect(find.byType(TodayScreen), findsOneWidget);
-    expect(services.drafts.draft?.title, 'Đi bộ 20 phút');
-    expect(find.text('Tiếp tục ghi nốt'), findsOneWidget);
-
-    // Mở lại: nháp được điền sẵn.
-    await tester.tap(find.text('Tiếp tục ghi nốt'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Tiếp'));
-    await tester.pumpAndSettle();
-    expect(find.text('Đi bộ 20 phút'), findsOneWidget);
-  });
-
-  testWidgets('Back ở bước 2 → Bỏ: xoá nháp, về S02', (tester) async {
-    final services = await pumpApp(tester);
-    services.drafts.draft = const NoteDraft(mood: Mood.on, title: 'cũ');
-    await openComposer(tester);
-    await tester.tap(find.text('Tiếp'));
-    await tester.pumpAndSettle();
 
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
@@ -114,21 +141,23 @@ void main() {
     expect(services.drafts.draft, isNull);
   });
 
-  testWidgets('ngày Rối: gợi ý sơ cứu 5-4-3-2-1', (tester) async {
+  testWidgets('Back ở bước ảnh khi chưa có gì: đóng luôn, không hỏi', (
+    tester,
+  ) async {
     await pumpApp(tester);
     await openComposer(tester);
-    await tester.tap(find.bySemanticsLabel('Tâm trạng Rối'));
-    await tester.pump();
-    expect(find.text('Ngày rối: 1 chip là đủ.'), findsOneWidget);
-    expect(find.text('Sơ cứu 1 phút: 5-4-3-2-1'), findsOneWidget);
-    expect(find.text('Làm cùng Nốt'), findsOneWidget);
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.text('Giữ nốt đang ghi?'), findsNothing);
+    expect(find.byType(TodayScreen), findsOneWidget);
   });
 
   testWidgets('mất mạng: vẫn tới S04 với banner Offline', (tester) async {
     final services = await pumpApp(tester);
     services.notes.offline = true;
     await openComposer(tester);
-    await pickMoodAndContinue(tester, Mood.binhThuong);
+    await skipPhoto(tester);
     await tester.tap(find.text('Ăn đủ bữa'));
     await tester.pump();
     await tester.tap(find.text('Bỏ qua phần kể thêm'));
@@ -146,7 +175,7 @@ void main() {
   testWidgets('lỗi lưu: SnackBar, ở lại S03 với nội dung cũ', (tester) async {
     final services = await pumpApp(tester);
     await openComposer(tester);
-    await pickMoodAndContinue(tester, Mood.on);
+    await skipPhoto(tester);
     await tester.enterText(find.byType(TextField), 'Đi bộ');
     await tester.pump();
     services.notes.nextError = const AppException(

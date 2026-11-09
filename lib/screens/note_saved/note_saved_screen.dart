@@ -196,6 +196,7 @@ class _SavedContent extends StatelessWidget {
                             child: NoteTile(
                               type: note.type,
                               title: note.title,
+                              image: note.image,
                               dateLabel: dateLabel,
                             ),
                           ),
@@ -410,10 +411,17 @@ class _Celebration extends StatelessWidget {
                   height: 133.06,
                   excludeFromSemantics: true,
                 ),
-                JarIllustration(
-                  notes: jarNotes,
-                  semanticLabel: 'Hũ chiến thắng',
-                  height: 203.84,
+                TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0, end: 1),
+                  duration: MediaQuery.disableAnimationsOf(context)
+                      ? Duration.zero
+                      : const Duration(milliseconds: 680),
+                  builder: (context, progress, _) => JarIllustration(
+                    notes: jarNotes,
+                    semanticLabel: 'Hũ chiến thắng',
+                    height: 203.84,
+                    insertion: progress,
+                  ),
                 ),
               ],
             ),

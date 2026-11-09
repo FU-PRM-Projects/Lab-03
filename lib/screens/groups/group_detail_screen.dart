@@ -243,6 +243,7 @@ class _Body extends StatelessWidget {
                     NoteCard(
                       type: note.type,
                       title: note.title,
+                      image: note.image,
                       meta: <String>[
                         if (note.challenge?.anxietyBefore case final a?)
                           'Hồi hộp $a/5'

@@ -46,7 +46,7 @@
 | 1 | Design traceability | Xong | [`docs/design-traceability.md`](docs/design-traceability.md) |
 | 2 | Kiến trúc và theme | Xong | [`docs/architecture.md`](docs/architecture.md), `lib/theme/`, `lib/widgets/`, khung route 12 màn |
 | 3 | Firebase và đăng nhập | Xong (code + test; chờ project Firebase thật để chạy Google Sign-In trên máy) | `lib/services/`, `lib/firebase/`, S01, đăng xuất ở S12 |
-| 4 | Tính năng | Xong (code + test; chờ chạy thử trên máy với project Firebase thật): đủ 12 màn, 3 flow F1–F3 và các flow phụ, PDF Thẻ tuần lên Storage | Đủ 12 màn với mọi trạng thái, xuất và tải PDF |
+| 4 | Tính năng | Xong (code + test; chờ chạy thử trên máy với project Firebase thật): đủ 12 màn, 3 flow F1–F3 và các flow phụ, PDF Thẻ tuần (Final: lưu trên máy, chia sẻ, metadata Firestore) | Đủ 12 màn với mọi trạng thái, lưu và chia sẻ PDF |
 | 5 | Analytics, Crashlytics, Remote Config, FCM | Đang làm (Analytics + Crashlytics) | [`docs/analytics-plan.md`](docs/analytics-plan.md) |
 | 6 | Test plan và ARTEMIS | Chưa làm | `docs/test-plan.md`, `e2e_test/` |
 | 7 | AI code review | Chưa làm | `docs/code-review.md` |
@@ -217,6 +217,9 @@ lib/
 | [`docs/architecture.md`](docs/architecture.md) | Lớp MVVM, sơ đồ, luồng F1, bảng ViewModel–service |
 | [`docs/analytics-plan.md`](docs/analytics-plan.md) | Sự kiện Analytics, Crashlytics, quy ước dữ liệu và kế hoạch Stage 5 |
 | [`docs/system-architecture.md`](docs/system-architecture.md) | Kiến trúc cả hệ thống cho Final Assignment |
+| [`docs/gap-review.md`](docs/gap-review.md) | Final Stage 1: luồng Lab 2 / yêu cầu Lab 3 còn thiếu và quyết định cho từng mục |
+| [`docs/data-model.md`](docs/data-model.md) | Collection, vai trò, quyền, bước chuyển trạng thái và test rules |
+| [`docs/cross-role-flow.md`](docs/cross-role-flow.md) | Luồng liên vai trò gửi thẻ → staff duyệt, sơ đồ và đo thời gian |
 | [`docs/ai-feature.md`](docs/ai-feature.md) | Nốt AI (Gemini qua Firebase AI Logic): Kể tự do, hồ sơ khởi đầu, câu chào; Remote Config, App Check, dự phòng, dữ liệu gửi đi |
 
 ## Công cụ AI đã dùng

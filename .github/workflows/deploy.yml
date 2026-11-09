@@ -5,6 +5,8 @@ name: Deploy
 #
 # Cần secret `FIREBASE_SERVICE_ACCOUNT` (JSON của service account có quyền
 # Firebase Develop Admin). Nếu chưa đặt, job chỉ cảnh báo và bỏ qua — CI vẫn xanh.
+# Biến repo `RECAPTCHA_SITE_KEY` (Settings → Secrets and variables → Actions →
+# Variables) bật App Check cho web admin.
 
 on:
   push:
@@ -98,9 +100,14 @@ jobs:
       - name: Build web admin
         if: steps.credentials.outputs.enabled == 'true'
         working-directory: web_admin
+        # Site key reCAPTCHA Enterprise (Fraud Defense) của App Check. Biến repo,
+        # không phải secret: site key nằm công khai trong trang. Chưa đặt thì
+        # build không có App Check.
+        env:
+          RECAPTCHA_SITE_KEY: ${{ vars.RECAPTCHA_SITE_KEY }}
         run: |
           flutter pub get
-          flutter build web --release --base-href /admin/
+          flutter build web --release --base-href /admin/ --dart-define=RECAPTCHA_SITE_KEY="$RECAPTCHA_SITE_KEY"
           rm -rf ../build/web/admin
           cp -r build/web ../build/web/admin
 
@@ -161,9 +168,14 @@ jobs:
       - name: Build web admin
         if: steps.credentials.outputs.enabled == 'true'
         working-directory: web_admin
+        # Site key reCAPTCHA Enterprise (Fraud Defense) của App Check. Biến repo,
+        # không phải secret: site key nằm công khai trong trang. Chưa đặt thì
+        # build không có App Check.
+        env:
+          RECAPTCHA_SITE_KEY: ${{ vars.RECAPTCHA_SITE_KEY }}
         run: |
           flutter pub get
-          flutter build web --release --base-href /admin/
+          flutter build web --release --base-href /admin/ --dart-define=RECAPTCHA_SITE_KEY="$RECAPTCHA_SITE_KEY"
           rm -rf ../build/web/admin
           cp -r build/web ../build/web/admin
 

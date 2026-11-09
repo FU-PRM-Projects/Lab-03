@@ -20,6 +20,7 @@ class AppImagePicker extends StatelessWidget {
     this.onCancel,
     this.onRemove,
     this.circle = false,
+    this.aspectRatio = 16 / 9,
     super.key,
   });
 
@@ -42,6 +43,9 @@ class AppImagePicker extends StatelessWidget {
   /// Xem trước hình tròn 96 dp (avatar) thay vì khung 16:9.
   final bool circle;
 
+  /// Tỉ lệ khung xem trước hình chữ nhật (rộng / cao). Mặc định 16:9.
+  final double aspectRatio;
+
   @override
   Widget build(BuildContext context) {
     final busy = upload.busy;
@@ -63,7 +67,7 @@ class AppImagePicker extends StatelessWidget {
           AppNetworkImage.wide(
             image: image,
             semanticLabel: previewLabel,
-            aspectRatio: 16 / 9,
+            aspectRatio: aspectRatio,
           ),
         if (busy)
           _Progress(upload: upload, onCancel: onCancel)

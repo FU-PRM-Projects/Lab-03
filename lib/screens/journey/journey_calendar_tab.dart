@@ -143,6 +143,7 @@ class _MonthView extends StatelessWidget {
                       child: NoteTile(
                         type: note.type,
                         title: note.title,
+                        image: note.image,
                         dateLabel: <String>[
                           ViDateFormat.time(note.createdAt),
                           ?note.mood?.label,

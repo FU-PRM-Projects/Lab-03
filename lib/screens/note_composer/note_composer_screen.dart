@@ -3,24 +3,20 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../models/image_ref.dart';
-import '../../models/mood.dart';
 import '../../models/note.dart';
 import '../../router/app_routes.dart';
 import '../../theme/app_tokens.dart';
-import '../../theme/app_typography.dart';
-import '../../utils/vi_date_format.dart';
 import '../../viewmodels/image_upload_view_model.dart';
 import '../../viewmodels/note_composer_view_model.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_dialog.dart';
 import '../../widgets/app_image_picker.dart';
+import '../../widgets/app_network_image.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/app_top_bar.dart';
-import '../../widgets/mood_option.dart';
-import '../../widgets/note_tile.dart';
 import '../../widgets/quick_win_chip.dart';
 
-/// S03 · Ghi nốt (3 bước: tâm trạng → chiến thắng → vài dòng).
+/// S03 · Ghi nốt (3 bước: chụp khoảnh khắc → chiến thắng → vài dòng).
 class NoteComposerScreen extends ConsumerStatefulWidget {
   const NoteComposerScreen({this.step = 1, this.groupId, super.key});
 
@@ -153,9 +149,9 @@ class _NoteComposerScreenState extends ConsumerState<NoteComposerScreen> {
                             child: KeyedSubtree(
                               key: ValueKey<int>(state.step),
                               child: switch (state.step) {
-                                1 => _MoodStep(
-                                  state: state,
-                                  onSelect: _viewModel.selectMood,
+                                1 => _PhotoStep(
+                                  image: state.draft.image,
+                                  onRemoveImage: _viewModel.removeImage,
                                 ),
                                 2 => _WinStep(
                                   state: state,
@@ -169,7 +165,6 @@ class _NoteComposerScreenState extends ConsumerState<NoteComposerScreen> {
                                   controller: _body,
                                   onChanged: _viewModel.setBody,
                                   image: state.draft.image,
-                                  onRemoveImage: _viewModel.removeImage,
                                 ),
                               },
                             ),
@@ -193,9 +188,12 @@ class _NoteComposerScreenState extends ConsumerState<NoteComposerScreen> {
   List<Widget> _actions(NoteComposerState state) {
     final saving = state.saving;
     final viewModel = _viewModel;
+    final uploading = ref
+        .watch(imageUploadViewModelProvider(ImageFolder.note))
+        .busy;
 
     return <Widget>[
-      if (state.step == 3)
+      if (state.step == kComposerSteps)
         AppButton(
           label: 'Lưu vào hũ',
           expand: true,
@@ -206,7 +204,17 @@ class _NoteComposerScreenState extends ConsumerState<NoteComposerScreen> {
         AppButton(
           label: 'Tiếp',
           expand: true,
-          onPressed: state.canContinue && !saving ? viewModel.next : null,
+          // Bước ảnh: chờ tải xong mới đi tiếp, kẻo mất ảnh.
+          onPressed: state.canContinue && !saving && !uploading
+              ? viewModel.next
+              : null,
+        ),
+      if (state.step == 1)
+        AppButton(
+          label: 'Bỏ qua',
+          variant: AppButtonVariant.text,
+          expand: true,
+          onPressed: uploading ? null : viewModel.skipPhoto,
         ),
       if (state.step == 2)
         AppButton(
@@ -218,7 +226,7 @@ class _NoteComposerScreenState extends ConsumerState<NoteComposerScreen> {
               ? () => viewModel.save(skipJournal: true)
               : null,
         ),
-      if (state.step == 3)
+      if (state.step == kComposerSteps)
         AppButton(
           label: 'Bỏ qua',
           variant: AppButtonVariant.text,
@@ -245,7 +253,7 @@ class _StepProgress extends StatelessWidget {
       spacing: AppSpace.s8,
       children: <Widget>[
         Text(
-          'Bước $step/3',
+          'Bước $step/$kComposerSteps',
           style: theme.textTheme.labelMedium?.copyWith(
             fontWeight: FontWeight.w400,
             color: scheme.onSurfaceVariant,
@@ -255,7 +263,7 @@ class _StepProgress extends StatelessWidget {
           child: Row(
             spacing: AppSpace.s6,
             children: <Widget>[
-              for (var i = 1; i <= 3; i++)
+              for (var i = 1; i <= kComposerSteps; i++)
                 Expanded(
                   child: Container(
                     height: AppSpace.s6,
@@ -292,15 +300,22 @@ class _StepTitle extends StatelessWidget {
   );
 }
 
-class _MoodStep extends StatelessWidget {
-  const _MoodStep({required this.state, required this.onSelect});
+/// Bước 1: chụp lại khoảnh khắc (tuỳ chọn). Ảnh tải lên Cloudinary ngay, rồi
+/// mới sang phần mô tả.
+class _PhotoStep extends ConsumerWidget {
+  const _PhotoStep({required this.image, required this.onRemoveImage});
 
-  final NoteComposerState state;
-  final ValueChanged<Mood> onSelect;
+  /// Ảnh đã đính kèm vào nháp.
+  final ImageRef? image;
+  final VoidCallback onRemoveImage;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final upload = ref.watch(imageUploadViewModelProvider(ImageFolder.note));
+    final uploadViewModel = ref.read(
+      imageUploadViewModelProvider(ImageFolder.note).notifier,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -310,71 +325,26 @@ class _MoodStep extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           spacing: AppSpace.s8,
           children: <Widget>[
-            const _StepTitle('Hôm nay bạn thấy thế nào?'),
-            if (state.isRoughDay)
-              Text(
-                'Ngày rối: 1 chip là đủ.',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-          ],
-        ),
-        Wrap(
-          spacing: AppSpace.s12,
-          runSpacing: AppSpace.s12,
-          children: <Widget>[
-            for (final mood in Mood.values)
-              MoodOption(
-                mood: mood,
-                selected: state.draft.mood == mood,
-                onTap: () => onSelect(mood),
-              ),
-          ],
-        ),
-        if (state.isRoughDay) const _FirstAidCard(),
-      ],
-    );
-  }
-}
-
-/// Figma `Card/sơ cứu` cho ngày Rối: nền surface-variant, tiêu đề Title/17
-/// Bold và nút tonal mở màn Thở cùng Nốt.
-class _FirstAidCard extends StatelessWidget {
-  const _FirstAidCard();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(AppRadius.card),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpace.s16,
-          vertical: AppSpace.s12,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          spacing: AppSpace.s8,
-          children: <Widget>[
+            const _StepTitle('Chụp lại khoảnh khắc'),
             Text(
-              'Sơ cứu 1 phút: 5-4-3-2-1',
-              style: AppTextStyles.of(context).title17Bold
-                  .copyWith(letterSpacing: -0.17),
-            ),
-            AppButton(
-              label: 'Làm cùng Nốt',
-              variant: AppButtonVariant.tonal,
-              expand: true,
-              onPressed: () => context.push(AppRoutes.breathe),
+              'Ảnh được lưu riêng cho bạn. Không bắt buộc, bạn có thể bỏ qua.',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ),
-      ),
+        AppImagePicker(
+          upload: upload,
+          image: image,
+          previewLabel: 'Ảnh khoảnh khắc của nốt',
+          // Khung 2:1 để cả "Chụp ảnh", "Tiếp" và "Bỏ qua" vừa một màn hình.
+          aspectRatio: 2,
+          onPick: uploadViewModel.pickAndUpload,
+          onCancel: uploadViewModel.cancel,
+          onRemove: onRemoveImage,
+        ),
+      ],
     );
   }
 }
@@ -441,27 +411,6 @@ class _WinStep extends StatelessWidget {
             ),
           ],
         ),
-        if (state.oldNote case final Note note)
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            spacing: AppSpace.s8,
-            children: <Widget>[
-              Text(
-                'Một chiến thắng cũ của bạn:',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-              SizedBox(
-                height: AppSize.noteTile.height,
-                child: NoteTile(
-                  type: note.type,
-                  title: note.title,
-                  dateLabel: ViDateFormat.shortDate(note.createdAt),
-                ),
-              ),
-            ],
-          ),
       ],
     );
   }
@@ -513,34 +462,34 @@ class _GroupBadge extends StatelessWidget {
   }
 }
 
-class _JournalStep extends ConsumerWidget {
+class _JournalStep extends StatelessWidget {
   const _JournalStep({
     required this.controller,
     required this.onChanged,
     required this.image,
-    required this.onRemoveImage,
   });
 
   final TextEditingController controller;
   final ValueChanged<String> onChanged;
 
-  /// Ảnh đã đính kèm vào nháp.
+  /// Ảnh khoảnh khắc đã chụp ở bước 1, hiện lại để mô tả cho đúng nốt này.
   final ImageRef? image;
-  final VoidCallback onRemoveImage;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final upload = ref.watch(imageUploadViewModelProvider(ImageFolder.note));
-    final uploadViewModel = ref.read(
-      imageUploadViewModelProvider(ImageFolder.note).notifier,
-    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: AppSpace.s16,
       children: <Widget>[
         const _StepTitle('Viết thêm vài dòng?'),
+        if (image != null)
+          AppNetworkImage.wide(
+            image: image,
+            semanticLabel: 'Ảnh khoảnh khắc của nốt',
+            aspectRatio: 16 / 9,
+          ),
         AppTextField(
           label: 'Kể thêm',
           helper: 'Không bắt buộc',
@@ -557,15 +506,6 @@ class _JournalStep extends ConsumerWidget {
             fontWeight: FontWeight.w400,
             color: theme.colorScheme.onSurfaceVariant,
           ),
-        ),
-        Text('Đính ảnh (không bắt buộc)', style: theme.textTheme.labelLarge),
-        AppImagePicker(
-          upload: upload,
-          image: image,
-          previewLabel: 'Ảnh đính kèm của nốt',
-          onPick: uploadViewModel.pickAndUpload,
-          onCancel: uploadViewModel.cancel,
-          onRemove: onRemoveImage,
         ),
       ],
     );

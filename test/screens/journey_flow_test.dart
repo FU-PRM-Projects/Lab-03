@@ -211,8 +211,10 @@ void main() {
     expect(find.byType(NoteDetailScreen), findsOneWidget);
   });
 
-  testWidgets('Thẻ tuần: mở từ Mục tiêu tuần', (tester) async {
-    await openJourney(tester, notes: monthOfNotes());
+  testWidgets('Thẻ tuần: Lưu PDF vào máy → chia sẻ → ghi metadata', (
+    tester,
+  ) async {
+    final services = await openJourney(tester, notes: monthOfNotes());
     await openTab(tester, 'Thống kê');
     await tester.scrollUntilVisible(find.text('Mục tiêu tuần'), 200);
     // Đưa thẻ lên đầu vùng cuộn, khỏi bị thanh tab nổi che.
@@ -222,7 +224,18 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(WeeklyCardPage), findsOneWidget);
     expect(find.text('19/10 – 25/10'), findsOneWidget);
-    expect(find.text('Lưu thẻ tuần (PDF)'), findsNothing);
+
+    await tester.tap(find.text('Lưu thẻ tuần (PDF)'));
+    await tester.pumpAndSettle();
+    expect(find.text('Đã lưu thẻ tuần vào máy.'), findsOneWidget);
+    expect(find.textContaining('weekly-2026-W43.pdf'), findsOneWidget);
+    expect(services.reportFiles.saved, <String>['weekly-2026-W43.pdf']);
+    expect(services.reportFiles.shared, <String>['weekly-2026-W43.pdf']);
+    expect(services.reportRecords.records['2026-W43']?.sizeBytes, 5);
+
+    await tester.tap(find.text('Chia sẻ PDF'));
+    await tester.pumpAndSettle();
+    expect(services.reportFiles.shared, hasLength(2));
   });
 
   testWidgets('P6: 5 ngày Rối liền → dialog gợi ý hỗ trợ, "Để sau" đóng', (

@@ -14,7 +14,7 @@ Derived from two handouts: **Lab 3 – Cloud-Enabled Mobile App** and **Final As
 | Testing | ARTEMIS E2E (≥10 cases, 3 runs each), AI code review (≥5 findings, ≥3 fixes) | + Security Rules tests (Emulator), web checklist, cross-role E2E ×3, ≥3 review findings |
 | Grade | 10 pts (6 product, 4 process) | 10 pts (8 system, 2 slides/video), +0.5 bonus |
 
-> **Resolved for the Final.** Lab 3 built the weekly-card PDF upload to Cloud Storage. The Final Assignment puts Cloud Storage out of scope, and the project has no bucket, so the PDF export, `firebase_storage`, `pdf`, `printing` and `storage.rules` were removed; the weekly card stays as a view-only screen.
+> **Resolved for the Final.** Lab 3 uploaded the weekly-card PDF to Cloud Storage. The Final Assignment puts Cloud Storage out of scope and asks for the PDF to be *saved and shared on the device, with its metadata in Firestore*. The app now builds the PDF with `pdf` (bundled Be Vietnam Pro font), writes it to the app documents folder (`path_provider`), opens the share sheet (`share_plus`) and records `users/{uid}/reports/{isoWeek}`; `firebase_storage`, `printing` and `storage.rules` stay removed.
 
 ## 2. System context
 

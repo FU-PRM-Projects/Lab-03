@@ -1,8 +1,26 @@
 <svg width="120" height="140" viewBox="0 0 120 140" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g>
-<rect id="glass" x="7.5" y="29.5" width="105" height="105" rx="28.5" fill="#EEF0FE" stroke="#C0C8F8" stroke-width="3"/>
-<rect id="neck" x="27.5" y="19.5" width="65" height="11" rx="4.5" fill="#E7E9F3" stroke="#C0C8F8" stroke-width="3"/>
-<rect id="lid" x="20" y="4" width="80" height="16" rx="8" fill="#3D4FD6"/>
-<rect id="shine" opacity="0.7" x="18" y="46" width="6" height="48" rx="3" fill="white"/>
-</g>
+<defs>
+  <linearGradient id="glass" x1="20" y1="42" x2="107" y2="129" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#FBFCFF"/>
+    <stop offset=".55" stop-color="#E9EEFF"/>
+    <stop offset="1" stop-color="#DFE6FC"/>
+  </linearGradient>
+  <linearGradient id="rim" x1="15" y1="42" x2="112" y2="126" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#C5CDFB"/>
+    <stop offset=".48" stop-color="#B7C2F4"/>
+    <stop offset="1" stop-color="#A4B2E9"/>
+  </linearGradient>
+  <linearGradient id="lid" x1="60" y1="4" x2="60" y2="20" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#677BF1"/>
+    <stop offset=".55" stop-color="#485DDE"/>
+    <stop offset="1" stop-color="#3244B8"/>
+  </linearGradient>
+</defs>
+<rect x="7.5" y="29.5" width="105" height="105" rx="28.5" fill="url(#glass)" stroke="url(#rim)" stroke-width="3"/>
+<path d="M14 68V60a24 24 0 0 1 24-24h34" stroke="#FFF" stroke-opacity=".74" stroke-width="2" stroke-linecap="round"/>
+<path d="M82 128a24 24 0 0 0 24-24V87" stroke="#8298DC" stroke-opacity=".45" stroke-width="2" stroke-linecap="round"/>
+<rect x="27.5" y="19.5" width="65" height="11" rx="4.5" fill="#DAE1FC" stroke="#AEBBF1" stroke-width="3"/>
+<rect x="20" y="4" width="80" height="16" rx="8" fill="url(#lid)"/>
+<path d="M29 8h47" stroke="#FFF" stroke-opacity=".33" stroke-width="1.5" stroke-linecap="round"/>
+<rect x="18" y="46" width="5" height="46" rx="2.5" fill="#FFF" opacity=".75"/>
 </svg>
