@@ -1,0 +1,25 @@
+name: not_core
+description: Shared design system, models and Firestore services for the Nốt mobile app and the web admin.
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.13.0
+  flutter: '>=3.47.0'
+
+dependencies:
+  cloud_firestore: ^7.1.0
+  flutter:
+    sdk: flutter
+  flutter_svg: ^2.3.0
+  material_ui: ^1.8.0
+
+dev_dependencies:
+  fake_cloud_firestore: ^4.5.0
+  flutter_lints: ^6.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  assets:
+    - assets/icons/
