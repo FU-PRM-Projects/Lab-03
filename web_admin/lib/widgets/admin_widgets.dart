@@ -1,6 +1,90 @@
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:not_core/not_core.dart';
+
+/// `Button/google`: nút đăng nhập theo hướng dẫn thương hiệu Google, giống nút
+/// "Tiếp tục với Google" ở màn Welcome của app (nền trắng, viền `#747775`,
+/// chữ Roboto Medium 14 `#1F1F1F`, logo chính thức) nhưng góc bo 8 (dạng chữ
+/// nhật Google cho phép) thay vì viên thuốc, hợp với giao diện admin. Đang xử
+/// lý thì giữ bề rộng và hiện vòng xoay.
+class GoogleSignInButton extends StatelessWidget {
+  const GoogleSignInButton({
+    required this.label,
+    required this.onPressed,
+    this.loading = false,
+    super.key,
+  });
+
+  static const Color _border = Color(0xFF747775);
+  static const Color _text = Color(0xFF1F1F1F);
+
+  final String label;
+  final VoidCallback? onPressed;
+  final bool loading;
+
+  @override
+  Widget build(BuildContext context) {
+    final onTap = loading ? null : onPressed;
+    final content = Row(
+      mainAxisSize: MainAxisSize.min,
+      spacing: AppSpace.s10,
+      children: <Widget>[
+        SvgPicture.asset(
+          'assets/icons/google.svg',
+          width: 20,
+          height: 20,
+          excludeFromSemantics: true,
+        ),
+        Flexible(
+          child: Text(
+            label,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.roboto(
+              fontSize: 14,
+              height: 20 / 14,
+              fontWeight: FontWeight.w500,
+              color: _text,
+            ),
+          ),
+        ),
+      ],
+    );
+
+    return Semantics(
+      button: true,
+      enabled: onTap != null,
+      label: loading ? '$label, đang xử lý' : null,
+      excludeSemantics: loading,
+      child: OutlinedButton(
+        onPressed: onTap,
+        style: OutlinedButton.styleFrom(
+          minimumSize: const Size.fromHeight(52),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpace.s12),
+          backgroundColor: Colors.white,
+          disabledBackgroundColor: Colors.white,
+          foregroundColor: _text,
+          side: const BorderSide(color: _border),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.r8),
+          ),
+        ),
+        child: loading
+            ? Stack(
+                alignment: Alignment.center,
+                children: <Widget>[
+                  Opacity(opacity: 0, child: content),
+                  const SizedBox.square(
+                    dimension: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                ],
+              )
+            : content,
+      ),
+    );
+  }
+}
 
 /// `pattern/note`: hoạ tiết tờ nốt chìm trên nền primary, cùng SVG với màn
 /// Welcome của app (opacity 45% có sẵn trong SVG). Ô 360×800 được lát kín
