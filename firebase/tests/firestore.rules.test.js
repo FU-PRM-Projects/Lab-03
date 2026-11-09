@@ -6,7 +6,10 @@ const {
   assertSucceeds,
   assertFails,
 } = require('@firebase/rules-unit-testing');
-const { doc, getDoc, setDoc, updateDoc, deleteDoc, deleteField, Timestamp } = require('firebase/firestore');
+const {
+  doc, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc, deleteField, Timestamp, serverTimestamp,
+  collection, query, where,
+} = require('firebase/firestore');
 
 let env;
 before(async () => {
@@ -18,6 +21,9 @@ before(async () => {
     const db = ctx.firestore();
     await setDoc(doc(db, 'users/alice'), { role: 'user' });
     await setDoc(doc(db, 'users/root'), { role: 'admin' });
+    await setDoc(doc(db, 'users/gina'), { role: 'user' });
+    await setDoc(doc(db, 'users/sam'), { role: 'staff' });
+    await setDoc(doc(db, 'users/uma'), { role: 'user' });
   });
 });
 after(() => env.cleanup());
@@ -28,7 +34,7 @@ test('R-01 user cannot change own role', async () => {
 });
 test('R-02 admin can change a role', async () => {
   const db = env.authenticatedContext('root').firestore();
-  await assertSucceeds(updateDoc(doc(db, 'users/alice'), { role: 'staff' }));
+  await assertSucceeds(updateDoc(doc(db, 'users/gina'), { role: 'staff' }));
 });
 test('R-03 user reads own profile; unauthenticated denied', async () => {
   await assertSucceeds(getDoc(doc(env.authenticatedContext('alice').firestore(), 'users/alice')));
@@ -176,4 +182,112 @@ test('R-18 owner sets and removes own profile photo, but cannot touch role or ot
   // First sign-in failed earlier: the app creates the profile with the photo.
   const frank = env.authenticatedContext('frank').firestore();
   await assertSucceeds(setDoc(doc(frank, 'users/frank'), { role: 'user', photo }));
+});
+
+// ---- Final Assignment: staff role, catalog, submissions, inbox, announcements ----
+
+const stamp = (uid) => ({ updatedBy: uid, updatedAt: serverTimestamp() });
+const card = (extra = {}) => ({
+  topic: 'dung_cam', level: 1, order: 9, title: 'Hỏi giờ một người lạ', minutes: 2, status: 'active', ...stamp('sam'), ...extra,
+});
+const submission = (uid, extra = {}) => ({
+  uid, topic: 'van_dong', title: 'Đi cầu thang thay thang máy', minutes: 5, status: 'pending', createdAt: serverTimestamp(), ...extra,
+});
+
+test('R-19 staff create, edit and archive catalog cards; users and bad cards are denied', async () => {
+  const staff = env.authenticatedContext('sam').firestore();
+  const user = env.authenticatedContext('uma').firestore();
+  await assertSucceeds(setDoc(doc(staff, 'challenges/st-1'), card({ source: 'staff' })));
+  await assertSucceeds(updateDoc(doc(staff, 'challenges/st-1'), { title: 'Hỏi đường một người lạ', ...stamp('sam') }));
+  await assertSucceeds(updateDoc(doc(staff, 'challenges/st-1'), { status: 'archived', ...stamp('sam') }));
+  await assertFails(updateDoc(doc(staff, 'challenges/st-1'), { status: 'active' }));
+  await assertFails(deleteDoc(doc(staff, 'challenges/st-1')));
+  await assertFails(setDoc(doc(user, 'challenges/st-2'), card(stamp('uma'))));
+  await assertFails(updateDoc(doc(user, 'challenges/st-1'), { status: 'active', ...stamp('uma') }));
+  await assertFails(setDoc(doc(staff, 'challenges/st-3'), card({ status: 'deleted' })));
+  await assertFails(setDoc(doc(staff, 'challenges/st-4'), card({ title: '' })));
+  await assertFails(setDoc(doc(staff, 'challenges/st-5'), card({ updatedBy: 'someone-else' })));
+});
+
+test('R-20 user submits a pending card for themselves only', async () => {
+  const user = env.authenticatedContext('uma').firestore();
+  await assertSucceeds(setDoc(doc(user, 'challengeSubmissions/s1'), submission('uma', { tip: 'Từ tầng 3 trở xuống' })));
+  await assertFails(setDoc(doc(user, 'challengeSubmissions/s2'), submission('uma', { status: 'approved' })));
+  await assertFails(setDoc(doc(user, 'challengeSubmissions/s3'), submission('alice')));
+  await assertFails(setDoc(doc(user, 'challengeSubmissions/s4'), submission('uma', { title: 'a'.repeat(81) })));
+  await assertFails(setDoc(doc(user, 'challengeSubmissions/s5'), submission('uma', { createdAt: Timestamp.fromMillis(0) })));
+  await assertFails(setDoc(doc(env.unauthenticatedContext().firestore(), 'challengeSubmissions/s6'), submission('uma')));
+});
+
+test('R-21 owner and staff read a submission; other users do not', async () => {
+  await assertSucceeds(getDoc(doc(env.authenticatedContext('uma').firestore(), 'challengeSubmissions/s1')));
+  await assertSucceeds(getDoc(doc(env.authenticatedContext('sam').firestore(), 'challengeSubmissions/s1')));
+  await assertSucceeds(getDocs(query(collection(env.authenticatedContext('uma').firestore(), 'challengeSubmissions'), where('uid', '==', 'uma'))));
+  await assertSucceeds(getDocs(query(collection(env.authenticatedContext('sam').firestore(), 'challengeSubmissions'), where('status', '==', 'pending'))));
+  await assertFails(getDoc(doc(env.authenticatedContext('alice').firestore(), 'challengeSubmissions/s1')));
+  await assertFails(getDocs(query(collection(env.authenticatedContext('uma').firestore(), 'challengeSubmissions'), where('status', '==', 'pending'))));
+});
+
+test('R-22 only staff move pending to approved or rejected; a rejection needs a reason', async () => {
+  const staff = env.authenticatedContext('sam').firestore();
+  const user = env.authenticatedContext('uma').firestore();
+  await assertSucceeds(setDoc(doc(user, 'challengeSubmissions/s7'), submission('uma')));
+  await assertSucceeds(setDoc(doc(user, 'challengeSubmissions/s8'), submission('uma')));
+  const review = (status, reason) => ({ status, reason, reviewedBy: 'sam', reviewedAt: serverTimestamp() });
+  await assertFails(updateDoc(doc(user, 'challengeSubmissions/s1'), review('approved', '')));
+  await assertFails(updateDoc(doc(staff, 'challengeSubmissions/s7'), review('rejected', '')));
+  await assertFails(updateDoc(doc(staff, 'challengeSubmissions/s7'), { ...review('approved', ''), title: 'Đổi tên' }));
+  await assertFails(updateDoc(doc(staff, 'challengeSubmissions/s7'), { ...review('approved', ''), reviewedBy: 'root' }));
+  await assertSucceeds(updateDoc(doc(staff, 'challengeSubmissions/s7'), { ...review('approved', ''), challengeId: 'cm-s7' }));
+  await assertSucceeds(updateDoc(doc(staff, 'challengeSubmissions/s8'), review('rejected', 'Trùng với thẻ có sẵn')));
+  // Reviewed items are final.
+  await assertFails(updateDoc(doc(staff, 'challengeSubmissions/s8'), review('approved', '')));
+});
+
+test('R-23 owner withdraws a pending submission but not a reviewed one', async () => {
+  const user = env.authenticatedContext('uma').firestore();
+  await assertFails(deleteDoc(doc(env.authenticatedContext('alice').firestore(), 'challengeSubmissions/s1')));
+  await assertSucceeds(deleteDoc(doc(user, 'challengeSubmissions/s1')));
+  await assertFails(deleteDoc(doc(user, 'challengeSubmissions/s8')));
+});
+
+test('R-24 staff write inbox messages; the owner reads and marks them read', async () => {
+  const staff = env.authenticatedContext('sam').firestore();
+  const user = env.authenticatedContext('uma').firestore();
+  const message = (extra = {}) => ({
+    kind: 'submission_approved', title: 'Thẻ của bạn đã được duyệt', body: 'Đi cầu thang thay thang máy', read: false,
+    submissionId: 's7', createdAt: serverTimestamp(), ...extra,
+  });
+  await assertSucceeds(setDoc(doc(staff, 'users/uma/inbox/m1'), message()));
+  await assertFails(setDoc(doc(user, 'users/uma/inbox/m2'), message()));
+  await assertFails(setDoc(doc(staff, 'users/uma/inbox/m3'), message({ kind: 'spam' })));
+  await assertSucceeds(getDoc(doc(user, 'users/uma/inbox/m1')));
+  await assertFails(getDoc(doc(staff, 'users/uma/inbox/m1')));
+  await assertSucceeds(updateDoc(doc(user, 'users/uma/inbox/m1'), { read: true }));
+  await assertFails(updateDoc(doc(user, 'users/uma/inbox/m1'), { title: 'Sửa' }));
+  await assertSucceeds(deleteDoc(doc(user, 'users/uma/inbox/m1')));
+});
+
+test('R-25 staff post announcements that every signed-in user reads', async () => {
+  const staff = env.authenticatedContext('sam').firestore();
+  const user = env.authenticatedContext('uma').firestore();
+  const post = (extra = {}) => ({ title: 'Thẻ mới tuần này', body: 'Có 3 thẻ vận động mới.', authorUid: 'sam', createdAt: serverTimestamp(), ...extra });
+  await assertSucceeds(setDoc(doc(staff, 'announcements/a1'), post()));
+  await assertSucceeds(getDoc(doc(user, 'announcements/a1')));
+  await assertFails(getDoc(doc(env.unauthenticatedContext().firestore(), 'announcements/a1')));
+  await assertFails(setDoc(doc(user, 'announcements/a2'), post({ authorUid: 'uma' })));
+  await assertFails(setDoc(doc(staff, 'announcements/a3'), post({ authorUid: 'root' })));
+  await assertFails(setDoc(doc(staff, 'announcements/a4'), post({ body: '' })));
+  await assertFails(updateDoc(doc(staff, 'announcements/a1'), { title: 'Sửa' }));
+  await assertFails(deleteDoc(doc(user, 'announcements/a1')));
+  await assertSucceeds(deleteDoc(doc(staff, 'announcements/a1')));
+});
+
+test('R-26 staff read user profiles; only an admin changes roles, never their own', async () => {
+  await assertSucceeds(getDoc(doc(env.authenticatedContext('sam').firestore(), 'users/uma')));
+  await assertFails(getDoc(doc(env.authenticatedContext('uma').firestore(), 'users/sam')));
+  await assertFails(updateDoc(doc(env.authenticatedContext('sam').firestore(), 'users/uma'), { role: 'staff' }));
+  await assertFails(updateDoc(doc(env.authenticatedContext('sam').firestore(), 'users/sam'), { role: 'admin' }));
+  await assertFails(updateDoc(doc(env.authenticatedContext('root').firestore(), 'users/root'), { role: 'user' }));
+  await assertFails(updateDoc(doc(env.authenticatedContext('root').firestore(), 'users/uma'), { role: 'owner' }));
 });

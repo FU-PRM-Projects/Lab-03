@@ -7,6 +7,12 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/users/$(uid)).data.role;
     }
     function isAdmin() { return signedIn() && roleOf(request.auth.uid) == 'admin'; }
+    // Staff work on the web admin; an admin has every staff right too.
+    function isStaff() { return signedIn() && roleOf(request.auth.uid) in ['staff', 'admin']; }
+    function isTopic(topic) { return topic in ['dung_cam', 'van_dong']; }
+    function shortText(value, min, max) {
+      return value is string && value.size() >= min && value.size() <= max;
+    }
 
     // An image uploaded to Cloudinary (ImageRef): exactly a secure URL on
     // res.cloudinary.com and its public id. The bytes live on Cloudinary;
@@ -56,22 +62,93 @@ service cloud.firestore {
         && (!('image' in group) || validImage(group.image));
     }
 
-    // Challenge catalog: read-only for signed-in users; staff manage it from
-    // the admin web (Final Assignment) or the seed script.
+    // A catalog card. `status` archived hides it in the app; cards are never
+    // deleted so notes that point at them keep working.
+    function validChallenge(card) {
+      return card.keys().hasAll(['topic', 'level', 'order', 'title', 'minutes', 'status', 'updatedBy', 'updatedAt'])
+        && card.keys().hasOnly(['topic', 'level', 'order', 'title', 'minutes', 'tip', 'script',
+                                'discordRoom', 'status', 'source', 'submissionId', 'updatedAt', 'updatedBy'])
+        && isTopic(card.topic)
+        && card.level is int && card.level >= 1 && card.level <= 10
+        && card.order is int && card.order >= 0 && card.order <= 999
+        && shortText(card.title, 1, 80)
+        && card.minutes is int && card.minutes >= 1 && card.minutes <= 600
+        && (!('tip' in card) || shortText(card.tip, 0, 120))
+        && (!('script' in card) || shortText(card.script, 0, 300))
+        && (!('discordRoom' in card) || shortText(card.discordRoom, 1, 40))
+        && card.status in ['active', 'archived']
+        && (!('source' in card) || card.source in ['seed', 'staff', 'community'])
+        && (!('submissionId' in card) || shortText(card.submissionId, 1, 64))
+        // Every staff write stamps who changed the card and when.
+        && card.updatedBy == request.auth.uid
+        && card.updatedAt == request.time;
+    }
+
+    // Challenge catalog: every signed-in user reads it; staff manage it on the
+    // web admin (archive instead of delete).
     match /challenges/{id} {
       allow read: if signedIn();
+      allow create, update: if isStaff() && validChallenge(request.resource.data);
+    }
+
+    // Cards users suggest for the shared catalog (cross-role flow): the user
+    // submits it as pending, staff approve or reject it with a reason.
+    match /challengeSubmissions/{id} {
+      allow read: if signedIn() && (resource.data.uid == request.auth.uid || isStaff());
+      allow create: if signedIn()
+                    && request.resource.data.keys().hasAll(['uid', 'topic', 'title', 'minutes', 'status', 'createdAt'])
+                    && request.resource.data.keys().hasOnly(['uid', 'topic', 'title', 'minutes', 'tip', 'customId', 'status', 'createdAt'])
+                    && request.resource.data.uid == request.auth.uid
+                    && request.resource.data.status == 'pending'
+                    && isTopic(request.resource.data.topic)
+                    && shortText(request.resource.data.title, 1, 80)
+                    && request.resource.data.minutes is int
+                    && request.resource.data.minutes >= 1 && request.resource.data.minutes <= 600
+                    && (!('tip' in request.resource.data) || shortText(request.resource.data.tip, 0, 120))
+                    && (!('customId' in request.resource.data) || shortText(request.resource.data.customId, 1, 64))
+                    && request.resource.data.createdAt == request.time;
+      // Only pending -> approved | rejected; a rejection needs a reason.
+      allow update: if isStaff()
+                    && resource.data.status == 'pending'
+                    && request.resource.data.status in ['approved', 'rejected']
+                    && request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(['status', 'reason', 'reviewedAt', 'reviewedBy', 'challengeId'])
+                    && request.resource.data.reviewedBy == request.auth.uid
+                    && request.resource.data.reviewedAt == request.time
+                    && shortText(request.resource.data.get('reason', ''), 0, 200)
+                    && (request.resource.data.status == 'approved'
+                        || request.resource.data.get('reason', '').size() >= 1);
+      allow delete: if signedIn()
+                    && resource.data.uid == request.auth.uid
+                    && resource.data.status == 'pending';
+    }
+
+    // Announcements from the web admin; every signed-in user reads them in
+    // the app inbox.
+    match /announcements/{id} {
+      allow read: if signedIn();
+      allow create: if isStaff()
+                    && request.resource.data.keys().hasOnly(['title', 'body', 'authorUid', 'createdAt'])
+                    && request.resource.data.keys().hasAll(['title', 'body', 'authorUid', 'createdAt'])
+                    && shortText(request.resource.data.title, 1, 80)
+                    && shortText(request.resource.data.body, 1, 1000)
+                    && request.resource.data.authorUid == request.auth.uid
+                    && request.resource.data.createdAt == request.time;
+      allow delete: if isStaff();
     }
 
     // Deny by default: only the matches below are reachable.
     match /users/{uid} {
-      allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow read: if signedIn() && (request.auth.uid == uid || isStaff());
       allow create: if signedIn() && request.auth.uid == uid
                     && request.resource.data.role == 'user'
                     && (!('photo' in request.resource.data) || validImage(request.resource.data.photo));
-      // Admin changes the role; the owner changes only their profile photo
-      // (set or removed), never the role.
+      // Admin changes someone else's role; the owner changes only their
+      // profile photo (set or removed), never the role.
       allow update: if (isAdmin()
-                       && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['role']))
+                       && request.auth.uid != uid
+                       && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['role'])
+                       && request.resource.data.role in ['user', 'staff', 'admin'])
                     || (isOwner(uid)
                        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['photo'])
                        && (!('photo' in request.resource.data) || validImage(request.resource.data.photo)));
@@ -122,6 +199,24 @@ service cloud.firestore {
                       && (!('tip' in request.resource.data)
                           || (request.resource.data.tip is string && request.resource.data.tip.size() <= 120))
                       && request.resource.data.createdAt is timestamp;
+      }
+
+      // Personal inbox: staff write a message when they review a submission;
+      // the owner reads it, marks it read and deletes it.
+      match /inbox/{messageId} {
+        allow read, delete: if isOwner(uid);
+        allow create: if isStaff()
+                      && request.resource.data.keys().hasOnly(['kind', 'title', 'body', 'submissionId', 'read', 'createdAt'])
+                      && request.resource.data.keys().hasAll(['kind', 'title', 'body', 'read', 'createdAt'])
+                      && request.resource.data.kind in ['submission_approved', 'submission_rejected']
+                      && shortText(request.resource.data.title, 1, 80)
+                      && shortText(request.resource.data.body, 1, 500)
+                      && (!('submissionId' in request.resource.data) || shortText(request.resource.data.submissionId, 1, 64))
+                      && request.resource.data.read == false
+                      && request.resource.data.createdAt == request.time;
+        allow update: if isOwner(uid)
+                      && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read'])
+                      && request.resource.data.read is bool;
       }
 
       match /groups/{groupId} {
