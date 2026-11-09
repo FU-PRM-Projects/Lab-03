@@ -196,6 +196,7 @@ class _SavedContent extends StatelessWidget {
                             child: NoteTile(
                               type: note.type,
                               title: note.title,
+                              image: note.image,
                               dateLabel: dateLabel,
                             ),
                           ),

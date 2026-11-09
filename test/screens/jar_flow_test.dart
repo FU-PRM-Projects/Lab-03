@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lab03/app.dart';
+import 'package:lab03/models/image_ref.dart';
 import 'package:lab03/models/mood.dart';
 import 'package:lab03/models/note.dart';
 import 'package:lab03/models/note_type.dart';
@@ -9,6 +10,7 @@ import 'package:lab03/screens/note_composer/note_composer_screen.dart';
 import 'package:lab03/screens/note_detail/note_detail_screen.dart';
 import 'package:lab03/services/app_exception.dart';
 import 'package:lab03/viewmodels/note_wall_view_model.dart';
+import 'package:lab03/widgets/app_network_image.dart';
 import 'package:lab03/widgets/jar_illustration.dart';
 import 'package:lab03/widgets/note_card.dart';
 import 'package:lab03/widgets/note_tile.dart';
@@ -78,6 +80,40 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(JarScreen), findsOneWidget);
   }
+
+  testWidgets('nốt có ảnh: Hũ hiện ảnh trên tờ nốt, chi tiết hiện ảnh to', (
+    tester,
+  ) async {
+    final withPhoto = sampleNote(
+      'photo',
+      DateTime(2026, 10, 24, 19),
+      title: 'Chụp hoàng hôn sau giờ học',
+      image: const ImageRef(
+        url: 'https://res.cloudinary.com/demo/image/upload/sunset.jpg',
+        publicId: 'notes/sunset',
+      ),
+    );
+    await pumpApp(tester, services: withNotes([withPhoto]));
+    await openJar(tester);
+
+    await scrollJarTo(tester, find.text('Chụp hoàng hôn sau giờ học'));
+    expect(find.byType(AppNetworkImage), findsWidgets);
+    expect(
+      find.bySemanticsLabel(RegExp('Chụp hoàng hôn.*có ảnh')),
+      findsOneWidget,
+    );
+
+    await tapNote(tester, 'Chụp hoàng hôn sau giờ học');
+    await tester.pumpAndSettle();
+    expect(find.byType(NoteDetailScreen), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(NoteDetailScreen),
+        matching: find.byType(AppNetworkImage),
+      ),
+      findsOneWidget,
+    );
+  });
 
   testWidgets('chạm hũ làm bật nốt để đọc lại', (tester) async {
     await pumpApp(tester, services: withNotes([sample.first]));

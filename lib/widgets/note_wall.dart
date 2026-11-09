@@ -172,6 +172,7 @@ class _WallCard extends ConsumerWidget {
           child: NoteTile(
             type: value.type,
             title: value.title,
+            image: value.image,
             dateLabel: leaving ? 'Đang về hũ' : 'Đang dán trên tường',
             onTap: leaving
                 ? null

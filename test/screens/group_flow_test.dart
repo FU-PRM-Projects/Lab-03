@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lab03/app.dart';
 import 'package:lab03/models/first_group.dart';
-import 'package:lab03/models/mood.dart';
 import 'package:lab03/router/app_routes.dart';
 import 'package:lab03/screens/groups/group_detail_screen.dart';
 import 'package:lab03/screens/jar/jar_screen.dart';
@@ -139,9 +138,7 @@ void main() {
 
       await tester.tap(find.text('Ghi lần đầu'));
       await tester.pumpAndSettle();
-      await tester.tap(find.bySemanticsLabel('Tâm trạng ${Mood.on.label}'));
-      await tester.pump();
-      await tester.tap(find.text('Tiếp'));
+      await tester.tap(find.text('Bỏ qua'));
       await tester.pumpAndSettle();
       expect(find.text('Lần đầu cho nhóm “Bắt chuyện”'), findsOneWidget);
       await tester.enterText(
@@ -196,9 +193,7 @@ void main() {
     await openGroup(tester, 'bat-chuyen');
     await tester.tap(find.text('Thử lần nữa'));
     await tester.pumpAndSettle();
-    await tester.tap(find.bySemanticsLabel('Tâm trạng ${Mood.vui.label}'));
-    await tester.pump();
-    await tester.tap(find.text('Tiếp'));
+    await tester.tap(find.text('Bỏ qua'));
     await tester.pumpAndSettle();
     await tester.enterText(
       findField('Chiến thắng nhỏ'),

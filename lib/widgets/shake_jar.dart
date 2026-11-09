@@ -6,9 +6,11 @@ import 'package:flutter/scheduler.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 
+import '../models/image_ref.dart';
 import '../models/note.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_tokens.dart';
+import 'app_network_image.dart';
 import 'jar_illustration.dart';
 import 'note_type_icon.dart';
 
@@ -351,6 +353,14 @@ class _DrawnPaper extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
+                  if (note.image case final ImageRef photo) ...<Widget>[
+                    const SizedBox(height: AppSpace.s12),
+                    AppNetworkImage.wide(
+                      image: photo,
+                      semanticLabel: 'Ảnh của nốt',
+                      aspectRatio: 16 / 9,
+                    ),
+                  ],
                   const SizedBox(height: AppSpace.s16),
                   Text(
                     'Chạm để đọc lại',

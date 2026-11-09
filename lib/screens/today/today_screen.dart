@@ -469,6 +469,7 @@ class _FallenNote extends StatelessWidget {
           child: NoteTile(
             type: note.type,
             title: note.title,
+            image: note.image,
             tagSuffix: note.isFirst ? 'Lần đầu' : null,
             excerpt: note.body.isEmpty ? null : '“${note.body}”',
             dateLabel: <String>[

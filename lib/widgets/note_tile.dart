@@ -1,9 +1,11 @@
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../models/image_ref.dart';
 import '../models/note_type.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_tokens.dart';
+import 'app_network_image.dart';
 import 'note_type_icon.dart';
 
 /// Component `Note/Tờ nốt`: tờ nốt trong lưới 2 cột ở S04, S05.
@@ -16,6 +18,7 @@ class NoteTile extends StatelessWidget {
     required this.dateLabel,
     this.tagSuffix,
     this.excerpt,
+    this.image,
     this.onTap,
     super.key,
   });
@@ -31,6 +34,9 @@ class NoteTile extends StatelessWidget {
 
   /// Trích nhật ký, tối đa 2 dòng (thẻ "Nhớ lại lần này nhé" ở S02).
   final String? excerpt;
+
+  /// Ảnh khoảnh khắc của nốt: hiện ô nhỏ ở bên phải, không làm tờ nốt cao thêm.
+  final ImageRef? image;
   final VoidCallback? onTap;
 
   @override
@@ -47,6 +53,7 @@ class NoteTile extends StatelessWidget {
         '$tag: $title',
         ?excerpt,
         if (dateLabel.isNotEmpty) dateLabel,
+        if (image != null) 'có ảnh',
       ].join(', '),
       onTap: onTap,
       excludeSemantics: true,
@@ -58,67 +65,90 @@ class NoteTile extends StatelessWidget {
           borderRadius: radius,
           child: Padding(
             padding: const EdgeInsets.all(AppSpace.s12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: AppSpace.s6,
-              children: <Widget>[
-                // Nhãn loại: icon 14 + Caption/12 Bold màu theo loại.
-                Row(
-                  spacing: AppSpace.s4,
-                  children: <Widget>[
-                    SvgPicture.asset(
-                      type.tagIconAsset,
-                      width: 14,
-                      height: 14,
-                      colorFilter: ColorFilter.mode(tagColor, BlendMode.srcIn),
-                      excludeFromSemantics: true,
-                    ),
-                    Flexible(
-                      child: Text(
-                        tag,
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: tagColor,
-                          fontWeight: FontWeight.w700,
+            child: _withPhoto(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: AppSpace.s6,
+                children: <Widget>[
+                  // Nhãn loại: icon 14 + Caption/12 Bold màu theo loại.
+                  Row(
+                    spacing: AppSpace.s4,
+                    children: <Widget>[
+                      SvgPicture.asset(
+                        type.tagIconAsset,
+                        width: 14,
+                        height: 14,
+                        colorFilter: ColorFilter.mode(
+                          tagColor,
+                          BlendMode.srcIn,
                         ),
-                        overflow: TextOverflow.ellipsis,
+                        excludeFromSemantics: true,
+                      ),
+                      Flexible(
+                        child: Text(
+                          tag,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: tagColor,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  // Tối đa 3 dòng rồi "…" (Figma `Note/Tờ nốt`); Flexible thu
+                  // còn ít dòng hơn khi ô có chiều cao cố định hoặc chữ phóng to.
+                  Flexible(
+                    child: Text(
+                      title,
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  if (excerpt case final excerpt?)
+                    Text(
+                      excerpt,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  if (dateLabel.isNotEmpty)
+                    Text(
+                      dateLabel,
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        fontWeight: FontWeight.w400,
+                        color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
-                  ],
-                ),
-                // Tối đa 3 dòng rồi "…" (Figma `Note/Tờ nốt`); Flexible thu
-                // còn ít dòng hơn khi ô có chiều cao cố định hoặc chữ phóng to.
-                Flexible(
-                  child: Text(
-                    title,
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                if (excerpt case final excerpt?)
-                  Text(
-                    excerpt,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                if (dateLabel.isNotEmpty)
-                  Text(
-                    dateLabel,
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      fontWeight: FontWeight.w400,
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  /// Ảnh (nếu có) nằm bên phải khối chữ.
+  Widget _withPhoto(Widget content) {
+    final photo = image;
+    if (photo == null) return content;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: AppSpace.s8,
+      children: <Widget>[
+        Expanded(child: content),
+        AppNetworkImage.square(
+          image: photo,
+          semanticLabel: 'Ảnh của nốt',
+          size: 48,
+        ),
+      ],
     );
   }
 }

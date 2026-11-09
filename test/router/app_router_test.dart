@@ -74,9 +74,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(NoteComposerScreen), findsOneWidget);
 
-    await tester.tap(find.bySemanticsLabel('Tâm trạng Ổn'));
-    await tester.pump();
-    await tester.tap(find.text('Tiếp'));
+    await tester.tap(find.text('Bỏ qua'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Đi bộ'));
     await tester.pump();
