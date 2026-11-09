@@ -30,7 +30,7 @@ dependencies:
   google_sign_in: ^7.2.0
   image_picker: ^1.2.4
   local_auth: ^3.0.2
-  material_ui: ^1.8.0
+  material_ui: ^1.10.0
   not_core:
     path: packages/core
   sensors_plus: ^7.1.1
