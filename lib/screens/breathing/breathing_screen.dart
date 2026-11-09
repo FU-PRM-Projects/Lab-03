@@ -11,6 +11,7 @@ import '../../utils/vi_date_format.dart';
 import '../../viewmodels/breathing_view_model.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_top_bar.dart';
+import '../../widgets/breathing_buddy.dart';
 import '../../widgets/mascot.dart';
 import '../../widgets/quick_win_chip.dart';
 
@@ -70,12 +71,6 @@ class _Breathing extends StatelessWidget {
   final BreathingState state;
   final BreathingViewModel viewModel;
 
-  /// Figma `vòng thở`: vòng ngoài 240 (mono/1), vòng trong primary-container
-  /// to khi hít vào / giữ hơi, nhỏ khi thở ra.
-  static const double _ring = 240;
-  static const double _big = 220;
-  static const double _small = 140;
-
   void _choosePattern(BuildContext context) {
     showModalBottomSheet<void>(
       context: context,
@@ -107,37 +102,16 @@ class _Breathing extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final noMotion = MediaQuery.disableAnimationsOf(context);
-    final big = state.phase != BreathPhase.exhale;
     final status = state.roundDone
         ? 'Xong một vòng'
         : 'Còn ${ViDateFormat.countdown(state.remaining)}';
 
     return _SpacedBody(
       top: <Widget>[
-        Container(
-          width: _ring,
-          height: _ring,
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-            color: AppPalette.mono1,
-          ),
-          alignment: Alignment.center,
-          child: AnimatedContainer(
-            // Không có chuyển động: đổi kích thước theo bước.
-            duration: noMotion || state.roundDone
-                ? Duration.zero
-                : Duration(seconds: state.phaseSeconds),
-            curve: Curves.easeInOut,
-            width: big ? _big : _small,
-            height: big ? _big : _small,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: scheme.primaryContainer,
-            ),
-            alignment: Alignment.center,
-            child: const Mascot(state: MascotState.thongTha, size: 102.6),
-          ),
+        BreathingBuddy(
+          phase: state.phase,
+          phaseSeconds: state.phaseSeconds,
+          done: state.roundDone,
         ),
         Column(
           spacing: AppSpace.s8,

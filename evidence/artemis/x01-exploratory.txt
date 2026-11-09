@@ -1,0 +1,65 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.5, pytest-9.2.0, pluggy-1.7.0
+rootdir: D:\Semester 8_FA26\PRM393\Code_Lab3\Lab-03\e2e_test
+configfile: pyproject.toml
+testpaths: .
+plugins: asyncio-1.4.1.post1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=session, asyncio_default_test_loop_scope=session
+collected 17 items / 16 deselected / 1 selected
+
+test_main_flows.py F
+
+================================== FAILURES ===================================
+_____________________ test_x01_exploratory_session[run1] ______________________
+
+client = <artemis_client.client.ArtemisClient object at 0x000002DA4E4FF620>
+app_id = 'com.quanphungg.lab03', attempt = 1
+reported = <function reported.<locals>.read at 0x000002DA4E669170>
+
+    @pytest.mark.exploratory
+    async def test_x01_exploratory_session(client, app_id: str, attempt: int, reported) -> None:
+        """Phiên khám phá 15–30 phút, profile Pro: agent tự đi khắp app và liệt kê lỗi.
+    
+        Chạy một lần: `uv run pytest -m exploratory --runs 1 -s`. Danh sách lỗi in ra
+        được chép vào docs/test-plan.md mục 6.
+        """
+        result = await client.run(
+            "Khám phá app Nốt khoảng 20 phút như một người dùng mới tò mò: đi qua mọi tab "
+            "(Hôm nay, Hũ, Thử thách, Hành trình), mở Cài đặt, thử ghi nốt, mở nốt, thử "
+            "thách, nhóm, màn thở, nhập dữ liệu lạ (rất dài, emoji, để trống), xoay màn "
+            "hình, bấm Back nhiều lần. Không đăng xuất, không xoá tài khoản, không gửi gì ra "
+            "ngoài app. Ghi lại mọi lỗi thấy được: app đóng, màn trắng, chữ bị cắt, nút "
+            "không phản hồi, câu báo lỗi khó hiểu. Cuối cùng trả lời danh sách, mỗi lỗi một "
+            "dòng dạng 'BUG: <màn> | <bước> | <thấy gì>', hoặc đúng một dòng 'NO_BUGS'.",
+            profile="pro",
+            locked_app_package=app_id,
+            expected_output="các dòng BUG: ... hoặc NO_BUGS",
+            timeout=40 * 60,
+        )
+        assert result.succeeded, f"[run{attempt}] {result.error or result.status}"
+>       answer = (await reported(result)).strip()
+                  ^^^^^^^^^^^^^^^^^^^^^^
+
+test_main_flows.py:309: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+result = TaskResult(task_id='44655b9a-d26d-4218-b17e-2ea5e17aff9e', status='completed', goal="Khám phá app Nốt khoảng 20 phút n...gì>', hoặc đúng một dòng 'NO_BUGS'.", profile=None, device_serial='emulator-5554', output=None, error=None, turns=None)
+
+    async def read(result: Any) -> str:
+        # Bước cuối có thể chưa được lưu ngay khi phiên vừa xong (T13 lần 1
+        # đọc ra chuỗi rỗng dù agent đã báo SAVED), nên thử đọc lại vài lần.
+        for _ in range(5):
+            steps = await client._request(  # noqa: SLF001 - client chưa có API công khai cho bước
+                "GET", f"/api/sessions/{result.task_id}/steps"
+            )
+            for step in reversed(steps if isinstance(steps, list) else []):
+                action = step.get("action_taken") or {}
+>               if action.get("action") == "report_task_status":
+                   ^^^^^^^^^^
+E               AttributeError: 'list' object has no attribute 'get'
+
+conftest.py:111: AttributeError
+- generated xml file: D:\Semester 8_FA26\PRM393\Code_Lab3\Lab-03\evidence\artemis\junit-x01.xml -
+=========================== short test summary info ===========================
+FAILED test_main_flows.py::test_x01_exploratory_session[run1] - AttributeErro...
+================ 1 failed, 16 deselected in 1538.20s (0:25:38) ================

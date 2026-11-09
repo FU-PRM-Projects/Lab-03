@@ -12,6 +12,7 @@ Biến môi trường:
 
 from __future__ import annotations
 
+import asyncio
 import os
 from collections.abc import Awaitable, Callable
 from typing import Any, Literal, cast
@@ -99,13 +100,28 @@ def reported(client: ArtemisClient) -> Callable[[Any], Awaitable[str]]:
     """
 
     async def read(result: Any) -> str:
-        steps = await client._request(  # noqa: SLF001 - client chưa có API công khai cho bước
-            "GET", f"/api/sessions/{result.task_id}/steps"
-        )
-        for step in reversed(steps if isinstance(steps, list) else []):
-            action = step.get("action_taken") or {}
-            if action.get("action") == "report_task_status":
-                return str((action.get("args") or {}).get("explanation") or "")
+        # Bước cuối có thể chưa được lưu ngay khi phiên vừa xong (T13 lần 1
+        # đọc ra chuỗi rỗng dù agent đã báo SAVED), nên thử đọc lại vài lần.
+        for _ in range(5):
+            steps = await client._request(  # noqa: SLF001 - client chưa có API công khai cho bước
+                "GET", f"/api/sessions/{result.task_id}/steps"
+            )
+            steps = steps if isinstance(steps, list) else []
+            for step in reversed(steps):
+                # Profile Flash ghi một hành động (dict); profile Pro ghi một
+                # danh sách hành động mỗi bước.
+                taken = step.get("action_taken") or []
+                for action in taken if isinstance(taken, list) else [taken]:
+                    if isinstance(action, dict) and action.get("action") == "report_task_status":
+                        return str((action.get("args") or {}).get("explanation") or "")
+            # Profile Pro không gọi report_task_status: câu trả lời cuối nằm sau
+            # "Final answer:" trong phần suy nghĩ của bước cuối (X01).
+            if steps:
+                thinking = str(steps[-1].get("operator_raw_thinking") or "")
+                marker = thinking.rfind("Final answer:")
+                if marker >= 0:
+                    return thinking[marker + len("Final answer:") :].strip()
+            await asyncio.sleep(2)
         return str(result.output or "")
 
     return read

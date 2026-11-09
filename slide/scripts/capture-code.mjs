@@ -34,6 +34,10 @@ const all = [
   // Ảnh trên Cloudinary và chuỗi ngày (PR #43, #46).
   ['cld-upload', 'firebase/cloudinary_image_service.dart', 73, 86],
   ['streak-count', 'utils/journey_stats.dart', 103, 113],
+  // Cloud Firestore: ghi nốt, luật cho nốt.
+  ['fs-add', 'firebase/firestore_note_repository.dart', 182, 192],
+  ['fs-rules-notes', '../firebase/firestore.rules', 79, 82],
+  ['fs-validnote', '../firebase/firestore.rules', 25, 33],
   // Bản xoá hộp thư FCM khi đăng xuất (736453a) đang ở nhánh này.
   ['signout', 'viewmodels/auth_view_model.dart', 120, 127, 'chore/submission-files'],
 ];
