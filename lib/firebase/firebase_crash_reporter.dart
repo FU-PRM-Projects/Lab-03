@@ -39,4 +39,11 @@ class FirebaseCrashReporter implements CrashReporter {
     );
     return 'Đã gửi crash thử — xem Crashlytics sau khoảng 5 phút.';
   }
+
+  @override
+  Future<String> forceCrash() async {
+    // Crash native: app tắt ngay, báo cáo gửi lên ở lần mở app kế tiếp.
+    FirebaseCrashlytics.instance.crash();
+    return '';
+  }
 }

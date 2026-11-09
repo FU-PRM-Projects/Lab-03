@@ -299,6 +299,27 @@ class SettingsScreen extends ConsumerWidget {
                           snack(message);
                         },
                       ),
+                    if (!kReleaseMode)
+                      SettingRow.value(
+                        title: 'Crash thật (tắt app)',
+                        subtitle: 'App sập ngay; mở lại để gửi báo cáo lên Crashlytics',
+                        value: '',
+                        onTap: () async {
+                          final confirmed = await showAppDialog(
+                            context: context,
+                            title: 'Làm sập app?',
+                            message:
+                                'App sẽ tắt ngay. Mở lại app để báo cáo crash '
+                                'được gửi lên Crashlytics.',
+                            confirmLabel: 'Crash',
+                          );
+                          if (!(confirmed ?? false)) return;
+                          final message = await ref
+                              .read(crashReporterProvider)
+                              .forceCrash();
+                          if (message.isNotEmpty) snack(message);
+                        },
+                      ),
                   ],
                 ),
               const SizedBox(height: AppSpace.s24),
