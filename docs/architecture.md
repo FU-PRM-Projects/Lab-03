@@ -24,7 +24,7 @@ lib/
 ├── theme/             Token Lab 2: ColorScheme, TextTheme, AppColors, AppSpace, AppRadius, AppElevation, AppSize
 ├── models/            Dữ liệu thuần Dart, không phụ thuộc Flutter/Firebase: Note, Mood, NoteType, Challenge…
 ├── services/          Interface (abstract) + Provider của từng service; ViewModel chỉ biết tới lớp này
-├── firebase/          Hiện thực service bằng Firebase SDK (Auth, Firestore, Storage, FCM, Analytics, Crashlytics, Remote Config)
+├── firebase/          Hiện thực service bằng Firebase SDK (Auth, Firestore, FCM, Analytics, Crashlytics, Remote Config)
 ├── viewmodels/        Notifier của Riverpod, mỗi màn một ViewModel; ViewState<T> dùng chung
 ├── screens/           Một thư mục mỗi màn S01–S12; chỉ dựng UI từ state của ViewModel
 ├── widgets/           Component Lab 2 dùng lại (nút, ô nhập, tờ nốt, thanh tab, dialog, trạng thái…)
@@ -61,7 +61,7 @@ flowchart TD
   SV["services/<br/>interface + Provider"]
   FB["firebase/<br/>hiện thực bằng SDK"]
   MD["models/<br/>Dart thuần"]
-  SDK[("Firebase SDK<br/>Auth · Firestore · Storage · FCM<br/>Analytics · Crashlytics · Remote Config")]
+  SDK[("Firebase SDK<br/>Auth · Firestore · FCM<br/>Analytics · Crashlytics · Remote Config")]
   MAIN["main.dart<br/>composition root"]
 
   SCR --> WID --> TH
@@ -124,7 +124,6 @@ Khi Firestore trả lỗi quyền (`permission-denied`) hoặc lỗi khác, `Not
 | `SelfControlViewModel` | S09 | `SelfControlState` (`ViewState<SelfControlSummary>` + khoá, đang lưu) | `NoteRepository`, `HabitRepository`, `SettingsRepository`, `LocalAuthService`, `ScreenGuard`, `Clock` |
 | `BreathingViewModel` | S10 | `BreathingState` (kiểu thở, giây đã thở, màn sau khi thở) | `NoteRepository` (chỉ sau khi thở), `ScreenGuard`, `Clock` |
 | `JourneyViewModel` | S11a/b/c | `JourneyState` (`ViewState<JourneyData>` cho Thống kê / Lịch, `ViewState<List<PathStage>>` cho Con đường, khoảng biểu đồ, tháng đang xem, dialog P6) | `NoteRepository`, `ChallengeRepository`, `Clock`, `JourneyStats` (hàm thuần trong `utils/`) |
-| `WeeklyReportViewModel` | S11b Thẻ tuần | `ReportState` (`ReportPhase`: idle, building, uploading + tiến độ, done + URL, failed) | `ReportService`, `StorageService`, `AnalyticsService`, `CrashReporter` |
 | `SettingsViewModel` | S12 | `SettingsState` (`ViewState<UserSettings>` + đang xác thực) | `SettingsRepository`, `LocalAuthService`; Stage 5: `MessagingService`, `AnalyticsService` (đăng xuất ở `AuthViewModel`) |
 | `FirebaseDemoViewModel` | S12 khu demo | `FirebaseDemoState` (thông báo đã nhận, giá trị RC) | `NotificationInbox`, `RemoteConfigService`, `CrashReporter` |
 
@@ -137,8 +136,6 @@ Khi Firestore trả lỗi quyền (`permission-denied`) hoặc lỗi khác, `Not
 | `HabitRepository`, `SettingsRepository` | `FirestoreHabitRepository`, `FirestoreSettingsRepository` | `users/{uid}/private/habits` (thói quen muốn bớt), `users/{uid}/private/settings` (Giờ tỉnh, khoá Tự chủ; S12 thêm giờ nhắc) |
 | `NudgeService` | `LocalNudgeService` (`flutter_local_notifications`, `timezone`) | Lời nhắc trên máy (`Nudge`): "Nhắc ghi nốt buổi tối" mỗi ngày lúc giờ đã chọn (chạm vào mở S03a) và "Giờ tỉnh" lúc bắt đầu khung giờ (chạm vào mở S09). `nudgeSyncProvider` theo dõi cài đặt để hẹn lại hoặc huỷ; đăng xuất thì huỷ hết |
 | `DraftStore` | `PrefsDraftStore` (`shared_preferences`) | Nháp S03 trên máy; xoá khi đăng xuất |
-| `StorageService` | `FirebaseStorageService` | Tải PDF lên `reports/{uid}/weekly-<tuần ISO>.pdf`, phát tiến độ, trả URL; `storage.rules` chỉ cho chủ thư mục, PDF dưới 5 MB |
-| `ReportService` | `PdfReportService` (`pdf`, `printing`) | Dựng PDF Thẻ tuần (font Be Vietnam Pro qua `PdfGoogleFonts`), mở hộp chia sẻ |
 | `AnalyticsService` | `FirebaseAnalyticsService` | Sự kiện theo `analytics-plan.md`, `setUserId` sau đăng nhập |
 | `CrashReporter` | `FirebaseCrashReporter` | Lỗi non-fatal, crash thử, user ID, custom key |
 | `RemoteConfigService` | `InAppRemoteConfig` (Stage 4, giá trị mặc định) → `FirebaseRemoteConfigService` (Stage 5) | Giá trị mặc định trong app, fetch + activate, lắng nghe cập nhật realtime |
@@ -187,5 +184,5 @@ Accessibility (checklist Lab 2): vùng chạm ≥ 48 dp do theme và kích thư�
 
 - Service đổi lỗi SDK sang `AppException` (`network`, `permissionDenied`, `cancelled`, `notFound`, `unknown`) để ViewModel không phụ thuộc kiểu lỗi Firebase.
 - ViewModel đổi `AppException` thành state có thông báo tiếng Việt theo tone Lab 2 ("Chưa tải được hũ. Kiểm tra Wi-Fi rồi thử lại.").
-- Lỗi trên đường xử lý thật (lưu nốt, tải PDF) được ghi non-fatal qua `CrashReporter`.
+- Lỗi trên đường xử lý thật (lưu nốt) được ghi non-fatal qua `CrashReporter`.
 - Tải dữ liệu quá 10 giây → `Failure` (flow T3 → T2).

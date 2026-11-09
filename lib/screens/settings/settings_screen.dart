@@ -28,7 +28,7 @@ import '../discord/discord_connect_sheet.dart';
 
 /// S12 · Cài đặt (+ khu demo Firebase, deviation D-01).
 ///
-/// Stage 4: Nhắc nhở, Quyền riêng tư, Tài khoản, lối vào Xuất & tải lên PDF.
+/// Stage 4: Nhắc nhở, Quyền riêng tư, Tài khoản.
 /// Stage 5 thêm vào khu demo: thông báo đã nhận, Remote Config, Crashlytics.
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -274,12 +274,6 @@ class SettingsScreen extends ConsumerWidget {
                               : 'Cấu hình chưa có gì mới.',
                         );
                       },
-                    ),
-                    SettingRow.value(
-                      title: 'Xuất & tải lên Thẻ tuần (PDF)',
-                      subtitle: 'Cloud Storage · reports/{uid}/',
-                      value: '',
-                      onTap: () => context.go(AppRoutes.journeyTab('stats')),
                     ),
                     if (!kReleaseMode)
                       SettingRow.value(

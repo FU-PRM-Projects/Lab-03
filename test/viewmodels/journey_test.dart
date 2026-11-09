@@ -11,11 +11,9 @@ import 'package:lab03/services/challenge_repository.dart';
 import 'package:lab03/services/clock.dart';
 import 'package:lab03/services/crash_reporter.dart';
 import 'package:lab03/services/note_repository.dart';
-import 'package:lab03/services/report_services.dart';
 import 'package:lab03/utils/journey_stats.dart';
 import 'package:lab03/viewmodels/journey_view_model.dart';
 import 'package:lab03/viewmodels/view_state.dart';
-import 'package:lab03/viewmodels/weekly_report_view_model.dart';
 
 import '../support/fakes.dart';
 
@@ -102,7 +100,7 @@ void main() {
       expect(JourneyStats.lowMoodRun(notes, now), 2);
     });
 
-    test('tên file Thẻ tuần theo tuần ISO', () {
+    test('Thẻ tuần kéo dài từ Thứ Hai tới Chủ Nhật', () {
       final summary = WeeklySummary(
         weekStart: DateTime(2026, 10, 19),
         noteCount: 0,
@@ -111,7 +109,6 @@ void main() {
         wins: const <String>[],
         balance: const <String, int>{},
       );
-      expect(summary.fileName, 'weekly-2026-W43.pdf');
       expect(summary.weekEnd, DateTime(2026, 10, 25));
     });
   });
@@ -119,15 +116,11 @@ void main() {
   group('JourneyViewModel', () {
     late FakeNoteRepository notes;
     late FakeChallengeRepository challenges;
-    late FakeReportService reports;
-    late FakeStorageService storage;
     late FakeCrashReporter crash;
 
     setUp(() {
       notes = FakeNoteRepository();
       challenges = FakeChallengeRepository();
-      reports = FakeReportService();
-      storage = FakeStorageService();
       crash = FakeCrashReporter();
     });
 
@@ -140,8 +133,6 @@ void main() {
           noteRepositoryProvider.overrideWithValue(notes),
           challengeRepositoryProvider.overrideWithValue(challenges),
           clockProvider.overrideWithValue(FixedClock()),
-          reportServiceProvider.overrideWithValue(reports),
-          storageServiceProvider.overrideWithValue(storage),
           crashReporterProvider.overrideWithValue(crash),
         ],
       );
@@ -226,50 +217,21 @@ void main() {
       expect(state(c).data, isA<Failure<JourneyData>>());
     });
 
-    test(
-      'Thẻ tuần: tạo PDF, tải lên reports/{uid}/, có link, mở chia sẻ',
-      () async {
-        notes.notes.addAll(<Note>[
-          sampleNote('w1', DateTime(2026, 10, 20), title: 'Dọn bàn học'),
-          sampleNote('w2', DateTime(2026, 10, 23), title: 'Đi bộ 20 phút'),
-          sampleNote('old', DateTime(2026, 10, 12), title: 'Tuần trước'),
-        ]);
-        final c = makeContainer()
-          ..listen(weeklyReportViewModelProvider, (_, _) {});
-        await pumpEventQueue();
-        final summary = c
-            .read(journeyViewModelProvider.notifier)
-            .weeklySummary()!;
-        expect(summary.noteCount, 2);
-        expect(summary.wins, <String>['Đi bộ 20 phút', 'Dọn bàn học']);
-        expect(summary.dayMoods[1], Mood.on);
-        expect(summary.dayMoods[0], isNull);
-
-        await c.read(weeklyReportViewModelProvider.notifier).export(summary);
-        final report = c.read(weeklyReportViewModelProvider);
-        expect(report.phase, ReportPhase.done);
-        expect(report.url, contains('reports/u-minh/weekly-2026-W43.pdf'));
-        expect(storage.uploaded.single, 'reports/u-minh/weekly-2026-W43.pdf');
-        expect(reports.shared.single, 'weekly-2026-W43.pdf');
-      },
-    );
-
-    test('Thẻ tuần: mất mạng khi tải lên → báo lỗi, thử lại được', () async {
-      storage.uploadError = const AppException(AppErrorKind.network);
-      final c = makeContainer()
-        ..listen(weeklyReportViewModelProvider, (_, _) {});
+    test('Thẻ tuần: tổng hợp nốt, chiến thắng và tâm trạng của tuần', () async {
+      notes.notes.addAll(<Note>[
+        sampleNote('w1', DateTime(2026, 10, 20), title: 'Dọn bàn học'),
+        sampleNote('w2', DateTime(2026, 10, 23), title: 'Đi bộ 20 phút'),
+        sampleNote('old', DateTime(2026, 10, 12), title: 'Tuần trước'),
+      ]);
+      final c = makeContainer();
       await pumpEventQueue();
       final summary = c
           .read(journeyViewModelProvider.notifier)
           .weeklySummary()!;
-      await c.read(weeklyReportViewModelProvider.notifier).export(summary);
-      final report = c.read(weeklyReportViewModelProvider);
-      expect(report.phase, ReportPhase.failed);
-      expect(report.message, contains('Wi-Fi'));
-      expect(reports.shared, isEmpty);
-      // Lỗi đã xử lý: người dùng vẫn thấy thông báo, Crashlytics nhận non-fatal.
-      expect(crash.errors.single.reason, 'report_export');
-      expect(crash.errors.single.fatal, isFalse);
+      expect(summary.noteCount, 2);
+      expect(summary.wins, <String>['Đi bộ 20 phút', 'Dọn bàn học']);
+      expect(summary.dayMoods[1], Mood.on);
+      expect(summary.dayMoods[0], isNull);
     });
   });
 }

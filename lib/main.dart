@@ -32,7 +32,6 @@ import 'firebase/firestore_self_control.dart';
 import 'firebase/firestore_user_repository.dart';
 import 'firebase/local_nudge_service.dart';
 import 'firebase/prefs_draft_store.dart';
-import 'firebase/report_impl.dart';
 import 'firebase/streak_share_impl.dart';
 import 'services/analytics_service.dart';
 import 'services/auth_service.dart';
@@ -47,7 +46,6 @@ import 'services/note_repository.dart';
 import 'services/nudge_service.dart';
 import 'services/profile_photo_repository.dart';
 import 'services/remote_config_service.dart';
-import 'services/report_services.dart';
 import 'services/self_control_services.dart';
 import 'services/streak_share_service.dart';
 import 'services/user_repository.dart';
@@ -108,12 +106,8 @@ Future<void> main() async {
           FirestoreGroupRepository(currentUid: uid),
         ),
         draftStoreProvider.overrideWithValue(PrefsDraftStore()),
-        reportServiceProvider.overrideWithValue(const PdfReportService()),
         streakShareServiceProvider.overrideWithValue(
           FirebaseStreakShareService(currentUid: uid),
-        ),
-        storageServiceProvider.overrideWithValue(
-          FirebaseStorageService(currentUid: uid),
         ),
         imagePickerServiceProvider.overrideWithValue(
           DeviceImagePickerService(),

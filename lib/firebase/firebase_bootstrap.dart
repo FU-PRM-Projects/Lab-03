@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 import '../firebase_options.dart';
@@ -26,9 +25,5 @@ Future<void> initFirebase() async {
     // Cổng khớp với `firebase.json`.
     await FirebaseAuth.instance.useAuthEmulator(firebaseEmulatorHost, 9099);
     FirebaseFirestore.instance.useFirestoreEmulator(firebaseEmulatorHost, 8080);
-    await FirebaseStorage.instance.useStorageEmulator(
-      firebaseEmulatorHost,
-      9199,
-    );
   }
 }

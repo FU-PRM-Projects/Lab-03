@@ -59,7 +59,7 @@ Ca ghi dữ liệu dùng nốt `E2E test note`; ca T03 xoá mọi nốt đó sau
 | T11 | Cài đặt, Remote Config | Đọc dòng phụ của hàng Remote Config | chứa "Cờ tính năng" |
 | T12 | Android gốc | Home → kéo thanh thông báo → mở lại app từ launcher | `LOGGED_IN` (giữ màn đang xem) |
 | T13 | Analytics | Bật log `FA` qua `adb`, ghi nốt như T02, test tự đọc `adb logcat` | `SAVED`, và logcat có `note_saved` kèm `mood`, `note_type`, không có nội dung nốt |
-| T14 | Xuất và tải lên | Tab Hành trình → Thẻ tuần → 'Lưu thẻ tuần (PDF)' | `UPLOADED` khi có bucket (`E2E_STORAGE_READY=1`), ngược lại `ERROR_MESSAGE` (câu lỗi + 'Thử lại') |
+| T14 | Thẻ tuần | Tab Hành trình → Thống kê → Mục tiêu tuần | `WEEKLY_CARD` (khoảng ngày + 'Chiến thắng nhỏ'). Final bỏ xuất PDF / Cloud Storage |
 | T15 | Đăng xuất, đăng nhập | Cài đặt → Đăng xuất → 'Đăng nhập bằng email' với tài khoản test | `OUT_WELCOME IN_TODAY` |
 | T16 | Đăng nhập lỗi | Đăng xuất → email đúng, mật khẩu sai → rồi mật khẩu đúng | `ERROR_SHOWN IN_TODAY` |
 | X01 | Khám phá | Profile Pro, khoảng 20 phút, agent tự đi khắp app | Danh sách `BUG: màn \| bước \| thấy gì` hoặc `NO_BUGS` |

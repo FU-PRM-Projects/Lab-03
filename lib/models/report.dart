@@ -1,6 +1,6 @@
 import 'mood.dart';
 
-/// Nội dung Thẻ tuần (S11b), cũng là nội dung file PDF tải lên Storage.
+/// Nội dung Thẻ tuần (S11b).
 class WeeklySummary {
   const WeeklySummary({
     required this.weekStart,
@@ -33,34 +33,4 @@ class WeeklySummary {
 
   DateTime get weekEnd =>
       DateTime(weekStart.year, weekStart.month, weekStart.day + 6);
-
-  /// Số tuần ISO 8601, dùng trong tên file (`weekly-2026-W43.pdf`).
-  String get isoWeek {
-    final thursday = DateTime(
-      weekStart.year,
-      weekStart.month,
-      weekStart.day + 3,
-    );
-    final firstThursday = DateTime(thursday.year, 1, 4);
-    final firstWeekStart = DateTime(
-      firstThursday.year,
-      1,
-      4 - (firstThursday.weekday - 1),
-    );
-    final week = thursday.difference(firstWeekStart).inDays ~/ 7 + 1;
-    return '${thursday.year}-W${week.toString().padLeft(2, '0')}';
-  }
-
-  String get fileName => 'weekly-$isoWeek.pdf';
-}
-
-/// Một bước của lần tải file lên Storage.
-class UploadProgress {
-  const UploadProgress(this.fraction, {this.url});
-
-  /// 0–1.
-  final double fraction;
-
-  /// Có khi đã tải xong: link tải về.
-  final String? url;
 }

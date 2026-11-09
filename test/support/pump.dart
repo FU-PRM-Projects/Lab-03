@@ -12,7 +12,6 @@ import 'package:lab03/services/draft_store.dart';
 import 'package:lab03/services/group_repository.dart';
 import 'package:lab03/services/note_repository.dart';
 import 'package:lab03/services/nudge_service.dart';
-import 'package:lab03/services/report_services.dart';
 import 'package:lab03/services/self_control_services.dart';
 import 'package:lab03/services/user_repository.dart';
 import 'package:lab03/theme/app_theme.dart';
@@ -50,8 +49,6 @@ class TestServices {
   final FakeNudgeService nudges = FakeNudgeService();
   final FakeDiscordService discord = FakeDiscordService();
   final FakeChallengeRepository challenges = FakeChallengeRepository();
-  final FakeReportService reports = FakeReportService();
-  final FakeStorageService storage = FakeStorageService();
 
   List<Override> get overrides => <Override>[
     authServiceProvider.overrideWithValue(auth),
@@ -67,8 +64,6 @@ class TestServices {
     nudgeServiceProvider.overrideWithValue(nudges),
     discordServiceProvider.overrideWithValue(discord),
     challengeRepositoryProvider.overrideWithValue(challenges),
-    reportServiceProvider.overrideWithValue(reports),
-    storageServiceProvider.overrideWithValue(storage),
   ];
 }
 
