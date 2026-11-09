@@ -1,3 +1,5 @@
+mod agent;
+mod chat;
 mod commands;
 mod firebase;
 
@@ -13,6 +15,10 @@ use crate::firebase::FirebaseClient;
 /// Shared bot state accessible across all commands
 pub struct Data {
     pub firebase: FirebaseClient,
+    /// OpenRouter model id for the AI agent; `None` when `OPENROUTER_API_KEY` is not set.
+    pub ai_model: Option<String>,
+    /// Last AI call per Discord user (cooldown).
+    pub last_ai_call: Mutex<HashMap<serenity::UserId, std::time::Instant>>,
     /// Background tasks (keyed by Discord user id) waiting for a connect code to be redeemed in the app.
     pub link_watchers: Arc<Mutex<HashMap<String, tokio::task::JoinHandle<()>>>>,
 }
@@ -29,6 +35,19 @@ async fn main() {
         .trim()
         .to_string();
     let firebase = FirebaseClient::from_env();
+    let ai_model = std::env::var("OPENROUTER_API_KEY")
+        .ok()
+        .filter(|k| !k.trim().is_empty())
+        .map(|_| {
+            std::env::var("OPENROUTER_MODEL")
+                .ok()
+                .filter(|m| !m.trim().is_empty())
+                .unwrap_or_else(|| agent::DEFAULT_MODEL.to_string())
+        });
+    match &ai_model {
+        Some(m) => println!("AI agent enabled (OpenRouter model: {m})"),
+        None => println!("AI agent disabled (OPENROUTER_API_KEY not set)"),
+    }
 
     // Only subscribe to DM messages (non-privileged; does not require enabling Privileged Intents in Discord Portal)
     let intents = serenity::GatewayIntents::DIRECT_MESSAGES;
@@ -36,6 +55,13 @@ async fn main() {
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
             commands: commands::all(),
+            event_handler: |framework, event| {
+                Box::pin(chat::event_handler(
+                    framework.serenity_context,
+                    event,
+                    framework.user_data,
+                ))
+            },
             command_check: Some(|ctx| Box::pin(commands::dm_only_check(ctx))),
             prefix_options: poise::PrefixFrameworkOptions {
                 prefix: Some("!".into()),
@@ -50,6 +76,8 @@ async fn main() {
                 poise::builtins::register_globally(ctx, &framework.options().commands).await?;
                 Ok(Data {
                     firebase,
+                    ai_model,
+                    last_ai_call: Mutex::new(HashMap::new()),
                     link_watchers: Arc::new(Mutex::new(HashMap::new())),
                 })
             })
