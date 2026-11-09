@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lab03/models/self_control.dart';
-import 'package:lab03/screens/journey/journey_screen.dart';
 import 'package:lab03/screens/settings/settings_screen.dart';
 import 'package:lab03/services/auth_service.dart';
 import 'package:lab03/services/self_control_services.dart';
@@ -95,7 +94,8 @@ void main() {
       expect(find.text('23:00 – 01:00'), findsOneWidget);
       expect(find.text('QUYỀN RIÊNG TƯ'), findsOneWidget);
       await tester.scrollUntilVisible(find.text('KHU DEMO FIREBASE'), 200);
-      expect(find.text('Xuất & tải lên Thẻ tuần (PDF)'), findsOneWidget);
+      expect(find.text('Remote Config'), findsOneWidget);
+      expect(find.text('Xuất & tải lên Thẻ tuần (PDF)'), findsNothing);
       expect(tester.takeException(), isNull);
     });
   }
@@ -115,23 +115,5 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Lướt mạng xã hội'), findsNothing);
     expect(find.text('Mở khoá'), findsOneWidget);
-  });
-
-  testWidgets('khu demo: Xuất & tải lên PDF mở Thống kê của S11', (
-    tester,
-  ) async {
-    await pumpApp(tester);
-    await tester.tap(find.byTooltip('Cài đặt'));
-    await tester.pumpAndSettle();
-    await tester.scrollUntilVisible(
-      find.text('Xuất & tải lên Thẻ tuần (PDF)'),
-      200,
-    );
-    await tester.ensureVisible(find.text('Xuất & tải lên Thẻ tuần (PDF)'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Xuất & tải lên Thẻ tuần (PDF)'));
-    await tester.pumpAndSettle();
-    expect(find.byType(JourneyScreen), findsOneWidget);
-    expect(find.text('Mục tiêu tuần'), findsOneWidget);
   });
 }

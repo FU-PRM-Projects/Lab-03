@@ -212,28 +212,20 @@ async def test_t12_native_home_and_return(ask) -> None:
     assert "LOGGED_IN" in answer, f"{answer!r} (trace {result.trace_id})"
 
 
-# --- Xuất và tải thẻ tuần lên Cloud Storage --------------------------------
-
-#: Đặt E2E_STORAGE_READY=1 khi project đã có Storage bucket (cần gói Blaze).
-STORAGE_READY = os.environ.get("E2E_STORAGE_READY") == "1"
+# --- Thẻ tuần ----------------------------------------------------------------
 
 
-async def test_t14_export_weekly_card(ask) -> None:
-    """S11b: tạo PDF thẻ tuần và tải lên Storage.
-
-    Có bucket: phải thấy link tải về. Chưa có bucket: phải thấy câu báo lỗi kèm
-    nút 'Thử lại' (app không treo, không đóng).
-    """
+async def test_t14_weekly_card(ask) -> None:
+    """S11b: mở Thẻ tuần từ Thống kê. Final bỏ xuất PDF (không dùng Cloud
+    Storage), nên màn chỉ còn phần xem."""
     answer, result = await ask(
-        "Mở tab 'Hành trình' và mở 'Thẻ tuần' (có thể phải cuộn xuống). Bấm 'Lưu thẻ "
-        "tuần (PDF)' rồi chờ tối đa 60 giây. Trả lời UPLOADED nếu hiện 'Đã lưu thẻ tuần "
-        "lên đám mây.' kèm một link, ERROR_MESSAGE nếu hiện câu báo lỗi kèm nút 'Thử "
-        "lại', STUCK nếu vẫn đang chạy sau 60 giây, CRASHED nếu app bị đóng. Rồi đóng "
-        "màn Thẻ tuần." + RULES,
-        "UPLOADED, ERROR_MESSAGE, STUCK hoặc CRASHED",
+        "Mở tab 'Hành trình', chọn 'Thống kê' và chạm 'Mục tiêu tuần' (có thể phải "
+        "cuộn xuống). Trả lời WEEKLY_CARD nếu hiện màn 'Thẻ tuần' có khoảng ngày của "
+        "tuần và mục 'Chiến thắng nhỏ', NOT_FOUND nếu không mở được, CRASHED nếu app "
+        "bị đóng. Rồi đóng màn Thẻ tuần." + RULES,
+        "WEEKLY_CARD, NOT_FOUND hoặc CRASHED",
     )
-    expected = "UPLOADED" if STORAGE_READY else "ERROR_MESSAGE"
-    assert expected in answer, f"{answer!r} (trace {result.trace_id})"
+    assert "WEEKLY_CARD" in answer, f"{answer!r} (trace {result.trace_id})"
 
 
 # --- Đăng xuất và đăng nhập (chạy cuối vì đổi phiên đăng nhập) --------------

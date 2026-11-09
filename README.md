@@ -19,7 +19,7 @@
    - Thực hiện các thẻ thử thách theo cấp độ (*Dũng cảm*, *Vận động*) hoặc tự tạo thẻ riêng.
    - Ghi nhận những lần dừng lại thành công và tập thở ở màn **Tự chủ** (hỗ trợ khoá sinh trắc học/PIN).
 4. **Hành trình & Thẻ tuần (Tab Hành trình):**
-   - Theo dõi chuỗi ngày (streak), lịch tâm trạng, biểu đồ năng lượng, chia sẻ ảnh thẻ streak hoặc xuất báo cáo **Thẻ tuần (PDF)**.
+   - Theo dõi chuỗi ngày (streak), lịch tâm trạng, biểu đồ năng lượng, chia sẻ ảnh thẻ streak và xem **Thẻ tuần**.
 5. **Kết nối Discord Bot (Remote Agent qua DM):**
    - Nhắn tin riêng (DM) cho **Nốt Bot** trên Discord với lệnh `/connect` (hoặc `!connect`) để nhận mã liên kết 6 ký tự (hiệu lực 10 phút).
    - Trong ứng dụng Nốt, vào **Cài đặt → Cộng đồng → Liên kết Discord** (hoặc **Phòng trò chuyện → Liên kết tài khoản Discord**) và nhập mã 6 ký tự.
@@ -76,7 +76,7 @@ Kho thẻ thử thách (`challenges`, chỉ đọc với người dùng) nạp t
 
 Project thật: **`prm393-not-lab3`** — Android app `com.quanphungg.lab03` và web app `1:1069128102779:web:4f900912701ead247203de`. `flutterfire configure` đã sinh `lib/firebase_options.dart` (có cả `web` và `android`) và `android/app/google-services.json`; không sửa tay hai file này — cần đổi cấu hình thì chạy lại lệnh đó.
 
-Emulator vẫn dùng được (Auth 9099, Firestore 8080, Storage 9199, UI 4000) và ghi vào cùng project id với app:
+Emulator vẫn dùng được (Auth 9099, Firestore 8080, UI 4000) và ghi vào cùng project id với app:
 
 ```sh
 cd firebase && npm run emulators          # cửa sổ 1
@@ -130,7 +130,7 @@ Workflow nằm trong `.github/workflows/`:
 | Workflow | Chạy khi | Việc làm |
 |---|---|---|
 | `ci.yml` | push `main`, mọi PR, bấm tay | format → analyze → test (kèm coverage), build web release, build APK debug, chạy test Security Rules trên Emulator |
-| `deploy.yml` | push `main` (đường dẫn liên quan), bấm tay | build web → `firebase deploy` Hosting + Firestore rules/indexes + Storage rules |
+| `deploy.yml` | push `main` (đường dẫn liên quan), bấm tay | build web → `firebase deploy` Hosting + Firestore rules/indexes |
 | `deploy.yml` (PR) | mọi PR | build web → Hosting preview 7 ngày, URL được comment vào PR |
 | `release.yml` | tag `v*`, bấm tay | build AAB `--obfuscate --split-debug-info`, upload symbol lên Crashlytics, lưu AAB/mapping/symbol làm artifact |
 
@@ -155,9 +155,7 @@ Khi secret chưa được đặt, `deploy.yml` và `release.yml` chỉ ghi cản
 | firebase_core · firebase_auth · cloud_firestore | ^5.1.0 · ^7.0.1 · ^7.1.0 |
 | firebase_analytics · firebase_crashlytics | ^13.0.1 · ^6.0.1 |
 | google_sign_in | ^7.2.0 |
-| firebase_storage | ^14.0.1 |
 | fl_chart | ^1.3.0 |
-| pdf · printing | ^3.13.1 · ^5.15.1 |
 | shared_preferences | ^2.5.6 |
 | local_auth | ^3.0.2 |
 | fake_async (dev) | ^1.3.3 |
