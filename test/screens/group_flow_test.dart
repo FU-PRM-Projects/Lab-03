@@ -169,6 +169,9 @@ void main() {
       expect(group.noteCount, 1);
       expect(group.firstNoteId, note.id);
 
+      // Nút "Dán lên tường" đẩy nút này xuống dưới mép màn 360 dp.
+      await tester.ensureVisible(find.text('Xem nhóm Bắt chuyện'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Xem nhóm Bắt chuyện'));
       await tester.pumpAndSettle();
       expect(find.byType(GroupDetailScreen), findsOneWidget);

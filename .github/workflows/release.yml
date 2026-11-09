@@ -56,6 +56,9 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      - name: Set up Gradle cache
+        uses: gradle/actions/setup-gradle@v4
+
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -70,7 +73,7 @@ jobs:
       # lên trước khi có crash từ bản build này.
       - name: Build release App Bundle
         run: |
-          flutter build appbundle \
+          .github/scripts/flutter-build-retry.sh appbundle \
             --release \
             --obfuscate \
             --split-debug-info=build/symbols

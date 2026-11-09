@@ -118,6 +118,11 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      # Cache bộ phân phối Gradle (~200 MB) và thư viện giữa các lần chạy, để
+      # không phải tải lại từ GitHub Releases (hay trả 504).
+      - name: Set up Gradle cache
+        uses: gradle/actions/setup-gradle@v4
+
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -129,9 +134,10 @@ jobs:
         run: flutter pub get
 
       # google-services.json và Gradle plugin Crashlytics nằm trong repo, nên
-      # job này bắt lỗi cấu hình Firebase trước khi merge.
+      # job này bắt lỗi cấu hình Firebase trước khi merge. Lỗi tải (5xx,
+      # timeout) thì thử lại tối đa 3 lần; lỗi build thật thì dừng ngay.
       - name: Build debug APK
-        run: flutter build apk --debug
+        run: .github/scripts/flutter-build-retry.sh apk --debug
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v7

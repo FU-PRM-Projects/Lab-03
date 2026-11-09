@@ -11,6 +11,10 @@ pluginManagement {
     includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
 
     repositories {
+        // Google's mirror of Maven Central serves files directly. Maven Central
+        // itself redirects large artifacts (Kotlin compiler) to GitHub
+        // Releases, which often answers 504 on CI runners.
+        maven("https://maven-central.storage-download.googleapis.com/maven2/")
         google()
         mavenCentral()
         gradlePluginPortal()
