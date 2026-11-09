@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/challenge.dart';
 import '../models/onboarding.dart';
+import 'ai_service.dart';
 
 /// Câu trả lời làm quen (`users/{uid}/private/onboarding`). Lỗi là
 /// `AppException`.
@@ -39,9 +40,22 @@ final onboardingRepositoryProvider = Provider<OnboardingRepository>(
   (ref) => const _AlreadyOnboarded(),
 );
 
+/// Gemini trước; lỗi hoặc tắt thì `OnboardingViewModel` dùng bảng luật.
 final starterPlanServiceProvider = Provider<StarterPlanService>(
-  (ref) => const RulesStarterPlanService(),
+  (ref) => AiStarterPlanService(ref.watch(aiServiceProvider)),
 );
+
+class AiStarterPlanService implements StarterPlanService {
+  const AiStarterPlanService(this._ai);
+
+  final AiService _ai;
+
+  @override
+  Future<StarterPlan> plan(
+    OnboardingAnswers answers,
+    List<Challenge> catalog,
+  ) => _ai.starterPlan(answers, catalog);
+}
 
 class _AlreadyOnboarded implements OnboardingRepository {
   const _AlreadyOnboarded();

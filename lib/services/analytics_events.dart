@@ -25,6 +25,13 @@ abstract final class AnalyticsEvents {
   /// Làm quen (A2): mỗi bước S13a–d, và khi lưu hồ sơ khởi đầu.
   static const String onboardingStep = 'onboarding_step';
   static const String onboardingDone = 'onboarding_done';
+
+  /// Nốt AI (Final Assignment): mỗi lần gọi Gemini, khi người dùng lưu kết
+  /// quả, và khi lỗi (`reason`: quota, network, timeout, disabled, parse,
+  /// blocked). Tham số không có nội dung người dùng viết.
+  static const String aiRequest = 'ai_request';
+  static const String aiResultAccepted = 'ai_result_accepted';
+  static const String aiError = 'ai_error';
 }
 
 abstract final class AnalyticsParams {

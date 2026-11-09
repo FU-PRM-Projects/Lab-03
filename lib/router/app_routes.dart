@@ -5,6 +5,9 @@ abstract final class AppRoutes {
   static const String welcome = '/welcome';
   static const String today = '/today';
   static const String noteNew = '/note/new';
+
+  /// S03b "Kể tự do" (Nốt AI sắp xếp giúp).
+  static const String freeTell = '/note/free-tell';
   static const String jar = '/jar';
   static const String challenges = '/challenges';
   static const String selfControl = '/self-control';

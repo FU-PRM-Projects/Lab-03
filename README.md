@@ -217,6 +217,7 @@ lib/
 | [`docs/architecture.md`](docs/architecture.md) | Lớp MVVM, sơ đồ, luồng F1, bảng ViewModel–service |
 | [`docs/analytics-plan.md`](docs/analytics-plan.md) | Sự kiện Analytics, Crashlytics, quy ước dữ liệu và kế hoạch Stage 5 |
 | [`docs/system-architecture.md`](docs/system-architecture.md) | Kiến trúc cả hệ thống cho Final Assignment |
+| [`docs/ai-feature.md`](docs/ai-feature.md) | Nốt AI (Gemini qua Firebase AI Logic): Kể tự do, hồ sơ khởi đầu, câu chào; Remote Config, App Check, dự phòng, dữ liệu gửi đi |
 
 ## Công cụ AI đã dùng
 

@@ -18,6 +18,7 @@ import 'app.dart';
 import 'firebase/crash_handlers.dart';
 import 'firebase/device_discord_service.dart';
 import 'firebase/device_services.dart';
+import 'firebase/firebase_ai_service.dart';
 import 'firebase/firebase_analytics_service.dart';
 import 'firebase/firebase_auth_service.dart';
 import 'firebase/firebase_bootstrap.dart';
@@ -34,6 +35,7 @@ import 'firebase/firestore_user_repository.dart';
 import 'firebase/local_nudge_service.dart';
 import 'firebase/prefs_draft_store.dart';
 import 'firebase/streak_share_impl.dart';
+import 'services/ai_service.dart';
 import 'services/analytics_service.dart';
 import 'services/auth_service.dart';
 import 'services/challenge_repository.dart';
@@ -88,17 +90,16 @@ Future<void> main() async {
   String? uid() => auth.currentUser?.uid;
   // Remote Config không có emulator: dùng project thật, lỗi thì về mặc định.
   final remoteConfig = await FirebaseRemoteConfigService.create();
+  final AnalyticsService analytics = useFirebaseEmulator
+      ? const DebugAnalyticsService()
+      : FirebaseAnalyticsService();
 
   runApp(
     ProviderScope(
       overrides: [
         authServiceProvider.overrideWithValue(auth),
         messagingServiceProvider.overrideWithValue(messaging),
-        analyticsServiceProvider.overrideWithValue(
-          useFirebaseEmulator
-              ? const DebugAnalyticsService()
-              : FirebaseAnalyticsService(),
-        ),
+        analyticsServiceProvider.overrideWithValue(analytics),
         remoteConfigServiceProvider.overrideWithValue(remoteConfig),
         userRepositoryProvider.overrideWithValue(FirestoreUserRepository()),
         noteRepositoryProvider.overrideWithValue(
@@ -138,6 +139,16 @@ Future<void> main() async {
         inboxRepositoryProvider.overrideWithValue(FirestoreInboxRepository()),
         onboardingRepositoryProvider.overrideWithValue(
           FirestoreOnboardingRepository(currentUid: uid),
+        ),
+        // Firebase AI Logic không có trên Emulator: dùng bản tắt, mọi flow
+        // đi nhánh dự phòng.
+        aiServiceProvider.overrideWithValue(
+          useFirebaseEmulator
+              ? const DisabledAiService()
+              : FirebaseAiService(
+                  configSource: () => remoteConfig.ai,
+                  analytics: analytics,
+                ),
         ),
         habitRepositoryProvider.overrideWithValue(
           FirestoreHabitRepository(currentUid: uid),

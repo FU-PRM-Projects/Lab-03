@@ -27,6 +27,41 @@
       },
       "valueType": "BOOLEAN",
       "description": "Cờ: cho gửi thẻ tự thêm lên kho chung để staff duyệt (luồng liên vai trò)"
+    },
+    "ai_enabled": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "valueType": "BOOLEAN",
+      "description": "Cờ: bật Nốt AI (Gemini). Tắt thì mọi tính năng AI đi nhánh dự phòng"
+    },
+    "ai_onboarding_enabled": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "valueType": "BOOLEAN",
+      "description": "Cờ: hồ sơ khởi đầu bằng AI ở Làm quen (S13f)"
+    },
+    "ai_model": {
+      "defaultValue": {
+        "value": "gemini-2.5-flash"
+      },
+      "valueType": "STRING",
+      "description": "Tên model Gemini qua Firebase AI Logic"
+    },
+    "ai_timeout_ms": {
+      "defaultValue": {
+        "value": "8000"
+      },
+      "valueType": "NUMBER",
+      "description": "Quá thời gian (ms) thì coi như lỗi, dùng nhánh dự phòng"
+    },
+    "ai_max_chars": {
+      "defaultValue": {
+        "value": "500"
+      },
+      "valueType": "NUMBER",
+      "description": "Độ dài tối đa đoạn kể gửi cho AI"
     }
   }
 }

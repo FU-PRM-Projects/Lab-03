@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'ai_service.dart';
+
 /// Tham số Remote Config mà màn hình dùng.
 ///
 /// Stage 4 dùng [InAppRemoteConfig] (giá trị mặc định trong app). Stage 5 gắn
@@ -34,6 +36,9 @@ abstract interface class RemoteConfigService {
 
   /// Hiện nhóm "Khu demo Firebase" ở S12 (`firebase_demo_enabled`).
   bool get firebaseDemoEnabled;
+
+  /// Tham số Nốt AI (`ai_*`).
+  AiConfig get ai;
 
   /// Tải lại cấu hình từ Console; `true` khi có giá trị mới được kích hoạt.
   Future<bool> refresh();
@@ -86,6 +91,9 @@ class InAppRemoteConfig implements RemoteConfigService {
 
   @override
   bool get firebaseDemoEnabled => true;
+
+  @override
+  AiConfig get ai => const AiConfig();
 
   @override
   Future<bool> refresh() async => false;
