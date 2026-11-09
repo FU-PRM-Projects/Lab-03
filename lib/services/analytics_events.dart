@@ -7,6 +7,7 @@ abstract final class AnalyticsEvents {
   static const String logout = 'logout';
   static const String noteSaved = 'note_saved';
   static const String challengeCompleted = 'challenge_completed';
+  static const String reportExported = 'report_exported';
   static const String challengeOpened = 'challenge_opened';
   static const String noteViewed = 'note_viewed';
   static const String groupViewed = 'group_viewed';

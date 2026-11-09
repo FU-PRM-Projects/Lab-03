@@ -76,17 +76,17 @@ Màn hình → ViewModel Riverpod → service → Firebase. Ví dụ **Lưu vào
 ## 06 · Xuất PDF | 04:15–05:05
 
 - **Bấm** — **Hành trình → Thống kê → Mục tiêu tuần → Lưu thẻ tuần (PDF)**.
-- **Chỉ** — Tiến độ hoặc link trong app. Nếu upload thành công, mở **Storage → Files → reports → UID demo → weekly-…pdf** và chỉ thời điểm cập nhật.
+- **Chỉ** — Hộp chia sẻ của Android mở ra với file `weekly-….pdf` (đóng lại hoặc mở bằng trình xem PDF), rồi dòng **"Đã lưu thẻ tuần vào máy."** kèm tên file và dung lượng. Sau đó mở **Firestore → users → UID demo → reports → tuần này** và chỉ `fileName`, `sizeBytes`, `savedAt`.
 
 **Lời thoại khi bấm lưu**
 
-> Trong Hành trình, em mở Thống kê rồi chạm Mục tiêu tuần để xem Thẻ tuần. Em bấm Lưu thẻ tuần để app tạo PDF và gửi tệp lên Storage.
+> Trong Hành trình, em mở Thống kê rồi chạm Mục tiêu tuần để xem Thẻ tuần. Em bấm Lưu thẻ tuần, app tạo PDF ngay trên máy, lưu vào bộ nhớ của app rồi mở hộp chia sẻ để em gửi đi.
 
-**Khi thấy tệp trên Storage**
+**Khi mở Firestore**
 
-> Bên Storage, em mở thư mục reports của tài khoản demo. Đây là tệp PDF của tuần này. Thời điểm cập nhật khớp với lần em vừa bấm lưu.
+> Đề Final không dùng Cloud Storage, nên file nằm trên máy. Firestore chỉ giữ metadata: tuần nào đã lưu, tên file, dung lượng và giờ lưu.
 
-**Nếu upload lỗi** — Quay thông báo và nút **Thử lại**. Nói “Lần tải này chưa hoàn tất. App báo lỗi và cho phép thử lại.” Phần chứng minh upload vẫn còn thiếu.
+**Nếu lưu lỗi** — Quay thông báo và nút **Thử lại**. Nói “App báo lỗi và cho phép thử lại.”
 
 ## 07 · Analytics | 05:05–05:50
 
@@ -196,7 +196,7 @@ Số liệu nếu cần đọc thêm **35/36 lượt của T01–T12 sau khi ch�
    adb -s emulator-5554 logcat -d -s flutter | Select-String '\[fcm\] token:'
    ```
 
-4. Thử **Lưu thẻ tuần (PDF)** một lần và xác nhận kết quả trong Storage. Nếu bucket chưa sẵn sàng, dùng lời thoại nhánh lỗi ở dưới. Có thể gửi **Thử crash (dev)** trước khi quay vài phút để báo cáo có thời gian hiện. Khi quay, nói rõ thời điểm của báo cáo đang mở.
+4. Thử **Lưu thẻ tuần (PDF)** một lần và xác nhận metadata trong **Firestore → users → UID demo → reports**. Có thể gửi **Thử crash (dev)** trước khi quay vài phút để báo cáo có thời gian hiện. Khi quay, nói rõ thời điểm của báo cáo đang mở.
 5. Chuẩn bị ARTEMIS trước. Chạy `uv sync` trong cả hai thư mục dưới đây một lần, chuẩn bị `OPEN_ROUTER_API_KEY` trong `D:\Lab-03\tools\artemis\.env` và để server chạy sẵn. Để sẵn lệnh pytest trong terminal thứ hai. Giữ tài khoản demo đăng nhập khi chạy test. [Hướng dẫn ARTEMIS trong repo](../e2e_test/README.md)
 
    **Terminal server**

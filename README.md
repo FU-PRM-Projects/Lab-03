@@ -46,7 +46,7 @@
 | 1 | Design traceability | Xong | [`docs/design-traceability.md`](docs/design-traceability.md) |
 | 2 | Kiến trúc và theme | Xong | [`docs/architecture.md`](docs/architecture.md), `lib/theme/`, `lib/widgets/`, khung route 12 màn |
 | 3 | Firebase và đăng nhập | Xong (code + test; chờ project Firebase thật để chạy Google Sign-In trên máy) | `lib/services/`, `lib/firebase/`, S01, đăng xuất ở S12 |
-| 4 | Tính năng | Xong (code + test; chờ chạy thử trên máy với project Firebase thật): đủ 12 màn, 3 flow F1–F3 và các flow phụ, PDF Thẻ tuần lên Storage | Đủ 12 màn với mọi trạng thái, xuất và tải PDF |
+| 4 | Tính năng | Xong (code + test; chờ chạy thử trên máy với project Firebase thật): đủ 12 màn, 3 flow F1–F3 và các flow phụ, PDF Thẻ tuần (Final: lưu trên máy, chia sẻ, metadata Firestore) | Đủ 12 màn với mọi trạng thái, lưu và chia sẻ PDF |
 | 5 | Analytics, Crashlytics, Remote Config, FCM | Đang làm (Analytics + Crashlytics) | [`docs/analytics-plan.md`](docs/analytics-plan.md) |
 | 6 | Test plan và ARTEMIS | Chưa làm | `docs/test-plan.md`, `e2e_test/` |
 | 7 | AI code review | Chưa làm | `docs/code-review.md` |

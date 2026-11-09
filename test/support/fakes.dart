@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:lab03/models/app_user.dart';
 import 'package:lab03/models/challenge.dart';
@@ -7,6 +8,7 @@ import 'package:lab03/models/image_ref.dart';
 import 'package:lab03/models/mood.dart';
 import 'package:lab03/models/note.dart';
 import 'package:lab03/models/note_type.dart';
+import 'package:lab03/models/report.dart';
 import 'package:lab03/models/self_control.dart';
 import 'package:lab03/services/analytics_service.dart';
 import 'package:lab03/services/app_exception.dart';
@@ -20,6 +22,7 @@ import 'package:lab03/services/group_repository.dart';
 import 'package:lab03/services/messaging_service.dart';
 import 'package:lab03/services/note_repository.dart';
 import 'package:lab03/services/nudge_service.dart';
+import 'package:lab03/services/report_services.dart';
 import 'package:lab03/services/self_control_services.dart';
 import 'package:lab03/services/user_repository.dart';
 
@@ -791,5 +794,68 @@ class FakeChallengeRepository implements ChallengeRepository {
       completed: <String>{...old.completed, challengeId},
     );
     _changes.add(null);
+  }
+}
+
+class FakeReportService implements ReportService {
+  final List<WeeklySummary> built = <WeeklySummary>[];
+  AppException? buildError;
+
+  @override
+  Future<Uint8List> weeklyCard(WeeklySummary summary) async {
+    if (buildError != null) throw buildError!;
+    built.add(summary);
+    return Uint8List.fromList(<int>[37, 80, 68, 70, 45]);
+  }
+}
+
+class FakeReportFileStore implements ReportFileStore {
+  final List<String> saved = <String>[];
+  final List<String> shared = <String>[];
+  AppException? saveError;
+  AppException? shareError;
+
+  @override
+  Future<SavedReport> save(Uint8List bytes, String fileName) async {
+    if (saveError != null) throw saveError!;
+    saved.add(fileName);
+    return SavedReport(
+      fileName: fileName,
+      bytes: bytes,
+      path: '/app/documents/reports/$fileName',
+    );
+  }
+
+  @override
+  Future<void> share(SavedReport report) async {
+    if (shareError != null) throw shareError!;
+    shared.add(report.fileName);
+  }
+}
+
+class FakeReportRepository implements ReportRepository {
+  final Map<String, ReportRecord> records = <String, ReportRecord>{};
+  final StreamController<void> _changes = StreamController<void>.broadcast();
+  AppException? recordError;
+
+  @override
+  Future<void> record(ReportRecord record) async {
+    if (recordError != null) throw recordError!;
+    records[record.isoWeek] = ReportRecord(
+      isoWeek: record.isoWeek,
+      fileName: record.fileName,
+      sizeBytes: record.sizeBytes,
+      noteCount: record.noteCount,
+      savedAt: DateTime(2026, 10, 25, 9, 30),
+    );
+    _changes.add(null);
+  }
+
+  @override
+  Stream<ReportRecord?> watchWeek(String isoWeek) async* {
+    yield records[isoWeek];
+    await for (final _ in _changes.stream) {
+      yield records[isoWeek];
+    }
   }
 }
