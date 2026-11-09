@@ -24,7 +24,7 @@ Cột trạng thái được cập nhật ở cuối mỗi stage.
 | S08 | Chi tiết thử thách | `/challenges/:id` | `ChallengeDetailScreen` | `ChallengeDetailViewModel` | Firestore `challenges/{id}`, ghi `users/{uid}/notes` và `challengeProgress` | Done (Stage 4) · Deviation D-17 |
 | S09 | Tự chủ | `/self-control` | `SelfControlScreen` | `SelfControlViewModel` | Firestore `users/{uid}/notes` (đếm tự chủ), `users/{uid}/private/habits`, `users/{uid}/private/settings`; `local_auth`; `FLAG_SECURE` | Done (Stage 4) · Deviation D-16 |
 | S10 | Thở 90 giây | `/breathe` | `BreathingScreen` | `BreathingViewModel` | Không gọi mạng khi mở (tiêu chí < 2 giây); ghi nốt khi "Ghi vào hũ"; giữ màn hình sáng khi thở | Done (Stage 4) · Deviation D-16 |
-| S11 | Hành trình (tab 4: `S11a` Con đường, `S11b` Thống kê, `S11c` Lịch) | `/journey?tab=path\|stats\|calendar` | `JourneyScreen` | `JourneyViewModel`, `WeeklyReportViewModel` | Firestore `users/{uid}/notes`, `challengeProgress`; PDF Thẻ tuần → Cloud Storage `reports/{uid}/` | Done (Stage 4) · Deviation D-06, D-18 |
+| S11 | Hành trình (tab 4: `S11a` Con đường, `S11b` Thống kê, `S11c` Lịch) | `/journey?tab=path\|stats\|calendar` | `JourneyScreen` | `JourneyViewModel`, `WeeklyReportViewModel` | Firestore `users/{uid}/notes`, `challengeProgress`; PDF Thẻ tuần lưu trên máy + metadata `users/{uid}/reports/{isoWeek}` | Done (Stage 4) · Deviation D-06, D-18 |
 | S12 | Cài đặt (+ khu demo Firebase) | `/settings` | `SettingsScreen` | `SettingsViewModel`, `FirebaseDemoViewModel` | Firestore `users/{uid}/private/settings`, `local_auth`; khu demo: Storage (Stage 4), FCM, Remote Config, Crashlytics (Stage 5) | Done (Stage 4: Nhắc nhở, Quyền riêng tư, Tài khoản, Xuất & tải lên PDF); khu demo còn FCM, Remote Config, Crashlytics ở Stage 5 · Deviation D-01, D-19 |
 
 Tab cấp cao giữ đúng Lab 2: Hôm nay, Hũ, Thử thách, Hành trình trong `StatefulShellRoute.indexedStack` (mỗi tab giữ vị trí cuộn). Màn lồng (`S03`, `S04`, `S06`, `S08`, `S09`, `S10`, `S12`) nằm ngoài shell nên không có thanh tab, đúng mục 1.1 của `user-flow.md`.
@@ -46,7 +46,7 @@ Tab cấp cao giữ đúng Lab 2: Hôm nay, Hũ, Thử thách, Hành trình tron
 | Sheet "Lúc đó mình đang thấy gì?" | S09 | `showModalBottomSheet` | Done |
 | Sheet "Đổi kiểu thở" (4-6, 4-7-8) | S10 | `showModalBottomSheet` | Done |
 | Sheet các nốt của một ngày | S11c | `showModalBottomSheet` | Done |
-| Thẻ tuần dạng story | S11b | `WeeklyCardPage` (route toàn màn, `fullscreenDialog`) | Done · Deviation D-06 (Final bỏ nút PDF) |
+| Thẻ tuần dạng story | S11b | `WeeklyCardPage` (route toàn màn, `fullscreenDialog`) | Done · Deviation D-06 (Final: PDF lưu trên máy) |
 | Dialog gợi ý hỗ trợ (Mệt/Rối 5 ngày liền) | S11 (P6) | `showAppDialog(kind: confirmation)` | Done |
 
 ### 1.2 Phần thêm trên Figma (section 24/10 – 01/11)
@@ -167,7 +167,7 @@ Mỗi dòng là một chỗ app khác Figma, kèm lý do. Cột "Figma" cho bi�
 | D-03 | Toàn app | Không có dark theme (`DESIGN.md` mục 11) | Bỏ chế độ tối và nút chọn theme của bản khung cũ; app chỉ có light theme | Giữ đúng thiết kế; dark theme không có token | Không cần |
 | D-04 | Toàn app | Thanh trạng thái kiểu iPhone ("9:41") | Thanh trạng thái Android, nội dung bọc `SafeArea` | Ràng buộc nền tảng (Android); handoff đã ghi | Không cần |
 | D-05 | Chữ | Be Vietnam Pro trong Figma | Be Vietnam Pro qua `google_fonts` (tải lúc chạy, lưu cache). Lần mở đầu tiên khi không có mạng sẽ dùng font hệ thống | Ràng buộc thời gian; sẽ đóng gói font vào `assets/fonts/` nếu bị chấm lệch so với Figma | Không cần |
-| D-06 | S11b Thẻ tuần | "Lưu thẻ tuần (PDF)" mở hộp chia sẻ | **Final: bỏ nút "Lưu thẻ tuần (PDF)"**, Thẻ tuần chỉ để xem. (Lab 3 từng tạo PDF và tải lên Cloud Storage `reports/{uid}/`.) | Final Assignment không cho dùng Cloud Storage; project chưa có bucket (cần gói Blaze) nên tính năng không chạy được trên bản thật | Cần cập nhật |
+| D-06 | S11b Thẻ tuần | "Lưu thẻ tuần (PDF)" mở hộp chia sẻ | **Final:** "Lưu thẻ tuần (PDF)" tạo PDF (font Be Vietnam Pro đóng gói, chạy offline), lưu vào thư mục tài liệu của app (`reports/weekly-{isoWeek}.pdf`), tự mở hộp chia sẻ và có nút "Chia sẻ PDF"; metadata ở `users/{uid}/reports/{isoWeek}`. (Lab 3 từng tải PDF lên Cloud Storage `reports/{uid}/`.) | Đề Final, mục 4: Cloud Storage ngoài phạm vi, *"the Lab 3 PDF report is saved and shared on the device, with its metadata in Firestore"* | Cần cập nhật |
 | D-07 | Chuông ở 4 màn tab | Chuông mở S12 (mục Nhắc nhở) | Giữ nguyên; danh sách thông báo đã nhận nằm trong khu demo ở S12 (D-01) | Lab 3 yêu cầu lưu danh sách thông báo trong app; đặt cùng chỗ chuông dẫn tới | Cần cập nhật (cùng D-01) |
 | D-08 | "Lưu trên máy" khi mất mạng | Ghi vào bộ nhớ máy, cờ `pendingSync` | Dùng bộ nhớ đệm offline của Firestore: ghi xong ngay trên máy, tự đồng bộ khi có mạng; banner dựa trên `hasPendingWrites` | Cùng hành vi với thiết kế, ít code hơn và không mất dữ liệu | Không cần |
 | D-09 | S11b biểu đồ | Vẽ cố định 294 px | `fl_chart` co giãn theo chiều rộng thẻ | `design-decisions.md` mục 2 đã ghi | Không cần |

@@ -59,7 +59,7 @@ Ca ghi dữ liệu dùng nốt `E2E test note`; ca T03 xoá mọi nốt đó sau
 | T11 | Cài đặt, Remote Config | Đọc dòng phụ của hàng Remote Config | chứa "Cờ tính năng" |
 | T12 | Android gốc | Home → kéo thanh thông báo → mở lại app từ launcher | `LOGGED_IN` (giữ màn đang xem) |
 | T13 | Analytics | Bật log `FA` qua `adb`, ghi nốt như T02, test tự đọc `adb logcat` | `SAVED`, và logcat có `note_saved` kèm `mood`, `note_type`, không có nội dung nốt |
-| T14 | Thẻ tuần | Tab Hành trình → Thống kê → Mục tiêu tuần | `WEEKLY_CARD` (khoảng ngày + 'Chiến thắng nhỏ'). Final bỏ xuất PDF / Cloud Storage |
+| T14 | Thẻ tuần PDF | Tab Hành trình → Thống kê → Mục tiêu tuần → 'Lưu thẻ tuần (PDF)' → đóng hộp chia sẻ | `SAVED_SHARED` ('Đã lưu thẻ tuần vào máy.' + tên `weekly-….pdf`, hộp chia sẻ đã mở). Final: lưu trên máy, không dùng Cloud Storage |
 | T15 | Đăng xuất, đăng nhập | Cài đặt → Đăng xuất → 'Đăng nhập bằng email' với tài khoản test | `OUT_WELCOME IN_TODAY` |
 | T16 | Đăng nhập lỗi | Đăng xuất → email đúng, mật khẩu sai → rồi mật khẩu đúng | `ERROR_SHOWN IN_TODAY` |
 | X01 | Khám phá | Profile Pro, khoảng 20 phút, agent tự đi khắp app | Danh sách `BUG: màn \| bước \| thấy gì` hoặc `NO_BUGS` |
@@ -116,8 +116,8 @@ mong muốn, không phải để che lỗi của app.
   fixture `reported` đọc danh sách bước ngay khi phiên vừa xong, lúc bước cuối chưa được lưu, nên
   nhận chuỗi rỗng. Thêm vòng thử lại (5 lần, cách 2 giây) rồi chạy lại T13 đủ 3 lần: 3/3. Lần
   chạy đầu (2/3 cho T13) vẫn giữ trong `junit-t13-t14.xml`.
-- **T14:** chưa có Storage bucket nên kết quả đúng là câu báo lỗi kèm "Thử lại" (3/3). Khi có
-  bucket, đặt `E2E_STORAGE_READY=1` để T14 đòi tải lên thành công.
+- **T14 (Lab 3):** chưa có Storage bucket nên kết quả đúng là câu báo lỗi kèm "Thử lại" (3/3).
+  Ở Final, PDF lưu trên máy nên T14 đòi lưu và mở hộp chia sẻ thành công; cần chạy lại 3 lần.
 
 ### Phiên khám phá X01
 
@@ -162,7 +162,7 @@ cấm đăng xuất, xoá tài khoản và gửi ra ngoài app. Sau khi chạy, 
 
 - **T15 và T16 chưa chạy**: cần một tài khoản email chỉ dùng cho test.
   Đặt `E2E_EMAIL`, `E2E_PASSWORD` rồi chạy `uv run pytest -k "t15 or t16"`.
-- T14 chỉ kiểm tra nhánh lỗi cho tới khi có Storage bucket (gói Blaze).
+- T14 (bản Final: lưu PDF trên máy) chưa chạy lại trên ARTEMIS.
 - Agent là mô hình ngôn ngữ nên kết quả có thể thay đổi giữa các lần; 3 lần mỗi ca chỉ cho
   ước lượng thô về độ ổn định.
 - Chỉ có một model (DeepSeek) và một thiết bị ảo; chưa thử điện thoại thật.
