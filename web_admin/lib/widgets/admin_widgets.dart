@@ -5,8 +5,9 @@ import 'package:not_core/not_core.dart';
 
 /// `Button/google`: nút đăng nhập theo hướng dẫn thương hiệu Google, giống nút
 /// "Tiếp tục với Google" ở màn Welcome của app (nền trắng, viền `#747775`,
-/// chữ Roboto Medium 14 `#1F1F1F`, logo chính thức). Đang xử lý thì giữ bề
-/// rộng và hiện vòng xoay.
+/// chữ Roboto Medium 14 `#1F1F1F`, logo chính thức) nhưng góc bo 8 (dạng chữ
+/// nhật Google cho phép) thay vì viên thuốc, hợp với giao diện admin. Đang xử
+/// lý thì giữ bề rộng và hiện vòng xoay.
 class GoogleSignInButton extends StatelessWidget {
   const GoogleSignInButton({
     required this.label,
@@ -64,7 +65,9 @@ class GoogleSignInButton extends StatelessWidget {
           disabledBackgroundColor: Colors.white,
           foregroundColor: _text,
           side: const BorderSide(color: _border),
-          shape: const StadiumBorder(),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.r8),
+          ),
         ),
         child: loading
             ? Stack(
