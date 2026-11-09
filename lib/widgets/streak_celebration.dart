@@ -1,3 +1,6 @@
+import 'dart:math' as math;
+
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../models/streak.dart';
@@ -18,9 +21,6 @@ class StreakCelebration extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-    final colors = AppColors.of(context);
     final milestone = streak.isMilestone;
     final (title, subtitle) = milestone
         ? (
@@ -31,6 +31,48 @@ class StreakCelebration extends StatelessWidget {
         ? ('Chuỗi đã bắt đầu!', 'Ngày thứ 2 đang chờ bạn.')
         : ('Chuỗi ${streak.current} ngày!', 'Hôm nay đã nối thêm một ngày.');
 
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: MediaQuery.disableAnimationsOf(context)
+          ? Duration.zero
+          : const Duration(milliseconds: 1250),
+      builder: (context, progress, _) {
+        final bounce = math.sin(math.pi * (progress * 2).clamp(0, 1));
+        final glow = math.sin(math.pi * progress);
+        return Stack(
+          children: [
+            _banner(context, title, subtitle, bounce, glow),
+            if (milestone && progress > 0 && progress < 1)
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: Opacity(
+                    opacity: glow,
+                    child: Transform.scale(
+                      scale: 0.75 + progress * 0.45,
+                      child: SvgPicture.asset(
+                        'assets/illustrations/confetti.svg',
+                        excludeFromSemantics: true,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _banner(
+    BuildContext context,
+    String title,
+    String subtitle,
+    double bounce,
+    double glow,
+  ) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final colors = AppColors.of(context);
     return DecoratedBox(
       decoration: BoxDecoration(
         color: colors.streakContainer,
@@ -46,15 +88,34 @@ class StreakCelebration extends StatelessWidget {
           children: <Widget>[
             DecoratedBox(
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
+                borderRadius: BorderRadius.circular(AppRadius.card),
                 color: scheme.surface,
+                boxShadow: [
+                  BoxShadow(
+                    color: colors.streak.withValues(alpha: glow * 0.55),
+                    blurRadius: 12 * glow,
+                    spreadRadius: 3 * glow,
+                  ),
+                ],
               ),
-              child: SizedBox.square(
-                dimension: AppSpace.s24 + AppSpace.s16,
-                child: Icon(
-                  Icons.local_fire_department_rounded,
-                  color: colors.streak,
-                  size: 24,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Transform.translate(
+                      offset: Offset(0, -6 * bounce),
+                      child: Transform.scale(
+                        scale: 1 + 0.22 * bounce,
+                        child: Icon(
+                          Icons.local_fire_department_rounded,
+                          color: colors.streak,
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                    Text('Hôm nay', style: theme.textTheme.labelSmall),
+                  ],
                 ),
               ),
             ),
@@ -70,7 +131,7 @@ class StreakCelebration extends StatelessWidget {
                     Text(
                       title,
                       style: theme.textTheme.titleSmall?.copyWith(
-                        color: milestone
+                        color: streak.isMilestone
                             ? colors.primaryDark
                             : scheme.onSurface,
                       ),

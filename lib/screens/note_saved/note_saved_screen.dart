@@ -11,6 +11,7 @@ import '../../router/app_routes.dart';
 import '../../theme/app_tokens.dart';
 import '../../utils/vi_date_format.dart';
 import '../../viewmodels/note_saved_view_model.dart';
+import '../../viewmodels/note_wall_view_model.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/jar_illustration.dart';
 import '../../widgets/mascot.dart';
@@ -55,6 +56,7 @@ class NoteSavedScreen extends ConsumerWidget {
                 data: (summary) => _SavedContent(
                   summary: summary,
                   onDone: goToday,
+                  wallAction: _PinNoteButton(noteId: noteId, onPinned: goToday),
                   onWriteMore: () => context.go(
                     AppRoutes.noteDetail(summary.note.id, edit: true),
                   ),
@@ -85,12 +87,14 @@ class _SavedContent extends StatelessWidget {
     required this.onDone,
     required this.onWriteMore,
     required this.onPin,
+    required this.wallAction,
   });
 
   final SavedNoteSummary summary;
   final VoidCallback onDone;
   final VoidCallback onWriteMore;
   final VoidCallback onPin;
+  final Widget wallAction;
 
   @override
   Widget build(BuildContext context) {
@@ -249,6 +253,7 @@ class _SavedContent extends StatelessWidget {
                       onPressed: onWriteMore,
                     ),
                   ],
+                  wallAction,
                 ],
               ),
             ),
@@ -257,6 +262,41 @@ class _SavedContent extends StatelessWidget {
       ),
     );
   }
+}
+
+class _PinNoteButton extends ConsumerStatefulWidget {
+  const _PinNoteButton({required this.noteId, required this.onPinned});
+
+  final String noteId;
+  final VoidCallback onPinned;
+
+  @override
+  ConsumerState<_PinNoteButton> createState() => _PinNoteButtonState();
+}
+
+class _PinNoteButtonState extends ConsumerState<_PinNoteButton> {
+  bool _saving = false;
+
+  Future<void> _pin() async {
+    setState(() => _saving = true);
+    try {
+      await ref.read(noteWallProvider.notifier).pin(widget.noteId);
+      if (mounted) widget.onPinned();
+    } on Object {
+      if (!mounted) return;
+      setState(() => _saving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Chưa dán được nốt. Thử lại nhé.')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => TextButton.icon(
+    onPressed: _saving ? null : _pin,
+    icon: const Icon(Icons.push_pin_outlined),
+    label: const Text('Dán lên tường · 2 ngày'),
+  );
 }
 
 /// Figma S04 · đạt mốc tháng: mascot Thong Thả bên trái nhãn dán tháng cỡ

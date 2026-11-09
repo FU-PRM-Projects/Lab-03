@@ -12,6 +12,7 @@ import '../utils/dates.dart';
 import '../utils/streak_stats.dart';
 import 'auth_view_model.dart';
 import 'error_messages.dart';
+import 'note_wall_view_model.dart';
 import 'view_state.dart';
 
 /// Nội dung S02 · Hôm nay.
@@ -89,12 +90,14 @@ class TodayViewModel extends Notifier<ViewState<TodaySummary>> {
         state = const Failure<TodaySummary>(ErrorMessages.slow, offline: true);
       }
     });
-    final sub = _notes
-        .watchSince(since)
-        .listen(
-          (notes) => _onNotes(notes, now),
-          onError: (Object error) => state = ErrorMessages.failure(error),
-        );
+    List<Note>? latestNotes;
+    ref.listen(noteWallProvider, (_, _) {
+      if (latestNotes case final notes?) unawaited(_onNotes(notes, now));
+    });
+    final sub = _notes.watchSince(since).listen((notes) {
+      latestNotes = notes;
+      unawaited(_onNotes(notes, now));
+    }, onError: (Object error) => state = ErrorMessages.failure(error));
     ref.onDispose(() {
       timeout.cancel();
       sub.cancel();
@@ -116,11 +119,16 @@ class TodayViewModel extends Notifier<ViewState<TodaySummary>> {
       if (!ref.mounted) return;
     }
 
+    final pins = ref.read(noteWallProvider).asData?.value ?? const {};
     state = Data<TodaySummary>(
       TodaySummary(
         todayCount: notes.where((n) => Dates.sameDay(n.createdAt, now)).length,
         monthCount: month.length,
-        jarNotes: month.take(jarCapacity).map((n) => n.type).toList(),
+        jarNotes: month
+            .where((note) => !pins.containsKey(note.id))
+            .take(jarCapacity)
+            .map((note) => note.type)
+            .toList(),
         streak: StreakStats.summary(notes, now),
         fallenNote: hadLowDay ? _fallenNote : null,
         pendingSync: notes.any((n) => n.pendingSync),
