@@ -7,7 +7,7 @@ use std::convert::Infallible;
 
 use chrono::{FixedOffset, Utc};
 use rig_agent::{AgentBuilder, tool::{Tool, ToolContext}};
-use rig_core::providers::openrouter;
+use rig_core::{message::Message, providers::openrouter};
 use serde::Deserialize;
 use serde_json::{Value, json};
 
@@ -22,12 +22,15 @@ const SEARCH_WINDOW: i64 = 100;
 
 const PREAMBLE: &str = "Bạn là trợ lý của ứng dụng **Nốt**, một hũ ghi chú những khoảnh khắc nhỏ của người dùng. \
 Trả lời bằng tiếng Việt, ngắn gọn, ấm áp. Bạn có các công cụ để tạo nốt, xem nốt gần đây và tìm nốt. \
-Chỉ làm điều người dùng yêu cầu; không tự ý tạo nốt khi họ chỉ hỏi han. \
+Bạn nhớ các tin nhắn gần đây trong cuộc trò chuyện. Chỉ tạo nốt khi người dùng muốn lưu; \
+khi họ đã muốn lưu và nội dung đã rõ (kể cả từ các tin trước) thì tự đặt tiêu đề, chọn loại nốt hợp lý \
+rồi tạo ngay, đừng hỏi lại. Không tự ý tạo nốt khi họ chỉ hỏi han. \
 Loại nốt: chien_thang (chiến thắng nhỏ), tu_chu (tự chủ), nhat_ky (nhật ký). \
 Nếu yêu cầu mơ hồ về nội dung thì hỏi lại thay vì bịa. Không bao giờ nhắc đến uid hay chi tiết kỹ thuật.";
 
 /// Runs one agent turn for `uid` and returns the final text to send back on Discord.
 pub async fn run(
+    history: Vec<Message>,
     firebase: &FirebaseClient,
     uid: &str,
     model_id: &str,
@@ -55,7 +58,7 @@ pub async fn run(
         .tool(SearchNotes(ctx))
         .build();
 
-    let answer = agent.prompt(request).max_turns(MAX_TURNS).await?;
+    let answer = agent.prompt(request).history(history).max_turns(MAX_TURNS).await?;
     Ok(answer.to_string())
 }
 

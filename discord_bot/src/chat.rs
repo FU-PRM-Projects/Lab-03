@@ -3,11 +3,50 @@
 use std::time::{Duration, Instant};
 
 use poise::serenity_prelude as serenity;
+use rig_core::message::Message;
 
 use crate::{Data, Error, agent};
 
 const DISCORD_LIMIT: usize = 1900;
 const COOLDOWN: Duration = Duration::from_secs(3);
+
+/// How many of the latest DM messages (before the new one) the agent remembers.
+const HISTORY_MESSAGES: u8 = 20;
+const HISTORY_CHARS_PER_MESSAGE: usize = 1500;
+
+/// The last [`HISTORY_MESSAGES`] messages of this DM, oldest first, as chat history.
+async fn load_history(
+    ctx: &serenity::Context,
+    msg: &serenity::Message,
+) -> Result<Vec<Message>, Error> {
+    let mut recent = msg
+        .channel_id
+        .messages(
+            &ctx.http,
+            serenity::GetMessages::new()
+                .before(msg.id)
+                .limit(HISTORY_MESSAGES),
+        )
+        .await?;
+    recent.reverse(); // Discord returns newest first.
+
+    Ok(recent
+        .iter()
+        .filter_map(|m| {
+            let text: String = m.content.trim().chars().take(HISTORY_CHARS_PER_MESSAGE).collect();
+            if text.is_empty() {
+                return None;
+            }
+            if m.author.bot {
+                Some(Message::assistant(text))
+            } else if text.starts_with('!') {
+                None // prefix commands are not conversation
+            } else {
+                Some(Message::user(text))
+            }
+        })
+        .collect())
+}
 
 pub async fn event_handler(
     ctx: &serenity::Context,
@@ -61,8 +100,12 @@ pub async fn event_handler(
         return Ok(());
     };
 
+    let history = load_history(ctx, msg).await.unwrap_or_else(|e| {
+        eprintln!("history load failed: {e}");
+        Vec::new()
+    });
     let _typing = msg.channel_id.start_typing(&ctx.http);
-    let reply = match agent::run(&data.firebase, &uid, model, text).await {
+    let reply = match agent::run(history, &data.firebase, &uid, model, text).await {
         Ok(t) if !t.trim().is_empty() => t,
         Ok(_) => "Mình chưa hiểu ý bạn, bạn nói lại giúp mình nhé.".to_string(),
         Err(e) => {
