@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:lab03/models/app_user.dart';
 import 'package:lab03/models/challenge.dart';
 import 'package:lab03/models/first_group.dart';
+import 'package:lab03/models/image_ref.dart';
 import 'package:lab03/models/mood.dart';
 import 'package:lab03/models/note.dart';
 import 'package:lab03/models/note_type.dart';
@@ -278,6 +279,7 @@ class FakeNoteRepository implements NoteRepository {
       challenge: draft.challenge,
       groupId: draft.groupId,
       isFirst: draft.groupId != null && draft.isFirst,
+      image: draft.image,
     );
     notes.add(note);
     _changes.add(null);
@@ -474,6 +476,7 @@ Note sampleNote(
   Mood? mood = Mood.on,
   String title = 'Dọn bàn học, gửi email hỏi thầy',
   bool pendingSync = false,
+  ImageRef? image,
 }) => Note(
   id: id,
   type: type,
@@ -481,6 +484,7 @@ Note sampleNote(
   mood: mood,
   createdAt: createdAt,
   pendingSync: pendingSync,
+  image: image,
 );
 
 /// Thói quen và cài đặt trong bộ nhớ. Là [HabitRepository]; dùng

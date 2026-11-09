@@ -48,7 +48,21 @@ class ShortcutButton extends StatelessWidget {
                 DecoratedBox(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: scheme.surfaceContainerHighest,
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [scheme.surface, scheme.surfaceContainerHighest],
+                    ),
+                    border: Border.all(
+                      color: scheme.primary.withValues(alpha: 0.10),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: scheme.primary.withValues(alpha: 0.08),
+                        offset: const Offset(0, 2),
+                        blurRadius: 5,
+                      ),
+                    ],
                   ),
                   child: SizedBox.square(
                     dimension: AppSize.shortcut,

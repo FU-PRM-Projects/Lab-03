@@ -4,9 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/first_group.dart';
 import '../models/image_ref.dart';
-import '../models/mood.dart';
 import '../models/note.dart';
-import '../models/note_type.dart';
 import '../services/analytics_events.dart';
 import '../services/analytics_service.dart';
 import '../services/clock.dart';
@@ -21,15 +19,18 @@ import 'today_view_model.dart';
 
 /// Việc màn S03 làm khi người dùng bấm Back (handout mục 3).
 enum ComposerBack {
-  /// Bước 1: đóng luồng, về S02.
+  /// Bước 1 chưa có dữ liệu: đóng luồng, về S02.
   close,
 
-  /// Bước 2 có dữ liệu: hỏi "Giữ nốt đang ghi?".
+  /// Bước 1 có dữ liệu (ảnh): hỏi "Giữ nốt đang ghi?".
   confirmKeepDraft,
 
-  /// Bước 3: lùi về bước 2 (ViewModel đã đổi bước).
+  /// Bước 2–3: lùi về bước trước (ViewModel đã đổi bước).
   previousStep,
 }
+
+/// Số bước của S03: chụp khoảnh khắc → chiến thắng → vài dòng.
+const int kComposerSteps = 3;
 
 class NoteComposerState {
   const NoteComposerState({
@@ -39,11 +40,10 @@ class NoteComposerState {
     this.saving = false,
     this.savedNoteId,
     this.message,
-    this.oldNote,
     this.group,
   });
 
-  /// Bước 1–3.
+  /// Bước 1–[kComposerSteps]: 1 ảnh, 2 chiến thắng, 3 vài dòng.
   final int step;
   final NoteDraft draft;
 
@@ -57,17 +57,13 @@ class NoteComposerState {
   /// Lỗi lưu cho SnackBar.
   final String? message;
 
-  /// Một nốt cũ cho ngày Mệt / Rối, hiện ở bước 2 (nhánh thay thế F1).
-  final Note? oldNote;
-
   /// Nhóm lần đầu sẽ chứa nốt ("Thử lần nữa" ở S05e).
   final FirstGroup? group;
 
-  /// Ngày rối: gợi ý "Sơ cứu 1 phút" và "1 chip là đủ".
-  bool get isRoughDay => draft.mood == Mood.roi;
-
+  /// Bước 1 (ảnh) tuỳ chọn: "Tiếp" chỉ mở khi đã có ảnh, còn không thì dùng
+  /// "Bỏ qua".
   bool get canContinue => switch (step) {
-    1 => draft.mood != null,
+    1 => draft.image != null,
     _ => draft.title.trim().isNotEmpty,
   };
 
@@ -77,7 +73,6 @@ class NoteComposerState {
     bool? saving,
     String? savedNoteId,
     String? Function()? message,
-    Note? Function()? oldNote,
     FirstGroup? Function()? group,
   }) => NoteComposerState(
     step: step ?? this.step,
@@ -86,7 +81,6 @@ class NoteComposerState {
     saving: saving ?? this.saving,
     savedNoteId: savedNoteId ?? this.savedNoteId,
     message: message == null ? this.message : message(),
-    oldNote: oldNote == null ? this.oldNote : oldNote(),
     group: group == null ? this.group : group(),
   );
 }
@@ -133,7 +127,7 @@ class NoteComposerViewModel extends Notifier<NoteComposerState> {
     unawaited(_restoreDraft());
     if (args.groupId case final id?) unawaited(_loadGroup(id));
     return NoteComposerState(
-      step: args.step.clamp(1, 3),
+      step: args.step.clamp(1, kComposerSteps),
       quickWins: ref.read(remoteConfigServiceProvider).quickWinChips,
     );
   }
@@ -148,7 +142,6 @@ class NoteComposerViewModel extends Notifier<NoteComposerState> {
     }
     if (!ref.mounted || draft == null || state.draft.hasInput) return;
     state = state.copyWith(draft: draft);
-    unawaited(_loadOldNoteIfLow());
   }
 
   Future<void> _loadGroup(String id) async {
@@ -167,11 +160,6 @@ class NoteComposerViewModel extends Notifier<NoteComposerState> {
   /// Bỏ "Xếp vào nhóm" ở bước 2: nốt lưu như bình thường.
   void clearGroup() => state = state.copyWith(group: () => null);
 
-  void selectMood(Mood mood) {
-    state = state.copyWith(draft: state.draft.copyWith(mood: mood));
-    unawaited(_loadOldNoteIfLow());
-  }
-
   void setTitle(String title) =>
       state = state.copyWith(draft: state.draft.copyWith(title: title));
 
@@ -185,16 +173,25 @@ class NoteComposerViewModel extends Notifier<NoteComposerState> {
   void removeImage() =>
       state = state.copyWith(draft: state.draft.copyWith(clearImage: true));
 
+  bool get _uploadingImage =>
+      ref.read(imageUploadViewModelProvider(ImageFolder.note)).busy;
+
   void next() {
-    if (!state.canContinue || state.step >= 3) return;
+    if (!state.canContinue || state.step >= kComposerSteps) return;
+    // Ảnh còn đang tải: đi tiếp lúc này sẽ làm mất ảnh.
+    if (state.step == 1 && _uploadingImage) return;
     state = state.copyWith(step: state.step + 1);
+  }
+
+  /// "Bỏ qua" ở bước chụp ảnh: sang bước chiến thắng, nốt không kèm ảnh.
+  void skipPhoto() {
+    if (state.step != 1 || _uploadingImage) return;
+    state = state.copyWith(step: 2);
   }
 
   ComposerBack back() {
     switch (state.step) {
       case 1:
-        return ComposerBack.close;
-      case 2:
         return state.draft.hasInput
             ? ComposerBack.confirmKeepDraft
             : ComposerBack.close;
@@ -224,8 +221,7 @@ class NoteComposerViewModel extends Notifier<NoteComposerState> {
     // ảnh rồi rời màn hình làm huỷ luôn lần tải. Chờ tải xong (hoặc huỷ).
     if (ref.read(imageUploadViewModelProvider(ImageFolder.note)).busy) return;
     final title = state.draft.title.trim();
-    if (state.draft.mood == null ||
-        title.isEmpty ||
+    if (title.isEmpty ||
         title.length > NoteLimits.title ||
         state.draft.body.length > NoteLimits.body) {
       return;
@@ -298,17 +294,4 @@ class NoteComposerViewModel extends Notifier<NoteComposerState> {
   }
 
   void clearMessage() => state = state.copyWith(message: () => null);
-
-  Future<void> _loadOldNoteIfLow() async {
-    if (!(state.draft.mood?.isLow ?? false) || state.oldNote != null) return;
-    try {
-      final notes = await _notes.list(limit: 20);
-      final wins = notes.where((n) => n.type == NoteType.chienThang).toList();
-      if (!ref.mounted || wins.isEmpty) return;
-      final today = ref.read(clockProvider).now();
-      state = state.copyWith(oldNote: () => wins[today.day % wins.length]);
-    } on Object {
-      // Nốt cũ chỉ là phần thêm; không có thì thôi.
-    }
-  }
 }
