@@ -72,6 +72,34 @@ Kho thẻ thử thách (`challenges`, chỉ đọc với người dùng) nạp t
 - Thẻ cấp 3 "Chào 1 câu ở phòng chung" mở phòng Discord: link lấy từ Remote Config `discord_invite_url` / `discord_channel_map` (mặc định là link mẫu trong `InAppRemoteConfig`).
 - Project thật: đặt `GOOGLE_APPLICATION_CREDENTIALS` trỏ tới file khoá service account để **ngoài** repo, rồi `npm run seed -- <project-id>`.
 
+### Web admin (`web_admin/`)
+
+Web admin cho `staff` / `admin`, bản deploy ở `https://prm393-not-lab3.web.app/admin/`. Chạy trên máy:
+
+```sh
+cd web_admin
+flutter pub get
+flutter run -d chrome       # nối Firebase thật, đăng nhập Google
+flutter test
+```
+
+Tài khoản phải có `role` là `staff` hoặc `admin`, nếu không web admin từ chối. Lần đầu đăng nhập, web admin tạo `users/{uid}` với `role = user`; nhờ admin đổi ở màn **Người dùng**, hoặc (admin đầu tiên) sửa `role` thành `admin` trong Firebase Console → Firestore → `users`.
+
+Chạy với Emulator (dữ liệu giả, không đụng project thật). Emulator cần Java 17+ (chưa cài Java thì dùng JDK đi kèm Android Studio, thư mục `jbr` trong chỗ cài Android Studio, ví dụ `C:\Program Files\Android\Android Studio\jbr`; đặt `JAVA_HOME` trỏ tới đó):
+
+```sh
+# cửa sổ 1
+cd firebase && npm run emulators
+# cửa sổ 2
+cd firebase && npm run seed:emulator                                  # nạp kho thẻ
+# tạo tài khoản email ở http://localhost:4000/auth, rồi cấp quyền:
+cd firebase && npm run role:emulator -- admin@example.test admin
+cd firebase && npm run seed:submissions -- user@example.test         # (tuỳ chọn) 3 thẻ chờ duyệt mẫu
+cd web_admin && flutter run -d chrome --dart-define=USE_FIREBASE_EMULATOR=true
+```
+
+Bản Emulator có thêm mục **"Tài khoản thử trên Emulator"** ở màn đăng nhập (email + mật khẩu); bản thật chỉ có Google. Chi tiết từng màn ở [`web_admin/README.md`](web_admin/README.md).
+
 ### Firebase
 
 Project thật: **`prm393-not-lab3`** — Android app `com.quanphungg.lab03` và web app `1:1069128102779:web:4f900912701ead247203de`. `flutterfire configure` đã sinh `lib/firebase_options.dart` (có cả `web` và `android`) và `android/app/google-services.json`; không sửa tay hai file này — cần đổi cấu hình thì chạy lại lệnh đó.
