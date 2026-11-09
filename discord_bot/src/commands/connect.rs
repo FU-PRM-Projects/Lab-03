@@ -1,6 +1,11 @@
+use std::time::{Duration, Instant};
+
+use poise::serenity_prelude as serenity;
 use rand::RngExt;
 
 use crate::{Context, Error};
+
+const POLL_INTERVAL: Duration = Duration::from_secs(3);
 
 const CODE_CHARS: &[u8] = b"ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const CODE_LEN: usize = 6;
@@ -61,5 +66,47 @@ pub async fn connect(ctx: Context<'_>) -> Result<(), Error> {
     );
 
     ctx.say(response).await?;
+
+    spawn_link_watcher(ctx, author.id);
     Ok(())
+}
+
+/// Watches `discordLinks/{discordId}` after a code is issued and DMs the user once the app redeems it.
+/// A new `/connect` replaces any previous watcher for the same user, so only one DM is ever sent.
+fn spawn_link_watcher(ctx: Context<'_>, user_id: serenity::UserId) {
+    let discord_id = user_id.to_string();
+    let http = ctx.serenity_context().http.clone();
+    let firebase = ctx.data().firebase.clone();
+    let watchers = ctx.data().link_watchers.clone();
+
+    let key = discord_id.clone();
+    let cleanup = watchers.clone();
+    let handle = tokio::spawn(async move {
+        let deadline = Instant::now() + Duration::from_secs(CODE_TTL_MINUTES as u64 * 60 + 30);
+        while Instant::now() < deadline {
+            tokio::time::sleep(POLL_INTERVAL).await;
+            match firebase.get_linked_uid(&discord_id).await {
+                Ok(Some(_)) => {
+                    let msg = serenity::CreateMessage::new().content(
+                        "🎉 **Liên kết thành công!** Tài khoản Discord của bạn đã được liên kết với tài khoản **Nốt**.",
+                    );
+                    if let Err(e) = user_id.direct_message(&http, msg).await {
+                        eprintln!("Failed to DM link confirmation to {discord_id}: {e}");
+                    }
+                    break;
+                }
+                Ok(None) => {}
+                Err(e) => eprintln!("Link watcher poll failed for {discord_id}: {e}"),
+            }
+        }
+        if let Ok(mut map) = cleanup.lock() {
+            map.remove(&discord_id);
+        }
+    });
+
+    if let Ok(mut map) = watchers.lock() {
+        if let Some(old) = map.insert(key, handle) {
+            old.abort();
+        }
+    }
 }

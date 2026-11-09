@@ -8,6 +8,12 @@ import '../../widgets/app_button.dart';
 import '../../widgets/app_dialog.dart';
 import '../../widgets/app_text_field.dart';
 
+/// Link cài Nốt Bot vào tài khoản Discord của người dùng (User Install).
+const String kDiscordBotInstallUrl =
+    'https://discord.com/oauth2/authorize'
+    '?client_id=1568528720203878460&integration_type=1'
+    '&scope=applications.commands';
+
 /// Mở sheet liên kết (hoặc xem / ngắt liên kết) tài khoản Discord với Nốt.
 ///
 /// Mỗi tài khoản Nốt chỉ liên kết với 1 tài khoản Discord duy nhất thông qua
@@ -20,6 +26,36 @@ Future<void> showDiscordConnectSheet(BuildContext context) =>
       showDragHandle: true,
       builder: (_) => const _DiscordConnectSheet(),
     );
+
+class _SetupStep extends StatelessWidget {
+  const _SetupStep({required this.number, required this.text});
+
+  final int number;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: AppSpace.s12,
+      children: <Widget>[
+        CircleAvatar(
+          radius: 12,
+          backgroundColor: theme.colorScheme.primary,
+          child: Text(
+            '$number',
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: theme.colorScheme.onPrimary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        Expanded(child: Text(text, style: theme.textTheme.bodyMedium)),
+      ],
+    );
+  }
+}
 
 class _DiscordConnectSheet extends ConsumerStatefulWidget {
   const _DiscordConnectSheet();
@@ -56,6 +92,14 @@ class _DiscordConnectSheetState extends ConsumerState<_DiscordConnectSheet> {
       };
     }
     return 'Chưa liên kết được. Thử lại sau ít phút nhé.';
+  }
+
+  Future<void> _openBotInstall() async {
+    final opened = await ref
+        .read(discordServiceProvider)
+        .open(kDiscordBotInstallUrl);
+    if (opened || !mounted) return;
+    setState(() => _error = 'Không mở được Discord. Thử lại sau nhé.');
   }
 
   Future<void> _submit() async {
@@ -240,18 +284,39 @@ class _DiscordConnectSheetState extends ConsumerState<_DiscordConnectSheet> {
           ),
         ),
         Text(
-          'Nhắn trực tiếp (DM) lệnh /connect hoặc !connect cho Nốt Bot trên '
-          'Discord để nhận mã 6 ký tự. Mỗi tài khoản chỉ liên kết với 1 tài '
-          'khoản Discord duy nhất.',
+          'Làm theo 3 bước để liên kết. Mỗi tài khoản Nốt chỉ liên kết với 1 '
+          'tài khoản Discord duy nhất.',
           style: theme.textTheme.bodyMedium?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
+        ),
+        const _SetupStep(
+          number: 1,
+          text:
+              'Thêm Nốt Bot vào tài khoản Discord của bạn (chỉ cần làm một '
+              'lần). Bấm nút bên dưới, chọn "Thêm vào ứng dụng của tôi" rồi '
+              '"Cho phép".',
+        ),
+        AppButton(
+          label: 'Thêm Nốt Bot vào Discord',
+          variant: AppButtonVariant.tonal,
+          expand: true,
+          onPressed: _openBotInstall,
+        ),
+        const _SetupStep(
+          number: 2,
+          text:
+              'Mở tin nhắn riêng (DM) với Nốt Bot trên Discord và gửi lệnh '
+              '/connect (hoặc !⁠connect) để nhận mã 6 ký tự.',
+        ),
+        const _SetupStep(
+          number: 3,
+          text: 'Nhập mã vào ô bên dưới. Mã có hiệu lực trong 10 phút.',
         ),
         AppTextField(
           label: 'Mã kết nối',
           hint: 'Ví dụ: A1B2C3',
           controller: _code,
-          autofocus: true,
           maxLength: 6,
           errorText: _error,
           textInputAction: TextInputAction.done,

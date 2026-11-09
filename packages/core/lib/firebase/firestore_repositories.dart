@@ -489,7 +489,49 @@ class FirestoreDashboardRepository implements DashboardRepository {
       for (final topic in ChallengeTopic.values)
         _count(cards.where('topic', isEqualTo: topic.id)),
     ]);
+    final today = DateTime.now();
+    final start = DateTime(
+      today.year,
+      today.month,
+      today.day - (DashboardStats.days - 1),
+    );
+    final since = Timestamp.fromDate(start);
+    // Hai truy vấn nhỏ (tối đa vài trăm tài liệu trong 14 ngày), gom theo
+    // ngày trên máy; Firestore không có truy vấn tổng hợp theo nhóm.
+    final recent = await Future.wait(<Future<QuerySnapshot<JsonMap>>>[
+      users.where('createdAt', isGreaterThanOrEqualTo: since).limit(1000).get(),
+      submissions
+          .where('createdAt', isGreaterThanOrEqualTo: since)
+          .limit(1000)
+          .get(),
+    ]);
+    List<int> perDay(QuerySnapshot<JsonMap> snapshot) {
+      final buckets = List<int>.filled(DashboardStats.days, 0);
+      for (final doc in snapshot.docs) {
+        final at = _date(doc.data()['createdAt']);
+        if (at == null) continue;
+        final local = at.toLocal();
+        final index = DateTime(
+          local.year,
+          local.month,
+          local.day,
+        ).difference(start).inDays;
+        if (index >= 0 && index < DashboardStats.days) buckets[index]++;
+      }
+      return buckets;
+    }
+
+    final newUsers = perDay(recent[0]);
+    final sent = perDay(recent[1]);
     return DashboardStats(
+      daily: <DailyActivity>[
+        for (var i = 0; i < DashboardStats.days; i++)
+          DailyActivity(
+            day: DateTime(start.year, start.month, start.day + i),
+            newUsers: newUsers[i],
+            submissions: sent[i],
+          ),
+      ],
       users: counts[0],
       staff: counts[1],
       cards: counts[2],

@@ -37,7 +37,7 @@ Tab cấp cao giữ đúng Lab 2: Hôm nay, Hũ, Thử thách, Hành trình tron
 | Dialog "Xoá nốt này?" + snackbar Hoàn tác 5 giây | S06 → S05 | `showAppDialog(kind: destructive)` + `SnackBar` 5 giây có "Hoàn tác" (`NoteDeleter`) | Done |
 | Dialog "Đăng xuất khỏi Nốt?" | S12 | `showAppDialog(kind: confirmation)` | Done |
 | Dialog "Bỏ thay đổi?" | S06 (sửa) | `showAppDialog(kind: confirmation)` | Done |
-| Xin quyền thông báo Android 13+ | P1, P8 | `MessagingService.requestPermission()` (dialog hệ thống) | Planned |
+| Xin quyền thông báo Android 13+ | P1, P8 | `MessagingService.requestPermission()` (dialog hệ thống) | Done (khi bật lời nhắc và khi mở hộp thư) |
 | Banner "Offline · đã lưu trên máy" | S02, S04, S05 | `OfflineBanner` | Done |
 | Empty state "Hũ còn trống" | S05 | `EmptyState` | Done |
 | Loading skeleton "Đang tải lịch năng lượng…" | S05, S11c | `LoadingState.skeleton` | Done |
@@ -56,8 +56,8 @@ Các section `AI · Nốt sắp xếp giúp (Gemini)`, `Làm quen & Tụi Nốt 
 | Mã | Màn hình (Figma) | Route | Screen widget | ViewModel | Nguồn dữ liệu | Trạng thái |
 |---|---|---|---|---|---|---|
 | S03b AI | Ghi nốt bước 2 · Kể tự do, đang đọc, gợi ý để xác nhận, AI nghỉ, lần đầu dùng (quyền riêng tư), gợi ý nhóm & lần đầu | `/note/new?step=2` (tab "Kể tự do") | `NoteComposerScreen` + `FreeTellPanel` | `NoteComposerViewModel`, `AiSortViewModel` | `AiService.sortNotes()` (Gemini qua Firebase AI Logic, App Check), Remote Config `ai_*`; đồng ý lần đầu lưu `users/{uid}/private/settings.aiConsent` | Planned |
-| S04 nhóm | Lần đầu tiên! (nhóm mới) | `/note/saved/:id` | `NoteSavedScreen` (biến thể `isFirst`) | `NoteSavedViewModel` | Nốt có `isFirst`, nhóm `groups/{uid}/items/{groupId}` | Planned |
-| S05 kệ | Hũ & Nhật ký · kệ "Nhóm lần đầu" | `/jar` | `JarScreen` + `GroupShelf` | `JarViewModel`, `GroupsViewModel` | Firestore `groups/{uid}/items` | Planned |
+| S04 nhóm | Lần đầu tiên! (nhóm mới) | `/note/saved/:id` | `NoteSavedScreen` (biến thể `isFirst`) | `NoteSavedViewModel` | Nốt có `isFirst`, nhóm `users/{uid}/groups/{groupId}` (D-22) | Done |
+| S05 kệ | Hũ & Nhật ký · kệ "Nhóm lần đầu" | `/jar` | `JarScreen` + `GroupShelf` | `JarViewModel`, `GroupsViewModel` | Firestore `users/{uid}/groups` (D-22) | Done |
 | S05e | Chi tiết nhóm (Bắt chuyện, lối vào phòng Discord) | `/jar/groups/:groupId` | `GroupDetailScreen` | `GroupDetailViewModel` | `groups/{uid}/items/{groupId}`, nốt có `groupId`; Remote Config `discord_channel_map` | Done (lối vào phòng Discord: D-30) |
 | S08b | Tập nói với Tụi Nốt (AI), vai người trong #chao-hoi | `/challenges/:id/practice?role=` | `PracticeChatScreen` | `PracticeChatViewModel` | `AiService.roleplay()` (tối đa `ai_roleplay_max_turns` lượt, không lưu đoạn chat); lỗi → câu mở lời có sẵn | Planned |
 | S08c | Sau thử thách · lời nhắn Tụi Nốt (AI), cần hỗ trợ | `/challenges/:id/message` | `ChallengeMessageScreen` | `ChallengeMessageViewModel` | `AiService.afterChallenge()` → `{message, needs_support}`; lưu lời nhắn kèm nốt | Planned |
@@ -72,11 +72,11 @@ Các section `AI · Nốt sắp xếp giúp (Gemini)`, `Làm quen & Tụi Nốt 
 | Dialog / sheet mới | Ở màn | Flutter | Trạng thái |
 |---|---|---|---|
 | Sheet "Nốt AI" lần đầu dùng (gửi gì, không gửi gì) | S03b | `showModalBottomSheet` | Planned |
-| Sheet tạo nhóm lần đầu; lỗi trùng tên → "Xếp vào nhóm đó" | S05, S03b | `showCreateGroupSheet` + `GroupNameValidator` (bỏ dấu, không phân biệt hoa thường, 1–24 ký tự) | Planned |
+| Sheet tạo nhóm lần đầu; lỗi trùng tên → "Xếp vào nhóm đó" | S05, S03b | `showCreateGroupSheet` + `GroupNameValidator` (bỏ dấu, không phân biệt hoa thường, 1–24 ký tự) | Done |
 | Sheet quy tắc trước khi vào Discord (lần đầu) | S14, S05e, S08 | `showDiscordRulesSheet` + cờ `discord_rules_seen` (`shared_preferences`) | Done |
 | Dialog "Chưa mở được Discord" (Mở bằng web / Sao chép) | S14, S08d | `showAppDialog(kind: confirmation)` + `Clipboard` + snackbar "Đã sao chép" | Done |
 | Thẻ hỗ trợ "Nói với người bạn tin" khi `needs_support` | S03b, S08c | Dùng lại dialog P6 | Planned |
-| Snackbar Hoàn tác 5 giây khi xoá nhóm | S05e | `SnackBar` (nốt giữ lại, `groupId = null`) | Planned |
+| Snackbar Hoàn tác 5 giây khi xoá nhóm | S05e | `SnackBar` (nốt giữ lại, `groupId = null`) | Done |
 
 ---
 
@@ -89,22 +89,22 @@ Mã test case (`TC-xx`) sẽ được gán trong `docs/test-plan.md` ở Stage 6
 | F1 Ghi nốt buổi tối | S02 → S03a → S03b → S03c → S04 → S02 (hoặc thông báo 21:30 → S03a) | Bỏ qua phần kể thêm; tâm trạng Rối → "Sơ cứu 1 phút"; thoát giữa chừng → dialog Giữ nháp; mất mạng → lưu trên máy + banner | Done (Stage 4) |
 | F2 Tự chủ | S02 → S09 → S04 → S02; khó dừng: S02 (lối tắt Stress?) → S10 → S04 | Đã lỡ lướt → sheet + "Nhận ra cũng là bắt đầu tự chủ"; phần thói quen khoá bằng `local_auth` | Done (Stage 4; bật khoá ở S12 làm cùng S12) |
 | F3 Thử thách | S07 → S08 → S04 → S07 | Đổi thẻ dễ hơn; để mai (Back, không trừ gì); Không như ý → "Mình đã mở lời" | Done (Stage 4) |
-| P1 Làm quen lần đầu | S01 → (xin quyền thông báo) → S02 | Đăng nhập thất bại / huỷ → SnackBar + Thử lại | Một phần: đăng nhập, huỷ, mất mạng (Stage 3); xin quyền thông báo ở Stage 5 |
+| P1 Làm quen lần đầu | S01 → (xin quyền thông báo) → S02 | Đăng nhập thất bại / huỷ → SnackBar + Thử lại | Done (xin quyền thông báo khi bật lời nhắc / mở hộp thư) |
 | P2 Đăng ký email & quên mật khẩu | S01 (form email) → S02 | Lỗi dưới ô; quên mật khẩu → thông báo chung | Done (form email trong bottom sheet) |
 | P3 Ghi một lần vận động | S02 → S07 → S08 → S04 | Dừng sớm vẫn lưu số phút | Done (Stage 4) |
 | P4 Viết nhật ký dài | S05 → S06 (sửa) | Bí ý → câu gợi ý; app bị tắt → "Tiếp tục bản nháp?" | Một phần: nút "Gợi ý" (Stage 4); nháp khi app bị tắt chưa làm |
 | P5 Xem, sửa, xoá một nốt | S05 → S06 → S05 | Dialog xoá + Hoàn tác 5 giây | Done (Stage 4) |
 | P6 Ngày tệ: nhìn lại hành trình | S11 → S05 → S06 | Mệt/Rối 5 ngày liền → dialog hỗ trợ | Done (Stage 4) |
-| P7 Thông báo → mở đúng màn | Thông báo → S03 / S02 / S08 | Chưa đăng nhập → S01 rồi mới tới đích (`?next=`) | Một phần: redirect `?next=` (Stage 3); nhận thông báo ở Stage 5 |
-| P8 Hồ sơ & cài đặt | S02 → S12 → (đăng xuất) S01 | Từ chối quyền thông báo → banner "Mở cài đặt" | Một phần: giờ nhắc, Giờ tỉnh, khoá, Nốt AI, ẩn nội dung, đăng xuất (Stage 4); lời nhắc buổi tối và Giờ tỉnh bằng thông báo trên máy (D-27); banner quyền thông báo ở Stage 5 (FCM) |
+| P7 Thông báo → mở đúng màn | Thông báo → S03 / S02 / S08 | Chưa đăng nhập → S01 rồi mới tới đích (`?next=`) | Done (FCM 3 trạng thái app, lời nhắc trên máy, `?next=`) |
+| P8 Hồ sơ & cài đặt | S02 → S12 → (đăng xuất) S01 | Từ chối quyền thông báo → banner "Mở cài đặt" | Done, trừ "Làm lại khảo sát" (đi cùng A2) |
 | T1 Hũ rỗng | S05 → S03 → S04 | Empty state + "Ghi nốt đầu tiên" | Done (Stage 4) |
 | T2 Mất mạng / tải lỗi | S05, S11 | Error state + Thử lại; có dữ liệu cũ → banner | Done (Stage 4) |
 | T3 Đang tải → kết quả | S11c | Quá 10 giây → T2 | Done (Stage 4) |
-| T4 Bố cục 360 dp / 412 dp | S02, S03b, S09, S11b | Nội dung giãn theo chiều ngang, bottom nav căn giữa, FAB bám phải, biểu đồ co giãn (D-09) | Planned (golden test 360 × 800 và 412 × 915) |
+| T4 Bố cục 360 dp / 412 dp | S02, S03b, S09, S11b | Nội dung giãn theo chiều ngang, bottom nav căn giữa, FAB bám phải, biểu đồ co giãn (D-09) | Done bằng widget test ở 360 và 412 dp; bỏ golden test (xem gap-review) |
 | A1 Nốt AI · Kể tự do | S03a → S03b (Kể tự do → đang đọc → gợi ý) → S03c → S04 | Lần đầu → sheet quyền riêng tư; hết lượt / mất mạng / quá 8 giây / `ai_enabled = false` → giữ đoạn viết, chọn tay; `needs_support` → thẻ hỗ trợ; huỷ khi đang đọc | Planned |
 | A2 Làm quen & thẻ khởi đầu | S01 (đăng ký) → S13a → S13b → S13c → S13d → S13e → S13f → S02; làm lại từ S12 | Bỏ qua câu 1 → cấp 1; AI lỗi / tắt → S13g (bảng luật); chọn tối đa 2 mục tiêu | Done trừ hồ sơ do AI (dùng bảng luật); mở lại từ S12 · Tài khoản |
 | A3 Tập nói & lời nhắn | S07 → S08 → S08b → S08 → (Kết quả) → S08c → S04 | AI lỗi → ẩn chat, giữ câu mở lời; `needs_support` → thẻ hỗ trợ | Planned |
-| G1 Nhóm lần đầu | S03b (gợi ý nhóm) → S04 "Lần đầu tiên!" → S05 kệ → S05e | Tạo nhóm: tên trùng → "Xếp vào nhóm đó", tên rỗng → nút tắt; xoá nhóm → Hoàn tác | Planned |
+| G1 Nhóm lần đầu | S03b (gợi ý nhóm) → S04 "Lần đầu tiên!" → S05 kệ → S05e | Tạo nhóm: tên trùng → "Xếp vào nhóm đó", tên rỗng → nút tắt; xoá nhóm → Hoàn tác | Done, trừ gợi ý nhóm bằng AI ở S03b (đi cùng A1) |
 | D1 Phòng Discord | S05e / S12 → S14 → (S14b lần đầu) → Discord → S08 "Bạn vừa ghé phòng chung" → S04 | Mở link thất bại → dialog (Mở bằng web / Sao chép); `discord_enabled = false` → ẩn mọi lối vào | Done |
 | D2 Thử thách cấp 3 #chao-hoi | S07 → S08 (cấp 3) → S08b (vai #chao-hoi) → S08d → Discord → S08 → S04 | AI nghỉ → câu chào có sẵn; mở thất bại → dialog | Một phần: S07 → S08 → S08d → Discord → S08 → S04; S08b chờ Tụi Nốt AI |
 

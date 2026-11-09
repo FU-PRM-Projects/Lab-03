@@ -80,12 +80,14 @@ class TabScaffold extends ConsumerWidget {
     required this.title,
     required this.body,
     this.showAddNote = true,
+    this.raisedHeader = false,
     super.key,
   });
 
   final String title;
   final Widget body;
   final bool showAddNote;
+  final bool raisedHeader;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -103,6 +105,7 @@ class TabScaffold extends ConsumerWidget {
               onNotifications: () => openNotificationInbox(context, ref),
               onProfile: () => context.push(AppRoutes.settings),
               photo: photo,
+              raised: raisedHeader,
               unread: ref.watch(unreadInboxCountProvider),
             ),
             Expanded(child: body),

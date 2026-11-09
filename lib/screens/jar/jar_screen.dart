@@ -532,6 +532,7 @@ class _GridSection extends StatelessWidget {
                           key: ValueKey<String>(notes[i].id),
                           type: notes[i].type,
                           title: notes[i].title,
+                          image: notes[i].image,
                           dateLabel: _noteMeta(notes[i], section, now),
                           onTap: () =>
                               context.push(AppRoutes.noteDetail(notes[i].id)),
@@ -564,6 +565,7 @@ class _ListSection extends StatelessWidget {
         key: ValueKey<String>(notes[i].id),
         type: notes[i].type,
         title: notes[i].title,
+        image: notes[i].image,
         meta: <String>[
           notes[i].type.label,
           _noteMeta(notes[i], section, now),

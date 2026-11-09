@@ -115,6 +115,7 @@ class DashboardStats {
     required this.rejected,
     required this.announcements,
     required this.cardsByTopic,
+    this.daily = const <DailyActivity>[],
   });
 
   final int users;
@@ -127,8 +128,27 @@ class DashboardStats {
   final int announcements;
   final Map<ChallengeTopic, int> cardsByTopic;
 
+  /// [DashboardStats.days] ngày gần nhất, cũ nhất trước.
+  final List<DailyActivity> daily;
+
+  /// Số ngày của biểu đồ hoạt động.
+  static const int days = 14;
+
   int get activeCards => cards - archivedCards;
   int get reviewed => approved + rejected;
+}
+
+/// Hoạt động trong một ngày (giờ máy): người dùng mới và thẻ được gửi duyệt.
+class DailyActivity {
+  const DailyActivity({
+    required this.day,
+    this.newUsers = 0,
+    this.submissions = 0,
+  });
+
+  final DateTime day;
+  final int newUsers;
+  final int submissions;
 }
 
 abstract interface class DashboardRepository {

@@ -1,8 +1,10 @@
 import 'package:material_ui/material_ui.dart';
 
+import '../models/image_ref.dart';
 import '../models/note_type.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_tokens.dart';
+import 'app_network_image.dart';
 import 'note_type_icon.dart';
 
 /// Component `Card/Nốt`: 4 loại × Default, Pressed.
@@ -13,12 +15,16 @@ class NoteCard extends StatelessWidget {
     required this.type,
     required this.title,
     required this.meta,
+    this.image,
     this.onTap,
     super.key,
   });
 
   final NoteType type;
   final String title;
+
+  /// Ảnh khoảnh khắc của nốt: có thì hiện thay cho biểu tượng loại nốt.
+  final ImageRef? image;
 
   /// Dòng phụ, ví dụ "Chiến thắng · 24/10".
   final String meta;
@@ -33,7 +39,7 @@ class NoteCard extends StatelessWidget {
 
     return Semantics(
       button: onTap != null,
-      label: '$title, $meta',
+      label: <String>[title, meta, if (image != null) 'có ảnh'].join(', '),
       onTap: onTap,
       excludeSemantics: true,
       child: Material(
@@ -54,16 +60,23 @@ class NoteCard extends StatelessWidget {
               ),
               child: Row(
                 children: <Widget>[
-                  DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: colors.noteTint(type),
-                      borderRadius: BorderRadius.circular(AppRadius.r12),
+                  if (image case final ImageRef photo)
+                    AppNetworkImage.square(
+                      image: photo,
+                      semanticLabel: 'Ảnh của nốt',
+                      size: 44,
+                    )
+                  else
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: colors.noteTint(type),
+                        borderRadius: BorderRadius.circular(AppRadius.r12),
+                      ),
+                      child: SizedBox.square(
+                        dimension: 44,
+                        child: Icon(type.icon, color: colors.onSurfaceMuted),
+                      ),
                     ),
-                    child: SizedBox.square(
-                      dimension: 44,
-                      child: Icon(type.icon, color: colors.onSurfaceMuted),
-                    ),
-                  ),
                   const SizedBox(width: AppSpace.s12),
                   Expanded(
                     child: Column(
