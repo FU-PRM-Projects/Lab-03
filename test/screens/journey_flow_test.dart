@@ -3,6 +3,7 @@ import 'package:lab03/models/challenge.dart';
 import 'package:lab03/models/mood.dart';
 import 'package:lab03/models/note.dart';
 import 'package:lab03/screens/challenge_detail/challenge_detail_screen.dart';
+import 'package:lab03/screens/challenges/challenges_screen.dart';
 import 'package:lab03/screens/journey/journey_screen.dart';
 import 'package:lab03/screens/journey/weekly_card_page.dart';
 import 'package:lab03/screens/note_detail/note_detail_screen.dart';
@@ -47,7 +48,7 @@ void main() {
       tester,
     ) async {
       await openJourney(tester, notes: monthOfNotes(), size: size);
-      expect(find.text('CHẶNG 1 · DŨNG CẢM'), findsOneWidget);
+      expect(find.text('ĐANG LEO · DŨNG CẢM'), findsOneWidget);
 
       await openTab(tester, 'Thống kê');
       expect(find.text('Nốt tuần này'), findsOneWidget);
@@ -83,6 +84,84 @@ void main() {
     expect(find.byType(ChallengeDetailScreen), findsOneWidget);
   });
 
+  testWidgets('chạm banner mở S08 của thẻ đang làm', (tester) async {
+    final services = TestServices();
+    services.challenges.progress[ChallengeTopic.dungCam] =
+        const ChallengeProgress(completed: <String>{'dc-1-1'});
+    await pumpApp(tester, services: services);
+    await tester.tap(findTab('Hành trình'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(
+      find.bySemanticsLabel(RegExp(r'^Đang leo Dũng cảm: .*Mở thẻ$')),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byType(ChallengeDetailScreen), findsOneWidget);
+  });
+
+  testWidgets('nút sổ tay trên banner mở tab Thử thách', (tester) async {
+    await pumpApp(tester, services: TestServices());
+    await tester.tap(findTab('Hành trình'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel('Danh sách thẻ. Mở Thử thách'));
+    await tester.pumpAndSettle();
+    expect(find.byType(ChallengesScreen), findsOneWidget);
+  });
+
+  testWidgets('con đường leo lên: thẻ đã xong ở dưới, đích ở đỉnh', (
+    tester,
+  ) async {
+    final services = TestServices();
+    services.challenges.progress[ChallengeTopic.dungCam] =
+        const ChallengeProgress(completed: <String>{'dc-1-1'});
+    await pumpApp(tester, services: services);
+    await tester.tap(findTab('Hành trình'));
+    await tester.pumpAndSettle();
+
+    // Thẻ đã xong nằm thấp hơn thẻ đang làm (leo từ dưới lên).
+    final done = tester.getCenter(find.bySemanticsLabel(RegExp(r', đã xong$')));
+    final current = tester.getCenter(
+      find.bySemanticsLabel(RegExp(r', đang làm$')),
+    );
+    expect(done.dy, greaterThan(current.dy));
+
+    // Chặng đang leo ở chân đường, dưới thẻ đã xong.
+    final sign = tester.getCenter(find.bySemanticsLabel('Chặng 1 · xuất phát'));
+    expect(sign.dy, greaterThan(done.dy));
+
+    // Cuộn lên tới đỉnh: chặng sau (đang khóa) và huy hiệu chủ đề ở trên.
+    final summit = find.bySemanticsLabel(
+      RegExp(
+        r'^Chặng 2 · Dũng cảm\. chưa mở\. Lên đỉnh nhận huy hiệu Dũng cảm · xong \d+ thẻ để mở$',
+      ),
+    );
+    await tester.scrollUntilVisible(
+      summit,
+      -300,
+      scrollable: find.byType(Scrollable).last,
+    );
+    expect(summit, findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('làm thẻ không theo thứ tự: thẻ đã xong vẫn ở dưới', (
+    tester,
+  ) async {
+    final services = TestServices();
+    // Chỉ xong thẻ thứ 3 của Dũng cảm: thẻ đầu vẫn là thẻ đang làm.
+    services.challenges.progress[ChallengeTopic.dungCam] =
+        const ChallengeProgress(completed: <String>{'dc-1-3'});
+    await pumpApp(tester, services: services);
+    await tester.tap(findTab('Hành trình'));
+    await tester.pumpAndSettle();
+
+    final done = tester.getCenter(find.bySemanticsLabel(RegExp(r', đã xong$')));
+    final current = tester.getCenter(
+      find.bySemanticsLabel(RegExp(r', đang làm$')),
+    );
+    expect(done.dy, greaterThan(current.dy));
+  });
+
   testWidgets('Con đường: chip chủ đề, mỗi lần chỉ hiện một đường', (
     tester,
   ) async {
@@ -92,8 +171,8 @@ void main() {
     await pumpApp(tester, services: services);
     await tester.tap(findTab('Hành trình'));
     await tester.pumpAndSettle();
-    expect(find.text('CHẶNG 1 · DŨNG CẢM'), findsOneWidget);
-    expect(find.text('CHẶNG 1 · VẬN ĐỘNG'), findsNothing);
+    expect(find.text('ĐANG LEO · DŨNG CẢM'), findsOneWidget);
+    expect(find.text('ĐANG LEO · VẬN ĐỘNG'), findsNothing);
     expect(find.textContaining('Dũng cảm · 1/'), findsOneWidget);
 
     // Hàng chip cuộn ngang: chip sau có thể nằm ngoài mép phải.
@@ -101,15 +180,15 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.textContaining('Vận động · 0/'));
     await tester.pumpAndSettle();
-    expect(find.text('CHẶNG 1 · VẬN ĐỘNG'), findsOneWidget);
-    expect(find.text('CHẶNG 1 · DŨNG CẢM'), findsNothing);
+    expect(find.text('ĐANG LEO · VẬN ĐỘNG'), findsOneWidget);
+    expect(find.text('ĐANG LEO · DŨNG CẢM'), findsNothing);
 
     // Đổi tab rồi quay lại: vẫn ở chủ đề vừa chọn.
     await tester.tap(find.text('Thống kê'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Con đường'));
     await tester.pumpAndSettle();
-    expect(find.text('CHẶNG 1 · VẬN ĐỘNG'), findsOneWidget);
+    expect(find.text('ĐANG LEO · VẬN ĐỘNG'), findsOneWidget);
   });
 
   testWidgets('ít dữ liệu: biểu đồ thay bằng lời nhắc', (tester) async {
