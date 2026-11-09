@@ -25,6 +25,20 @@
    - Trong ứng dụng Nốt, vào **Cài đặt → Cộng đồng → Liên kết Discord** (hoặc **Phòng trò chuyện → Liên kết tài khoản Discord**) và nhập mã 6 ký tự.
    - Hệ thống đảm bảo ràng buộc **1-1**: mỗi tài khoản Nốt chỉ liên kết với duy nhất 1 tài khoản Discord.
 
+## Vai trò và web admin (Final Assignment)
+
+| Vai trò | Client | Làm gì |
+|---|---|---|
+| `user` | App mobile | Ghi nốt, nhận thử thách, gửi thẻ tự thêm lên kho chung ("Gửi cho mọi người"), đọc hộp thư |
+| `staff` | Web admin | Quản lý kho thẻ `challenges`, duyệt / từ chối thẻ người dùng gửi, gửi thông báo |
+| `admin` | Web admin | Mọi quyền của staff, cộng thêm đổi vai trò người dùng |
+
+- **Web admin:** `https://prm393-not-lab3.web.app/admin/` — mã nguồn và cách chạy ở [`web_admin/`](web_admin/README.md).
+- **Admin đầu tiên:** đặt `users/{uid}.role = "admin"` trong Firebase Console (rules chỉ cho admin đổi vai trò). _Ghi tên admin đầu tiên vào đây._
+- **Luồng liên vai trò:** người dùng gửi thẻ trên app (`pending`) → staff duyệt hoặc từ chối trên web → thẻ trên app đổi trạng thái ngay và hộp thư có tin mới.
+- **Dữ liệu và rules:** [`docs/data-model.md`](docs/data-model.md). Model, theme Lab 2 và repository Firestore dùng chung ở [`packages/core`](packages/core).
+- **Remote Config:** `challenge_submissions_enabled` bật / tắt nút gửi thẻ trên app (web admin hiện cảnh báo khi tắt).
+
 ## Tiến độ theo stage
 
 | # | Stage | Trạng thái | Đầu ra |
