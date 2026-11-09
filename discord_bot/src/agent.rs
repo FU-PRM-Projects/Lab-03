@@ -3,7 +3,10 @@
 //! The agent is built per request: its tools are bound to the caller's Firebase `uid`
 //! (resolved from the Discord link), so the model can never pick or see another user's data.
 
-use std::convert::Infallible;
+use std::{
+    convert::Infallible,
+    sync::{Arc, Mutex},
+};
 
 use chrono::{FixedOffset, Utc};
 use rig_agent::{AgentBuilder, tool::{Tool, ToolContext}};
@@ -11,7 +14,10 @@ use rig_core::{message::Message, providers::openrouter};
 use serde::Deserialize;
 use serde_json::{Value, json};
 
-use crate::{Error, firebase::FirebaseClient};
+use crate::{Error, cloudinary::Photo, firebase::FirebaseClient};
+
+/// The user's photo waiting to be attached to the next note; `create_note` takes it.
+pub type PhotoSlot = Arc<Mutex<Option<Photo>>>;
 
 pub const DEFAULT_MODEL: &str = "deepseek/deepseek-v4.1-flash-1017";
 const MAX_TURNS: usize = 5;
@@ -24,7 +30,11 @@ const PREAMBLE: &str = "Bạn là trợ lý của ứng dụng **Nốt**, một 
 Trả lời bằng tiếng Việt, ngắn gọn, ấm áp. Bạn có các công cụ để tạo nốt, xem nốt gần đây và tìm nốt. \
 Bạn nhớ các tin nhắn gần đây trong cuộc trò chuyện. Chỉ tạo nốt khi người dùng muốn lưu; \
 khi họ đã muốn lưu và nội dung đã rõ (kể cả từ các tin trước) thì tự đặt tiêu đề, chọn loại nốt hợp lý \
-rồi tạo ngay, đừng hỏi lại. Không tự ý tạo nốt khi họ chỉ hỏi han. \
+rồi tạo, đừng hỏi lại về nội dung. Không tự ý tạo nốt khi họ chỉ hỏi han. \
+Mỗi nốt có thể kèm MỘT ảnh khoảnh khắc (không bắt buộc). Trước khi tạo nốt, nếu chưa có ảnh đang chờ và bạn chưa \
+hỏi về ảnh trong cuộc trò chuyện này, hãy hỏi đúng một lần: họ có ảnh muốn đính kèm không (gửi ảnh ngay trong \
+cuộc trò chuyện, hoặc nói không/bỏ qua). Họ từ chối hoặc đã trả lời thì tạo nốt luôn, không hỏi lại. \
+Khi có ảnh đang chờ, gọi create_note với attach_photo=true; ảnh chỉ đính kèm được lúc tạo nốt mới. \
 Loại nốt: chien_thang (chiến thắng nhỏ), tu_chu (tự chủ), nhat_ky (nhật ký). \
 Nếu yêu cầu mơ hồ về nội dung thì hỏi lại thay vì bịa. Không bao giờ nhắc đến uid hay chi tiết kỹ thuật.";
 
@@ -35,13 +45,19 @@ pub async fn run(
     uid: &str,
     model_id: &str,
     request: &str,
+    photo: PhotoSlot,
 ) -> Result<String, Error> {
     let request: String = request.chars().take(MAX_REQUEST_CHARS).collect();
     let model = openrouter::from_env()?.chat(model_id);
 
     let now = Utc::now().with_timezone(&FixedOffset::east_opt(7 * 3600).expect("valid offset"));
+    let photo_status = if photo.lock().expect("photo slot poisoned").is_some() {
+        "Trạng thái ảnh: CÓ 1 ảnh đang chờ đính kèm."
+    } else {
+        "Trạng thái ảnh: chưa có ảnh nào đang chờ."
+    };
     let preamble = format!(
-        "{PREAMBLE}\nBây giờ là {} (giờ Việt Nam).",
+        "{PREAMBLE}\nBây giờ là {} (giờ Việt Nam).\n{photo_status}",
         now.format("%H:%M ngày %d/%m/%Y")
     );
 
@@ -53,7 +69,7 @@ pub async fn run(
         .preamble(preamble)
         .temperature(0.3)
         .max_tokens(800)
-        .tool(CreateNote(ctx.clone()))
+        .tool(CreateNote(ctx.clone(), photo))
         .tool(ListRecentNotes(ctx.clone()))
         .tool(SearchNotes(ctx))
         .build();
@@ -113,13 +129,14 @@ fn summarize_note(doc: &Value) -> Option<Value> {
 // ---------------------------------------------------------------- create_note
 
 #[derive(Clone)]
-struct CreateNote(NoteAccess);
+struct CreateNote(NoteAccess, PhotoSlot);
 
 #[derive(Deserialize)]
 struct CreateNoteArgs {
     r#type: String,
     title: String,
     body: Option<String>,
+    attach_photo: Option<bool>,
 }
 
 impl Tool for CreateNote {
@@ -142,7 +159,8 @@ impl Tool for CreateNote {
                     "description": "chien_thang: chiến thắng nhỏ; tu_chu: tự chủ; nhat_ky: nhật ký"
                 },
                 "title": { "type": "string", "description": "Tiêu đề ngắn, tối đa 120 ký tự" },
-                "body": { "type": "string", "description": "Nội dung kể thêm (không bắt buộc), tối đa 2000 ký tự" }
+                "body": { "type": "string", "description": "Nội dung kể thêm (không bắt buộc), tối đa 2000 ký tự" },
+                "attach_photo": { "type": "boolean", "description": "true để đính kèm ảnh người dùng vừa gửi (chỉ khi trạng thái ảnh là có ảnh đang chờ)" }
             },
             "required": ["type", "title"]
         })
@@ -170,10 +188,28 @@ impl Tool for CreateNote {
             fields["body"] = json!({ "stringValue": body });
         }
 
+        // Take the waiting photo (put back below if saving fails so the user can retry).
+        let photo = if args.attach_photo == Some(true) {
+            match self.1.lock().expect("photo slot poisoned").take() {
+                Some(p) => Some(p),
+                None => return Ok("Lỗi: chưa có ảnh nào đang chờ. Hãy nhờ người dùng gửi ảnh.".into()),
+            }
+        } else {
+            None
+        };
+        if let Some(p) = &photo {
+            fields["image"] = json!({ "mapValue": { "fields": {
+                "url": { "stringValue": p.url },
+                "publicId": { "stringValue": p.public_id },
+            }}});
+        }
+
         Ok(match self.0.firebase.create_document(&self.0.notes_path(), fields).await {
+            Ok(_) if photo.is_some() => format!("Đã tạo nốt \"{title}\" kèm ảnh."),
             Ok(_) => format!("Đã tạo nốt \"{title}\"."),
             Err(e) => {
                 eprintln!("create_note failed: {e}");
+                *self.1.lock().expect("photo slot poisoned") = photo;
                 "Lỗi: không lưu được nốt, hãy thử lại sau.".into()
             }
         })

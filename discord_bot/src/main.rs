@@ -1,5 +1,6 @@
 mod agent;
 mod chat;
+mod cloudinary;
 mod commands;
 mod firebase;
 
@@ -19,6 +20,11 @@ pub struct Data {
     pub ai_model: Option<String>,
     /// Last AI call per Discord user (cooldown).
     pub last_ai_call: Mutex<HashMap<serenity::UserId, std::time::Instant>>,
+    /// `/clear` cutoff per user: older DM messages are not given to the AI.
+    pub cleared_at: Mutex<HashMap<serenity::UserId, serenity::Timestamp>>,
+    /// Latest photo each user sent, uploaded and waiting to be attached to a note.
+    pub pending_photos: Mutex<HashMap<serenity::UserId, chat::PendingPhoto>>,
+    pub cloudinary: cloudinary::Cloudinary,
     /// Background tasks (keyed by Discord user id) waiting for a connect code to be redeemed in the app.
     pub link_watchers: Arc<Mutex<HashMap<String, tokio::task::JoinHandle<()>>>>,
 }
@@ -78,6 +84,9 @@ async fn main() {
                     firebase,
                     ai_model,
                     last_ai_call: Mutex::new(HashMap::new()),
+                    cleared_at: Mutex::new(HashMap::new()),
+                    pending_photos: Mutex::new(HashMap::new()),
+                    cloudinary: cloudinary::Cloudinary::from_env(),
                     link_watchers: Arc::new(Mutex::new(HashMap::new())),
                 })
             })

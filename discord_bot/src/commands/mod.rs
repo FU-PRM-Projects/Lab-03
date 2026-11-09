@@ -1,3 +1,4 @@
+pub mod clear;
 pub mod connect;
 pub mod ping;
 
@@ -5,7 +6,7 @@ use crate::{Context, Data, Error};
 
 /// Returns all registered bot commands.
 pub fn all() -> Vec<poise::Command<Data, Error>> {
-    vec![connect::connect(), ping::ping()]
+    vec![clear::clear(), connect::connect(), ping::ping()]
 }
 
 /// Global pre-command check: remote agent only responds in Direct Messages (DMs).
