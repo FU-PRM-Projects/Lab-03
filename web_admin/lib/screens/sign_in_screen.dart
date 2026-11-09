@@ -82,21 +82,26 @@ class SignInScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: scheme.primary,
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 480, minHeight: 360),
-          child: Card(
-            margin: const EdgeInsets.all(AppSpace.s24),
-            color: scheme.surface,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppRadius.card),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpace.s24),
-              child: body,
+      body: Stack(
+        children: <Widget>[
+          const Positioned.fill(child: NotePatternBackground()),
+          Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 480, minHeight: 360),
+              child: Card(
+                margin: const EdgeInsets.all(AppSpace.s24),
+                color: scheme.surface,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.card),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpace.s24),
+                  child: body,
+                ),
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

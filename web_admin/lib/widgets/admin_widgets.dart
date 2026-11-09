@@ -2,6 +2,44 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:not_core/not_core.dart';
 
+/// `pattern/note`: hoạ tiết tờ nốt chìm trên nền primary, cùng SVG với màn
+/// Welcome của app (opacity 45% có sẵn trong SVG). Ô 360×800 được lát kín
+/// thay vì phóng to, để nét vẽ trên màn hình rộng giữ đúng cỡ như trên điện
+/// thoại.
+class NotePatternBackground extends StatelessWidget {
+  const NotePatternBackground({super.key});
+
+  static const Size _tile = Size(360, 800);
+
+  @override
+  Widget build(BuildContext context) => ExcludeSemantics(
+    child: ClipRect(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final columns = (constraints.maxWidth / _tile.width).ceil();
+          final rows = (constraints.maxHeight / _tile.height).ceil();
+          return Stack(
+            children: <Widget>[
+              for (var row = 0; row < rows; row++)
+                for (var column = 0; column < columns; column++)
+                  Positioned(
+                    left: column * _tile.width,
+                    top: row * _tile.height,
+                    width: _tile.width,
+                    height: _tile.height,
+                    child: SvgPicture.asset(
+                      'assets/illustrations/note-pattern.svg',
+                      excludeFromSemantics: true,
+                    ),
+                  ),
+            ],
+          );
+        },
+      ),
+    ),
+  );
+}
+
 /// Tụi Nốt, cùng bộ SVG với app (component `Mascot` của Lab 2).
 class AdminMascot extends StatelessWidget {
   const AdminMascot(this.name, {this.size = 96, this.label, super.key});
