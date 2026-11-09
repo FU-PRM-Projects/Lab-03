@@ -27,14 +27,23 @@ const BODY_MAX: usize = 2000;
 const SEARCH_WINDOW: i64 = 100;
 
 const PREAMBLE: &str = "Bạn là trợ lý của ứng dụng **Nốt**, một hũ ghi chú những khoảnh khắc nhỏ của người dùng. \
-Trả lời bằng tiếng Việt, ngắn gọn, ấm áp. Bạn có các công cụ để tạo nốt, xem nốt gần đây và tìm nốt. \
+Trả lời bằng tiếng Việt, ngắn gọn (tối đa vài câu), ấm áp như một người bạn luôn ủng hộ. \
+Luôn tích cực: ghi nhận và khen nỗ lực của người dùng một cách chân thành, cụ thể theo điều họ vừa kể \
+(dù chỉ là việc nhỏ), động viên họ tiếp tục. Khi vừa tạo nốt xong, hãy mừng cùng họ và khen điều họ đã làm. \
+Khi họ kể ngày không tốt hoặc không đạt như ý, hãy thấu hiểu, trấn an rằng như vậy là bình thường, \
+nhấn mạnh điều nhỏ họ vẫn làm được; không phán xét, không giáo điều, không khuyên y tế. \
+Đừng khen sáo rỗng hay lặp lại cùng một câu, thỉnh thoảng dùng một emoji nhẹ nhàng. \
+Bạn có các công cụ để tạo nốt, xem nốt gần đây và tìm nốt. \
 Bạn nhớ các tin nhắn gần đây trong cuộc trò chuyện. Chỉ tạo nốt khi người dùng muốn lưu; \
 khi họ đã muốn lưu và nội dung đã rõ (kể cả từ các tin trước) thì tự đặt tiêu đề, chọn loại nốt hợp lý \
 rồi tạo, đừng hỏi lại về nội dung. Không tự ý tạo nốt khi họ chỉ hỏi han. \
-Mỗi nốt có thể kèm MỘT ảnh khoảnh khắc (không bắt buộc). Trước khi tạo nốt, nếu chưa có ảnh đang chờ và bạn chưa \
-hỏi về ảnh trong cuộc trò chuyện này, hãy hỏi đúng một lần: họ có ảnh muốn đính kèm không (gửi ảnh ngay trong \
-cuộc trò chuyện, hoặc nói không/bỏ qua). Họ từ chối hoặc đã trả lời thì tạo nốt luôn, không hỏi lại. \
-Khi có ảnh đang chờ, gọi create_note với attach_photo=true; ảnh chỉ đính kèm được lúc tạo nốt mới. \
+Mỗi nốt có thể kèm MỘT ảnh khoảnh khắc (không bắt buộc). QUY TẮC ẢNH, áp dụng cho TỪNG nốt riêng: \
+trước khi tạo MỖI nốt, nếu trạng thái ảnh là chưa có ảnh đang chờ, bạn phải hỏi người dùng có ảnh muốn đính kèm \
+cho nốt này không (gửi ảnh ngay trong cuộc trò chuyện, hoặc nói không/bỏ qua) và chờ câu trả lời của họ. \
+Việc đã hỏi hay họ đã gửi/bỏ qua ảnh ở nốt trước KHÔNG áp dụng cho nốt mới; luôn hỏi lại cho nốt mới. \
+Khi họ gửi ảnh hoặc trạng thái là CÓ ảnh đang chờ, gọi create_note với photo=\"attach\". \
+Chỉ khi họ vừa nói rõ không có ảnh/bỏ qua cho nốt này thì gọi create_note với photo=\"skip\". \
+Ảnh chỉ đính kèm được lúc tạo nốt mới. \
 Loại nốt: chien_thang (chiến thắng nhỏ), tu_chu (tự chủ), nhat_ky (nhật ký). \
 Nếu yêu cầu mơ hồ về nội dung thì hỏi lại thay vì bịa. Không bao giờ nhắc đến uid hay chi tiết kỹ thuật.";
 
@@ -136,7 +145,8 @@ struct CreateNoteArgs {
     r#type: String,
     title: String,
     body: Option<String>,
-    attach_photo: Option<bool>,
+    /// "attach" (use the waiting photo) or "skip" (user said no photo). Required: forces the model to settle the photo question.
+    photo: Option<String>,
 }
 
 impl Tool for CreateNote {
@@ -160,9 +170,9 @@ impl Tool for CreateNote {
                 },
                 "title": { "type": "string", "description": "Tiêu đề ngắn, tối đa 120 ký tự" },
                 "body": { "type": "string", "description": "Nội dung kể thêm (không bắt buộc), tối đa 2000 ký tự" },
-                "attach_photo": { "type": "boolean", "description": "true để đính kèm ảnh người dùng vừa gửi (chỉ khi trạng thái ảnh là có ảnh đang chờ)" }
+                "photo": { "type": "string", "enum": ["attach", "skip"], "description": "BẮT BUỘC cho mỗi nốt. attach: đính kèm ảnh đang chờ (chỉ khi trạng thái ảnh là CÓ ảnh đang chờ). skip: chỉ khi người dùng vừa nói rõ không có ảnh / bỏ qua cho nốt NÀY. Nếu chưa hỏi người dùng về ảnh cho nốt này thì đừng gọi công cụ, hãy hỏi trước." }
             },
-            "required": ["type", "title"]
+            "required": ["type", "title", "photo"]
         })
     }
 
@@ -189,13 +199,17 @@ impl Tool for CreateNote {
         }
 
         // Take the waiting photo (put back below if saving fails so the user can retry).
-        let photo = if args.attach_photo == Some(true) {
-            match self.1.lock().expect("photo slot poisoned").take() {
+        let photo = match args.photo.as_deref() {
+            Some("attach") => match self.1.lock().expect("photo slot poisoned").take() {
                 Some(p) => Some(p),
-                None => return Ok("Lỗi: chưa có ảnh nào đang chờ. Hãy nhờ người dùng gửi ảnh.".into()),
+                None => {
+                    return Ok("Lỗi: chưa có ảnh nào đang chờ. Hãy hỏi người dùng có muốn gửi ảnh cho nốt này không.".into());
+                }
+            },
+            Some("skip") => None,
+            _ => {
+                return Ok("Chưa tạo nốt: hãy hỏi người dùng xem họ có ảnh muốn đính kèm cho nốt này không (gửi ảnh hoặc nói bỏ qua), rồi mới tạo.".into());
             }
-        } else {
-            None
         };
         if let Some(p) = &photo {
             fields["image"] = json!({ "mapValue": { "fields": {
