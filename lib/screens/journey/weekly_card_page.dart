@@ -5,9 +5,12 @@ import '../../models/report.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_tokens.dart';
 import '../../utils/vi_date_format.dart';
+import '../../viewmodels/weekly_report_view_model.dart';
+import '../../widgets/app_button.dart';
 import '../../widgets/mascot.dart';
 
-/// Thẻ tuần dạng story toàn màn (S11b).
+/// Thẻ tuần dạng story toàn màn (S11b) với "Lưu thẻ tuần (PDF)" (D-06): file
+/// lưu trên máy, chia sẻ qua hộp chia sẻ, metadata trên Firestore.
 class WeeklyCardPage extends ConsumerWidget {
   const WeeklyCardPage({required this.summary, super.key});
 
@@ -17,6 +20,11 @@ class WeeklyCardPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colors = AppColors.of(context);
+    final report = ref.watch(weeklyReportViewModelProvider);
+    final viewModel = ref.read(weeklyReportViewModelProvider.notifier);
+    final lastSaved = ref
+        .watch(weeklyReportRecordProvider(summary.isoWeek))
+        .value;
     final range =
         '${ViDateFormat.shortDate(summary.weekStart)} – '
         '${ViDateFormat.shortDate(summary.weekEnd)}';
@@ -122,11 +130,119 @@ class WeeklyCardPage extends ConsumerWidget {
                     ],
                   ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.all(AppSpace.screen),
+                  child: _ExportArea(
+                    report: report,
+                    lastSaved: lastSaved,
+                    onExport: () => viewModel.export(summary),
+                    onShare: viewModel.share,
+                  ),
+                ),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Nút lưu và phản hồi: đang tạo, đang lưu, đã lưu (kèm chia sẻ lại), lỗi,
+/// và lần lưu trước của tuần này (từ Firestore).
+class _ExportArea extends StatelessWidget {
+  const _ExportArea({
+    required this.report,
+    required this.lastSaved,
+    required this.onExport,
+    required this.onShare,
+  });
+
+  final ReportState report;
+  final ReportRecord? lastSaved;
+  final VoidCallback onExport;
+  final VoidCallback onShare;
+
+  static String _size(int bytes) =>
+      bytes < 1024 ? '$bytes B' : '${ViDateFormat.decimal(bytes / 1024)} KB';
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = AppColors.of(context);
+    final saved = report.saved;
+    final previous = lastSaved?.savedAt;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        Semantics(
+          liveRegion: true,
+          child: switch (report.phase) {
+            ReportPhase.idle =>
+              previous == null
+                  ? const SizedBox.shrink()
+                  : Text(
+                      'Đã lưu tuần này lúc ${ViDateFormat.time(previous)} '
+                      '${ViDateFormat.shortDate(previous)}.',
+                      style: theme.textTheme.bodySmall,
+                    ),
+            ReportPhase.building => Text(
+              'Đang tạo PDF…',
+              style: theme.textTheme.bodyMedium,
+            ),
+            ReportPhase.saving => Text(
+              'Đang lưu vào máy…',
+              style: theme.textTheme.bodyMedium,
+            ),
+            ReportPhase.done => Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Text(
+                  'Đã lưu thẻ tuần vào máy.',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: colors.success,
+                  ),
+                ),
+                if (saved != null)
+                  Text(
+                    '${saved.fileName} · ${_size(saved.sizeBytes)}',
+                    style: theme.textTheme.bodySmall,
+                  ),
+                if (report.message case final message?)
+                  Text(message, style: theme.textTheme.bodySmall),
+              ],
+            ),
+            ReportPhase.failed => Text(
+              report.message ?? '',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.error,
+              ),
+            ),
+          },
+        ),
+        const SizedBox(height: AppSpace.s8),
+        if (report.phase == ReportPhase.done)
+          AppButton(
+            label: 'Chia sẻ PDF',
+            icon: Icons.ios_share,
+            variant: AppButtonVariant.tonal,
+            expand: true,
+            onPressed: onShare,
+          )
+        else
+          AppButton(
+            label: report.phase == ReportPhase.failed
+                ? 'Thử lại'
+                : 'Lưu thẻ tuần (PDF)',
+            icon: Icons.picture_as_pdf_outlined,
+            variant: AppButtonVariant.tonal,
+            expand: true,
+            loading: report.busy,
+            onPressed: report.busy ? null : onExport,
+          ),
+      ],
     );
   }
 }

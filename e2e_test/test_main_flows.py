@@ -215,17 +215,19 @@ async def test_t12_native_home_and_return(ask) -> None:
 # --- Thẻ tuần ----------------------------------------------------------------
 
 
-async def test_t14_weekly_card(ask) -> None:
-    """S11b: mở Thẻ tuần từ Thống kê. Final bỏ xuất PDF (không dùng Cloud
-    Storage), nên màn chỉ còn phần xem."""
+async def test_t14_weekly_card_pdf(ask) -> None:
+    """S11b: lưu Thẻ tuần PDF vào máy và mở hộp chia sẻ (Final: không dùng
+    Cloud Storage; metadata ghi vào Firestore)."""
     answer, result = await ask(
         "Mở tab 'Hành trình', chọn 'Thống kê' và chạm 'Mục tiêu tuần' (có thể phải "
-        "cuộn xuống). Trả lời WEEKLY_CARD nếu hiện màn 'Thẻ tuần' có khoảng ngày của "
-        "tuần và mục 'Chiến thắng nhỏ', NOT_FOUND nếu không mở được, CRASHED nếu app "
-        "bị đóng. Rồi đóng màn Thẻ tuần." + RULES,
-        "WEEKLY_CARD, NOT_FOUND hoặc CRASHED",
+        "cuộn xuống) để mở màn 'Thẻ tuần'. Bấm 'Lưu thẻ tuần (PDF)'. Khi hộp chia sẻ "
+        "của Android hiện lên, nhấn Back để đóng nó, không chọn ứng dụng nào. Trả lời "
+        "SAVED_SHARED nếu hộp chia sẻ đã hiện và màn Thẻ tuần ghi 'Đã lưu thẻ tuần vào "
+        "máy.' kèm tên file bắt đầu bằng 'weekly-', ERROR_MESSAGE nếu hiện câu báo lỗi "
+        "kèm nút 'Thử lại', CRASHED nếu app bị đóng. Rồi đóng màn Thẻ tuần." + RULES,
+        "SAVED_SHARED, ERROR_MESSAGE hoặc CRASHED",
     )
-    assert "WEEKLY_CARD" in answer, f"{answer!r} (trace {result.trace_id})"
+    assert "SAVED_SHARED" in answer, f"{answer!r} (trace {result.trace_id})"
 
 
 # --- Đăng xuất và đăng nhập (chạy cuối vì đổi phiên đăng nhập) --------------

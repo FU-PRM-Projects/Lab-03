@@ -291,3 +291,24 @@ test('R-26 staff read user profiles; only an admin changes roles, never their ow
   await assertFails(updateDoc(doc(env.authenticatedContext('root').firestore(), 'users/root'), { role: 'user' }));
   await assertFails(updateDoc(doc(env.authenticatedContext('root').firestore(), 'users/uma'), { role: 'owner' }));
 });
+
+test('R-28 owner saves weekly card PDF metadata; the shape must match the week', async () => {
+  const owner = env.authenticatedContext('uma').firestore();
+  const other = env.authenticatedContext('olga').firestore();
+  const report = (extra = {}) => ({
+    kind: 'weekly_card', isoWeek: '2026-W46', fileName: 'weekly-2026-W46.pdf', sizeBytes: 34120, noteCount: 5,
+    savedAt: serverTimestamp(), ...extra,
+  });
+  await assertSucceeds(setDoc(doc(owner, 'users/uma/reports/2026-W46'), report()));
+  await assertSucceeds(setDoc(doc(owner, 'users/uma/reports/2026-W46'), report({ sizeBytes: 35000 })));
+  await assertSucceeds(getDoc(doc(owner, 'users/uma/reports/2026-W46')));
+  await assertFails(getDoc(doc(other, 'users/uma/reports/2026-W46')));
+  await assertFails(setDoc(doc(other, 'users/uma/reports/2026-W47'), report({ isoWeek: '2026-W47', fileName: 'weekly-2026-W47.pdf' })));
+  await assertFails(setDoc(doc(owner, 'users/uma/reports/2026-W47'), report()));
+  await assertFails(setDoc(doc(owner, 'users/uma/reports/2026-W46'), report({ fileName: 'other.pdf' })));
+  await assertFails(setDoc(doc(owner, 'users/uma/reports/2026-W46'), report({ sizeBytes: 0 })));
+  await assertFails(setDoc(doc(owner, 'users/uma/reports/2026-W46'), report({ url: 'https://example.com/a.pdf' })));
+  await assertFails(setDoc(doc(owner, 'users/uma/reports/2026-W46'), report({ savedAt: Timestamp.fromDate(new Date('2020-01-01')) })));
+  await assertSucceeds(deleteDoc(doc(owner, 'users/uma/reports/2026-W46')));
+});
+

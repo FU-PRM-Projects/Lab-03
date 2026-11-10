@@ -240,6 +240,26 @@ service cloud.firestore {
                       && request.resource.data.createdAt is timestamp;
       }
 
+      // Weekly card PDF metadata (Final Assignment, section 4): the file is
+      // saved and shared on the device; Firestore keeps which week was saved,
+      // its file name and size. One doc per ISO week, overwritten on re-save.
+      match /reports/{week} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid)
+                              && week.matches('^[0-9]{4}-W[0-9]{2}$')
+                              && request.resource.data.keys().hasOnly(['kind', 'isoWeek', 'fileName', 'sizeBytes', 'noteCount', 'savedAt'])
+                              && request.resource.data.keys().hasAll(['kind', 'isoWeek', 'fileName', 'sizeBytes', 'noteCount', 'savedAt'])
+                              && request.resource.data.kind == 'weekly_card'
+                              && request.resource.data.isoWeek == week
+                              && request.resource.data.fileName == 'weekly-' + week + '.pdf'
+                              && request.resource.data.sizeBytes is int
+                              && request.resource.data.sizeBytes > 0
+                              && request.resource.data.sizeBytes <= 5000000
+                              && request.resource.data.noteCount is int
+                              && request.resource.data.noteCount >= 0
+                              && request.resource.data.savedAt == request.time;
+      }
+
       match /stickers/{month} {
         allow read: if isOwner(uid);
         allow create, update: if isOwner(uid)
