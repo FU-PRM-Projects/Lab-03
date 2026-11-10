@@ -191,6 +191,8 @@ class FreeTellViewModel extends Notifier<FreeTellState> {
         .where((s) => s.keep && s.title.trim().isNotEmpty)
         .toList();
     if (kept.isEmpty || state.phase == FreeTellPhase.saving) return;
+    final mood = state.mood;
+    final analytics = ref.read(analyticsServiceProvider);
     state = state.copyWith(phase: FreeTellPhase.saving, error: () => null);
     final repo = ref.read(noteRepositoryProvider);
     final now = ref.read(clockProvider).now();
@@ -200,7 +202,7 @@ class FreeTellViewModel extends Notifier<FreeTellState> {
         await repo.add(
           NoteDraft(
             type: s.type,
-            mood: state.mood,
+            mood: mood,
             title: s.title.trim().length <= NoteLimits.title
                 ? s.title.trim()
                 : s.title.trim().substring(0, NoteLimits.title),
@@ -209,19 +211,18 @@ class FreeTellViewModel extends Notifier<FreeTellState> {
           createdAt: now.add(Duration(seconds: i)),
         );
         saved++;
+        // Lần ghi đang chờ vẫn có thể hoàn tất, nhưng không bắt đầu ghi nốt
+        // tiếp theo sau khi màn đã đóng và provider bị huỷ.
+        if (!ref.mounted) return;
       }
-      unawaited(
-        ref.read(analyticsServiceProvider).logEvent(
-          AnalyticsEvents.aiResultAccepted,
-          <String, Object>{
-            'feature': AiFeature.note.id,
-            'item_count': saved,
-            'edited_count': kept.where((s) => s.edited).length,
-          },
-        ),
-      );
-      if (!ref.mounted) return;
       state = state.copyWith(phase: FreeTellPhase.saved, savedCount: saved);
+      unawaited(
+        analytics.track(AnalyticsEvents.aiResultAccepted, <String, Object>{
+          'feature': AiFeature.note.id,
+          'item_count': saved,
+          'edited_count': kept.where((s) => s.edited).length,
+        }),
+      );
     } on Object catch (error) {
       if (!ref.mounted) return;
       // Nốt đã lưu thì bỏ khỏi danh sách để bấm lại không lưu trùng.

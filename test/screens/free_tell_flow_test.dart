@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lab03/app.dart';
+import 'package:lab03/firebase/firebase_ai_service.dart';
 import 'package:lab03/models/challenge.dart';
 import 'package:lab03/models/mood.dart';
 import 'package:lab03/models/note_type.dart';
@@ -11,6 +12,7 @@ import 'package:lab03/router/app_routes.dart';
 import 'package:lab03/screens/note_composer/free_tell_screen.dart';
 import 'package:lab03/services/ai_service.dart';
 import 'package:lab03/services/analytics_service.dart';
+import 'package:lab03/services/note_repository.dart';
 import 'package:lab03/viewmodels/free_tell_view_model.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -47,7 +49,62 @@ class FakeAi implements AiService {
   }) async => throw const AiException(AiErrorReason.disabled);
 }
 
+class _FailingAnalytics extends FakeAnalyticsService {
+  @override
+  Future<void> logEvent(String name, [Map<String, Object>? parameters]) async {
+    throw StateError('Analytics unavailable');
+  }
+}
+
 void main() {
+  test('Analytics lỗi vẫn giữ đúng lý do AI đang tắt', () async {
+    final ai = FirebaseAiService(
+      configSource: () => const AiConfig(enabled: false),
+      analytics: _FailingAnalytics(),
+    );
+    await expectLater(
+      ai.sortNotes('Hom nay minh don ban hoc'),
+      throwsA(
+        isA<AiException>().having(
+          (error) => error.reason,
+          'reason',
+          AiErrorReason.disabled,
+        ),
+      ),
+    );
+  });
+
+  test('rời màn khi ghi nốt AI thì không bắt đầu ghi nốt tiếp theo', () async {
+    final gate = Completer<void>();
+    final notes = FakeNoteRepository()..addGate = gate;
+    final container = ProviderContainer.test(
+      overrides: [
+        noteRepositoryProvider.overrideWithValue(notes),
+        aiServiceProvider.overrideWithValue(
+          FakeAi(
+            result: const AiSortResult(
+              notes: [
+                AiNoteSuggestion(type: NoteType.chienThang, title: 'Dọn bàn'),
+                AiNoteSuggestion(type: NoteType.tuChu, title: 'Đi ngủ sớm'),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+    final subscription = container.listen(freeTellViewModelProvider, (_, _) {});
+    final viewModel = container.read(freeTellViewModelProvider.notifier);
+    await viewModel.sort('Hom nay minh don ban va di ngu som');
+    final saving = viewModel.save();
+
+    subscription.close();
+    await container.pump();
+    gate.complete();
+    await saving;
+
+    expect(notes.notes.map((note) => note.title), ['Dọn bàn']);
+  });
+
   test('che email và số điện thoại, cắt theo ai_max_chars', () {
     final out = scrubForAi(
       'Mình nhắn cho lan.nguyen@fpt.edu.vn và gọi 0912 345 678 rồi đi học',

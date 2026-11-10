@@ -47,13 +47,15 @@ class FirebaseAiService implements AiService {
     final cfg = config;
     if (!cfg.enabled ||
         (feature == AiFeature.onboarding && !cfg.onboardingEnabled)) {
-      await _error(feature, AiErrorReason.disabled);
+      _error(feature, AiErrorReason.disabled);
       throw const AiException(AiErrorReason.disabled);
     }
-    await analytics.logEvent(AnalyticsEvents.aiRequest, <String, Object>{
-      'feature': feature.id,
-      'char_count': input.length,
-    });
+    unawaited(
+      analytics.track(AnalyticsEvents.aiRequest, <String, Object>{
+        'feature': feature.id,
+        'char_count': input.length,
+      }),
+    );
     try {
       final response = await _model(instructions, schema)
           .generateContent(<Content>[Content.text(input)])
@@ -68,33 +70,34 @@ class FirebaseAiService implements AiService {
       }
       return decoded;
     } on AiException catch (e) {
-      await _error(feature, e.reason);
+      _error(feature, e.reason);
       rethrow;
     } on TimeoutException {
-      await _error(feature, AiErrorReason.timeout);
+      _error(feature, AiErrorReason.timeout);
       throw const AiException(AiErrorReason.timeout);
     } on FormatException {
-      await _error(feature, AiErrorReason.parse);
+      _error(feature, AiErrorReason.parse);
       throw const AiException(AiErrorReason.parse);
     } on QuotaExceeded catch (e) {
-      await _error(feature, AiErrorReason.quota);
+      _error(feature, AiErrorReason.quota);
       throw AiException(AiErrorReason.quota, e.message);
     } on Object catch (e) {
       // ServiceApiNotEnabled, ServerException, lỗi App Check…: báo chung là
       // mạng / dịch vụ, flow đi nhánh dự phòng.
-      await _error(feature, AiErrorReason.network);
+      _error(feature, AiErrorReason.network);
       throw AiException(AiErrorReason.network, e.toString());
     }
   }
 
-  Future<void> _error(AiFeature feature, AiErrorReason reason) =>
-      analytics.logEvent(AnalyticsEvents.aiError, <String, Object>{
-        'feature': feature.id,
-        'reason': reason.name,
-      });
+  void _error(AiFeature feature, AiErrorReason reason) => unawaited(
+    analytics.track(AnalyticsEvents.aiError, <String, Object>{
+      'feature': feature.id,
+      'reason': reason.name,
+    }),
+  );
 
   Never _bad(AiFeature feature) {
-    unawaited(_error(feature, AiErrorReason.parse));
+    _error(feature, AiErrorReason.parse);
     throw const AiException(AiErrorReason.parse);
   }
 
@@ -130,9 +133,12 @@ class FirebaseAiService implements AiService {
     final notes = <AiNoteSuggestion>[];
     for (final item in json['notes'] is List ? json['notes']! as List : []) {
       if (item is! Map) continue;
-      var type = NoteType.fromId(item['type'] as String?);
+      final rawType = item['type'];
+      final rawTitle = item['title'];
+      if (rawType is! String || rawTitle is! String) _bad(AiFeature.note);
+      var type = NoteType.fromId(rawType);
       if (type == NoteType.thuThach) type = NoteType.chienThang;
-      final title = (item['title'] as String? ?? '').trim();
+      final title = rawTitle.trim();
       if (type == null || title.isEmpty) continue;
       notes.add(
         AiNoteSuggestion(
@@ -146,9 +152,11 @@ class FirebaseAiService implements AiService {
     }
     final needsSupport = json['needs_support'] == true;
     if (notes.isEmpty && !needsSupport) _bad(AiFeature.note);
+    final mood = json['mood'];
+    if (mood != null && mood is! String) _bad(AiFeature.note);
     return AiSortResult(
       notes: notes,
-      mood: Mood.fromId(json['mood'] as String?),
+      mood: Mood.fromId(mood is String ? mood : null),
       needsSupport: needsSupport,
     );
   }
@@ -189,7 +197,10 @@ class FirebaseAiService implements AiService {
         },
       ),
     );
-    final label = (json['profile_label'] as String? ?? '').trim();
+    final rawLabel = json['profile_label'];
+    final rawClock = json['remind_time'];
+    if (rawLabel is! String || rawClock is! String) _bad(AiFeature.onboarding);
+    final label = rawLabel.trim();
     final brave = json['dung_cam_level'];
     final move = json['van_dong_level'];
     final ids = json['card_ids'] is List
@@ -198,7 +209,7 @@ class FirebaseAiService implements AiService {
     final picked = <Challenge>[
       for (final id in ids.toSet()) ...cards.where((c) => c.id == id),
     ];
-    final remind = _parseClock(json['remind_time'] as String?);
+    final remind = _parseClock(rawClock);
     if (label.isEmpty ||
         label.length > StarterPlan.labelMax ||
         brave is! int ||
