@@ -30,7 +30,7 @@ Future<void> initFirebase() async {
   }
 }
 
-/// Site key reCAPTCHA v3 cho App Check trên web
+/// Site key reCAPTCHA Enterprise (Fraud Defense) cho App Check trên web
 /// (`--dart-define=RECAPTCHA_SITE_KEY=...`); trống thì web chưa có App Check.
 const String recaptchaSiteKey = String.fromEnvironment('RECAPTCHA_SITE_KEY');
 
@@ -46,7 +46,7 @@ Future<void> _activateAppCheck() async {
       providerAndroid: kDebugMode
           ? const AndroidDebugProvider()
           : const AndroidPlayIntegrityProvider(),
-      providerWeb: kIsWeb ? ReCaptchaV3Provider(recaptchaSiteKey) : null,
+      providerWeb: kIsWeb ? ReCaptchaEnterpriseProvider(recaptchaSiteKey) : null,
     );
   } on Object catch (error) {
     debugPrint('[app-check] chưa bật được: $error');
