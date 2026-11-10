@@ -144,10 +144,14 @@ class ReviewActions {
   }) async {
     try {
       final staff = requireStaff(_ref);
-      // Kho thẻ có thể chưa tải (staff chưa mở màn Kho thẻ): đợi để thẻ mới
-      // xếp cuối cấp, không trùng thứ tự với thẻ có sẵn.
+      // Đọc kho thẻ thẳng từ repository để thẻ mới xếp cuối cấp. Không dùng
+      // `catalogProvider.future`: khi staff chưa mở màn Kho thẻ, provider
+      // không có ai lắng nghe nên Riverpod tạm dừng nó, future không bao giờ
+      // xong và lần duyệt hết giờ sau 10 giây ("Có lỗi xảy ra").
       final cards = await _ref
-          .read(catalogProvider.future)
+          .read(catalogRepositoryProvider)
+          .watchAll()
+          .first
           .timeout(const Duration(seconds: 10));
       await _ref
           .read(submissionRepositoryProvider)

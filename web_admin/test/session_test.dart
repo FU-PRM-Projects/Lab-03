@@ -68,6 +68,75 @@ class _NoAnalytics implements AdminAnalytics {
   Future<void> setUser(String? uid) async {}
 }
 
+class _FakeCatalog implements CatalogRepository {
+  _FakeCatalog(this.cards);
+
+  final List<CatalogCard> cards;
+
+  @override
+  Stream<List<CatalogCard>> watchAll() => Stream.value(cards);
+
+  @override
+  Future<String> create(CatalogDraft draft, {required String staffUid}) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> update(
+    CatalogCard card,
+    CatalogDraft draft, {
+    required String staffUid,
+  }) => throw UnimplementedError();
+
+  @override
+  Future<void> setArchived(
+    CatalogCard card,
+    bool archived, {
+    required String staffUid,
+  }) => throw UnimplementedError();
+}
+
+class _FakeSubmissions implements SubmissionRepository {
+  final List<({String id, int level, int order, String reviewer})> approved =
+      <({String id, int level, int order, String reviewer})>[];
+
+  @override
+  Future<void> approve(
+    ChallengeSubmission submission, {
+    required String reviewerUid,
+    required int level,
+    required int order,
+  }) async => approved.add((
+    id: submission.id,
+    level: level,
+    order: order,
+    reviewer: reviewerUid,
+  ));
+
+  @override
+  Future<void> reject(
+    ChallengeSubmission submission, {
+    required String reviewerUid,
+    required String reason,
+  }) async {}
+
+  @override
+  Future<ChallengeSubmission> submit({
+    required String uid,
+    required Challenge card,
+  }) => throw UnimplementedError();
+
+  @override
+  Stream<List<ChallengeSubmission>> watchMine(String uid) =>
+      const Stream.empty();
+
+  @override
+  Stream<List<ChallengeSubmission>> watchByStatus(SubmissionStatus status) =>
+      const Stream.empty();
+
+  @override
+  Future<void> withdraw(String id) async {}
+}
+
 void main() {
   late _FakeAuth auth;
   late _FakeDirectory directory;
@@ -118,6 +187,59 @@ void main() {
     final admin = await container.read(sessionProvider.future);
     expect((admin as StaffSession).isAdmin, isTrue);
   });
+
+  test(
+    'duyệt được khi chưa mở màn Kho thẻ (kho thẻ chưa ai lắng nghe)',
+    () async {
+      final submissions = _FakeSubmissions();
+      final c = ProviderContainer(
+        overrides: [
+          adminAuthProvider.overrideWithValue(auth),
+          userDirectoryProvider.overrideWithValue(directory),
+          adminAnalyticsProvider.overrideWithValue(analytics),
+          catalogRepositoryProvider.overrideWithValue(
+            _FakeCatalog(<CatalogCard>[
+              const CatalogCard(
+                challenge: Challenge(
+                  id: 'vd-1-5',
+                  topic: ChallengeTopic.vanDong,
+                  level: 1,
+                  order: 5,
+                  title: 'x',
+                  minutes: 1,
+                ),
+              ),
+            ]),
+          ),
+          submissionRepositoryProvider.overrideWithValue(submissions),
+        ],
+      );
+      addTearDown(c.dispose);
+      directory.roles['root'] = UserRole.admin;
+      auth.emit(const AdminUser(uid: 'root'));
+      c.listen(sessionProvider, (_, _) {});
+      await c.read(sessionProvider.future);
+
+      final error = await c
+          .read(reviewActionsProvider)
+          .approve(
+            const ChallengeSubmission(
+              id: 's1',
+              uid: 'uma',
+              topic: ChallengeTopic.vanDong,
+              title: 'Giãn cơ 5 phút',
+              minutes: 5,
+              status: SubmissionStatus.pending,
+            ),
+            level: 1,
+          )
+          .timeout(const Duration(seconds: 2));
+
+      expect(error, isNull);
+      expect(submissions.approved.single.order, 6);
+      expect(submissions.approved.single.reviewer, 'root');
+    },
+  );
 
   test('thẻ mới xếp cuối cấp của đúng chủ đề', () {
     CatalogCard card(ChallengeTopic topic, int level, int order) => CatalogCard(

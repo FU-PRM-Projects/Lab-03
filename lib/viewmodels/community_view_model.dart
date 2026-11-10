@@ -80,12 +80,16 @@ final communityActionsProvider = Provider<CommunityActions>(
 );
 
 /// Một dòng trong hộp thư: thông báo chung của staff hoặc tin riêng.
+/// Loại tin trong hộp thư, để chọn biểu tượng và màu.
+enum InboxEntryKind { approved, rejected, announcement }
+
 class InboxEntry {
   const InboxEntry({
     required this.id,
     required this.title,
     required this.body,
     required this.personal,
+    this.kind = InboxEntryKind.announcement,
     this.at,
     this.unread = false,
   });
@@ -96,6 +100,7 @@ class InboxEntry {
 
   /// Tin riêng (`users/{uid}/inbox`) chứ không phải thông báo chung.
   final bool personal;
+  final InboxEntryKind kind;
   final DateTime? at;
   final bool unread;
 }
@@ -147,6 +152,9 @@ final communityInboxProvider = Provider<AsyncValue<List<InboxEntry>>>((ref) {
             title: item.title,
             body: item.body,
             personal: true,
+            kind: item.kind == InboxKind.submissionRejected
+                ? InboxEntryKind.rejected
+                : InboxEntryKind.approved,
             at: item.createdAt,
             unread: !item.read,
           ),
