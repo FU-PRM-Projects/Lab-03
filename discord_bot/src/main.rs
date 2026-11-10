@@ -4,6 +4,7 @@ mod cloudinary;
 mod commands;
 mod firebase;
 mod guard;
+mod welcome;
 
 use std::{
     collections::HashMap,
@@ -92,6 +93,7 @@ async fn main() {
             Box::pin(async move {
                 println!("Logged in as {} (DM-only Remote Agent)", ready.user.name);
                 poise::builtins::register_globally(ctx, &framework.options().commands).await?;
+                welcome::spawn(ctx.http.clone());
                 Ok(Data {
                     firebase,
                     ai_model,
