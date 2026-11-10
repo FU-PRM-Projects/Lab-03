@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/foundation.dart';
 
+import '../services/ai_service.dart';
 import '../services/remote_config_service.dart';
 
 /// Danh sách chuỗi từ JSON trên Console; JSON hỏng hoặc rỗng thì giữ [fallback].
@@ -62,6 +63,14 @@ class FirebaseRemoteConfigService implements RemoteConfigService {
           InAppRemoteConfig.defaultDiscordGreetings,
         ),
         'firebase_demo_enabled': true,
+        'ai_enabled': _fallback.ai.enabled,
+        'ai_onboarding_enabled': _fallback.ai.onboardingEnabled,
+        'ai_model': _fallback.ai.model,
+        'ai_timeout_ms': _fallback.ai.timeoutMs,
+        'ai_max_chars': _fallback.ai.maxChars,
+        'ai_prompt_sort': _fallback.ai.promptSort,
+        'ai_prompt_onboarding': _fallback.ai.promptOnboarding,
+        'ai_prompt_greeting': _fallback.ai.promptGreeting,
       });
       await config.setConfigSettings(
         RemoteConfigSettings(
@@ -119,6 +128,31 @@ class FirebaseRemoteConfigService implements RemoteConfigService {
 
   @override
   bool get firebaseDemoEnabled => _config.getBool('firebase_demo_enabled');
+
+  @override
+  AiConfig get ai {
+    String text(String key, String fallback) {
+      final value = _config.getString(key).trim();
+      return value.isEmpty ? fallback : value;
+    }
+
+    int number(String key, int fallback, int min, int max) {
+      final value = _config.getInt(key);
+      return value < min || value > max ? fallback : value;
+    }
+
+    final defaults = _fallback.ai;
+    return AiConfig(
+      enabled: _config.getBool('ai_enabled'),
+      onboardingEnabled: _config.getBool('ai_onboarding_enabled'),
+      model: text('ai_model', defaults.model),
+      timeoutMs: number('ai_timeout_ms', defaults.timeoutMs, 1000, 30000),
+      maxChars: number('ai_max_chars', defaults.maxChars, 50, 2000),
+      promptSort: text('ai_prompt_sort', defaults.promptSort),
+      promptOnboarding: text('ai_prompt_onboarding', defaults.promptOnboarding),
+      promptGreeting: text('ai_prompt_greeting', defaults.promptGreeting),
+    );
+  }
 
   @override
   Future<bool> refresh() async {

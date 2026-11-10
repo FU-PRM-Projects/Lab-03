@@ -61,6 +61,11 @@ void main() {
       'discord_channel_map': jsonEncode(config.discordChannels),
       'discord_greetings': jsonEncode(config.discordGreetings),
       'firebase_demo_enabled': '${config.firebaseDemoEnabled}',
+      'ai_enabled': '${config.ai.enabled}',
+      'ai_onboarding_enabled': '${config.ai.onboardingEnabled}',
+      'ai_model': config.ai.model,
+      'ai_timeout_ms': '${config.ai.timeoutMs}',
+      'ai_max_chars': '${config.ai.maxChars}',
     });
   });
 }

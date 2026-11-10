@@ -6,6 +6,9 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../models/discord_room.dart';
+import '../../services/ai_service.dart';
+import '../../services/analytics_events.dart';
+import '../../services/analytics_service.dart';
 import '../../services/remote_config_service.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_tokens.dart';
@@ -18,8 +21,8 @@ import '../discord/discord_launcher.dart';
 
 /// S08d · Câu chào của bạn: chọn hoặc sửa một câu chào, sao chép rồi mở phòng
 /// Discord. Quay lại app sau khi mở thì trả `true` cho S08 ("Bạn vừa ghé
-/// phòng chung"). Chưa có Tụi Nốt AI nên dùng câu chào có sẵn trong Remote
-/// Config (biến thể "AI nghỉ").
+/// phòng chung"). Tụi Nốt AI viết 3 câu chào theo thẻ và phòng; AI tắt
+/// hoặc lỗi thì dùng câu có sẵn trong Remote Config (biến thể "AI nghỉ").
 class GreetingScreen extends ConsumerStatefulWidget {
   const GreetingScreen({required this.challengeId, super.key});
 
@@ -32,7 +35,11 @@ class GreetingScreen extends ConsumerStatefulWidget {
 class _GreetingScreenState extends ConsumerState<GreetingScreen> {
   final _text = TextEditingController();
   final _focus = FocusNode();
-  late final List<String> _greetings;
+  late List<String> _greetings;
+
+  /// `null`: chưa hỏi; `true`: đang viết; `false`: đã xong (AI hoặc nghỉ).
+  bool? _aiLoading;
+  bool _fromAi = false;
   late final AppLifecycleListener _lifecycle;
   int? _selected;
   bool _awaitingReturn = false;
@@ -61,6 +68,36 @@ class _GreetingScreenState extends ConsumerState<GreetingScreen> {
     super.dispose();
   }
 
+  /// Nhờ Tụi Nốt AI viết câu chào khi đã biết thẻ (một lần).
+  Future<void> _askAi(String challengeTitle, String room) async {
+    final ai = ref.read(aiServiceProvider);
+    if (!ai.config.enabled) {
+      _aiLoading = false;
+      return;
+    }
+    setState(() => _aiLoading = true);
+    try {
+      final lines = await ai.greetings(
+        challengeTitle: challengeTitle,
+        room: room,
+      );
+      if (!mounted) return;
+      setState(() {
+        // Người dùng đang sửa câu riêng thì giữ nguyên ô nhập.
+        final keepOwn = _selected == null && _text.text.trim().isNotEmpty;
+        _greetings = lines;
+        _fromAi = true;
+        _aiLoading = false;
+        if (!keepOwn) {
+          _selected = 0;
+          _text.text = lines.first;
+        }
+      });
+    } on AiException {
+      if (mounted) setState(() => _aiLoading = false);
+    }
+  }
+
   void _pick(int index) => setState(() {
     _selected = index;
     _text.text = _greetings[index];
@@ -73,7 +110,20 @@ class _GreetingScreenState extends ConsumerState<GreetingScreen> {
   }
 
   Future<void> _copyAndOpen(DiscordRoom room) async {
-    await Clipboard.setData(ClipboardData(text: _text.text.trim()));
+    final text = _text.text.trim();
+    await Clipboard.setData(ClipboardData(text: text));
+    if (_fromAi) {
+      unawaited(
+        ref.read(analyticsServiceProvider).logEvent(
+          AnalyticsEvents.aiResultAccepted,
+          <String, Object>{
+            'feature': AiFeature.greeting.id,
+            'item_count': 1,
+            'edited_count': _greetings.contains(text) ? 0 : 1,
+          },
+        ),
+      );
+    }
     if (!mounted) return;
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
@@ -95,6 +145,12 @@ class _GreetingScreenState extends ConsumerState<GreetingScreen> {
         DiscordRooms.byKey(challenge?.discordRoom ?? DiscordRooms.chaoHoi) ??
         DiscordRooms.shared.first;
     final canSend = _text.text.trim().isNotEmpty;
+    if (challenge != null && _aiLoading == null) {
+      _aiLoading = false;
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => _askAi(challenge.title, room.name),
+      );
+    }
 
     return Scaffold(
       appBar: const AppTopBar(title: 'Câu chào của bạn'),
@@ -129,7 +185,12 @@ class _GreetingScreenState extends ConsumerState<GreetingScreen> {
                             ),
                           ),
                         ),
-                        const _Resting(),
+                        if (_aiLoading ?? false)
+                          const _Writing()
+                        else if (_fromAi)
+                          const _AiLabel()
+                        else
+                          const _Resting(),
                         if (_greetings.isNotEmpty)
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -271,6 +332,54 @@ class _GreetingTile extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Đang chờ Tụi Nốt AI viết câu chào.
+class _Writing extends StatelessWidget {
+  const _Writing();
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    liveRegion: true,
+    child: Row(
+      children: <Widget>[
+        const SizedBox.square(
+          dimension: 20,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+        const SizedBox(width: AppSpace.s12),
+        Expanded(
+          child: Text(
+            'Tụi Nốt đang viết câu chào cho bạn…',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+/// Nhãn "Gợi ý từ Nốt AI" phía trên các câu do AI viết.
+class _AiLabel extends StatelessWidget {
+  const _AiLabel();
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Row(
+      children: <Widget>[
+        Icon(Icons.auto_awesome, size: 18, color: scheme.primary),
+        const SizedBox(width: AppSpace.s8),
+        Expanded(
+          child: Text(
+            'Tụi Nốt AI viết giúp · sửa thoải mái trước khi gửi',
+            style: Theme.of(context).textTheme.bodyMedium
+                ?.copyWith(color: scheme.primary),
+          ),
+        ),
+      ],
     );
   }
 }

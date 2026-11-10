@@ -17,6 +17,7 @@ import '../screens/groups/groups_screen.dart';
 import '../screens/jar/jar_screen.dart';
 import '../screens/journal/journal_screen.dart';
 import '../screens/journey/journey_screen.dart';
+import '../screens/note_composer/free_tell_screen.dart';
 import '../screens/note_composer/note_composer_screen.dart';
 import '../screens/note_detail/note_detail_screen.dart';
 import '../screens/note_saved/note_saved_screen.dart';
@@ -177,6 +178,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.journal,
         builder: (context, state) => const JournalScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.freeTell,
+        builder: (context, state) => const FreeTellScreen(),
       ),
       GoRoute(
         path: AppRoutes.selfControl,

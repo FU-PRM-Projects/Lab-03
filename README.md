@@ -220,6 +220,7 @@ lib/
 | [`docs/gap-review.md`](docs/gap-review.md) | Final Stage 1: luồng Lab 2 / yêu cầu Lab 3 còn thiếu và quyết định cho từng mục |
 | [`docs/data-model.md`](docs/data-model.md) | Collection, vai trò, quyền, bước chuyển trạng thái và test rules |
 | [`docs/cross-role-flow.md`](docs/cross-role-flow.md) | Luồng liên vai trò gửi thẻ → staff duyệt, sơ đồ và đo thời gian |
+| [`docs/ai-feature.md`](docs/ai-feature.md) | Nốt AI (Gemini qua Firebase AI Logic): Kể tự do, hồ sơ khởi đầu, câu chào; Remote Config, App Check, dự phòng, dữ liệu gửi đi |
 
 ## Công cụ AI đã dùng
 

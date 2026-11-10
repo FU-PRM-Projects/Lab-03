@@ -8,14 +8,17 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_tokens.dart';
 import '../../widgets/note_type_icon.dart';
 
-/// "Ghi nốt" (S02) và nút + (màn tab): hỏi ghi chiến thắng nhỏ hay viết nhật
-/// ký rồi mở S03 hoặc màn Viết nhật ký (deviation D-29).
+/// "Ghi nốt" (S02) và nút + (màn tab): hỏi ghi chiến thắng nhỏ, viết nhật
+/// ký hay kể tự do rồi mở S03, màn Viết nhật ký (deviation D-29) hoặc S03b
+/// Kể tự do (Nốt AI).
 Future<void> openNoteKindSheet(BuildContext context) async {
   final route = await showModalBottomSheet<String>(
     context: context,
     // Nằm trên thanh tab nổi, không bị nó che phần dưới.
     useRootNavigator: true,
     showDragHandle: true,
+    // 3 lựa chọn cao hơn nửa màn 800 dp: cho khay cao theo nội dung.
+    isScrollControlled: true,
     builder: (_) => const _NoteKindSheet(),
   );
   if (route != null && context.mounted) await context.push(route);
@@ -29,7 +32,7 @@ class _NoteKindSheet extends StatelessWidget {
     final theme = Theme.of(context);
 
     return SafeArea(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(
           AppSpace.screen,
           0,
@@ -62,6 +65,12 @@ class _NoteKindSheet extends StatelessWidget {
               title: 'Viết nhật ký',
               subtitle: 'Viết ra suy nghĩ cho đầu nhẹ và rõ hơn.',
               onTap: () => Navigator.of(context).pop(AppRoutes.journal),
+            ),
+            _KindCard(
+              type: NoteType.tuChu,
+              title: 'Kể tự do · Nốt AI',
+              subtitle: 'Kể cả ngày, Tụi Nốt tách thành vài nốt cho bạn chọn.',
+              onTap: () => Navigator.of(context).pop(AppRoutes.freeTell),
             ),
           ],
         ),

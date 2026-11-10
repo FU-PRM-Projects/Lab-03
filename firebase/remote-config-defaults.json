@@ -7,5 +7,10 @@
   "discord_channel_map": "{}",
   "discord_greetings": "[\"Chào mọi người! Mình mới vào, mong được làm quen.\",\"Hi cả phòng, mình đang tập bắt chuyện.\"]",
   "firebase_demo_enabled": "true",
-  "challenge_submissions_enabled": "true"
+  "challenge_submissions_enabled": "true",
+  "ai_enabled": "true",
+  "ai_onboarding_enabled": "true",
+  "ai_model": "gemini-flash-lite-latest",
+  "ai_timeout_ms": "8000",
+  "ai_max_chars": "500"
 }

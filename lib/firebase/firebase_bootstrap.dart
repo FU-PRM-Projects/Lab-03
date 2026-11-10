@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show debugPrint, kDebugMode, kIsWeb;
 
 import '../firebase_options.dart';
 
@@ -20,10 +21,36 @@ const String firebaseEmulatorHost = String.fromEnvironment(
 /// Khởi tạo Firebase trước `runApp`.
 Future<void> initFirebase() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  if (!useFirebaseEmulator) await _activateAppCheck();
 
   if (useFirebaseEmulator) {
     // Cổng khớp với `firebase.json`.
     await FirebaseAuth.instance.useAuthEmulator(firebaseEmulatorHost, 9099);
     FirebaseFirestore.instance.useFirestoreEmulator(firebaseEmulatorHost, 8080);
+  }
+}
+
+/// Site key reCAPTCHA Enterprise (Fraud Defense) cho App Check trên web
+/// (`--dart-define=RECAPTCHA_SITE_KEY=...`); trống thì web chưa có App Check.
+const String recaptchaSiteKey = String.fromEnvironment('RECAPTCHA_SITE_KEY');
+
+/// App Check cho Firestore và Firebase AI Logic (Final Assignment). Bản debug
+/// dùng debug provider: token in ra logcat, dán vào Firebase Console → App
+/// Check → app Android → Manage debug tokens. Bản release dùng Play
+/// Integrity. Lỗi khi bật không chặn app (Console chưa bật Enforce thì
+/// request không token vẫn qua).
+Future<void> _activateAppCheck() async {
+  if (kIsWeb && recaptchaSiteKey.isEmpty) return;
+  try {
+    await FirebaseAppCheck.instance.activate(
+      providerAndroid: kDebugMode
+          ? const AndroidDebugProvider()
+          : const AndroidPlayIntegrityProvider(),
+      providerWeb: kIsWeb
+          ? ReCaptchaEnterpriseProvider(recaptchaSiteKey)
+          : null,
+    );
+  } on Object catch (error) {
+    debugPrint('[app-check] chưa bật được: $error');
   }
 }
