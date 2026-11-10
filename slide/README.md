@@ -109,3 +109,18 @@ import { Slide, Stack, Fragment, Code } from '@revealjs/react';
   <Slide>Slide con (nhấn phím mũi tên xuống để xem)</Slide>
 </Stack>
 ```
+
+---
+
+## Bộ slide Final Assignment (`final.html`)
+
+Bộ slide riêng cho Final (tiếng Anh, theo *Software Project Presentation Guideline*: Problem → Design → Demo → Proof, 28 slide gồm bìa và 2 phụ lục). Mã ở `src/final/`, ảnh minh chứng chép từ `evidence/` vào `public/final/`.
+
+```sh
+cd slide
+npm run dev                         # mở http://localhost:5173/final.html
+npx vite build && npx vite preview  # bản build ở http://localhost:4173/final.html
+node scripts/export-pdf.mjs http://localhost:4173/final.html 28 ../slides/Final_SE190992_slides.pdf
+```
+
+Phím `S` mở Speaker View (mỗi slide có ghi chú thuyết trình).

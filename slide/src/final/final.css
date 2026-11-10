@@ -1,0 +1,348 @@
+/* Final deck: white page, Nốt indigo accent, Be Vietnam Pro. */
+
+.fd {
+  --ink: #1b1d2a;
+  --muted: #555b6e;
+  --line: #e3e5ee;
+  --card: #f6f7fb;
+  --primary: #3d4fd6;
+  --primary-soft: #dce6ff;
+  --ok: #187a4d;
+  --ok-soft: #ddf5ea;
+  --bad: #b3261e;
+  --bad-soft: #fde1df;
+  --warn: #a84f00;
+  --warn-soft: #ffebd6;
+  font-family: 'Be Vietnam Pro', Inter, 'Segoe UI', sans-serif;
+  color: var(--ink);
+}
+
+.reveal .slides section.fd {
+  padding: 40px 56px 36px !important;
+  display: flex !important;
+  flex-direction: column;
+}
+
+.fd .kicker {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.reveal .slides section.fd h2 {
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  max-width: 1020px;
+}
+
+.fd .sub {
+  margin: 8px 0 0;
+  font-size: 19px;
+  color: var(--muted);
+  max-width: 1040px;
+}
+
+.fd .body {
+  flex: 1;
+  min-height: 0;
+  margin-top: 22px;
+  display: flex;
+  gap: 24px;
+}
+
+.fd .col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.fd .grow {
+  flex: 1;
+}
+
+.fd .foot {
+  margin: 10px 0 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.fd .foot code,
+.fd code {
+  font-family: 'JetBrains Mono', Consolas, monospace;
+  font-size: 0.9em;
+  color: var(--primary);
+}
+
+/* Cards */
+.fd .card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.fd .card h4 {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.fd .card p {
+  margin: 0;
+}
+
+.fd .card.accent {
+  background: var(--primary-soft);
+  border-color: transparent;
+}
+
+.fd .card.ok {
+  background: var(--ok-soft);
+  border-color: transparent;
+}
+
+.fd .card.bad {
+  background: var(--bad-soft);
+  border-color: transparent;
+}
+
+.fd .card.warn {
+  background: var(--warn-soft);
+  border-color: transparent;
+}
+
+.fd .cards {
+  display: grid;
+  gap: 12px;
+}
+
+.fd ul.tight {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.fd ul.tight li {
+  margin: 2px 0;
+}
+
+/* Tables */
+.fd table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.fd th {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 6px 10px;
+  border-bottom: 2px solid var(--line);
+}
+
+.fd td {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+.fd td b {
+  font-weight: 600;
+}
+
+/* Pills */
+.fd .pill {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--primary-soft);
+  color: var(--primary);
+  white-space: nowrap;
+}
+
+.fd .pill.ok {
+  background: var(--ok-soft);
+  color: var(--ok);
+}
+
+.fd .pill.bad {
+  background: var(--bad-soft);
+  color: var(--bad);
+}
+
+.fd .pill.warn {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+/* Screenshots */
+.fd .shot {
+  display: block;
+  margin: 0;
+  background: none;
+  flex: none;
+}
+
+.fd .shot img {
+  display: block;
+  margin: 0;
+  max-width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  box-shadow: 0 6px 18px rgba(27, 29, 42, 0.12);
+}
+
+.fd .shot figcaption {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.fd .phones {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+/* Stats */
+.fd .stats {
+  display: grid;
+  gap: 12px;
+}
+
+.fd .stat {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.fd .stat b {
+  display: block;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.1;
+}
+
+.fd .stat span {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* Step flow */
+.fd .steps {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.fd .step {
+  flex: 1;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.fd .step b {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+.fd .arrow {
+  align-self: center;
+  color: var(--muted);
+  font-size: 20px;
+}
+
+/* Cover */
+.fd.cover {
+  background: radial-gradient(circle at 85% 20%, #e8ecff 0, #fff 55%);
+}
+
+.fd.cover h1 {
+  margin: 120px 0 0;
+  font-size: 96px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+}
+
+.fd.cover .tag {
+  margin: 10px 0 0;
+  font-size: 30px;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.fd.cover .meta {
+  margin: 28px 0 0;
+  font-size: 18px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.fd .diagram {
+  width: 100%;
+  height: 100%;
+}
+
+.fd .diagram text {
+  font-family: 'Be Vietnam Pro', sans-serif;
+}
+
+.fd .num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- layout fixes after the first review --- */
+.fd .body {
+  align-items: flex-start;
+}
+
+.fd .body > table {
+  flex: 1;
+}
+
+.reveal .slides section.fd .foot {
+  position: absolute;
+  left: 56px;
+  bottom: 30px;
+  max-width: 1040px;
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.reveal .slides section.fd .body {
+  margin-bottom: 30px;
+}
+
+.fd td code {
+  font-size: 0.95em;
+}
