@@ -236,6 +236,12 @@ class SettingsScreen extends ConsumerWidget {
                     title: 'Email',
                     value: user?.email ?? 'Không có email',
                   ),
+                  SettingRow.value(
+                    title: 'Làm lại khảo sát làm quen',
+                    subtitle: 'Chọn lại cấp thử thách và giờ nhắc',
+                    value: '',
+                    onTap: () => context.push(AppRoutes.onboarding),
+                  ),
                 ],
               ),
               const SizedBox(height: AppSpace.s16),

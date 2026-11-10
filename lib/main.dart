@@ -27,6 +27,7 @@ import 'firebase/firebase_remote_config_service.dart';
 import 'firebase/firestore_challenge_repository.dart';
 import 'firebase/firestore_group_repository.dart';
 import 'firebase/firestore_note_repository.dart';
+import 'firebase/firestore_onboarding_repository.dart';
 import 'firebase/firestore_profile_photo_repository.dart';
 import 'firebase/firestore_self_control.dart';
 import 'firebase/firestore_user_repository.dart';
@@ -45,6 +46,7 @@ import 'services/group_repository.dart';
 import 'services/messaging_service.dart';
 import 'services/note_repository.dart';
 import 'services/nudge_service.dart';
+import 'services/onboarding_services.dart';
 import 'services/profile_photo_repository.dart';
 import 'services/remote_config_service.dart';
 import 'services/report_services.dart';
@@ -143,6 +145,9 @@ Future<void> main() async {
           FirestoreAnnouncementRepository(),
         ),
         inboxRepositoryProvider.overrideWithValue(FirestoreInboxRepository()),
+        onboardingRepositoryProvider.overrideWithValue(
+          FirestoreOnboardingRepository(currentUid: uid),
+        ),
         habitRepositoryProvider.overrideWithValue(
           FirestoreHabitRepository(currentUid: uid),
         ),

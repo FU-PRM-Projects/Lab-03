@@ -22,6 +22,10 @@ abstract final class AnalyticsEvents {
 
   /// Mở hộp thư có tin từ web admin.
   static const String inboxOpened = 'inbox_opened';
+
+  /// Làm quen (A2): mỗi bước S13a–d, và khi lưu hồ sơ khởi đầu.
+  static const String onboardingStep = 'onboarding_step';
+  static const String onboardingDone = 'onboarding_done';
 }
 
 abstract final class AnalyticsParams {
@@ -42,4 +46,7 @@ abstract final class AnalyticsParams {
   static const String screenName = 'firebase_screen';
   static const String imageFolder = 'image_folder';
   static const String fileSizeKb = 'file_size_kb';
+  static const String step = 'step';
+  static const String skipped = 'skipped';
+  static const String source = 'source';
 }

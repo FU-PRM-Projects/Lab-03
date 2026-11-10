@@ -172,6 +172,29 @@ service cloud.firestore {
                               && request.resource.data.keys().hasOnly(['eveningReminder', 'awakeEnabled', 'awakeStart', 'awakeEnd',
                                                                   'lockSelfControl', 'aiEnabled', 'hideNotificationContent']);
       }
+      // Câu trả lời làm quen (A2): chỉ chủ tài khoản, giá trị trong danh sách
+      // của app; không có tên, email hay nội dung nốt.
+      match /private/onboarding {
+        allow read: if isOwner(uid);
+        allow create, update: if isOwner(uid)
+                              && request.resource.data.keys().hasOnly(['strangerLevel', 'habits', 'move', 'freeSlot', 'goals',
+                                                                  'profileLabel', 'planSource', 'done', 'completedAt'])
+                              && request.resource.data.done == true
+                              && (request.resource.data.get('strangerLevel', null) == null
+                                  || (request.resource.data.strangerLevel is int
+                                      && request.resource.data.strangerLevel >= 1
+                                      && request.resource.data.strangerLevel <= 4))
+                              && request.resource.data.get('habits', []) is list
+                              && request.resource.data.get('habits', []).size() <= 20
+                              && request.resource.data.get('move', null) in [null, 'it_khi', 'thinh_thoang', 'thuong_xuyen']
+                              && request.resource.data.get('freeSlot', null) in [null, 'sang', 'chieu', 'toi', 'khuya']
+                              && request.resource.data.get('goals', []) is list
+                              && request.resource.data.get('goals', []).size() <= 2
+                              && (request.resource.data.get('profileLabel', '') is string
+                                  && request.resource.data.get('profileLabel', '').size() <= 30)
+                              && request.resource.data.get('planSource', 'rules') in ['ai', 'rules']
+                              && request.resource.data.completedAt == request.time;
+      }
 
       match /challengeProgress/{topic} {
         allow read: if isOwner(uid);

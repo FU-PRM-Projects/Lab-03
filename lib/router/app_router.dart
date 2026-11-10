@@ -20,6 +20,7 @@ import '../screens/journey/journey_screen.dart';
 import '../screens/note_composer/note_composer_screen.dart';
 import '../screens/note_detail/note_detail_screen.dart';
 import '../screens/note_saved/note_saved_screen.dart';
+import '../screens/onboarding/onboarding_screen.dart';
 import '../screens/self_control/self_control_screen.dart';
 import '../screens/settings/settings_screen.dart';
 import '../screens/splash/splash_screen.dart';
@@ -188,6 +189,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.settings,
         builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.onboarding,
+        builder: (context, state) => const OnboardingScreen(),
       ),
       if (!kReleaseMode)
         GoRoute(
