@@ -1,8 +1,8 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, SyntheticEvent } from 'react';
 import { Deck, Slide } from '@revealjs/react';
 import RevealNotes from 'reveal.js/plugin/notes';
+import RevealZoom from 'reveal.js/plugin/zoom';
 import {
-  ArrowRight,
   BellRing,
   Bot,
   Cloud,
@@ -14,6 +14,7 @@ import {
   ImageUp,
   Database,
   KeyRound,
+  Layers,
   SlidersHorizontal,
 } from 'lucide-react';
 
@@ -179,7 +180,7 @@ function Page({
 function TechImage({ image }: { image: [string, string] }) {
   const [path, caption] = image;
   return (
-    <figure className="tech-image">
+    <figure className={/^(code|review)\//.test(path) ? 'tech-image tech-image-code' : 'tech-image'}>
       <img src={`${import.meta.env.BASE_URL}${path}`} alt={caption} />
       <figcaption>{caption}</figcaption>
     </figure>
@@ -194,6 +195,9 @@ const technologyIcons = {
   analytics: ChartColumn,
   crashlytics: Bug,
   'remote-config': SlidersHorizontal,
+  riverpod: Layers,
+  artemis: Bot,
+  coderabbit: GitPullRequest,
 };
 
 function TechHeading({ id, step }: { id: keyof typeof technologies; step: string }) {
@@ -207,56 +211,118 @@ function TechHeading({ id, step }: { id: keyof typeof technologies; step: string
   );
 }
 
+/** Renders text with `backtick` spans as <code>. */
+function rich(text: string): ReactNode {
+  return text.split('`').map((part, i) => (i % 2 ? <code key={i}>{part}</code> : part));
+}
+
+const plain = (text: string) => text.replaceAll('`', '');
+
+/** A screenshot that is not taken yet shows a grey slot instead of a broken image. */
+function markMissing(e: SyntheticEvent<HTMLImageElement>) {
+  e.currentTarget.closest('figure')?.classList.add('tech-missing');
+}
+
+/** HOW row: give each step a width in proportion to its screenshot, so all screenshots share one height. */
+function fitByRatio(e: SyntheticEvent<HTMLImageElement>) {
+  const { naturalWidth: w, naturalHeight: h } = e.currentTarget;
+  const figure = e.currentTarget.closest('figure');
+  if (figure && w && h) figure.style.flex = `${(w / h).toFixed(3)} 1 0`;
+}
+
 function TechnologySlides({ id }: { id: keyof typeof technologies }) {
-  const { what, example, why, how, flow, code, service, images } = technologies[id];
+  const { what, points, example, why, alternatives, how, setupTitle, setup, where, images } = technologies[id];
+  const base = import.meta.env.BASE_URL;
   return [
-    <Slide key={`${id}-what`} className="tech-slide" notes={`${what} ${example}`}>
-      <TechHeading id={id} step="01 / WHAT" />
+    <Slide key={`${id}-what`} className="tech-slide" notes={`${what} ${points.map(plain).join('. ')}. ${example}`}>
+      <TechHeading id={id} step="01 / WHAT · What is it?" />
       <div className="tech-layout">
         <div>
           <p className="tech-lead">{what}</p>
+          <ul className="tech-points">
+            {points.map((p) => <li key={p}>{rich(p)}</li>)}
+          </ul>
           <p className="tech-example">{example}</p>
         </div>
         <TechImage image={images[0]} />
       </div>
     </Slide>,
-    <Slide key={`${id}-why`} className="tech-slide" notes={why.join(' ')}>
-      <TechHeading id={id} step="02 / WHY" />
-      <div className="tech-layout">
-        <ul className="tech-reasons">
-          {why.map((reason) => <li key={reason}>{reason}</li>)}
-        </ul>
-        <div className="tech-pair">
-          {images[1].map((image) => <TechImage key={image[0]} image={image} />)}
+    <Slide
+      key={`${id}-why`}
+      className="tech-slide"
+      notes={`Why we use it. ${why.map(([head, text]) => `${head}: ${plain(text)}`).join(' ')} Why not something else. ${alternatives.map(([name, text]) => `${plain(name)}: ${plain(text)}`).join(' ')}`}
+    >
+      <TechHeading id={id} step="02 / WHY · Why this, and not something else?" />
+      <div className="tech-why">
+        <div>
+          <h3>Why we use it</h3>
+          <ul className="tech-reasons">
+            {why.map(([head, text]) => (
+              <li key={head}>
+                <b>{head}</b>
+                <span>{rich(text)}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h3>Why not something else?</h3>
+          <ul className="tech-alternatives">
+            {alternatives.map(([name, text]) => (
+              <li key={name}>
+                <b>{rich(name)}</b>
+                <span>{rich(text)}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </Slide>,
-    <Slide key={`${id}-how`} className="tech-slide" notes={`${how} ${[...code, service].map(([place, detail]) => `${place}. ${detail}`).join(' ')}`}>
-      <TechHeading id={id} step="03 / HOW + WHERE" />
-      <div className="tech-layout tech-implementation">
-        <div>
-          <ol className="tech-flow" aria-label="Implementation steps">
-            {flow.map((step, index) => (
-              <li key={step}>
-                {index > 0 && <ArrowRight size={20} aria-hidden="true" />}
-                <span>{step}</span>
-              </li>
-            ))}
-          </ol>
-          <div className="tech-locations">
-            <h3>Source code</h3>
-            <ul>
-              {code.map(([path, detail]) => <li key={path}><code title={detail}>{path}</code></li>)}
-            </ul>
-            <h3>{id === 'cloudinary' ? 'Cloudinary and Firebase' : 'Firebase Console'}</h3>
-            <p>{service[0]}</p>
-          </div>
-        </div>
-        <div>
-          <TechImage image={images[2]} />
-          <a className="tech-evidence" href={`#/evidence-${id}`}>View demo and evidence →</a>
-        </div>
+    <Slide
+      key={`${id}-how`}
+      className="tech-slide tech-slide-tight"
+      notes={`How: ${plain(how)} ${setup.map(([, step], i) => `Step ${i + 1}: ${plain(step)}.`).join(' ')}`}
+    >
+      <TechHeading id={id} step={`03 / HOW · How did we set it up? · ${setupTitle}`} />
+      <p className="tech-how">{rich(how)}</p>
+      <div className="tech-setup">
+        {setup.map(([img, step], i) => (
+          <figure key={img + step}>
+            <div className="tech-setup-img">
+              <img src={`${base}${img}`} alt={plain(step)} onError={markMissing} onLoad={fitByRatio} />
+              <span className="tech-missing-label">Screenshot to add: {img}</span>
+            </div>
+            <figcaption>
+              <em>{i + 1}</em>
+              <span>{rich(step)}</span>
+            </figcaption>
+          </figure>
+        ))}
       </div>
+      <a className="tech-evidence" href={`#/evidence-${id}`}>View demo and evidence →</a>
+    </Slide>,
+    <Slide
+      key={`${id}-where`}
+      className="tech-slide tech-slide-tight"
+      notes={`Where in the code: ${where.map(([, file, lines, does]) => `${file}, lines ${lines}: ${plain(does)}.`).join(' ')}`}
+    >
+      <TechHeading id={id} step="04 / WHERE · Where is it in the code?" />
+      <div className={where.length > 3 ? 'tech-code tech-code-4' : 'tech-code'}>
+        {where.map(([img, file, lines, does]) => (
+          <figure key={img}>
+            <figcaption>
+              <code>{file}</code>
+              <span className="tech-at">:{lines}</span>
+              <span className="tech-does">{rich(does)}</span>
+            </figcaption>
+            <div className="tech-code-img">
+              <img src={`${base}${img}`} alt={`${file} lines ${lines}: ${plain(does)}`} onError={markMissing} />
+              <span className="tech-missing-label">Screenshot to add: {img}</span>
+            </div>
+          </figure>
+        ))}
+      </div>
+      <p className="tech-source">Real code on GitHub · FU-PRM-Projects/Lab-03 · branch main · key lines boxed in red</p>
     </Slide>,
   ];
 }
@@ -599,7 +665,7 @@ export default function App() {
           controls: false,
           progress: false,
         }}
-        plugins={[RevealNotes]}
+        plugins={[RevealNotes, RevealZoom]}
       >
         <Slide notes="Nốt is built for Minh, a 22-year-old final-year student. Lab 2 success criterion: log a mood and one win in under 30 seconds after tapping the evening notification.">
           <OrgLogo cover />
@@ -804,7 +870,9 @@ export default function App() {
           <p className="foot">docs/design-traceability.md · §1 screens, §5 every deviation with its reason</p>
         </Page>
 
-        <Page
+        <TechnologySlides id="riverpod" />
+
+        <Page id="evidence-riverpod"
           title="MVVM"
           notes="Widgets never call an SDK. Each screen has an explicit state model. Services are injected through Riverpod, so ViewModels can be tested with fakes. Details: docs/architecture.md."
         >
@@ -1025,58 +1093,13 @@ export default function App() {
           <p className="foot">firebase/firestore.rules · lib/firebase/firestore_note_repository.dart · evidence/firestore/ · evidence/deploy/</p>
         </Page>
 
-        <Page
-          dense
-          title="Historical demo: Cloud Storage"
-          line="When it fails: offline → “Chưa tải lên được: kiểm tra Wi-Fi” · signed out → “đăng nhập lại” · any other error → “Chưa tạo được thẻ tuần” + Thử lại"
-          notes="The weekly card (S11b) is built as a PDF on the device and uploaded to reports/{uid}/ in Cloud Storage. The upload streams its progress, which the screen shows as a percentage bar, and then returns the download URL, shown with a copy button. storage.rules lets each user read and write only their own folder, and only PDFs under 5 MB. Failures never crash: no network, an expired session and any other error each show a message with a retry, and the error is also sent to Crashlytics as a non-fatal. The project is on the Spark plan, and Firebase now needs the Blaze plan to create a Storage bucket, so on the real project the upload currently fails and shows the error on the left; the full flow was tested on the Firebase Emulator."
-        >
-          <div className="stg">
-            <figure className="stg-phone">
-              <img src="app/report-error.png" alt="Upload failed: Chưa tạo được thẻ tuần. Thử lại nhé. with a retry button" />
-              <figcaption>
-                <b>Failure</b> → message + Thử lại
-              </figcaption>
-            </figure>
-            <div className="stg-col">
-              <figure>
-                <figcaption>
-                  <b>Console</b> · Storage › reports/
-                </figcaption>
-                <div className="stg-console">Console file list: add after the Storage bucket is created (Blaze plan)</div>
-              </figure>
-              <figure>
-                <figcaption>
-                  <b>Rules: own folder only</b> <code>firebase/storage.rules</code>
-                </figcaption>
-                <Crop src="code/storage-rules.png" alt="storage.rules: read and write only reports/{uid} of the signed-in user, PDF under 5 MB" natural={620} y={22} w={620} h={114} scale={0.72} />
-              </figure>
-            </div>
-            <div className="stg-col">
-              <figure>
-                <figcaption>
-                  <b>Upload to reports/&#123;uid&#125;, progress, URL</b> <code>report_impl.dart</code>
-                </figcaption>
-                <Crop src="code/storage-upload.png" alt="uploadReport: putData to reports/uid, yields progress, then the download URL" natural={620} y={22} w={620} h={314} scale={0.72} />
-              </figure>
-              <figure>
-                <figcaption>
-                  <b>Progress on screen</b> <code>weekly_card_page.dart</code>
-                </figcaption>
-                <Crop src="code/storage-progress.png" alt="Weekly card page shows Đang tải lên đám mây with a percentage bar" natural={620} y={22} w={620} h={154} scale={0.72} />
-              </figure>
-            </div>
-          </div>
-          <p className="foot">firebase/storage.rules · lib/firebase/report_impl.dart</p>
-        </Page>
-
         <TechnologySlides id="cloudinary" />
 
         <Page id="evidence-cloudinary"
           dense
           title="Photos on Cloudinary"
           line="Why: Firebase Storage needs the paid Blaze plan, so profile, note and group photos are uploaded to Cloudinary"
-          notes="Firebase Storage now needs the Blaze plan to create a bucket, so we moved photo uploads to Cloudinary's free plan. Three places take a photo: the profile picture in Settings, a photo attached to a note in step 3, and a photo for a first-time group. The previous slide shows the historical Storage prototype. The app uploads with an unsigned upload preset, so no API secret is in the app; the format and size limits are set on the preset, and the app also refuses files over 5 MB. Each upload gets a random public id under not/avatars, not/notes or not/groups, so it cannot be guessed or overwritten. The upload streams its progress, as in the first screenshot, and can be cancelled. Firestore only keeps the reference, url and publicId; firestore.rules accepts it only as exactly those two keys with a secure URL on res.cloudinary.com (validImage, PR 47, tests R-16 to R-18). Errors show a message: no network, expired session, wrong file type or size. A successful upload logs image_uploaded with the folder and size."
+          notes="Firebase Storage now needs the Blaze plan to create a bucket, so we moved photo uploads to Cloudinary's free plan. Three places take a photo: the profile picture in Settings, a photo attached to a note in step 3, and a photo for a first-time group. The app uploads with an unsigned upload preset, so no API secret is in the app; the format and size limits are set on the preset, and the app also refuses files over 5 MB. Each upload gets a random public id under not/avatars, not/notes or not/groups, so it cannot be guessed or overwritten. The upload streams its progress, as in the first screenshot, and can be cancelled. Firestore only keeps the reference, url and publicId; firestore.rules accepts it only as exactly those two keys with a secure URL on res.cloudinary.com (validImage, PR 47, tests R-16 to R-18). Errors show a message: no network, expired session, wrong file type or size. A successful upload logs image_uploaded with the folder and size."
         >
           <Gallery
             cols={4}
@@ -1111,47 +1134,6 @@ export default function App() {
             </ul>
           </div>
           <p className="foot">lib/firebase/cloudinary_image_service.dart · firebase/firestore.rules · evidence/cloudinary/</p>
-        </Page>
-
-        <Page
-          dense
-          title="Streak of days"
-          line="Counted from the notes themselves: no extra data in Firestore, so editing or deleting a note keeps it right"
-          notes="A new feature on top of the Lab 2 design, logged as deviation D-31. Today shows a streak card under the jar: the current streak, the record, the last seven days and how far the next milestone is. The milestones are 3, 7, 14, 30, 60, 100 and 365 days. When the first note of the day extends the streak, the saved screen celebrates; here it was the third day, so it says Mốc 3 ngày. The share button builds an image of the streak and opens the system share sheet. The streak is computed from the notes, by the same function as the statistics screen; if today has no note yet, it counts up to yesterday, so the streak does not break before the day ends. Two Analytics events: streak_extended and streak_shared. The shared image is also kept privately in users/uid/sharedStreaks."
-        >
-          <Gallery
-            cols={4}
-            height={300}
-            items={[
-              { src: 'app/streak-today.png', alt: 'Today with the streak card: 3 days, record 3, 4 days to the 7-day milestone', caption: '1 · Streak card on Today' },
-              { src: 'app/streak-milestone.png', alt: 'Saved screen celebrating the 3-day milestone', caption: '2 · Milestone on the saved screen' },
-              { src: 'app/streak-share.png', alt: 'Share screen with the streak image', caption: '3 · Share as an image' },
-              { src: 'app/streak-sharesheet.png', alt: 'Android share sheet with the streak image and text', caption: '4 · Android share sheet' },
-            ]}
-          />
-          <div className="cld-row">
-            <figure>
-              <figcaption>
-                <b>Counting the streak</b> <code>utils/journey_stats.dart</code>
-              </figcaption>
-              <Crop src="code/streak-count.png" alt="streak counts consecutive days with a note, starting from yesterday when today has none" natural={620} y={22} w={620} h={226} scale={0.56} />
-            </figure>
-            <ul>
-              <li>
-                <b>Milestones:</b> 3 · 7 · 14 · 30 · 60 · 100 · 365 days
-              </li>
-              <li>
-                <b>No penalty:</b> no note yet today still counts up to yesterday
-              </li>
-              <li>
-                <b>Same number everywhere:</b> Today, the saved screen and Statistics share one function
-              </li>
-              <li>
-                <b>Analytics:</b> <code>streak_extended</code>, <code>streak_shared</code> · deviation D-31
-              </li>
-            </ul>
-          </div>
-          <p className="foot">lib/utils/streak_stats.dart · lib/widgets/streak_card.dart · docs/design-traceability.md D-31 · evidence/streak/</p>
         </Page>
 
         <TechnologySlides id="fcm" />
@@ -1388,7 +1370,9 @@ export default function App() {
           <p className="foot">docs/analytics-plan.md §10 · firebase/remote-config-defaults.json · evidence/remote-config/</p>
         </Page>
 
-        <Page
+        <TechnologySlides id="artemis" />
+
+        <Page id="evidence-artemis"
           dense
           title="ARTEMIS E2E"
           notes="ARTEMIS drives the real app on the Android 15 emulator through ADB. Model: deepseek-v4.1-flash via OpenRouter, Flash profile. 14 cases (T01 to T14) cover F1 write a note (main path, empty note, leave with a draft, offline), F2 self-control and breathing, F3 challenges, the four tabs, Settings (feature flags) and a native Android case (Home, notification shade, relaunch). Each case ran 3 times and asserts on the value the agent reports, not only on success. First full run: 31 of 36. Two failures came from wrong assertions in our tests (T05 run 3 accepted only an answer starting with DIALOG; T12 demanded the Today screen although the app correctly restores the previous screen). We fixed those and re-ran T05 and T12: 6 of 6. T06 run 3 timed out after 420 seconds in the offline case and stays a failure. T13 (analytics event read from adb logcat) and T14 (weekly card export) were added later: 6 of 6 after a fixture fix. Final: 41 of 42. The exploratory session ran for 25 minutes with the Pro profile and reported 10 issues; the sign-in cases need an email test account. Details and the table: docs/test-plan.md (branch feat/e2e-artemis); proofs in evidence/artemis/."
@@ -1634,7 +1618,9 @@ export default function App() {
           <p className="foot">docs/test-plan.md §5 · evidence/artemis/x01-bugs.txt · evidence/artemis/x01/ · junit-x01.xml</p>
         </Page>
 
-        <Page
+        <TechnologySlides id="coderabbit" />
+
+        <Page id="evidence-coderabbit"
           dense
           title="AI code review"
           line="CodeRabbit reviewed every PR: 52 findings on #28, #29 and #38"
