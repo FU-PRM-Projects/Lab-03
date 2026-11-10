@@ -1,7 +1,13 @@
+import 'dart:async';
+
 import 'package:not_core/not_core.dart';
 
 /// Câu báo lỗi cho staff, theo loại lỗi của tầng service.
 String errorMessage(Object error) {
+  // Hết giờ chờ máy chủ (thường do mất mạng): báo như lỗi mạng.
+  if (error is TimeoutException) {
+    return 'Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.';
+  }
   if (error is AppException) {
     return switch (error.kind) {
       AppErrorKind.network =>

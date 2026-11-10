@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:not_admin/services/admin_services.dart';
 import 'package:not_admin/viewmodels/admin_view_models.dart';
+import 'package:not_admin/viewmodels/messages.dart';
 import 'package:not_admin/viewmodels/session_view_model.dart';
 import 'package:not_core/not_core.dart';
 
@@ -240,6 +241,13 @@ void main() {
       expect(submissions.approved.single.reviewer, 'root');
     },
   );
+
+  test('hết giờ chờ máy chủ báo như lỗi mạng, không phải lỗi chung', () {
+    expect(
+      errorMessage(TimeoutException('count')),
+      'Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.',
+    );
+  });
 
   test('thẻ mới xếp cuối cấp của đúng chủ đề', () {
     CatalogCard card(ChallengeTopic topic, int level, int order) => CatalogCard(

@@ -18,6 +18,8 @@ admin "Thị Kim Thúy Đoàn".
 | 9 | Thông báo | **Trạng thái trống** ("Chưa có thông báo nào") và form đang soạn | Đạt | [`09-announcement-form.png`](09-announcement-form.png) |
 | 10 | Thông báo | **Gửi** "Bạn đã vận động chưa ?": hiện trong danh sách lúc 10:56, form được xoá | Đạt | [`10-announcement-sent.png`](10-announcement-sent.png) |
 | 11 | App (Galaxy A70) | Thông báo vừa gửi tới **hộp thư của app theo thời gian thực** (Thông báo chung · Hôm nay · 10:56) | Đạt | [`11-app-inbox-announcement.png`](11-app-inbox-announcement.png) |
+| 12 | Người dùng | Danh sách người dùng có tìm kiếm; chỉ admin đổi vai trò; vai trò của chính mình bị khoá ("(bạn)", ô mờ). Đã che email | Đạt | [`12-users.png`](12-users.png) |
+| 13 | Tổng quan | **Trạng thái đang tải**: "Đang đếm số liệu…", nút Làm mới mờ | Đạt | [`13-dashboard-loading.png`](13-dashboard-loading.png) |
 
 ## Trạng thái lỗi
 
@@ -29,6 +31,11 @@ xảy ra. Thử lại sau ít phút."* và giữ thẻ ở hàng chờ (đã s�
 [`docs/cross-role-flow.md`](../../docs/cross-role-flow.md)). Chưa có ảnh chụp
 trạng thái lỗi.
 
-## Còn thiếu
+## Phát hiện khi chụp trạng thái lỗi
 
-- Màn **Người dùng** (danh sách và đổi vai trò, chỉ admin).
+Tắt mạng rồi bấm Làm mới ở Tổng quan: màn quay vòng mãi ở "Đang đếm số
+liệu…" (ảnh 13) thay vì báo lỗi, vì truy vấn `count()` của Firestore chờ máy
+chủ không giới hạn. Đã sửa: Tổng quan chờ tối đa 15 giây rồi hiện trạng thái
+lỗi *"Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại."*, và mọi lỗi hết
+giờ khác (như bước Duyệt) cũng báo như lỗi mạng thay vì "Có lỗi xảy ra". Ảnh
+trạng thái lỗi chụp sau khi bản sửa được deploy.
