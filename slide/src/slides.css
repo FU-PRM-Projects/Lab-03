@@ -23,6 +23,161 @@ html, body, #root, .stage {
   box-sizing: border-box;
 }
 
+.reveal .slides section.tech-slide {
+  padding: 62px 90px !important;
+}
+
+.tech-step {
+  margin: 0 0 14px;
+  color: #b71c25;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+
+.reveal .tech-slide h2 {
+  font-size: 54px;
+}
+
+.tech-title {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.tech-title svg {
+  flex: 0 0 auto;
+  width: 48px;
+  height: 48px;
+  color: #454bc2;
+  stroke-width: 1.75;
+}
+
+.tech-layout {
+  display: grid;
+  grid-template-columns: 0.95fr 1.05fr;
+  align-items: center;
+  gap: 42px;
+  margin-top: 30px;
+}
+
+.tech-layout > *,
+.tech-pair > * {
+  min-width: 0;
+}
+
+.tech-lead,
+.tech-reasons {
+  margin: 0;
+  font-size: 30px;
+  line-height: 1.3;
+}
+
+.tech-example {
+  margin: 22px 0 0;
+  color: #555;
+  font-size: 23px;
+  line-height: 1.35;
+}
+
+.tech-reasons {
+  padding-left: 1em;
+}
+
+.tech-reasons li + li {
+  margin-top: 24px;
+}
+
+.tech-image {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  text-align: center;
+}
+
+.tech-image img {
+  width: 100%;
+  height: 355px;
+  object-fit: contain;
+  background: #f5f5f5;
+}
+
+.tech-image figcaption {
+  color: #444;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.tech-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.tech-implementation {
+  grid-template-columns: 1fr 1fr;
+}
+
+.tech-flow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  font-size: 22px;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.tech-flow li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tech-flow svg {
+  flex: 0 0 auto;
+  color: #454bc2;
+}
+
+.tech-implementation .tech-image img {
+  height: 290px;
+}
+
+.tech-locations {
+  margin-top: 24px;
+  padding-top: 12px;
+  border-top: 1px solid #ccc;
+  font-size: 19px;
+  line-height: 1.35;
+}
+
+.tech-locations h3 {
+  margin: 12px 0 3px;
+  color: #555;
+  font-size: 18px;
+}
+
+.tech-locations p,
+.tech-locations ul {
+  margin: 0;
+}
+
+.tech-locations ul {
+  padding-left: 1.1em;
+  overflow-wrap: anywhere;
+}
+
+.tech-evidence {
+  display: block;
+  margin-top: 18px;
+  color: #b71c25;
+  font-size: 18px;
+  text-align: center;
+}
+
 .reveal h1,
 .reveal h2 {
   margin: 0;

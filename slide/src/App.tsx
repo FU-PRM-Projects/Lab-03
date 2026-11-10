@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Deck, Slide } from '@revealjs/react';
 import RevealNotes from 'reveal.js/plugin/notes';
 import {
+  ArrowRight,
   BellRing,
   Bot,
   Cloud,
@@ -18,33 +19,11 @@ import {
 
 import 'reveal.js/reveal.css';
 import './slides.css';
+import { technologies } from './lab3-technologies';
 
 /** Slot for a real screenshot. Replace with <img> once evidence exists; never fill in assumed results. */
 function Shot({ label }: { label: string }) {
   return <div className="shot">{label}</div>;
-}
-
-/** Figma frame next to the real app screen, with a few short notes on what differs. */
-function Compare({ screen, diffs }: { screen: string; diffs: string[] }) {
-  const base = import.meta.env.BASE_URL;
-  const file = screen.toLowerCase();
-  return (
-    <div className="compare">
-      <figure>
-        <img src={`${base}figma/${file}.png`} alt={`${screen} in Figma`} />
-        <figcaption>Figma</figcaption>
-      </figure>
-      <figure>
-        <img src={`${base}app/${file}.png`} alt={`${screen} in the app`} />
-        <figcaption>App</figcaption>
-      </figure>
-      <ul className="diffs">
-        {diffs.map((d) => (
-          <li key={d}>{d}</li>
-        ))}
-      </ul>
-    </div>
-  );
 }
 
 type ShotImage = {
@@ -147,6 +126,7 @@ function OrgLogo({ cover }: { cover?: boolean }) {
 }
 
 function Page({
+  id,
   title,
   line,
   todo,
@@ -156,6 +136,7 @@ function Page({
   dense,
   children,
 }: {
+  id?: string;
   title: string;
   line?: string;
   todo?: string;
@@ -166,7 +147,7 @@ function Page({
   children?: ReactNode;
 }) {
   return (
-    <Slide notes={notes} className={dense ? 'dense' : undefined}>
+    <Slide id={id} notes={notes} className={dense ? 'dense' : undefined}>
       <OrgLogo />
       <h2>{title}</h2>
       {line && <p className="line">{line}</p>}
@@ -195,8 +176,89 @@ function Page({
   );
 }
 
-function Flow({ steps }: { steps: string[] }) {
-  return <p className="flow">{steps.join('  →  ')}</p>;
+function TechImage({ image }: { image: [string, string] }) {
+  const [path, caption] = image;
+  return (
+    <figure className="tech-image">
+      <img src={`${import.meta.env.BASE_URL}${path}`} alt={caption} />
+      <figcaption>{caption}</figcaption>
+    </figure>
+  );
+}
+
+const technologyIcons = {
+  auth: KeyRound,
+  firestore: Database,
+  cloudinary: ImageUp,
+  fcm: BellRing,
+  analytics: ChartColumn,
+  crashlytics: Bug,
+  'remote-config': SlidersHorizontal,
+};
+
+function TechHeading({ id, step }: { id: keyof typeof technologies; step: string }) {
+  const Icon = technologyIcons[id];
+  return (
+    <>
+      <OrgLogo />
+      <p className="tech-step">{step}</p>
+      <h2 className="tech-title"><Icon aria-hidden="true" />{technologies[id].name}</h2>
+    </>
+  );
+}
+
+function TechnologySlides({ id }: { id: keyof typeof technologies }) {
+  const { what, example, why, how, flow, code, service, images } = technologies[id];
+  return [
+    <Slide key={`${id}-what`} className="tech-slide" notes={`${what} ${example}`}>
+      <TechHeading id={id} step="01 / WHAT" />
+      <div className="tech-layout">
+        <div>
+          <p className="tech-lead">{what}</p>
+          <p className="tech-example">{example}</p>
+        </div>
+        <TechImage image={images[0]} />
+      </div>
+    </Slide>,
+    <Slide key={`${id}-why`} className="tech-slide" notes={why.join(' ')}>
+      <TechHeading id={id} step="02 / WHY" />
+      <div className="tech-layout">
+        <ul className="tech-reasons">
+          {why.map((reason) => <li key={reason}>{reason}</li>)}
+        </ul>
+        <div className="tech-pair">
+          {images[1].map((image) => <TechImage key={image[0]} image={image} />)}
+        </div>
+      </div>
+    </Slide>,
+    <Slide key={`${id}-how`} className="tech-slide" notes={`${how} ${[...code, service].map(([place, detail]) => `${place}. ${detail}`).join(' ')}`}>
+      <TechHeading id={id} step="03 / HOW + WHERE" />
+      <div className="tech-layout tech-implementation">
+        <div>
+          <ol className="tech-flow" aria-label="Implementation steps">
+            {flow.map((step, index) => (
+              <li key={step}>
+                {index > 0 && <ArrowRight size={20} aria-hidden="true" />}
+                <span>{step}</span>
+              </li>
+            ))}
+          </ol>
+          <div className="tech-locations">
+            <h3>Source code</h3>
+            <ul>
+              {code.map(([path, detail]) => <li key={path}><code title={detail}>{path}</code></li>)}
+            </ul>
+            <h3>{id === 'cloudinary' ? 'Cloudinary and Firebase' : 'Firebase Console'}</h3>
+            <p>{service[0]}</p>
+          </div>
+        </div>
+        <div>
+          <TechImage image={images[2]} />
+          <a className="tech-evidence" href={`#/evidence-${id}`}>View demo and evidence →</a>
+        </div>
+      </div>
+    </Slide>,
+  ];
 }
 
 type ArchBox = { x: number; y: number; w: number; title: string; sub: string; dim?: boolean; n?: number };
@@ -809,7 +871,9 @@ export default function App() {
           </p>
         </Page>
 
-        <Page
+        <TechnologySlides id="auth" />
+
+        <Page id="evidence-auth"
           dense
           title="Authentication"
           line="When it fails: cancel → “Bạn đã huỷ đăng nhập.” · offline → “Không có mạng. Kiểm tra Wi-Fi rồi thử lại.” · sign-out error → “Chưa đăng xuất được. Thử lại.”"
@@ -897,7 +961,9 @@ export default function App() {
           <p className="foot">evidence/auth/ · lib/firebase/firebase_auth_service.dart</p>
         </Page>
 
-        <Page
+        <TechnologySlides id="firestore" />
+
+        <Page id="evidence-firestore"
           dense
           title="Cloud Firestore"
           line="When it fails: offline → saved on the device + banner · load error or over 10 s → error state + Thử lại · denied → message, draft kept"
@@ -961,7 +1027,7 @@ export default function App() {
 
         <Page
           dense
-          title="Cloud Storage"
+          title="Historical demo: Cloud Storage"
           line="When it fails: offline → “Chưa tải lên được: kiểm tra Wi-Fi” · signed out → “đăng nhập lại” · any other error → “Chưa tạo được thẻ tuần” + Thử lại"
           notes="The weekly card (S11b) is built as a PDF on the device and uploaded to reports/{uid}/ in Cloud Storage. The upload streams its progress, which the screen shows as a percentage bar, and then returns the download URL, shown with a copy button. storage.rules lets each user read and write only their own folder, and only PDFs under 5 MB. Failures never crash: no network, an expired session and any other error each show a message with a retry, and the error is also sent to Crashlytics as a non-fatal. The project is on the Spark plan, and Firebase now needs the Blaze plan to create a Storage bucket, so on the real project the upload currently fails and shows the error on the left; the full flow was tested on the Firebase Emulator."
         >
@@ -1004,11 +1070,13 @@ export default function App() {
           <p className="foot">firebase/storage.rules · lib/firebase/report_impl.dart</p>
         </Page>
 
-        <Page
+        <TechnologySlides id="cloudinary" />
+
+        <Page id="evidence-cloudinary"
           dense
           title="Photos on Cloudinary"
           line="Why: Firebase Storage needs the paid Blaze plan, so profile, note and group photos are uploaded to Cloudinary"
-          notes="Firebase Storage now needs the Blaze plan to create a bucket, so we moved photo uploads to Cloudinary's free plan. Three places take a photo: the profile picture in Settings, a photo attached to a note in step 3, and a photo for a first-time group. The weekly PDF card still uses Firebase Storage and is covered on the previous slide. The app uploads with an unsigned upload preset, so no API secret is in the app; the format and size limits are set on the preset, and the app also refuses files over 5 MB. Each upload gets a random public id under not/avatars, not/notes or not/groups, so it cannot be guessed or overwritten. The upload streams its progress, as in the first screenshot, and can be cancelled. Firestore only keeps the reference, url and publicId; firestore.rules accepts it only as exactly those two keys with a secure URL on res.cloudinary.com (validImage, PR 47, tests R-16 to R-18). Errors show a message: no network, expired session, wrong file type or size. A successful upload logs image_uploaded with the folder and size."
+          notes="Firebase Storage now needs the Blaze plan to create a bucket, so we moved photo uploads to Cloudinary's free plan. Three places take a photo: the profile picture in Settings, a photo attached to a note in step 3, and a photo for a first-time group. The previous slide shows the historical Storage prototype. The app uploads with an unsigned upload preset, so no API secret is in the app; the format and size limits are set on the preset, and the app also refuses files over 5 MB. Each upload gets a random public id under not/avatars, not/notes or not/groups, so it cannot be guessed or overwritten. The upload streams its progress, as in the first screenshot, and can be cancelled. Firestore only keeps the reference, url and publicId; firestore.rules accepts it only as exactly those two keys with a secure URL on res.cloudinary.com (validImage, PR 47, tests R-16 to R-18). Errors show a message: no network, expired session, wrong file type or size. A successful upload logs image_uploaded with the folder and size."
         >
           <Gallery
             cols={4}
@@ -1038,7 +1106,7 @@ export default function App() {
                 <b>When it fails:</b> no Wi-Fi, expired session, wrong type or over 5 MB each show a message
               </li>
               <li>
-                <b>Not on Cloudinary:</b> the weekly PDF still goes to Firebase Storage
+                <b>Weekly card PDF:</b> saved locally in the current build
               </li>
             </ul>
           </div>
@@ -1086,7 +1154,9 @@ export default function App() {
           <p className="foot">lib/utils/streak_stats.dart · lib/widgets/streak_card.dart · docs/design-traceability.md D-31 · evidence/streak/</p>
         </Page>
 
-        <Page
+        <TechnologySlides id="fcm" />
+
+        <Page id="evidence-fcm"
           dense
           title="Cloud Messaging"
           line="When it fails: permission denied → dialog + “Mở cài đặt” · unknown route → opens Today · FCM start error → logged, the app keeps running"
@@ -1172,7 +1242,9 @@ export default function App() {
           <p className="foot">evidence/fcm/ · lib/firebase/firebase_messaging_service.dart</p>
         </Page>
 
-        <Page
+        <TechnologySlides id="analytics" />
+
+        <Page id="evidence-analytics"
           dense
           title="Analytics"
           line="When it fails: a failed log is caught and skipped (SafeAnalytics.track), so the user's action never fails"
@@ -1227,7 +1299,9 @@ export default function App() {
           <p className="foot">docs/analytics-plan.md §4 event table · evidence/analytics/</p>
         </Page>
 
-        <Page
+        <TechnologySlides id="crashlytics" />
+
+        <Page id="evidence-crashlytics"
           dense
           title="Crashlytics"
           line="When it fails: the user still sees the error message; Emulator and web builds use a no-op reporter"
@@ -1270,7 +1344,9 @@ export default function App() {
           <p className="foot">docs/analytics-plan.md §6 · evidence/crashlytics/</p>
         </Page>
 
-        <Page
+        <TechnologySlides id="remote-config" />
+
+        <Page id="evidence-remote-config"
           dense
           title="Remote Config"
           line="When it fails: fetch error → in-app defaults · broken JSON on the Console → default list · refresh shows “Cấu hình chưa có gì mới.”"
@@ -1739,6 +1815,7 @@ export default function App() {
             ))}
           </div>
         </Slide>
+
       </Deck>
     </div>
   );
