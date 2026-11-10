@@ -1,0 +1,38 @@
+# App mobile (Final): chạy trên máy thật
+
+Chạy ngày 10/11/2026 trên **Samsung Galaxy A70 (SM-A705F, Android 11)**, bản
+debug từ `main` (commit `1aec01a`, sau PR #65–#68), nối Firebase thật
+`prm393-not-lab3`. App Check: debug provider, debug token của máy đã đăng ký
+cho `lab03 (android)`; Firebase AI Logic đang Enforce App Check.
+
+## Onboarding (A2, S13a–g)
+
+| Ảnh | Cho thấy |
+|---|---|
+| [`01-onboarding-q1.png`](01-onboarding-q1.png) | Câu 1/4: mức ngại bắt chuyện với người lạ |
+| [`02-onboarding-q4.png`](02-onboarding-q4.png) | Câu 4/4: chọn tối đa 2 mục tiêu |
+| [`03-onboarding-starter-plan.png`](03-onboarding-starter-plan.png) | Hồ sơ khởi đầu "Bạn nhỏ thân thiện", 3 thẻ đầu tiên, giờ nhắc 21:00 theo câu trả lời "buổi tối" |
+
+## Nốt AI · Kể tự do (A1, S03b) với Gemini thật
+
+| Ảnh | Cho thấy |
+|---|---|
+| [`04-ai-consent.png`](04-ai-consent.png) | Lần đầu dùng: sheet nói rõ gửi gì cho Gemini, không gửi gì, tắt ở đâu |
+| [`05-ai-free-tell-result.png`](05-ai-free-tell-result.png) | Gemini tách đoạn kể thành 3 nốt (Chiến thắng / Tự chủ / Nhật ký) và tâm trạng "Ổn"; nhãn **"Gợi ý từ Nốt AI · kiểm tra trước khi lưu"**, đổi được loại, sửa được tiêu đề, bỏ chọn được |
+| [`06-ai-notes-saved.png`](06-ai-notes-saved.png) | "Đã lưu 3 nốt vào hũ", hũ tăng từ 11 lên 14 nốt, chuỗi ngày bắt đầu |
+
+Đoạn kể nhập qua `adb shell input text` nên không dấu ("Sang nay minh day som
+chay bo 2km quanh ho…"); Gemini vẫn hiểu và trả tiêu đề có dấu. Model:
+`gemini-flash-lite-latest` (mặc định trong code, Remote Config chưa ghi đè).
+
+## Thẻ tuần PDF (S11b, D-06): lưu và chia sẻ trên máy
+
+| Ảnh / file | Cho thấy |
+|---|---|
+| [`07-weekly-card.png`](07-weekly-card.png) | Thẻ tuần 09/11–15/11 có nút "Lưu thẻ tuần (PDF)" |
+| [`08-pdf-share-sheet.png`](08-pdf-share-sheet.png) | Hộp chia sẻ của Android mở với `weekly-2026-W46.pdf` (đã cắt phần danh bạ bên dưới) |
+| [`09-pdf-saved.png`](09-pdf-saved.png) | "Đã lưu thẻ tuần vào máy. weekly-2026-W46.pdf · 15,4 KB" và nút "Chia sẻ PDF" |
+| [`10-pdf-file.png`](10-pdf-file.png), [`weekly-2026-W46.pdf`](weekly-2026-W46.pdf) | File thật lấy từ máy (`adb exec-out run-as com.quanphungg.lab03 cat app_flutter/reports/weekly-2026-W46.pdf`), 15 775 byte, tiếng Việt đúng |
+
+File nằm ở thư mục riêng của app (`app_flutter/reports/`), không lên Cloud
+Storage. Metadata ghi ở Firestore `users/{uid}/reports/2026-W46`.
