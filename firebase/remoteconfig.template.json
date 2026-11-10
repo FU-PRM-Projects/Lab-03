@@ -44,7 +44,7 @@
     },
     "ai_model": {
       "defaultValue": {
-        "value": "gemini-2.5-flash"
+        "value": "gemini-flash-lite-latest"
       },
       "valueType": "STRING",
       "description": "Tên model Gemini qua Firebase AI Logic"

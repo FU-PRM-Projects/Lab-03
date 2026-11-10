@@ -39,7 +39,7 @@ class AiConfig {
   final String promptOnboarding;
   final String promptGreeting;
 
-  static const String defaultModel = 'gemini-2.5-flash';
+  static const String defaultModel = 'gemini-flash-lite-latest';
 
   static const String defaultPromptSort =
       'Bạn là Tụi Nốt, bạn đồng hành nhẹ nhàng của một sinh viên. Người dùng '

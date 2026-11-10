@@ -38,8 +38,8 @@ vì nốt thử thách cần kết quả thử thách đi kèm.
 
 | Yêu cầu | Cách làm |
 |---|---|
-| App Check | `FirebaseAppCheck.activate` lúc khởi động (`firebase_bootstrap.dart`): debug provider ở bản debug, Play Integrity ở bản release, reCAPTCHA v3 trên web khi build với `--dart-define=RECAPTCHA_SITE_KEY=…`. `firebase_ai` tự gắn token App Check vào mỗi lời gọi |
-| Model, prompt, cờ bật / tắt từ Remote Config | `ai_enabled`, `ai_onboarding_enabled`, `ai_model` (mặc định `gemini-2.5-flash`), `ai_timeout_ms` (8000), `ai_max_chars` (500), `ai_prompt_sort`, `ai_prompt_onboarding`, `ai_prompt_greeting`. Đọc lại mỗi lần gọi (`AiConfig`), nên đổi trên Console có tác dụng sau khi tải lại cấu hình |
+| App Check | `FirebaseAppCheck.activate` lúc khởi động (`firebase_bootstrap.dart`): debug provider ở bản debug, Play Integrity ở bản release, reCAPTCHA Enterprise (Fraud Defense) trên web khi build với `--dart-define=RECAPTCHA_SITE_KEY=…`. `firebase_ai` tự gắn token App Check vào mỗi lời gọi |
+| Model, prompt, cờ bật / tắt từ Remote Config | `ai_enabled`, `ai_onboarding_enabled`, `ai_model` (mặc định `gemini-flash-lite-latest`), `ai_timeout_ms` (8000), `ai_max_chars` (500), `ai_prompt_sort`, `ai_prompt_onboarding`, `ai_prompt_greeting`. Đọc lại mỗi lần gọi (`AiConfig`), nên đổi trên Console có tác dụng sau khi tải lại cấu hình |
 | Hết quota, mất mạng vẫn chạy | Mọi lỗi thành `AiException(reason)`. Kể tự do: giữ đoạn kể, câu báo theo lý do, nút **Thử lại** và **Ghi tay**. Làm quen: dùng bảng luật `StarterPlanRules` (S13g "Nốt AI đang nghỉ"). Câu chào: câu có sẵn `discord_greetings` (biến thể "AI nghỉ") |
 | Không gửi dữ liệu cá nhân | Kể tự do: chỉ gửi đoạn kể, đã che email và số điện thoại (`scrubForAi`), cắt còn `ai_max_chars`; không gửi uid, tên, email tài khoản, ảnh, nốt cũ; prompt yêu cầu không lặp lại tên người. Làm quen: chỉ gửi các lựa chọn khảo sát và tên thẻ trong kho. Câu chào: chỉ tên thẻ và tên phòng |
 | Gắn nhãn kết quả AI, cho sửa | Nhãn "Gợi ý từ Nốt AI · kiểm tra trước khi lưu" (S03b), "Tụi Nốt AI viết giúp · sửa thoải mái trước khi gửi" (S08d); mọi trường sửa được trước khi lưu / gửi |
@@ -62,23 +62,46 @@ tiêu đề.
   `USE_FIREBASE_EMULATOR=true` thì app dùng `DisabledAiService`, mọi flow đi
   nhánh dự phòng.
 
-## Ví dụ thật (điền sau khi bật AI Logic trên Console)
+## Ví dụ thật
 
-| # | Đầu vào | Đầu ra (rút gọn) | Người dùng sửa gì |
+Chạy ngày 10/11/2026 qua Firebase AI Logic (Gemini Developer API), model
+`gemini-flash-lite-latest`, đúng prompt `ai_prompt_sort` và response schema
+của `FirebaseAiService.sortNotes`, kèm App Check token (debug token của web
+app). Mỗi lần trả lời khoảng 2 giây. Đầu ra là JSON, app chuyển thành
+`AiSortResult` và hiện từng nốt có nhãn **"Gợi ý của Nốt AI"** để người dùng
+sửa loại, sửa tiêu đề hoặc bỏ trước khi lưu.
+
+| # | Đầu vào (đoạn kể tự do) | Đầu ra của Gemini | Nhận xét |
 |---|---|---|---|
-| 1 | | | |
-| 2 | | | |
-| 3 | | | |
+| 1 | "Sáng nay mình dậy sớm chạy bộ 2km quanh hồ. Chiều lỡ ăn thêm gói snack dù đã định nhịn, nhưng tối mình không tự trách mà ngồi thở vài phút rồi bình tĩnh lại." | `chien_thang` "Chạy bộ 2km quanh hồ"; `nhat_ky` "Lỡ ăn thêm gói snack dù định nhịn"; `tu_chu` "Không tự trách và bình tĩnh lại"; mood `binh_thuong`; `needs_support` false | Tách đúng 3 loại nốt. Nốt 2 nên là nhật ký như AI chọn (không phải chiến thắng), người dùng giữ nguyên |
+| 2 | "Hôm nay ở thư viện mình hỏi một bạn lạ chỗ để sạc pin, tim đập nhanh lắm nhưng bạn ấy chỉ rất vui vẻ. Về nhà mình viết vài dòng nhật ký cho buổi chiều mưa." | `chien_thang` "Lấy hết can đảm hỏi mượn chỗ sạc pin"; `nhat_ky` "Ghi lại vài dòng cảm xúc buổi chiều mưa"; mood `vui`; `needs_support` false | Đúng ý: hỏi người lạ là chiến thắng nhỏ. Tiêu đề 1 viết lại thành "hỏi mượn chỗ sạc pin" (câu gốc là hỏi chỗ sạc), người dùng có thể sửa |
+| 3 | "Mấy hôm nay mình thấy mệt, làm gì cũng không nổi, tối nằm nghĩ lung tung tới khuya. Hôm nay chỉ dọn được cái bàn học thôi." | `chien_thang` "Mình đã dọn dẹp được cái bàn học"; `nhat_ky` "Mấy hôm nay thấy mệt và làm gì cũng không nổi"; `nhat_ky` "Tối nằm suy nghĩ lung tung đến khuya"; mood `met`; `needs_support` false | Biến việc nhỏ thành chiến thắng, đúng tinh thần app. `needs_support` false là hợp lý vì đoạn kể chỉ ở mức mệt; thẻ hỗ trợ dành cho dấu hiệu nặng hơn |
 
-**Một lỗi đã xử lý:** _ghi lại lần chạy thật bị lỗi (ví dụ tắt `ai_enabled`
-trên Remote Config, hoặc tắt mạng) và màn hình dự phòng._
+Đầu vào chỉ là đoạn kể (đã qua `scrubForAi`: bỏ email, số điện thoại), không
+có tên, email hay ảnh người.
+
+### Một lỗi đã xử lý: model ngừng hoạt động
+
+Lần gọi đầu với model mặc định cũ `gemini-2.5-flash` trả
+`HTTP 404 This model models/gemini-2.5-flash is no longer available to new
+users`. Trước đó, khi chưa có App Check token, API trả `HTTP 401 Firebase App
+Check token is invalid` (AI Logic đã bật Enforce).
+
+Cách app xử lý: mọi lỗi không phải hết lượt hay hết giờ đi vào nhánh
+`AiErrorReason.network` của `FirebaseAiService`. App log `ai_error`
+(`reason = network`), giữ nguyên đoạn kể và hiện *"Tụi Nốt chưa đọc được vì
+mạng chậm. Kiểm tra Wi-Fi rồi thử lại, hoặc ghi tay."* cùng nút ghi tay, nên
+người dùng vẫn lưu được nốt. Cách sửa không cần phát hành app: đổi `ai_model`
+trên Remote Config. Code đổi mặc định sang `gemini-flash-lite-latest`
+(`gemini-3.8-flash` không trả lời trong 60 giây nên không hợp với giới hạn
+`ai_timeout_ms` 8 giây).
 
 ## Cần bật trên Firebase Console
 
 1. **AI Logic** → Get started → **Gemini Developer API**.
 2. **App Check**: đăng ký app Android (Play Integrity; bản debug thêm debug
    token in ra logcat: `DebugAppCheckProvider: Enter this debug secret…`) và web
-   app (reCAPTCHA v3). Bật Enforce cho **Firebase AI Logic** và **Cloud
+   app (Fraud Defense / reCAPTCHA Enterprise). Bật Enforce cho **Firebase AI Logic** và **Cloud
    Firestore** sau khi Metrics cho thấy request đã được xác minh.
 3. **Remote Config**: thêm các tham số `ai_*` ở trên (giá trị mặc định có sẵn
    trong app nên không thêm vẫn chạy).

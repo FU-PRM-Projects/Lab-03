@@ -10,7 +10,7 @@
   "challenge_submissions_enabled": "true",
   "ai_enabled": "true",
   "ai_onboarding_enabled": "true",
-  "ai_model": "gemini-2.5-flash",
+  "ai_model": "gemini-flash-lite-latest",
   "ai_timeout_ms": "8000",
   "ai_max_chars": "500"
 }
