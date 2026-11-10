@@ -217,6 +217,9 @@ lib/
 | [`docs/architecture.md`](docs/architecture.md) | Lớp MVVM, sơ đồ, luồng F1, bảng ViewModel–service |
 | [`docs/analytics-plan.md`](docs/analytics-plan.md) | Sự kiện Analytics, Crashlytics, quy ước dữ liệu và kế hoạch Stage 5 |
 | [`docs/system-architecture.md`](docs/system-architecture.md) | Kiến trúc cả hệ thống cho Final Assignment |
+| [`docs/gap-review.md`](docs/gap-review.md) | Final Stage 1: luồng Lab 2 / yêu cầu Lab 3 còn thiếu và quyết định cho từng mục |
+| [`docs/data-model.md`](docs/data-model.md) | Collection, vai trò, quyền, bước chuyển trạng thái và test rules |
+| [`docs/cross-role-flow.md`](docs/cross-role-flow.md) | Luồng liên vai trò gửi thẻ → staff duyệt, sơ đồ và đo thời gian |
 
 ## Công cụ AI đã dùng
 
