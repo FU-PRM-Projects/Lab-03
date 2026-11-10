@@ -192,8 +192,13 @@ final reviewActionsProvider = Provider<ReviewActions>(ReviewActions.new);
 
 // -------------------------------------------------------------- Dashboard
 
+/// Truy vấn `count()` cần máy chủ: mất mạng thì Firestore chờ mãi, màn Tổng
+/// quan quay vòng không dứt. Quá thời gian này thì báo lỗi để staff thử lại.
+const Duration dashboardTimeout = Duration(seconds: 15);
+
 final dashboardProvider = FutureProvider<DashboardStats>(
-  (ref) => ref.watch(dashboardRepositoryProvider).load(),
+  (ref) =>
+      ref.watch(dashboardRepositoryProvider).load().timeout(dashboardTimeout),
 );
 
 // ---------------------------------------------------------- Announcements
