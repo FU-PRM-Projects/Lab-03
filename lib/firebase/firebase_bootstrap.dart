@@ -46,7 +46,9 @@ Future<void> _activateAppCheck() async {
       providerAndroid: kDebugMode
           ? const AndroidDebugProvider()
           : const AndroidPlayIntegrityProvider(),
-      providerWeb: kIsWeb ? ReCaptchaEnterpriseProvider(recaptchaSiteKey) : null,
+      providerWeb: kIsWeb
+          ? ReCaptchaEnterpriseProvider(recaptchaSiteKey)
+          : null,
     );
   } on Object catch (error) {
     debugPrint('[app-check] chưa bật được: $error');
