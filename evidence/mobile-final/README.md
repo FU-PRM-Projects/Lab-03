@@ -36,3 +36,11 @@ chay bo 2km quanh ho…"); Gemini vẫn hiểu và trả tiêu đề có dấu. 
 
 File nằm ở thư mục riêng của app (`app_flutter/reports/`), không lên Cloud
 Storage. Metadata ghi ở Firestore `users/{uid}/reports/2026-W46`.
+
+## Tắt AI bằng Remote Config
+
+| Ảnh | Cho thấy |
+|---|---|
+| [`11-ai-off-remote-config.png`](11-ai-off-remote-config.png) | Đặt `ai_enabled = false` (Boolean) trên Remote Config rồi Publish, mở lại app: Kể tự do hiện "Nốt AI đang nghỉ. Bạn vẫn ghi nốt tay như thường nhé.", không còn nút gọi Gemini, chỉ còn "Ghi tay". Luồng ghi nốt vẫn chạy khi không có AI |
+
+Sau khi chụp, đặt lại `ai_enabled = true`.
