@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:not_core/models/user_role.dart';
 
 import '../models/app_user.dart';
 import '../services/analytics_events.dart';
@@ -9,6 +10,7 @@ import '../services/app_exception.dart';
 import '../services/auth_service.dart';
 import '../services/crash_reporter.dart';
 import '../services/draft_store.dart';
+import '../services/journal_draft_store.dart';
 import '../services/messaging_service.dart';
 import '../services/user_repository.dart';
 import '../utils/validators.dart';
@@ -17,6 +19,21 @@ import '../utils/validators.dart';
 final authUserProvider = StreamProvider<AppUser?>(
   (ref) => ref.watch(authServiceProvider).authStateChanges(),
 );
+
+/// Vai trò của tài khoản đang đăng nhập (`users/{uid}.role`). App mobile chỉ
+/// dành cho `user`: router đưa tài khoản `staff` / `admin` sang màn báo dùng
+/// web admin (đề Final mục 6, "each client rejects accounts of the wrong
+/// role"). Chưa đăng nhập, chưa có hồ sơ hoặc không đọc được (mất mạng) thì
+/// coi như `user`: Security Rules vẫn kiểm tra vai trò ở mọi lần ghi.
+final accountRoleProvider = FutureProvider<UserRole>((ref) async {
+  final uid = ref.watch(authUserProvider.select((auth) => auth.value?.uid));
+  if (uid == null) return UserRole.user;
+  try {
+    return await ref.read(userRepositoryProvider).roleOf(uid) ?? UserRole.user;
+  } on AppException {
+    return UserRole.user;
+  }
+});
 
 final authViewModelProvider = NotifierProvider<AuthViewModel, AuthState>(
   AuthViewModel.new,
@@ -118,16 +135,26 @@ class AuthViewModel extends Notifier<AuthState> {
     await analytics.track(AnalyticsEvents.logout);
     await analytics.setUserId(null).onError((_, _) {});
     await _auth.signOut();
-    try {
-      await _users.clearLocalData();
-      await ref.read(draftStoreProvider).clear();
-      // Hộp thư FCM nằm trên máy, không theo tài khoản: xoá để người đăng
-      // nhập sau không đọc được thông báo cũ.
+    // Mỗi phần dữ liệu trên máy xoá riêng: một phần lỗi không được giữ lại
+    // các phần sau (người đăng nhập sau không được thấy nháp hay thông báo
+    // cũ). Không chặn đăng xuất nếu chưa xoá được; lần sau xoá lại.
+    Future<void> attempt(Future<void> Function() clear) async {
+      try {
+        await clear();
+      } on Object {
+        // Bỏ qua, xem trên.
+      }
+    }
+
+    await attempt(_users.clearLocalData);
+    await attempt(() => ref.read(draftStoreProvider).clear());
+    await attempt(() => ref.read(journalDraftStoreProvider).clear());
+    // Hộp thư FCM nằm trên máy, không theo tài khoản: xoá để người đăng
+    // nhập sau không đọc được thông báo cũ.
+    await attempt(() async {
       await ref.read(messagingServiceProvider).clearInbox();
       ref.read(inboxRevisionProvider.notifier).bump();
-    } on Object {
-      // Không chặn đăng xuất nếu chưa xoá được bộ nhớ đệm; lần sau xoá lại.
-    }
+    });
     return null;
   });
 

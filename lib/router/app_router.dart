@@ -27,6 +27,7 @@ import '../screens/settings/settings_screen.dart';
 import '../screens/splash/splash_screen.dart';
 import '../screens/today/today_screen.dart';
 import '../screens/welcome/welcome_screen.dart';
+import '../screens/welcome/wrong_role_screen.dart';
 import '../services/analytics_service.dart';
 import '../services/crash_reporter.dart';
 import '../services/messaging_service.dart';
@@ -52,6 +53,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       unawaited(ref.read(analyticsServiceProvider).setUserId(uid));
       unawaited(ref.read(crashReporterProvider).setUser(uid));
     })
+    // Đổi vai trò (đọc xong, hoặc đổi tài khoản) cũng chạy lại `redirect`.
+    ..listen(accountRoleProvider, (_, _) => authChanged.value++)
     ..onDispose(authChanged.dispose);
   var lastScreen = '';
 
@@ -59,13 +62,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     navigatorKey: rootKey,
     initialLocation: AppRoutes.today,
     refreshListenable: authChanged,
-    redirect: (context, state) =>
-        authRedirect(ref.read(authUserProvider), state.uri),
+    redirect: (context, state) => authRedirect(
+      ref.read(authUserProvider),
+      state.uri,
+      role: ref.read(accountRoleProvider),
+    ),
     routes: <RouteBase>[
       GoRoute(path: '/', redirect: (context, state) => AppRoutes.today),
       GoRoute(
         path: AppRoutes.splash,
         builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.wrongRole,
+        builder: (context, state) => const WrongRoleScreen(),
       ),
       GoRoute(
         path: AppRoutes.welcome,

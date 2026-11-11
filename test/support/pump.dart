@@ -10,6 +10,7 @@ import 'package:lab03/services/clock.dart';
 import 'package:lab03/services/discord_service.dart';
 import 'package:lab03/services/draft_store.dart';
 import 'package:lab03/services/group_repository.dart';
+import 'package:lab03/services/journal_draft_store.dart';
 import 'package:lab03/services/note_repository.dart';
 import 'package:lab03/services/nudge_service.dart';
 import 'package:lab03/services/report_services.dart';
@@ -43,6 +44,7 @@ class TestServices {
   final FakeNoteRepository notes = FakeNoteRepository();
   final FakeGroupRepository groups = FakeGroupRepository();
   final FakeDraftStore drafts = FakeDraftStore();
+  final FakeJournalDraftStore journalDrafts = FakeJournalDraftStore();
   final FixedClock clock = FixedClock();
   final FakeSelfControl selfControl = FakeSelfControl();
   final FakeLocalAuth localAuth = FakeLocalAuth();
@@ -60,6 +62,7 @@ class TestServices {
     noteRepositoryProvider.overrideWithValue(notes),
     groupRepositoryProvider.overrideWithValue(groups),
     draftStoreProvider.overrideWithValue(drafts),
+    journalDraftStoreProvider.overrideWithValue(journalDrafts),
     clockProvider.overrideWithValue(clock),
     habitRepositoryProvider.overrideWithValue(selfControl),
     settingsRepositoryProvider.overrideWithValue(selfControl.settingsView),
