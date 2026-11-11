@@ -42,9 +42,11 @@ vai trò dùng đúng hai tài khoản này.
 
 ## Collection
 
-Chỉ liệt kê collection mà Final thêm hoặc đổi quyền; các collection riêng của
-người dùng từ Lab 3 (`notes`, `private/*`, `challengeProgress`, `groups`,
-`stickers`, …) giữ nguyên: chỉ chủ sở hữu đọc / ghi.
+Bảng đầu là collection Final thêm hoặc đổi quyền (dùng chung giữa các vai
+trò). Bảng sau là dữ liệu riêng của người dùng từ Lab 3: chỉ chủ tài khoản đọc
+/ ghi, staff và admin cũng không đọc được (test R-29).
+
+### Collection dùng chung và collection Final thêm
 
 | Collection | Trường chính (kiểu) | Tạo | Đọc | Sửa | Xoá | Màn dùng |
 |---|---|---|---|---|---|---|
@@ -55,6 +57,31 @@ người dùng từ Lab 3 (`notes`, `private/*`, `challengeProgress`, `groups`,
 | `users/{uid}/inbox/{id}` | `kind` (`submission_approved`/`submission_rejected`), `title` (1–80), `body` (1–500), `submissionId`?, `read` (bool), `createdAt` | Staff, admin, `read = false`, `createdAt` = giờ server | Chủ hộp thư | Chủ hộp thư: chỉ `read` | Chủ hộp thư | App: hộp thư (chuông). Web: tạo khi duyệt / từ chối |
 | `users/{uid}/private/onboarding` | `strangerLevel` (1–4 hoặc null), `habits` (≤ 20), `move` (`it_khi`/`thinh_thoang`/`thuong_xuyen`/null), `freeSlot` (`sang`/`chieu`/`toi`/`khuya`/null), `goals` (≤ 2), `profileLabel` (≤ 30), `planSource` (`ai`/`rules`), `done` (true), `completedAt` | Chủ tài khoản | Chủ tài khoản | Chủ tài khoản, cùng điều kiện | — | App: S13a–g, S12 "Làm lại khảo sát" |
 | `announcements/{id}` | `title` (1–80), `body` (1–1000), `authorUid`, `createdAt` | Staff, admin, `authorUid` = mình, `createdAt` = giờ server | Mọi người đã đăng nhập | — | Staff, admin | App: hộp thư. Web: Thông báo, Tổng quan |
+
+### Dữ liệu riêng của người dùng (từ Lab 3)
+
+Mọi collection dưới đây nằm trong `users/{uid}/…`. Quy tắc chung: **chỉ chủ tài
+khoản** (`isOwner(uid)`) được tạo, đọc, sửa, xoá; người dùng khác, staff và
+admin đều bị cấm (R-08, R-11, R-29). Rules kiểm tra hình dạng dữ liệu ở mọi lần
+ghi.
+
+| Collection | Trường chính (kiểu, giới hạn) | Tạo | Đọc | Sửa | Xoá | Màn dùng |
+|---|---|---|---|---|---|---|
+| `notes/{id}` | `type` (`chien_thang`/`tu_chu`/`thu_thach`/`nhat_ky`), `title` (1–120), `body`? (≤ 2000), `mood`? (`vui`/`on`/`binh_thuong`/`met`/`roi`), `createdAt` (timestamp); thử thách: `challengeId`, `subtype` (`nguoi_la`/`van_dong`), `outcome` (`suon_se`/`khong_nhu_y`), `anxietyBefore`/`anxietyAfter` (1–5), `minutes` (0–600); nhóm: `groupId`, `isFirst`; `image`? (Cloudinary `{url, publicId}`) | Chủ | Chủ | Chủ, cùng điều kiện | Chủ | S02 Hôm nay, S03 Ghi nốt, S03b Kể tự do, Viết nhật ký, S04, S05 Hũ, S06 chi tiết, S08 thử thách, S09 tự chủ, S11 Hành trình, Thẻ tuần |
+| `private/habits` | `selected` (≤ 20), `custom` (≤ 8) | Chủ | Chủ | Chủ | — | S09 Tự chủ (thói quen muốn bớt), S13 Làm quen |
+| `private/settings` | `eveningReminder`, `awakeEnabled`, `awakeStart`, `awakeEnd`, `lockSelfControl`, `aiEnabled`, `hideNotificationContent` | Chủ | Chủ | Chủ | — | S12 Cài đặt (giờ nhắc, Giờ tỉnh, khoá Tự chủ, Nốt AI, ẩn nội dung thông báo) |
+| `private/onboarding` | Xem bảng trên (Final) | Chủ | Chủ | Chủ | — | S13a–g, S12 |
+| `challengeProgress/{topic}` | id ∈ `dung_cam`/`van_dong`; `level` (int ≥ 1), `completed` | Chủ | Chủ | Chủ | — | S07 Thử thách, S11a con đường leo |
+| `customChallenges/{id}` | `topic`, `title` (1–80), `minutes` (1–600), `tip`? (≤ 120), `createdAt` | Chủ | Chủ | — (không sửa) | Chủ | S07 "Thêm thẻ của bạn"; gửi lên kho chung tạo `challengeSubmissions` |
+| `groups/{id}` | `name` (1–24), `idea` (`chien_thang`/`nhat_ky`/`tu_chu`/`nguoi_la`/`van_dong`), `source` (`system`/`user`/`ai_suggested`), `noteCount` (≥ 0), `firstNoteId`, `firstNoteTitle` (≤ 120), `firstAt`, `lastAt`, `createdAt`, `image`? | Chủ | Chủ | Chủ | Chủ (có Hoàn tác) | S05 kệ Nhóm lần đầu, S05e chi tiết nhóm, S03 chọn nhóm |
+| `sharedStreaks/{id}` | `image` (PNG base64, ≤ 850 000 ký tự), `streak`, `record`, `milestone` (int), `createdAt` | Chủ | Chủ | — (tạo một lần) | Chủ | S02 thẻ chuỗi, S04 chúc mừng chuỗi, trang Chia sẻ chuỗi ngày (R-30) |
+| `reports/{isoWeek}` | Xem bảng trên (Final) | Chủ | Chủ | Chủ | Chủ | Thẻ tuần (S11b) |
+| `stickers/{month}` | `month` (bằng id `YYYY-MM`), `createdAt` | Chủ | Chủ | Chủ | — | S05 Hũ: nhãn dán tháng (sticker) |
+| `inbox/{id}` | Xem bảng trên (Final) | Staff, admin | Chủ | Chủ: chỉ `read` | Chủ | Hộp thư |
+
+Các collection của Discord bot (`discordConnectCodes`, `discordLinks`,
+`users/{uid}/private/discord`) thuộc phần mở rộng ngoài phạm vi chấm của Final,
+không ghi ở đây.
 
 ### Bước chuyển trạng thái
 
@@ -77,7 +104,7 @@ của web.
 ## Test rules
 
 `npm run test:rules` trong `firebase/` (Emulator, `node --test`). R-01…R-18 từ
-Lab 3; R-19…R-28 thêm cho Final, mỗi vai trò và collection mới có ít nhất một
+Lab 3; R-19…R-30 thêm cho Final, mỗi vai trò và collection mới có ít nhất một
 ca được phép và một ca bị cấm:
 
 | ID | Collection | Vai trò | Thao tác | Mong đợi |
@@ -104,4 +131,9 @@ ca được phép và một ca bị cấm:
 | R-28 | `users/{uid}/reports` | user | chủ ghi metadata tuần, ghi đè khi lưu lại, đọc, xoá | Cho phép |
 | R-28 | `users/{uid}/reports` | user | người khác đọc / ghi; `isoWeek` khác id; tên file khác; `sizeBytes = 0`; thêm trường `url`; `savedAt` giả | Cấm |
 
-Kết quả lần chạy gần nhất (11/11/2026): 28/28 pass (`evidence/firestore/rules-tests.txt`).
+| R-29 | 10 collection riêng của người dùng (`notes`, `private/habits`, `private/settings`, `private/onboarding`, `challengeProgress`, `customChallenges`, `groups`, `sharedStreaks`, `reports`, `stickers`) | user (chủ) | chủ đọc nốt của mình | Cho phép |
+| R-29 | như trên | staff / admin | đọc, ghi, xoá từng tài liệu; truy vấn cả `notes` của người khác | Cấm |
+| R-30 | `users/{uid}/sharedStreaks` | user (chủ) | tạo thẻ chuỗi hợp lệ, đọc, xoá | Cho phép |
+| R-30 | `users/{uid}/sharedStreaks` | user | sửa thẻ đã tạo; `streak` là chuỗi; thêm trường lạ; ảnh > 850 000 ký tự; thiếu `createdAt`; người khác đọc / tạo | Cấm |
+
+Kết quả lần chạy gần nhất (11/11/2026): 30/30 pass (`evidence/firestore/rules-tests.txt`).
