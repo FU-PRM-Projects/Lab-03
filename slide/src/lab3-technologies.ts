@@ -40,7 +40,7 @@ type Technology = {
 export const technologies = {
   riverpod: {
     images: [
-      ['code/viewmodel.png', 'TodayViewModel: a Riverpod Notifier'],
+      ['app/s02.png', 'S02 Today: drawn from the state of TodayViewModel'],
     ],
     name: 'Riverpod + MVVM',
     what: 'Riverpod is a Flutter library that keeps app state and services in providers; a widget watches a provider and rebuilds when it changes.',
@@ -67,11 +67,16 @@ export const technologies = {
       ['where/w-rp-main.png', 'Wrap the app in `ProviderScope` and override each service'],
       ['where/h-rp-test.png', 'Tests override the same providers with fakes'],
     ],
+    // One entry per numbered box of the MVVM diagram, in order 1–8 ("layer · what it does").
     where: [
-      ['where/w-rp-screen.png', 'lib/screens/today/today_screen.dart', '41–45', 'View: watch the ViewModel, switch on its state'],
-      ['where/w-rp-vm.png', 'lib/viewmodels/today_view_model.dart', '55–62', 'ViewModel: `NotifierProvider` + `Notifier`'],
-      ['where/w-rp-state.png', 'lib/viewmodels/view_state.dart', '5–13', '`sealed class ViewState<T>`'],
-      ['where/w-rp-service.png', 'lib/services/note_repository.dart', '48–50', 'Service provider, set in main.dart'],
+      ['where/w-rp-screen.png', 'lib/screens/today/today_screen.dart', '41–45', 'screens/ · watches its ViewModel, switches on the state'],
+      ['where/mv-widgets.png', 'lib/widgets/app_button.dart', '11–15', 'widgets/ · one shared component, variant as a parameter'],
+      ['where/mv-theme.png', 'packages/core/lib/theme/app_tokens.dart', '4–10', 'theme/ · spacing tokens, no hard-coded numbers'],
+      ['where/w-rp-vm.png', 'lib/viewmodels/today_view_model.dart', '55–62', 'ViewModel · `NotifierProvider` + `Notifier<ViewState>`'],
+      ['where/mv-service.png', 'lib/services/note_repository.dart', '9–15', 'Service · the interface the ViewModel calls'],
+      ['where/mv-impl.png', 'lib/firebase/firestore_note_repository.dart', '19–23', 'Implementation · implements it with Firestore'],
+      ['where/mv-main.png', 'lib/main.dart', '107–109', 'main.dart · overrides the provider with the Firestore class'],
+      ['where/mv-models.png', 'lib/models/note.dart', '7–14', 'models/ · plain Dart, shared by every layer'],
     ],
   },
   auth: {
@@ -101,7 +106,7 @@ export const technologies = {
     setup: [
       ['console/auth-providers.png', 'Authentication › Sign-in method: enable Google and Email/Password'],
       ['console/auth-sha.png', 'Project settings › Android app: add the SHA-1 / SHA-256 fingerprints'],
-      ['app/console-auth-users.png', 'Authentication › Users: accounts and their UIDs'],
+      ['console/auth-users-crop.png', 'Authentication › Users: accounts and their UIDs'],
     ],
     where: [
       ['where/w-auth-google.png', 'lib/firebase/firebase_auth_service.dart', '47–58', 'Google ID token → Firebase credential'],
@@ -276,8 +281,8 @@ export const technologies = {
     how: 'Add the Crashlytics Gradle plugin, send a test crash from Settings › “Thử crash (dev)” to activate the dashboard, then read non-fatals with their keys and user ID.',
     setupTitle: 'Firebase Console',
     setup: [
-      ['app/console-crashlytics.png', 'Crashlytics: dashboard active after the test crash'],
-      ['console/crash-nonfatal-list.png', 'Issues: non-fatal errors the app reported'],
+      ['console/crash-issues-crop.png', 'Crashlytics › Issues: the test crash and a real Hero error'],
+      ['console/crash-nonfatal-crop.png', 'Issues: a non-fatal error the app reported'],
       ['app/console-crash-keys.png', 'Issue › Keys: `screen` and the user ID'],
     ],
     where: [
@@ -312,7 +317,6 @@ export const technologies = {
     setupTitle: 'Firebase Console',
     setup: [
       ['app/console-remoteconfig.png', 'Remote Config: the feature flags'],
-      ['console/rc-parameters.png', 'Parameters published, with their default values'],
       ['app/rc-jar-after.png', 'Flag set to false → the groups shelf is gone'],
     ],
     where: [
@@ -347,7 +351,7 @@ export const technologies = {
     how: 'Put the OpenRouter key in tools/artemis/.env, start the ARTEMIS server next to the emulator, then run `uv run pytest --runs 3` in e2e_test/.',
     setupTitle: 'ARTEMIS Workspace',
     setup: [
-      ['console/artemis-running.jpg', 'Server running: agent steps live, run history'],
+      ['console/artemis-running-crop.jpg', 'Server running: agent steps live, run history'],
       ['app/artemis-saved.jpg', 'T02: the agent saved a note and reported SAVED'],
     ],
     where: [

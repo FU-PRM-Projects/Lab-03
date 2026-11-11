@@ -2389,3 +2389,225 @@ html, body, #root, .stage {
   color: #444;
   line-height: 1.35;
 }
+
+/* FCM requirements: permission prompt and the Android settings page side by side. */
+.fq-pair {
+  display: flex;
+  gap: 8px;
+}
+
+.fq-pair .fq-phone {
+  height: 380px;
+}
+
+/* HOW with 3 steps: step 1 large on the left, steps 2 and 3 stacked on the right. */
+.reveal .tech-slide-tight .tech-setup-feature {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 14px 24px;
+  align-items: start;
+  min-height: 0;
+  margin-top: 16px;
+}
+
+.tech-setup-feature figure:first-child {
+  grid-row: span 2;
+}
+
+.reveal .tech-setup-feature .tech-setup-img {
+  height: 186px;
+  max-height: none;
+}
+
+.reveal .tech-setup-feature figure:first-child .tech-setup-img {
+  height: 420px;
+}
+
+.reveal .tech-setup-feature .tech-setup-img img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.tech-setup-feature figcaption {
+  margin-top: 6px;
+  font-size: 16px;
+}
+
+/* HOW gallery: rows sized in SetupGallery from each screenshot's aspect ratio. */
+.tech-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.tech-row {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.tech-rows figure {
+  margin: 0;
+  flex: 0 0 auto;
+}
+
+.reveal .tech-rows .tech-setup-img {
+  max-height: none;
+  background: #fff;
+}
+
+.reveal .tech-rows .tech-setup-img img {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  object-fit: contain;
+}
+
+.tech-rows figcaption {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  margin-top: 6px;
+  font-size: 15.5px;
+  line-height: 1.3;
+}
+
+.tech-rows figcaption em {
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #e5262b;
+  color: #fff;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+/* MVVM WHERE (1/3): folder tree with layer numbers, full diagram. */
+.mv-arch {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 10px;
+}
+
+.reveal .mv-arch .tree {
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+.reveal .mv-arch .diagram {
+  width: 440px;
+}
+
+/* MVVM WHERE (2/3, 3/3): diagram with the current layers in red, code of each numbered layer beside it. */
+.mv {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 26px;
+  align-items: start;
+  margin-top: 14px;
+}
+
+.reveal .mv-diagram {
+  width: 360px;
+}
+
+.mv-code {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 18px;
+}
+
+.mv-code figure {
+  margin: 0;
+  min-width: 0;
+}
+
+.mv-code figcaption {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  margin-bottom: 5px;
+  font-size: 14.5px;
+  line-height: 1.3;
+}
+
+.mv-code figcaption em {
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #e5262b;
+  color: #fff;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.mv-code figcaption b {
+  flex: 0 0 auto;
+  font-size: 16px;
+}
+
+.mv-code figcaption span {
+  color: #555;
+}
+
+.mv-code-img {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 168px;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.reveal .mv-code-img img {
+  max-width: 100%;
+  max-height: 100%;
+  margin: 0;
+  object-fit: contain;
+}
+
+.reveal .mv-file {
+  display: block;
+  margin-top: 4px;
+  padding: 0;
+  background: none;
+  color: #333;
+  font-size: 12.5px;
+  overflow-wrap: anywhere;
+}
+
+/* Layer numbers in the MVVM folder tree, same red badge as the diagram. */
+.reveal .tree .mv-n {
+  display: inline-grid;
+  place-items: center;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: #e5262b;
+  color: #fff;
+  font: 700 11.5px/1 Inter, sans-serif;
+  font-style: normal;
+  vertical-align: 1px;
+}
+
+.reveal .mv-code-img {
+  height: 196px;
+}

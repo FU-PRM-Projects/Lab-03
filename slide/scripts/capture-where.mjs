@@ -15,11 +15,16 @@ const all = [
   // Riverpod + MVVM
   ['w-rp-screen', 'lib/screens/today/today_screen.dart', 41, 45],
   ['w-rp-vm', 'lib/viewmodels/today_view_model.dart', 55, 62],
-  ['w-rp-service', 'lib/services/note_repository.dart', 48, 50],
   ['w-rp-main', 'lib/main.dart', 100, 107],
-  ['w-rp-state', 'lib/viewmodels/view_state.dart', 5, 13],
   ['h-rp-pubspec', 'pubspec.yaml', 27, 27],
   ['h-rp-test', 'test/viewmodels/today_and_saved_view_model_test.dart', 21, 27],
+  // MVVM: one shot per layer of the diagram (1 screens and 4 ViewModel reuse w-rp-screen, w-rp-vm)
+  ['mv-widgets', 'lib/widgets/app_button.dart', 11, 15],
+  ['mv-theme', 'packages/core/lib/theme/app_tokens.dart', 4, 10],
+  ['mv-service', 'lib/services/note_repository.dart', 9, 15],
+  ['mv-impl', 'lib/firebase/firestore_note_repository.dart', 19, 23],
+  ['mv-main', 'lib/main.dart', 107, 109],
+  ['mv-models', 'lib/models/note.dart', 7, 14],
   // Firebase Authentication
   ['w-auth-google', 'lib/firebase/firebase_auth_service.dart', 47, 58],
   ['w-auth-map', 'lib/firebase/firebase_auth_service.dart', 119, 131],
