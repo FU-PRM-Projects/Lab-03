@@ -21,9 +21,8 @@ class PrefsJournalDraftStore implements JournalDraftStore {
   }
 
   @override
-  Future<void> save(String text) => text.trim().isEmpty
-      ? _prefs.remove(_key)
-      : _prefs.setString(_key, text);
+  Future<void> save(String text) =>
+      text.trim().isEmpty ? _prefs.remove(_key) : _prefs.setString(_key, text);
 
   @override
   Future<void> clear() => _prefs.remove(_key);

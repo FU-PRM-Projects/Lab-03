@@ -15,6 +15,5 @@ abstract interface class JournalDraftStore {
 }
 
 final journalDraftStoreProvider = Provider<JournalDraftStore>(
-  (ref) =>
-      throw UnimplementedError('journalDraftStoreProvider chưa được gắn'),
+  (ref) => throw UnimplementedError('journalDraftStoreProvider chưa được gắn'),
 );
