@@ -12,7 +12,7 @@ Cập nhật 11/11/2026, trên `main` commit `eb04447`.
 
 | Loại kiểm thử | Phạm vi | Kết quả | Minh chứng |
 |---|---|---|---|
-| Security Rules (Emulator) | R-01…R-28, mọi collection trừ Discord và `sharedStreaks` | **28/28 đạt** (chạy lại 11/11) | [`evidence/firestore/rules-tests.txt`](../evidence/firestore/rules-tests.txt) |
+| Security Rules (Emulator) | R-01…R-30, mọi collection trừ Discord | **30/30 đạt** (chạy lại 11/11) | [`evidence/firestore/rules-tests.txt`](../evidence/firestore/rules-tests.txt) |
 | Unit + widget test (Flutter) | App, `packages/core`, `web_admin` | **303 / 5 / 11 đạt** (app thêm 7 test vai trò, 6 test nháp nhật ký P4; web thêm 1 test vai trò theo thời gian thực), `flutter analyze` không lỗi | [`evidence/flutter/analyze-and-test.txt`](../evidence/flutter/analyze-and-test.txt) |
 | Mobile E2E (ARTEMIS) | T01–T14 (luồng Lab 2 / Lab 3) | **41/42 lần đạt (98%)** | [`test-plan.md`](test-plan.md) mục 5, `evidence/artemis/` |
 | Mobile E2E (ARTEMIS) | Luồng mới của Final | **Chưa chạy** (xem mục 2.2) | — |
@@ -24,8 +24,8 @@ Cập nhật 11/11/2026, trên `main` commit `eb04447`.
 ## 1. Security Rules (Emulator)
 
 Lệnh: `npm run test:rules` trong `firebase/` (Firebase Emulator, `node --test`,
-project `demo-prm393`). Lần chạy 11/11/2026 13:21 trên `eb04447`:
-**28 test, 28 đạt, 0 lỗi** (6,4 s).
+project `demo-prm393`). Lần chạy 11/11/2026 22:10 (sau PR #75, thêm R-29 và R-30):
+**30 test, 30 đạt, 0 lỗi** (khoảng 7 s).
 
 Bảng từng ca (vai trò, thao tác, được phép / bị cấm) ở
 [`data-model.md`](data-model.md) mục "Test rules". Tóm tắt theo collection:
@@ -39,12 +39,14 @@ Bảng từng ca (vai trò, thao tác, được phép / bị cấm) ở
 | `users/{uid}/inbox` | staff (tạo tin), chủ (đọc, đánh dấu đã đọc, xoá) | user (tự tạo tin), staff (đọc hộp thư người khác) | R-24 |
 | `users/{uid}/reports` | chủ (ghi metadata tuần, đọc, xoá) | người khác; dữ liệu sai hình dạng | R-28 |
 | `users/{uid}/private/onboarding` | chủ | người khác; giá trị lạ | R-27 |
-| Collection con của Lab 3 (`notes`, `private/*`, `challengeProgress`, `customChallenges`, `groups`, `stickers`) | chủ | người dùng khác; dữ liệu sai | R-07–R-17 |
+| Collection con của Lab 3 (`notes`, `private/*`, `challengeProgress`, `customChallenges`, `groups`, `stickers`, `reports`) | chủ | người dùng khác; **staff và admin** (đọc, ghi, xoá, truy vấn); dữ liệu sai | R-07–R-17, R-29 |
+| `users/{uid}/sharedStreaks` | chủ (tạo, đọc, xoá) | sửa sau khi tạo; sai kiểu; trường lạ; ảnh quá 850 000 ký tự; người khác | R-30 |
 | Collection không khai báo | — | mọi vai trò (deny by default) | R-04 |
 
-**Hạn chế:** các collection con của Lab 3 chỉ có ca cho vai trò `user`
-(chủ / người khác); chưa có ca staff hoặc admin bị cấm đọc nốt của người dùng.
-`sharedStreaks` chưa có test riêng.
+Mỗi vai trò (`user`, `staff`, `admin`, chưa đăng nhập) có ít nhất một ca được phép
+và một ca bị cấm trên mỗi collection mà vai trò đó chạm tới. Riêng dữ liệu riêng
+của người dùng, staff và admin chỉ có ca bị cấm vì không vai trò nào ngoài chủ
+tài khoản được đọc (R-29).
 
 ## 2. Mobile E2E (ARTEMIS)
 
@@ -172,9 +174,7 @@ Review của Lab 3 (CodeRabbit, các góp ý đã sửa và chưa sửa) ở
 ## 7. Việc còn lại
 
 1. Viết và chạy 3 lần các ca ARTEMIS T17–T20, chạy lại T14 (bản Final) và T15–T16.
-2. Deploy bản sửa trạng thái lỗi của web admin rồi chụp ảnh lỗi cho từng màn.
-3. Thêm ca rules cho staff / admin bị cấm đọc dữ liệu riêng của người dùng
-   (`notes`, `private/*`) và cho `sharedStreaks`.
+2. Chụp ảnh trạng thái lỗi cho từng màn web admin (bản sửa đã deploy qua PR #75).
 
 ## Cách chạy lại
 

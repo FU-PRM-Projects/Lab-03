@@ -34,10 +34,36 @@
 | `admin` | Web admin | Mọi quyền của staff, cộng thêm đổi vai trò người dùng |
 
 - **Web admin:** `https://prm393-not-lab3.web.app/admin/` — mã nguồn và cách chạy ở [`web_admin/`](web_admin/README.md).
-- **Admin đầu tiên:** đặt `users/{uid}.role = "admin"` trong Firebase Console (rules chỉ cho admin đổi vai trò). _Ghi tên admin đầu tiên vào đây._
+- **Admin đầu tiên:** **Thuy Doan** (tài khoản Google của Đoàn Thị Kim Thúy, uid `JjOLHVrwynQl0Dhxr2XEfbMw9zR2`), đặt `users/{uid}.role = "admin"` trong Firebase Console. Rules chỉ cho admin đổi vai trò và không ai đổi được vai trò của chính mình; các admin khác (Duy Phan, The Quan Phung) được cấp ở màn **Người dùng** hoặc trên Console.
 - **Luồng liên vai trò:** người dùng gửi thẻ trên app (`pending`) → staff duyệt hoặc từ chối trên web → thẻ trên app đổi trạng thái ngay và hộp thư có tin mới.
 - **Dữ liệu và rules:** [`docs/data-model.md`](docs/data-model.md). Model, theme Lab 2 và repository Firestore dùng chung ở [`packages/core`](packages/core).
-- **Remote Config:** `challenge_submissions_enabled` bật / tắt nút gửi thẻ trên app (web admin hiện cảnh báo khi tắt).
+- **Remote Config:** `challenge_submissions_enabled` bật / tắt nút gửi thẻ trên app (web admin hiện cảnh báo khi tắt); `ai_enabled`, `ai_model` và ba prompt `ai_prompt_*` điều khiển Nốt AI. Template ở [`firebase/remoteconfig.template.json`](firebase/remoteconfig.template.json), bản trên Console là Version 19 (11/11/2026).
+- **Video demo:** _thêm link sau khi quay (Stage 8)._
+
+### Tài khoản demo theo vai trò
+
+Đăng nhập bằng Google trên project thật; mỗi vai trò dùng một tài khoản riêng vì app mobile từ chối tài khoản `staff` / `admin` và web admin từ chối tài khoản `user` ([`docs/data-model.md`](docs/data-model.md)).
+
+| Vai trò | Tài khoản (tên hiển thị) | Dùng ở |
+|---|---|---|
+| `user` | Thị Kim Thúy Đoàn | App mobile (Galaxy A70 trong video và minh chứng) |
+| `admin` | Thuy Doan | Web admin `https://prm393-not-lab3.web.app/admin/` |
+| `admin` | Duy Phan, The Quan Phung | Web admin (thành viên nhóm) |
+| `staff` | Chưa có tài khoản cố định: admin đổi một tài khoản `user` thành `staff` ở màn **Người dùng** khi cần demo | Web admin |
+
+Giảng viên cần vào web admin thì đăng nhập Google một lần (web tạo hồ sơ `role = user` và báo từ chối), rồi báo nhóm để admin cấp `staff` / `admin`. Chạy trên Emulator thì tạo tài khoản email thử theo mục "Web admin" bên dưới.
+
+### Phiên bản
+
+| Thành phần | Phiên bản |
+|---|---|
+| Flutter | 3.47.4 trên máy dev, 3.47.2 trên CI (`.github/workflows`) |
+| Dart SDK | `^3.13.0` |
+| Firebase (Flutter) | `firebase_core` ^5.1.0, `cloud_firestore` ^7.1.0, `firebase_ai` ^5.1.0 |
+| State, điều hướng | `flutter_riverpod` ^3.4.3, `go_router` ^18.1.1 |
+| Firebase CLI | 14.27.0 (`firebase/package.json`), CI cài `firebase-tools@15` |
+| Node.js | 26 (test rules, script seed) |
+| Model Gemini | `gemini-flash-lite-latest` (Remote Config `ai_model`) |
 
 ## Tiến độ theo stage
 
@@ -45,12 +71,12 @@
 |---|---|---|---|
 | 1 | Design traceability | Xong | [`docs/design-traceability.md`](docs/design-traceability.md) |
 | 2 | Kiến trúc và theme | Xong | [`docs/architecture.md`](docs/architecture.md), `lib/theme/`, `lib/widgets/`, khung route 12 màn |
-| 3 | Firebase và đăng nhập | Xong (code + test; chờ project Firebase thật để chạy Google Sign-In trên máy) | `lib/services/`, `lib/firebase/`, S01, đăng xuất ở S12 |
-| 4 | Tính năng | Xong (code + test; chờ chạy thử trên máy với project Firebase thật): đủ 12 màn, 3 flow F1–F3 và các flow phụ, PDF Thẻ tuần (Final: lưu trên máy, chia sẻ, metadata Firestore) | Đủ 12 màn với mọi trạng thái, lưu và chia sẻ PDF |
-| 5 | Analytics, Crashlytics, Remote Config, FCM | Đang làm (Analytics + Crashlytics) | [`docs/analytics-plan.md`](docs/analytics-plan.md) |
+| 3 | Firebase và đăng nhập | Xong (chạy trên project thật `prm393-not-lab3`, Google Sign-In trên máy thật) | `lib/services/`, `lib/firebase/`, S01, đăng xuất ở S12 |
+| 4 | Tính năng | Xong: đủ 12 màn, 3 flow F1–F3 và các flow phụ, PDF Thẻ tuần (Final: lưu trên máy, chia sẻ, metadata Firestore); Final thêm Làm quen, Nốt AI, hộp thư, gửi thẻ lên kho chung, nháp nhật ký (P4) | Đủ 12 màn với mọi trạng thái, lưu và chia sẻ PDF |
+| 5 | Analytics, Crashlytics, Remote Config, FCM | Xong ([`evidence/analytics/`](evidence/analytics/), [`evidence/crashlytics/`](evidence/crashlytics/), [`evidence/remote-config/`](evidence/remote-config/), [`evidence/fcm/`](evidence/fcm/)) | [`docs/analytics-plan.md`](docs/analytics-plan.md) |
 | 6 | Test plan và ARTEMIS | Lab 3 xong (41/42); ca ARTEMIS cho luồng Final chưa chạy | `docs/test-plan.md`, `e2e_test/`, [`docs/test-report.md`](docs/test-report.md) |
 | 7 | AI code review | Lab 3 xong; Final: 5 góp ý có quyết định | `docs/code-review.md`, [`docs/test-report.md`](docs/test-report.md) mục 6 |
-| 8 | Báo cáo, slide, video | Chưa làm | `report/`, `slides/` |
+| 8 | Báo cáo, slide, video | Slide Final có bản đầu (`slides/Final_SE190992_slides.pdf`); report Final và video chưa làm | `report/`, `slides/` |
 
 ## Chạy app
 
@@ -226,6 +252,9 @@ lib/
 
 | Công cụ | Dùng để làm gì |
 |---|---|
-| Claude (Claude Code) | Đọc đề Lab 3 và tài liệu Lab 2, viết `design-traceability.md` và `architecture.md`, dựng theme, thư viện widget, khung route và test (Stage 1–2); tầng service Firebase, đăng nhập, redirect và test (Stage 3) |
+| Claude (Claude Code) | Đọc đề Lab 3 và tài liệu Lab 2, viết `design-traceability.md` và `architecture.md`, dựng theme, thư viện widget, khung route và test (Stage 1–2); tầng service Firebase, đăng nhập, redirect và test (Stage 3). Final: đối chiếu đề với repo, viết `docs/test-report.md` và AI code review cho code Final (mục 6), chặn tài khoản staff / admin trên app, nháp nhật ký (P4), vai trò web admin theo thời gian thực, prompt AI trong Remote Config, test rules R-29 / R-30, cập nhật gap review, data model, README |
+| CodeRabbit | AI code review cho Lab 3 ([`docs/code-review.md`](docs/code-review.md)) và nhận xét trên các PR của Final |
+| DeepSeek (qua Google ARTEMIS) | Agent chạy test E2E trên máy ảo Android ([`docs/test-plan.md`](docs/test-plan.md)) |
+| Gemini (Firebase AI Logic) | Tính năng trong app (Nốt AI), không phải công cụ viết code ([`docs/ai-feature.md`](docs/ai-feature.md)) |
 
-Danh sách đầy đủ được cập nhật ở mỗi stage. Link video demo sẽ được thêm ở Stage 8.
+Thành viên dùng thêm công cụ AI nào thì bổ sung vào bảng này trước khi nộp.
