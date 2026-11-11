@@ -329,3 +329,62 @@ test('R-28 owner saves weekly card PDF metadata; the shape must match the week',
   await assertSucceeds(deleteDoc(doc(owner, 'users/uma/reports/2026-W46')));
 });
 
+
+// Final: staff and admin manage the shared data on the web, but a user's own
+// data stays private to that user (no role can read or change it).
+const privatePaths = [
+  'users/alice/notes/p1',
+  'users/alice/private/habits',
+  'users/alice/private/settings',
+  'users/alice/private/onboarding',
+  'users/alice/challengeProgress/dung_cam',
+  'users/alice/customChallenges/c1',
+  'users/alice/groups/g1',
+  'users/alice/sharedStreaks/s1',
+  'users/alice/reports/2026-W46',
+  'users/alice/stickers/2026-11',
+];
+
+test("R-29 staff and admin cannot read or write a user's private data", async () => {
+  await env.withSecurityRulesDisabled(async (ctx) => {
+    const db = ctx.firestore();
+    for (const p of privatePaths) await setDoc(doc(db, p), { seeded: true });
+  });
+  const owner = env.authenticatedContext('alice').firestore();
+  await assertSucceeds(getDoc(doc(owner, 'users/alice/notes/p1')));
+  for (const uid of ['sam', 'root']) {
+    const db = env.authenticatedContext(uid).firestore();
+    for (const p of privatePaths) {
+      await assertFails(getDoc(doc(db, p)));
+      await assertFails(setDoc(doc(db, p), { seeded: false }));
+      await assertFails(deleteDoc(doc(db, p)));
+    }
+    await assertFails(getDocs(collection(db, 'users/alice/notes')));
+  }
+});
+
+const streakCard = (extra = {}) => ({
+  image: 'iVBORw0KGgo=',
+  streak: 7,
+  record: 9,
+  milestone: 7,
+  createdAt: Timestamp.now(),
+  ...extra,
+});
+
+test('R-30 owner shares a streak card once; shape and size are checked', async () => {
+  const db = env.authenticatedContext('alice').firestore();
+  await assertSucceeds(setDoc(doc(db, 'users/alice/sharedStreaks/s2'), streakCard()));
+  await assertSucceeds(getDoc(doc(db, 'users/alice/sharedStreaks/s2')));
+  // Created once, never edited.
+  await assertFails(updateDoc(doc(db, 'users/alice/sharedStreaks/s2'), { streak: 8 }));
+  await assertFails(setDoc(doc(db, 'users/alice/sharedStreaks/s3'), streakCard({ streak: '7' })));
+  await assertFails(setDoc(doc(db, 'users/alice/sharedStreaks/s4'), streakCard({ caption: 'hi' })));
+  await assertFails(setDoc(doc(db, 'users/alice/sharedStreaks/s5'), streakCard({ image: 'a'.repeat(850001) })));
+  const { createdAt, ...missing } = streakCard();
+  await assertFails(setDoc(doc(db, 'users/alice/sharedStreaks/s6'), missing));
+  const other = env.authenticatedContext('bob').firestore();
+  await assertFails(getDoc(doc(other, 'users/alice/sharedStreaks/s2')));
+  await assertFails(setDoc(doc(other, 'users/alice/sharedStreaks/s7'), streakCard()));
+  await assertSucceeds(deleteDoc(doc(db, 'users/alice/sharedStreaks/s2')));
+});
