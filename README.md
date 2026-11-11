@@ -48,8 +48,8 @@
 | 3 | Firebase và đăng nhập | Xong (code + test; chờ project Firebase thật để chạy Google Sign-In trên máy) | `lib/services/`, `lib/firebase/`, S01, đăng xuất ở S12 |
 | 4 | Tính năng | Xong (code + test; chờ chạy thử trên máy với project Firebase thật): đủ 12 màn, 3 flow F1–F3 và các flow phụ, PDF Thẻ tuần (Final: lưu trên máy, chia sẻ, metadata Firestore) | Đủ 12 màn với mọi trạng thái, lưu và chia sẻ PDF |
 | 5 | Analytics, Crashlytics, Remote Config, FCM | Đang làm (Analytics + Crashlytics) | [`docs/analytics-plan.md`](docs/analytics-plan.md) |
-| 6 | Test plan và ARTEMIS | Chưa làm | `docs/test-plan.md`, `e2e_test/` |
-| 7 | AI code review | Chưa làm | `docs/code-review.md` |
+| 6 | Test plan và ARTEMIS | Lab 3 xong (41/42); ca ARTEMIS cho luồng Final chưa chạy | `docs/test-plan.md`, `e2e_test/`, [`docs/test-report.md`](docs/test-report.md) |
+| 7 | AI code review | Lab 3 xong; Final: 5 góp ý có quyết định | `docs/code-review.md`, [`docs/test-report.md`](docs/test-report.md) mục 6 |
 | 8 | Báo cáo, slide, video | Chưa làm | `report/`, `slides/` |
 
 ## Chạy app
@@ -83,7 +83,7 @@ flutter run -d chrome       # nối Firebase thật, đăng nhập Google
 flutter test
 ```
 
-Tài khoản phải có `role` là `staff` hoặc `admin`, nếu không web admin từ chối. Lần đầu đăng nhập, web admin tạo `users/{uid}` với `role = user`; nhờ admin đổi ở màn **Người dùng**, hoặc (admin đầu tiên) sửa `role` thành `admin` trong Firebase Console → Firestore → `users`.
+Tài khoản phải có `role` là `staff` hoặc `admin`, nếu không web admin từ chối. Lần đầu đăng nhập, web admin tạo `users/{uid}` với `role = user`; nhờ admin đổi ở màn **Người dùng**, hoặc (admin đầu tiên) sửa `role` thành `admin` trong Firebase Console → Firestore → `users`. Ngược lại, app mobile chỉ nhận tài khoản `user` và báo tài khoản `staff` / `admin` dùng web admin ([`docs/data-model.md`](docs/data-model.md)), nên ghi nốt trên điện thoại và quản trị trên web cần hai tài khoản khác nhau.
 
 Chạy với Emulator (dữ liệu giả, không đụng project thật). Emulator cần Java 17+ (chưa cài Java thì dùng JDK đi kèm Android Studio, thư mục `jbr` trong chỗ cài Android Studio, ví dụ `C:\Program Files\Android\Android Studio\jbr`; đặt `JAVA_HOME` trỏ tới đó):
 

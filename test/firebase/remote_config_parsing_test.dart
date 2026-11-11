@@ -66,6 +66,9 @@ void main() {
       'ai_model': config.ai.model,
       'ai_timeout_ms': '${config.ai.timeoutMs}',
       'ai_max_chars': '${config.ai.maxChars}',
+      'ai_prompt_sort': config.ai.promptSort,
+      'ai_prompt_onboarding': config.ai.promptOnboarding,
+      'ai_prompt_greeting': config.ai.promptGreeting,
     });
   });
 }

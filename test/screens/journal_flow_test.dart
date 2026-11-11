@@ -130,5 +130,73 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(TodayScreen), findsOneWidget);
     expect(services.notes.notes, isEmpty);
+    expect(services.journalDrafts.text, isNull);
+  });
+
+  group('nháp khi app bị tắt giữa chừng (flow P4)', () {
+    testWidgets('đang gõ thì nháp được lưu trên máy', (tester) async {
+      final services = await pumpApp(tester);
+      await openJournal(tester);
+      await tester.enterText(find.byType(TextField), 'Hôm nay rối quá.');
+      await tester.pump(const Duration(seconds: 1));
+      expect(services.journalDrafts.text, 'Hôm nay rối quá.');
+    });
+
+    testWidgets('mở lại: "Tiếp tục bản nháp?" → Viết tiếp điền lại chữ', (
+      tester,
+    ) async {
+      final services = TestServices();
+      services.journalDrafts.text = 'Trang viết dở hôm qua.';
+      await pumpApp(tester, services: services);
+      await openJournal(tester);
+
+      expect(find.text('Tiếp tục bản nháp?'), findsOneWidget);
+      await tester.tap(find.text('Viết tiếp'));
+      await tester.pumpAndSettle();
+      final field = tester.widget<TextField>(find.byType(TextField));
+      expect(field.controller!.text, 'Trang viết dở hôm qua.');
+      expect(services.journalDrafts.text, 'Trang viết dở hôm qua.');
+    });
+
+    testWidgets('Bắt đầu trang mới: ô trống, nháp cũ bị xoá', (tester) async {
+      final services = TestServices();
+      services.journalDrafts.text = 'Trang viết dở hôm qua.';
+      await pumpApp(tester, services: services);
+      await openJournal(tester);
+
+      await tester.tap(find.text('Bắt đầu trang mới'));
+      await tester.pumpAndSettle();
+      final field = tester.widget<TextField>(find.byType(TextField));
+      expect(field.controller!.text, isEmpty);
+      expect(services.journalDrafts.text, isNull);
+    });
+
+    testWidgets('không có nháp thì không hỏi', (tester) async {
+      await pumpApp(tester);
+      await openJournal(tester);
+      expect(find.text('Tiếp tục bản nháp?'), findsNothing);
+    });
+
+    testWidgets('lưu thành nốt thì nháp bị xoá', (tester) async {
+      final services = TestServices();
+      services.journalDrafts.text = 'Mình đã hỏi thầy.';
+      await pumpApp(tester, services: services);
+      await openJournal(tester);
+      await tester.tap(find.text('Viết tiếp'));
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Xong'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Xong'));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Lưu vào hũ'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Lưu vào hũ'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(NoteSavedScreen), findsOneWidget);
+      expect(services.notes.notes.single.title, 'Mình đã hỏi thầy.');
+      expect(services.journalDrafts.text, isNull);
+    });
   });
 }

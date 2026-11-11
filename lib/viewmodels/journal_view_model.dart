@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/note.dart';
 import '../models/note_type.dart';
 import '../services/clock.dart';
+import '../services/journal_draft_store.dart';
 import '../services/note_repository.dart';
 import 'error_messages.dart';
 
@@ -49,6 +50,34 @@ class JournalViewModel extends Notifier<JournalState> {
   @override
   JournalState build() => const JournalState();
 
+  JournalDraftStore get _drafts => ref.read(journalDraftStoreProvider);
+
+  /// Trang viết dở từ lần trước (app bị tắt giữa chừng, flow P4).
+  Future<String?> loadDraft() async {
+    try {
+      return await _drafts.load();
+    } on Object {
+      return null;
+    }
+  }
+
+  /// Lưu chữ đang viết; lỗi bộ nhớ máy không làm hỏng việc viết.
+  Future<void> saveDraft(String text) async {
+    try {
+      await _drafts.save(text);
+    } on Object {
+      // Bỏ qua: lần gõ sau lưu lại.
+    }
+  }
+
+  Future<void> clearDraft() async {
+    try {
+      await _drafts.clear();
+    } on Object {
+      // Bỏ qua: nháp cũ sẽ bị hỏi lại ở lần mở sau, không mất dữ liệu.
+    }
+  }
+
   /// Tách bài viết thành các câu để chọn "điều rõ ràng nhất": bỏ các câu hỏi
   /// gợi ý đã chèn, câu dài quá tiêu đề thì cắt ở ranh giới từ.
   static List<String> sentences(String text) {
@@ -85,6 +114,7 @@ class JournalViewModel extends Notifier<JournalState> {
             ),
             createdAt: ref.read(clockProvider).now(),
           );
+      await clearDraft();
       if (!ref.mounted) return;
       state = state.copyWith(saving: false, savedNoteId: () => note.id);
     } on Object catch (error) {

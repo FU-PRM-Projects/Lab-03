@@ -34,10 +34,18 @@ final authUserProvider = StreamProvider<AdminUser?>(
 );
 
 /// Đăng nhập lần đầu thì tạo hồ sơ `role = user` (rules chỉ cho vậy), rồi
-/// đọc vai trò: chỉ staff và admin được vào.
-final sessionProvider = FutureProvider<Session>((ref) async {
+/// theo dõi vai trò: chỉ staff và admin được vào.
+///
+/// Vai trò đọc theo thời gian thực (`users/{uid}` snapshot), không chỉ một lần
+/// lúc đăng nhập: admin hạ một staff xuống `user` thì phiên đang mở của người
+/// đó chuyển ngay sang màn từ chối, thay vì vẫn hiện quyền cũ rồi mọi thao tác
+/// báo "không có quyền" (góp ý CR-F1 trong `docs/test-report.md`).
+final sessionProvider = StreamProvider<Session>((ref) async* {
   final user = await ref.watch(authUserProvider.future);
-  if (user == null) return const SignedOut();
+  if (user == null) {
+    yield const SignedOut();
+    return;
+  }
   final directory = ref.watch(userDirectoryProvider);
   final analytics = ref.read(adminAnalyticsProvider);
   await directory.ensureProfile(
@@ -45,14 +53,20 @@ final sessionProvider = FutureProvider<Session>((ref) async {
     displayName: user.displayName,
     email: user.email,
   );
-  final role = await directory.roleOf(user.uid) ?? UserRole.user;
-  if (!role.canUseAdmin) {
-    await analytics.log('admin_access_denied');
-    return Rejected(user);
+  UserRole? last;
+  await for (final value in directory.watchRole(user.uid)) {
+    final role = value ?? UserRole.user;
+    if (role == last) continue;
+    last = role;
+    if (!role.canUseAdmin) {
+      await analytics.log('admin_access_denied');
+      yield Rejected(user);
+    } else {
+      await analytics.setUser(user.uid);
+      await analytics.log('admin_sign_in', <String, Object>{'role': role.id});
+      yield StaffSession(user, role);
+    }
   }
-  await analytics.setUser(user.uid);
-  await analytics.log('admin_sign_in', <String, Object>{'role': role.id});
-  return StaffSession(user, role);
 });
 
 /// Phiên staff hiện tại; chỉ dùng ở các màn sau khi đã vào shell.

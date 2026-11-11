@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:not_core/models/user_role.dart';
 
 import '../models/app_user.dart';
 import '../services/user_repository.dart';
@@ -24,6 +25,17 @@ class FirestoreUserRepository implements UserRepository {
         'displayName': user.displayName,
         'createdAt': FieldValue.serverTimestamp(),
       });
+    } on FirebaseException catch (e) {
+      throw firestoreException(e);
+    }
+  }
+
+  @override
+  Future<UserRole?> roleOf(String uid) async {
+    try {
+      final snapshot = await _firestore.collection('users').doc(uid).get();
+      if (!snapshot.exists) return null;
+      return UserRole.fromId(snapshot.data()?['role'] as String?);
     } on FirebaseException catch (e) {
       throw firestoreException(e);
     }

@@ -46,11 +46,32 @@ class _FakeDirectory implements UserDirectory {
     String email = '',
   }) async => roles.putIfAbsent(uid, () => UserRole.user);
 
+  final StreamController<void> _changes = StreamController<void>.broadcast();
+
   @override
   Future<UserRole?> roleOf(String uid) async => roles[uid];
 
+  /// Như snapshot Firestore: gửi vai trò hiện tại khi bắt đầu nghe, rồi mỗi
+  /// lần đổi; sự kiện được giữ lại tới khi bên nghe sẵn sàng.
   @override
-  Future<void> setRole(String uid, UserRole role) async => roles[uid] = role;
+  Stream<UserRole?> watchRole(String uid) {
+    late final StreamController<UserRole?> out;
+    StreamSubscription<void>? changes;
+    out = StreamController<UserRole?>(
+      onListen: () {
+        out.add(roles[uid]);
+        changes = _changes.stream.listen((_) => out.add(roles[uid]));
+      },
+      onCancel: () => changes?.cancel(),
+    );
+    return out.stream;
+  }
+
+  @override
+  Future<void> setRole(String uid, UserRole role) async {
+    roles[uid] = role;
+    _changes.add(null);
+  }
 
   @override
   Stream<List<UserSummary>> watchAll() => const Stream.empty();
@@ -187,6 +208,28 @@ void main() {
     await Future<void>.delayed(Duration.zero);
     final admin = await container.read(sessionProvider.future);
     expect((admin as StaffSession).isAdmin, isTrue);
+  });
+
+  test('vai trò bị đổi khi đang mở web: phiên đổi theo ngay (CR-F1)', () async {
+    directory.roles['sam'] = UserRole.staff;
+    auth.emit(const AdminUser(uid: 'sam'));
+    expect(await session(), isA<StaffSession>());
+
+    // Chờ snapshot mới đi hết qua provider (vài vòng microtask).
+    Future<Session?> settled() async {
+      for (var i = 0; i < 20; i++) {
+        await Future<void>.delayed(Duration.zero);
+      }
+      return container.read(sessionProvider).value;
+    }
+
+    await directory.setRole('sam', UserRole.user);
+    expect(await settled(), isA<Rejected>());
+
+    await directory.setRole('sam', UserRole.admin);
+    final back = await settled();
+    expect(back, isA<StaffSession>());
+    expect((back! as StaffSession).isAdmin, isTrue);
   });
 
   test(

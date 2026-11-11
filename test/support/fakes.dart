@@ -19,12 +19,14 @@ import 'package:lab03/services/crash_reporter.dart';
 import 'package:lab03/services/discord_service.dart';
 import 'package:lab03/services/draft_store.dart';
 import 'package:lab03/services/group_repository.dart';
+import 'package:lab03/services/journal_draft_store.dart';
 import 'package:lab03/services/messaging_service.dart';
 import 'package:lab03/services/note_repository.dart';
 import 'package:lab03/services/nudge_service.dart';
 import 'package:lab03/services/report_services.dart';
 import 'package:lab03/services/self_control_services.dart';
 import 'package:lab03/services/user_repository.dart';
+import 'package:not_core/models/user_role.dart';
 
 const AppUser testUser = AppUser(
   uid: 'u-minh',
@@ -110,6 +112,16 @@ class FakeUserRepository implements UserRepository {
   Future<void> ensureProfile(AppUser user) async {
     if (ensureError != null) throw ensureError!;
     profiles.add(user);
+  }
+
+  /// Vai trò trả về cho mọi tài khoản; mặc định chưa có hồ sơ (coi như user).
+  UserRole? role;
+  AppException? roleError;
+
+  @override
+  Future<UserRole?> roleOf(String uid) async {
+    if (roleError != null) throw roleError!;
+    return role;
   }
 
   @override
@@ -469,6 +481,24 @@ class FakeDraftStore implements DraftStore {
 
   @override
   Future<void> clear() async => draft = null;
+}
+
+class FakeJournalDraftStore implements JournalDraftStore {
+  String? text;
+  int saveCount = 0;
+
+  @override
+  Future<String?> load() async =>
+      text == null || text!.trim().isEmpty ? null : text;
+
+  @override
+  Future<void> save(String value) async {
+    saveCount++;
+    text = value.trim().isEmpty ? null : value;
+  }
+
+  @override
+  Future<void> clear() async => text = null;
 }
 
 /// Nốt mẫu, mặc định là chiến thắng tâm trạng Ổn.

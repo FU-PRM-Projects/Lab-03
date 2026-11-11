@@ -36,19 +36,71 @@ class _JournalScreenState extends ConsumerState<JournalScreen> {
   JournalViewModel get _viewModel =>
       ref.read(journalViewModelProvider.notifier);
 
+  /// Lưu nháp sau khi ngừng gõ một lúc, để không ghi bộ nhớ máy mỗi phím.
+  Timer? _draftDebounce;
+  late final AppLifecycleListener _lifecycle;
+
+  /// Đang hỏi "Tiếp tục bản nháp?": chưa lưu nháp mới để không ghi đè nháp cũ.
+  bool _checkingDraft = true;
+
   @override
   void initState() {
     super.initState();
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted && !_picking) setState(() {});
     });
+    _text.addListener(_scheduleDraftSave);
+    // App bị đưa xuống nền (có thể bị hệ điều hành tắt sau đó): lưu ngay.
+    _lifecycle = AppLifecycleListener(onHide: _saveDraftNow);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _offerDraft());
   }
 
   @override
   void dispose() {
     _ticker?.cancel();
+    _draftDebounce?.cancel();
+    _lifecycle.dispose();
     _text.dispose();
     super.dispose();
+  }
+
+  /// Flow P4: trang viết dở từ lần trước (app bị tắt giữa chừng).
+  Future<void> _offerDraft() async {
+    final draft = await _viewModel.loadDraft();
+    if (!mounted) return;
+    if (draft != null && _text.text.trim().isEmpty) {
+      final resume = await showAppDialog(
+        context: context,
+        title: 'Tiếp tục bản nháp?',
+        message:
+            'Bạn còn một trang nhật ký viết dở từ lần trước '
+            '(${draft.trim().length} ký tự).',
+        confirmLabel: 'Viết tiếp',
+        cancelLabel: 'Bắt đầu trang mới',
+      );
+      if (!mounted) return;
+      if (resume ?? false) {
+        _text.value = TextEditingValue(
+          text: draft,
+          selection: TextSelection.collapsed(offset: draft.length),
+        );
+      } else {
+        await _viewModel.clearDraft();
+      }
+    }
+    _checkingDraft = false;
+  }
+
+  void _scheduleDraftSave() {
+    if (_checkingDraft) return;
+    _draftDebounce?.cancel();
+    _draftDebounce = Timer(const Duration(milliseconds: 800), _saveDraftNow);
+  }
+
+  void _saveDraftNow() {
+    if (_checkingDraft) return;
+    _draftDebounce?.cancel();
+    unawaited(_viewModel.saveDraft(_text.text));
   }
 
   void _close() =>
@@ -60,7 +112,9 @@ class _JournalScreenState extends ConsumerState<JournalScreen> {
       return;
     }
     if (_text.text.trim().isEmpty) {
-      _close();
+      _draftDebounce?.cancel();
+      await _viewModel.clearDraft();
+      if (mounted) _close();
       return;
     }
     final leave = await showAppDialog(
@@ -71,7 +125,12 @@ class _JournalScreenState extends ConsumerState<JournalScreen> {
       cancelLabel: 'Viết tiếp',
       kind: AppDialogKind.destructive,
     );
-    if ((leave ?? false) && mounted) _close();
+    if ((leave ?? false) && mounted) {
+      _draftDebounce?.cancel();
+      _checkingDraft = true; // không lưu lại khi ô nhập bị huỷ
+      await _viewModel.clearDraft();
+      if (mounted) _close();
+    }
   }
 
   /// Chèn câu hỏi gợi ý xuống dòng mới, con trỏ đặt ngay dưới để viết tiếp.
@@ -105,6 +164,9 @@ class _JournalScreenState extends ConsumerState<JournalScreen> {
 
     ref.listen(journalViewModelProvider, (previous, next) {
       if (next.savedNoteId != null && previous?.savedNoteId == null) {
+        // Nốt đã lưu và nháp đã xoá ở ViewModel: không lưu nháp lại nữa.
+        _draftDebounce?.cancel();
+        _checkingDraft = true;
         context.go(AppRoutes.noteSaved(next.savedNoteId!));
       }
       if (next.message != null && previous?.message != next.message) {

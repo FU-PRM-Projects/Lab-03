@@ -15,8 +15,30 @@ repository Firestore dùng chung ở [`packages/core`](../packages/core)
 | `staff` | Web admin | Admin đổi ở màn Người dùng |
 | `admin` | Web admin | Admin đầu tiên đặt trong Firebase Console (hoặc `npm run role -- <email> admin`); các admin sau do admin đổi |
 
-Chỉ admin đổi vai trò, không ai đổi vai trò của chính mình. Web admin từ chối
-tài khoản `user` với lời giải thích; app không có màn nào riêng cho staff.
+Chỉ admin đổi vai trò, không ai đổi vai trò của chính mình.
+
+### Mỗi client từ chối tài khoản sai vai trò
+
+Đề Final mục 6: *"each client rejects accounts of the wrong role with a clear
+message"*.
+
+| Client | Cho vào | Từ chối | Câu báo | Code |
+|---|---|---|---|---|
+| Web admin | `staff`, `admin` | `user` | "Tài khoản này không có quyền vào web admin" ([ảnh](../evidence/web-admin/02-rejected-user-account.png)) | `web_admin/lib/viewmodels/session_view_model.dart` |
+| App mobile | `user` | `staff`, `admin` | "Tài khoản này dành cho web admin", kèm địa chỉ web admin và nút Đăng xuất | `accountRoleProvider` (`lib/viewmodels/auth_view_model.dart`), `authRedirect` (`lib/router/auth_redirect.dart`), `WrongRoleScreen` |
+
+App đọc `users/{uid}.role` mỗi khi tài khoản đăng nhập đổi, kể cả khi phiên cũ
+được khôi phục lúc mở app. Trong lúc đọc, router giữ ở màn chờ để không lộ màn
+nào của app. Tài khoản `staff` / `admin` chỉ thấy màn báo và nút Đăng xuất,
+không có thanh tab. Chưa có hồ sơ (lần đăng nhập đầu) hoặc không đọc được vai
+trò (mất mạng) thì coi như `user`: lúc đó Security Rules vẫn kiểm tra vai trò ở
+mọi lần ghi, và app không có thao tác nào cần vai trò cao hơn `user`. Test:
+`test/router/auth_redirect_test.dart` (nhóm "vai trò") và
+`test/screens/auth_flow_test.dart`.
+
+Vì vậy mỗi người cần hai tài khoản khi làm cả hai việc: tài khoản `user` ghi nốt
+trên điện thoại, tài khoản `staff` / `admin` làm việc trên web. Demo luồng liên
+vai trò dùng đúng hai tài khoản này.
 
 ## Collection
 
@@ -82,4 +104,4 @@ ca được phép và một ca bị cấm:
 | R-28 | `users/{uid}/reports` | user | chủ ghi metadata tuần, ghi đè khi lưu lại, đọc, xoá | Cho phép |
 | R-28 | `users/{uid}/reports` | user | người khác đọc / ghi; `isoWeek` khác id; tên file khác; `sizeBytes = 0`; thêm trường `url`; `savedAt` giả | Cấm |
 
-Kết quả lần chạy gần nhất (10/11/2026): 28/28 pass (`evidence/firestore/rules-tests.txt`).
+Kết quả lần chạy gần nhất (11/11/2026): 28/28 pass (`evidence/firestore/rules-tests.txt`).

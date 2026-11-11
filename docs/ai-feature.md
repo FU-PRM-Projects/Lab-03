@@ -103,5 +103,9 @@ trên Remote Config. Code đổi mặc định sang `gemini-flash-lite-latest`
    token in ra logcat: `DebugAppCheckProvider: Enter this debug secret…`) và web
    app (Fraud Defense / reCAPTCHA Enterprise). Bật Enforce cho **Firebase AI Logic** và **Cloud
    Firestore** sau khi Metrics cho thấy request đã được xác minh.
-3. **Remote Config**: thêm các tham số `ai_*` ở trên (giá trị mặc định có sẵn
-   trong app nên không thêm vẫn chạy).
+3. **Remote Config**: các tham số `ai_*` ở trên, kể cả ba prompt `ai_prompt_sort`,
+   `ai_prompt_onboarding`, `ai_prompt_greeting`, có sẵn trong
+   `firebase/remoteconfig.template.json` (đưa lên bằng
+   `firebase deploy --only remoteconfig`) và `firebase/remote-config-defaults.json`.
+   Giá trị giống mặc định trong app (`AiConfig`), nên Console chưa có key thì app
+   vẫn chạy; sửa prompt trên Console có tác dụng ở lần gọi sau.

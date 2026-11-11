@@ -5,9 +5,11 @@ import 'package:lab03/screens/jar/jar_screen.dart';
 import 'package:lab03/screens/settings/settings_screen.dart';
 import 'package:lab03/screens/today/today_screen.dart';
 import 'package:lab03/screens/welcome/welcome_screen.dart';
+import 'package:lab03/screens/welcome/wrong_role_screen.dart';
 import 'package:lab03/services/app_exception.dart';
 import 'package:lab03/widgets/app_bottom_nav.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:not_core/models/user_role.dart';
 
 import '../support/fakes.dart';
 import '../support/pump.dart';
@@ -46,6 +48,42 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(TodayScreen), findsOneWidget);
     expect(services.users.profiles.single, testUser);
+  });
+
+  testWidgets('tài khoản admin mở app: màn báo dùng web admin, đăng xuất về '
+      'S01 (đề Final mục 6)', (tester) async {
+    final services = TestServices()..users.role = UserRole.admin;
+    await pumpApp(tester, services: services);
+    expect(find.byType(WrongRoleScreen), findsOneWidget);
+    expect(find.text('Tài khoản này dành cho web admin'), findsOneWidget);
+    expect(find.byType(TodayScreen), findsNothing);
+    expect(find.byType(AppBottomNav), findsNothing);
+
+    await tester.tap(find.text('Đăng xuất'));
+    await tester.pumpAndSettle();
+    expect(services.auth.signOutCount, 1);
+    expect(find.byType(WelcomeScreen), findsOneWidget);
+  });
+
+  testWidgets('đăng nhập Google bằng tài khoản staff: không vào S02', (
+    tester,
+  ) async {
+    final services = TestServices(signedIn: false)..users.role = UserRole.staff;
+    await pumpApp(tester, services: services);
+
+    await tester.tap(find.text('Tiếp tục với Google'));
+    await tester.pumpAndSettle();
+    expect(find.byType(WrongRoleScreen), findsOneWidget);
+    expect(find.byType(TodayScreen), findsNothing);
+  });
+
+  testWidgets('không đọc được vai trò (mất mạng): vẫn vào S02 như user', (
+    tester,
+  ) async {
+    final services = TestServices()
+      ..users.roleError = const AppException(AppErrorKind.network);
+    await pumpApp(tester, services: services);
+    expect(find.byType(TodayScreen), findsOneWidget);
   });
 
   testWidgets('huỷ chọn tài khoản: SnackBar, vẫn ở S01', (tester) async {

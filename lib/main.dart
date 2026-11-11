@@ -34,6 +34,7 @@ import 'firebase/firestore_self_control.dart';
 import 'firebase/firestore_user_repository.dart';
 import 'firebase/local_nudge_service.dart';
 import 'firebase/prefs_draft_store.dart';
+import 'firebase/prefs_journal_draft_store.dart';
 import 'firebase/report_impl.dart';
 import 'firebase/streak_share_impl.dart';
 import 'services/ai_service.dart';
@@ -45,6 +46,7 @@ import 'services/crash_reporter.dart';
 import 'services/discord_service.dart';
 import 'services/draft_store.dart';
 import 'services/group_repository.dart';
+import 'services/journal_draft_store.dart';
 import 'services/messaging_service.dart';
 import 'services/note_repository.dart';
 import 'services/nudge_service.dart';
@@ -111,6 +113,7 @@ Future<void> main() async {
           FirestoreGroupRepository(currentUid: uid),
         ),
         draftStoreProvider.overrideWithValue(PrefsDraftStore()),
+        journalDraftStoreProvider.overrideWithValue(PrefsJournalDraftStore()),
         streakShareServiceProvider.overrideWithValue(
           FirebaseStreakShareService(currentUid: uid),
         ),

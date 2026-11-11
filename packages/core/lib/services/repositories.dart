@@ -89,6 +89,10 @@ abstract interface class UserDirectory {
   /// Vai trò của [uid]; `null` khi chưa có hồ sơ.
   Future<UserRole?> roleOf(String uid);
 
+  /// Vai trò của [uid] theo thời gian thực: admin đổi vai trò thì phiên đang
+  /// mở đổi theo ngay, không cần tải lại trang. `null` khi chưa có hồ sơ.
+  Stream<UserRole?> watchRole(String uid);
+
   /// Tạo hồ sơ `role = user` khi đăng nhập lần đầu (rules chỉ cho vai trò
   /// này); đã có thì giữ nguyên.
   Future<void> ensureProfile(
