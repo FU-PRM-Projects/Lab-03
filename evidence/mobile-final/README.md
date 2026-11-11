@@ -44,3 +44,13 @@ Storage. Metadata ghi ở Firestore `users/{uid}/reports/2026-W46`.
 | [`11-ai-off-remote-config.png`](11-ai-off-remote-config.png) | Đặt `ai_enabled = false` (Boolean) trên Remote Config rồi Publish, mở lại app: Kể tự do hiện "Nốt AI đang nghỉ. Bạn vẫn ghi nốt tay như thường nhé.", không còn nút gọi Gemini, chỉ còn "Ghi tay". Luồng ghi nốt vẫn chạy khi không có AI |
 
 Sau khi chụp, đặt lại `ai_enabled = true`.
+
+## Từ chối tài khoản sai vai trò (đề Final mục 6)
+
+Chạy ngày 11/11/2026 trên Galaxy A70, bản debug có `WrongRoleScreen` (nhánh
+`docs/test-report`), tài khoản Google có `role = admin`.
+
+| Ảnh | Cho thấy |
+|---|---|
+| [`12-wrong-role-admin.png`](12-wrong-role-admin.png) | Mở app bằng tài khoản admin: màn "Tài khoản này dành cho web admin", địa chỉ web admin, nút Đăng xuất, không có thanh tab |
+| [`13-wrong-role-signed-out.png`](13-wrong-role-signed-out.png) | Bấm Đăng xuất: về S01 (Tiếp tục với Google / Đăng nhập bằng email) |

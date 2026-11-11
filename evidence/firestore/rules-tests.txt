@@ -1,31 +1,37 @@
-✔ R-01 user cannot change own role
-✔ R-02 admin can change a role
-✔ R-03 user reads own profile; unauthenticated denied
-✔ R-04 unknown collection denied by default
-✔ R-05 user creates own profile with role user (first sign-in)
-✔ R-06 user cannot create own profile as admin or for someone else
-✔ R-07 user writes, reads and deletes own notes
-✔ R-08 user cannot read or write someone else's notes
-✔ R-09 invalid notes are rejected
-✔ R-10 user saves own month sticker only under its own id
-✔ R-11 user keeps private habits and settings; others cannot read them
-✔ R-12 challenge catalog is read-only; progress is private
-✔ R-13 challenge notes keep their result fields within range
-✔ R-15 user adds and deletes their own challenge cards, privately
-✔ R-14 user keeps "first time" groups; names and ideas are checked
-✔ R-16 notes may carry a Cloudinary image; other images are rejected
-✔ R-17 groups may carry a Cloudinary image
-✔ R-18 owner sets and removes own profile photo, but cannot touch role or others
-✔ R-19 staff create, edit and archive catalog cards; users and bad cards are denied
-✔ R-20 user submits a pending card for themselves only
-✔ R-21 owner and staff read a submission; other users do not
-✔ R-22 only staff move pending to approved or rejected; a rejection needs a reason
-✔ R-23 owner withdraws a pending submission but not a reviewed one
-✔ R-24 staff write inbox messages; the owner reads and marks them read
-✔ R-25 staff post announcements that every signed-in user reads
-✔ R-26 staff read user profiles; only an admin changes roles, never their own
-✔ R-27 onboarding answers are private and limited to known values
-✔ R-28 owner saves weekly card PDF metadata; the shape must match the week
+# npm run test:rules — 2026-11-11 13:21 — commit eb04447
+✔ R-01 user cannot change own role (2390.8504ms)
+✔ R-02 admin can change a role (40.4904ms)
+✔ R-03 user reads own profile; unauthenticated denied (108.519ms)
+✔ R-04 unknown collection denied by default (30.2809ms)
+✔ R-05 user creates own profile with role user (first sign-in) (35.8713ms)
+✔ R-06 user cannot create own profile as admin or for someone else (46.9294ms)
+✔ R-07 user writes, reads and deletes own notes (65.713ms)
+✔ R-08 user cannot read or write someone else's notes (100.7868ms)
+✔ R-09 invalid notes are rejected (188.2022ms)
+✔ R-10 user saves own month sticker only under its own id (79.4025ms)
+✔ R-11 user keeps private habits and settings; others cannot read them (103.0824ms)
+✔ R-12 challenge catalog is read-only; progress is private (175.151ms)
+✔ R-13 challenge notes keep their result fields within range (79.7493ms)
+✔ R-15 user adds and deletes their own challenge cards, privately (304.4582ms)
+✔ R-14 user keeps "first time" groups; names and ideas are checked (161.8968ms)
+✔ R-16 notes may carry a Cloudinary image; other images are rejected (113.646ms)
+✔ R-17 groups may carry a Cloudinary image (32.1567ms)
+✔ R-18 owner sets and removes own profile photo, but cannot touch role or others (144.0678ms)
+✔ R-19 staff create, edit and archive catalog cards; users and bad cards are denied (192.3274ms)
+✔ R-20 user submits a pending card for themselves only (115.9718ms)
+✔ R-21 owner and staff read a submission; other users do not (336.364ms)
+✔ R-22 only staff move pending to approved or rejected; a rejection needs a reason (188.6512ms)
+✔ R-23 owner withdraws a pending submission but not a reviewed one (70.3931ms)
+✔ R-24 staff write inbox messages; the owner reads and marks them read (152.3744ms)
+✔ R-25 staff post announcements that every signed-in user reads (201.7879ms)
+✔ R-26 staff read user profiles; only an admin changes roles, never their own (248.169ms)
+✔ R-27 onboarding answers are private and limited to known values (165.7189ms)
+✔ R-28 owner saves weekly card PDF metadata; the shape must match the week (152.5694ms)
 ℹ tests 28
+ℹ suites 0
 ℹ pass 28
 ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6442.8356

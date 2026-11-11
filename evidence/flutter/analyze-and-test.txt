@@ -1,0 +1,33 @@
+# flutter analyze + flutter test — 2026-11-11 — commit eb04447 (main)
+# Mỗi phần chỉ giữ vài dòng cuối của output (tail).
+Got dependencies!
+31 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Analyzing Lab-03...                                             
+No issues found! (ran in 207.4s)
+===ROOT-TEST
+01:34 +287: test/widgets/streak_widgets_test.dart: thẻ S02: chuỗi, kỷ lục, câu nhắc và mốc kế tiếp
+01:35 +288: test/widgets/streak_widgets_test.dart: thẻ S02: chưa có nốt thì mời mở chuỗi
+01:35 +289: test/widgets/streak_widgets_test.dart: S04 chúc mừng chuỗi mới và biến thể chạm mốc
+01:35 +290: All tests passed!
+===CORE
+Analyzing core...                                               
+No issues found! (ran in 9.9s)
+00:00 +3: lưu trữ rồi khôi phục thẻ, không xoá
+00:00 +4: vai trò lạ hoặc thiếu coi như user
+00:00 +5: All tests passed!
+===WEB
+Analyzing web_admin...                                          
+No issues found! (ran in 4.0s)
+00:00 +8: web_admin/test/session_test.dart: thẻ mới xếp cuối cấp của đúng chủ đề
+00:00 +9: web_admin/test/session_test.dart: bộ lọc kho thẻ: ẩn thẻ lưu trữ, tìm theo tên
+00:00 +10: All tests passed!
+
+===ROOT-TEST (chạy lại sau khi thêm kiểm tra vai trò trên mobile, 11/11)
+00:55 +297: All tests passed!
+
+===Sau khi thêm nháp nhật ký (P4), vai trò web theo thời gian thực (CR-F1), prompt AI trong Remote Config — 11/11
+App:       00:50 +303: All tests passed!
+core:      00:00 +5: All tests passed!
+web_admin: 00:00 +11: All tests passed!
+flutter analyze (app, core, web_admin): No issues found!

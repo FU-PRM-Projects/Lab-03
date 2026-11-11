@@ -16,7 +16,7 @@ quyết định **Làm**, **Đã đóng** hoặc **Bỏ (có lý do)**.
 | P1 Làm quen lần đầu (đăng nhập, xin quyền thông báo) | Xong: đăng nhập Google / email, huỷ, mất mạng; xin quyền khi bật lời nhắc và khi mở hộp thư | — | Đã đóng |
 | P2 Đăng ký email, quên mật khẩu | Xong | — | Đã đóng |
 | P3 Ghi một lần vận động | Xong | — | Đã đóng |
-| P4 Viết nhật ký dài | Một phần: viết, câu hỏi gợi ý, chọn tiêu đề | "Tiếp tục bản nháp?" khi app bị tắt giữa chừng | Làm (nhỏ) |
+| P4 Viết nhật ký dài | Xong: viết, câu hỏi gợi ý, chọn tiêu đề; trang đang viết lưu trên máy (`JournalDraftStore`, lưu sau 0,8 s ngừng gõ và khi app xuống nền), mở lại thì hỏi "Tiếp tục bản nháp?" (Viết tiếp / Bắt đầu trang mới); lưu thành nốt, bấm Bỏ hoặc đăng xuất thì xoá nháp | — | Đã đóng |
 | P5 Xem, sửa, xoá nốt | Xong | — | Đã đóng |
 | P6 Ngày tệ: nhìn lại hành trình | Xong | — | Đã đóng |
 | P7 Thông báo mở đúng màn | Xong: FCM 3 trạng thái app, lời nhắc trên máy, `?next=` qua đăng nhập | — | Đã đóng |
@@ -25,11 +25,43 @@ quyết định **Làm**, **Đã đóng** hoặc **Bỏ (có lý do)**.
 | T4 Bố cục 360 / 412 dp | Kiểm tra bằng widget test ở 360 và 412 dp (`settings_flow_test`, `today_flow_test`, …) | Golden test ảnh | Bỏ golden test: widget test đã kiểm tra tràn bố cục ở cả hai kích thước |
 | G1 Nhóm lần đầu | Xong: kệ nhóm, tạo nhóm (tên trùng xếp vào nhóm có sẵn), "Lần đầu tiên!", chi tiết nhóm, xoá có Hoàn tác | Gợi ý nhóm bằng AI (thuộc A1) | Làm cùng A1 |
 | D1 Phòng Discord | Xong | — | Đã đóng |
-| D2 Thử thách cấp 3 #chao-hoi | Một phần: S07 → S08 → S08d (câu chào có sẵn) → Discord → S08 | S08b tập nói với AI, S08d câu chào do AI viết | Làm (A3) |
+| D2 Thử thách cấp 3 #chao-hoi | Xong: S07 → S08 (cấp 3) → S08d (Tụi Nốt AI viết 3 câu chào; AI nghỉ thì câu có sẵn) → Discord → S08 "Bạn vừa ghé phòng chung" → S04 | Bước S08b (tập nói với AI) trước S08d | **Bỏ S08b (có lý do)**, xem dòng A3; phần còn lại đã đóng |
 | **A1 Nốt AI · Kể tự do** (S03b) | Code xong ở nhánh `feat/ai`: tab "Kể tự do", sheet quyền riêng tư lần đầu, đang đọc, gợi ý để xác nhận (sửa được, gắn nhãn AI), AI nghỉ, thẻ hỗ trợ khi `needs_support`; Remote Config `ai_*`, App Check, log `ai_request` / `ai_result_accepted` / `ai_error` | Chạy với Gemini thật: API Firebase AI Logic của project còn tắt (HTTP 403 `SERVICE_DISABLED`), nên `docs/ai-feature.md` chưa có 3 ví dụ thật | **Làm**: bật API, merge `feat/ai`, ghi 3 ví dụ + 1 lỗi |
 | **A2 Làm quen và thẻ khởi đầu** (S13a–g) | Code xong ở nhánh `feat/onboarding`: 4 câu khảo sát, hồ sơ khởi đầu + 3 thẻ theo bảng luật, ghi `users/{uid}/private/onboarding`, làm lại từ S12 | Thẻ khởi đầu do AI viết (bảng luật là bản dự phòng, đang dùng) | Đóng khi merge `feat/onboarding` |
-| **A3 Tập nói và lời nhắn** (S08b, S08c) | Chưa có | Chat đóng vai, lời nhắn sau thử thách | **Làm** |
+| **A3 Tập nói và lời nhắn** (S08b, S08c) | Không làm | Chat đóng vai trước thử thách (S08b), lời nhắn AI sau thử thách (S08c) | **Bỏ (có lý do)**, xem [mục 1.1](#11-vì-sao-bỏ-a3-s08b-s08c) |
 | S11 Hỏi Nốt (bonus, AI mức 3) | Chưa có | Function calling đếm nốt | Làm nếu còn thời gian |
+
+### 1.1 Vì sao bỏ A3 (S08b, S08c)
+
+A3 gồm hai màn AI quanh thử thách "Dũng cảm": **S08b** cho người dùng nhắn
+qua lại với Tụi Nốt đóng vai một người trong #chao-hoi (tối đa 6 lượt) trước khi
+làm thử thách thật; **S08c** cho Gemini viết lời nhắn sau khi chọn kết quả, kèm
+thẻ hỗ trợ khi `needs_support`. Nhóm quyết định không làm cả hai màn vì:
+
+1. **Trùng mục đích với phần đã có.** Mục tiêu của S08b là bớt run trước khi mở
+   lời; S08d đã làm việc đó (Tụi Nốt AI viết sẵn 3 câu chào để chọn, sao chép rồi
+   mở Discord). Thử thách thật là chào **người thật** trong #chao-hoi; tập với AI
+   chỉ là bước đệm, không đổi kết quả của luồng D2. Phần ghi cảm xúc sau thử
+   thách của S08c cũng đã có ở S08 khi quay lại từ Discord (ô "Kể một câu", mức
+   "Sau đó bạn thấy sao?" lưu `anxietyAfter`, deviation D-30).
+2. **Rủi ro dữ liệu cá nhân.** S08b là chat nhiều lượt, gõ tự do: người dùng dễ
+   kể tên bạn bè, lớp, chuyện riêng, và mọi lượt đều gửi tới Gemini. Đề Final
+   mục 8 yêu cầu không gửi dữ liệu cá nhân; `scrubForAi` chỉ che được email và
+   số điện thoại, không che được tên (xem `test-report.md` CR-F2). Một ô kể ngắn
+   có sheet đồng ý (A1) còn kiểm soát được; một cuộc chat 6 lượt thì không.
+3. **Yêu cầu AI của đề đã đạt.** Đề cần một tính năng Gemini giúp một bước của
+   luồng Lab 2; Nốt AI · Kể tự do (A1, mức 2: JSON → Dart, người dùng xác nhận)
+   cùng Làm quen (A2) và câu chào S08d đã đáp ứng. Thêm S08b / S08c không thêm
+   điểm (đề: "New features earn no points") mà tốn quota Gemini nhiều nhất
+   (mỗi lượt chat một lần gọi) và khó kiểm thử E2E vì câu trả lời mỗi lần một
+   khác.
+4. **Thẻ hỗ trợ vẫn có.** Lối tới thẻ "Nói với người bạn tin" khi Gemini thấy
+   dấu hiệu cần hỗ trợ đã có ở Kể tự do (S03b, dialog P6), nên bỏ S08c không làm
+   mất phần chăm sóc người dùng.
+
+Thay đổi so với thiết kế ghi ở `design-traceability.md` (S08b, S08c, A3, D2 và
+deviation D-37). Key Remote Config `ai_prompt_roleplay`, `ai_roleplay_max_turns`
+trong Spec không dùng tới.
 
 ## 2. Yêu cầu Lab 3
 
@@ -37,9 +69,10 @@ quyết định **Làm**, **Đã đóng** hoặc **Bỏ (có lý do)**.
 |---|---|---|
 | Firebase Auth, Firestore, FCM, Analytics, Crashlytics, Remote Config | Xong | Đã đóng |
 | Tạo file PDF (Thẻ tuần) | Gỡ nhầm ở PR #57 rồi làm lại ở PR #65: tạo PDF trên máy (font đóng gói, chạy offline), lưu vào thư mục của app, mở hộp chia sẻ, metadata `users/{uid}/reports/{isoWeek}` (rules R-28) | Đóng khi merge PR #65. Đề Final mục 4: *"The Lab 3 PDF report is saved and shared on the device, with its metadata in Firestore"*; Cloud Storage ngoài phạm vi |
-| ARTEMIS E2E ≥ 10 ca, 3 lần chạy | Xong ở Lab 3 (`docs/test-plan.md`); T14 đổi sang lưu và chia sẻ PDF trên máy (PR #65), chưa chạy lại | Chạy lại cho Final kèm các luồng mới (`docs/test-report.md`) |
+| ARTEMIS E2E ≥ 10 ca, 3 lần chạy | Xong ở Lab 3 (`docs/test-plan.md`); T14 đổi sang lưu và chia sẻ PDF trên máy (PR #65), chưa chạy lại | Chạy lại cho Final kèm các luồng mới; tổng hợp kiểm thử và AI code review cho Final ở [`test-report.md`](test-report.md) |
 | AI code review ≥ 5 góp ý, sửa ≥ 3 | Xong ([`code-review.md`](code-review.md)) | Đã đóng; Final làm thêm review cho code mới |
 | Không dữ liệu mock | Xong (kho thẻ trên Firestore, seed script) | Đã đóng |
+| Mỗi client từ chối tài khoản sai vai trò (đề Final mục 6) | Web admin từ chối `user`; app mobile từ chối `staff` / `admin` bằng màn "Tài khoản này dành cho web admin" (`WrongRoleScreen`), có test | Đã đóng: xem [`data-model.md`](data-model.md) mục "Mỗi client từ chối tài khoản sai vai trò" |
 
 ## 3. Góp ý code review Lab 3
 
@@ -65,7 +98,7 @@ Các góp ý đã sửa và các góp ý chọn không sửa (kèm lý do) nằm
 
 1. Merge `feat/onboarding` (A2, P8) rồi `feat/ai` (A1, App Check cho mobile và AI Logic). `feat/ai` xây trên `feat/onboarding`.
 2. Bật API Firebase AI Logic cho project, chạy Kể tự do với Gemini thật, ghi 3 ví dụ + 1 lỗi vào `docs/ai-feature.md`.
-3. A3 (S08b tập nói, S08c lời nhắn) và câu chào AI ở S08d.
-4. P4 "Tiếp tục bản nháp?".
+3. ~~A3 (S08b tập nói, S08c lời nhắn)~~: bỏ, lý do ở mục 1.1. Câu chào AI ở S08d: xong.
+4. ~~P4 "Tiếp tục bản nháp?"~~: xong (`journal_flow_test.dart`, nhóm "flow P4").
 5. Chạy luồng liên vai trò 3 lần trên bản deploy (`docs/cross-role-flow.md`, bảng D-1…D-3).
 6. S11 Hỏi Nốt (bonus).
