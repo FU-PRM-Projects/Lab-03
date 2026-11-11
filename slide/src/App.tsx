@@ -1,8 +1,8 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode, type SyntheticEvent } from 'react';
 import { Deck, Slide } from '@revealjs/react';
 import RevealNotes from 'reveal.js/plugin/notes';
+import RevealZoom from 'reveal.js/plugin/zoom';
 import {
-  ArrowRight,
   BellRing,
   Bot,
   Cloud,
@@ -14,12 +14,13 @@ import {
   ImageUp,
   Database,
   KeyRound,
+  Layers,
   SlidersHorizontal,
 } from 'lucide-react';
 
 import 'reveal.js/reveal.css';
 import './slides.css';
-import { technologies } from './lab3-technologies';
+import { technologies, type SetupStep } from './lab3-technologies';
 
 /** Slot for a real screenshot. Replace with <img> once evidence exists; never fill in assumed results. */
 function Shot({ label }: { label: string }) {
@@ -179,7 +180,7 @@ function Page({
 function TechImage({ image }: { image: [string, string] }) {
   const [path, caption] = image;
   return (
-    <figure className="tech-image">
+    <figure className={/^(code|review)\//.test(path) ? 'tech-image tech-image-code' : 'tech-image'}>
       <img src={`${import.meta.env.BASE_URL}${path}`} alt={caption} />
       <figcaption>{caption}</figcaption>
     </figure>
@@ -194,6 +195,9 @@ const technologyIcons = {
   analytics: ChartColumn,
   crashlytics: Bug,
   'remote-config': SlidersHorizontal,
+  riverpod: Layers,
+  artemis: Bot,
+  coderabbit: GitPullRequest,
 };
 
 function TechHeading({ id, step }: { id: keyof typeof technologies; step: string }) {
@@ -207,57 +211,354 @@ function TechHeading({ id, step }: { id: keyof typeof technologies; step: string
   );
 }
 
-function TechnologySlides({ id }: { id: keyof typeof technologies }) {
-  const { what, example, why, how, flow, code, service, images } = technologies[id];
+/** Renders text with `backtick` spans as <code>. */
+function rich(text: string): ReactNode {
+  return text.split('`').map((part, i) => (i % 2 ? <code key={i}>{part}</code> : part));
+}
+
+const plain = (text: string) => text.replaceAll('`', '');
+
+/** A screenshot that is not taken yet shows a grey slot instead of a broken image. */
+function markMissing(e: SyntheticEvent<HTMLImageElement>) {
+  e.currentTarget.closest('figure')?.classList.add('tech-missing');
+}
+
+/** Space for the HOW screenshots, in slide pixels (1280 × 720 slide). */
+const HOW_AREA = { width: 1152, height: 452, gap: 20, rowGap: 12, caption: 50, maxRow: 400, minRatio: 0.75 };
+
+type RowPlan = { items: number[]; height: number }[];
+
+/**
+ * Picks the arrangement (one row, or two rows split anywhere) that shows the screenshots
+ * largest: each row fills the width, and the rows together fit the space under the title.
+ */
+function planRows(ratios: number[]): RowPlan {
+  const { width, height, gap, rowGap, caption, maxRow, minRatio } = HOW_AREA;
+  ratios = ratios.map((r) => Math.max(r, minRatio));
+  const n = ratios.length;
+  const splits: number[][][] = [[ratios.map((_, i) => i)]];
+  for (let k = 1; k < n; k++) splits.push([ratios.slice(0, k).map((_, i) => i), ratios.slice(k).map((_, i) => i + k)]);
+  let best: RowPlan = [];
+  let bestArea = -1;
+  for (const rows of splits) {
+    let plan = rows.map((items) => {
+      const sum = items.reduce((t, i) => t + ratios[i], 0);
+      return { items, height: Math.min((width - gap * (items.length - 1)) / sum, maxRow) };
+    });
+    const fixed = rows.length * caption + rowGap * (rows.length - 1);
+    const total = plan.reduce((t, r) => t + r.height, 0) + fixed;
+    if (total > height) {
+      const f = (height - fixed) / (total - fixed);
+      plan = plan.map((r) => ({ ...r, height: r.height * f }));
+    }
+    const area = plan.reduce((t, r) => t + r.items.reduce((a, i) => a + r.height * r.height * ratios[i], 0), 0);
+    if (area > bestArea) {
+      bestArea = area;
+      best = plan;
+    }
+  }
+  return best;
+}
+
+/** HOW: numbered setup screenshots, as large as the space allows. */
+function SetupGallery({ setup }: { setup: SetupStep[] }) {
+  const [ratios, setRatios] = useState<number[]>(() => setup.map(() => 1.6));
+  const base = import.meta.env.BASE_URL;
+  const plan = planRows(ratios);
+  const onLoad = (i: number) => (e: SyntheticEvent<HTMLImageElement>) => {
+    const { naturalWidth: w, naturalHeight: h } = e.currentTarget;
+    if (w && h) setRatios((prev) => prev.map((r, j) => (j === i ? w / h : r)));
+  };
+  return (
+    <div className="tech-rows">
+      {plan.map((row) => (
+        <div className="tech-row" key={row.items.join('-')}>
+          {row.items.map((i) => {
+            const [img, step] = setup[i];
+            const w = Math.round(row.height * Math.max(ratios[i], HOW_AREA.minRatio));
+            return (
+              <figure key={img + step} style={{ width: w }}>
+                <div className="tech-setup-img" style={{ height: Math.round(row.height) }}>
+                  <img src={`${base}${img}`} alt={plain(step)} onError={markMissing} onLoad={onLoad(i)} />
+                  <span className="tech-missing-label">Screenshot to add: {img}</span>
+                </div>
+                <figcaption>
+                  <em>{i + 1}</em>
+                  <span>{rich(step)}</span>
+                </figcaption>
+              </figure>
+            );
+          })}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** CodeRabbit HOW: zoomed crops of the review, our verdicts and the fix commits. */
+function CodeRabbitHow() {
+  return (
+    <div className="pf">
+      <figure>
+        <Crop
+          src="review/proof-review.png"
+          alt="CodeRabbit review on PR #38 with follow-up and inline comments"
+          natural={840}
+          w={840}
+          h={720}
+          scale={0.56}
+        />
+        <figcaption>
+          <b><em>1</em> CodeRabbit reviews every PR</b>
+          <span>52 findings on #28, #29 and #38</span>
+        </figcaption>
+      </figure>
+      <span className="pf-arrow">→</span>
+      <div className="pf-right">
+        <figure>
+          <Crop
+            src="review/proof-verdicts.png"
+            alt="docs/code-review.md: the AI finding, our verdict and a note for each row"
+            natural={1328}
+            x={795}
+            w={533}
+            h={172}
+            scale={0.95}
+          />
+          <figcaption>
+            <b><em>2</em> We judge every finding</b>
+            <span>51 right, 1 wrong · verdicts in docs/code-review.md</span>
+          </figcaption>
+        </figure>
+        <figure>
+          <div className="pf-commits">
+            {(
+              [
+                ['736453a', 118],
+                ['5e13651', 146],
+              ] as const
+            ).map(([sha, h]) => (
+              <Crop
+                key={sha}
+                src={`review/proof-commit-${sha}.png`}
+                alt={`Fix commit ${sha} naming the CodeRabbit finding it addresses`}
+                natural={1609}
+                y={52}
+                w={560}
+                h={h}
+                scale={0.92}
+              />
+            ))}
+          </div>
+          <figcaption>
+            <b><em>3</em> We fix with a commit</b>
+            <span>3 fixed so far; each message names its finding</span>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  );
+}
+
+const CODERABBIT_HOW_NOTES =
+  "Three real screenshots, left to right. One: CodeRabbit reviews every PR on GitHub; here is its review on PR #38 with follow-up comments and an inline comment on the FCM service. It left 52 findings on #28, #29 and #38. Two: we checked every finding against the code and wrote a verdict in docs/code-review.md; 51 were technically right and 1 was wrong. Of the right ones, 40 are real bugs and 11 are not worth fixing for this Lab. Three: each fix is its own commit, and the message names the finding it addresses; 211a4d5, 736453a and 5e13651 are fixed so far.";
+
+/** One code screenshot per layer, numbered like the boxes of the diagram. */
+function LayerShots({ from }: { from: number }) {
+  const base = import.meta.env.BASE_URL;
+  return (
+    <div className="mv-code">
+      {technologies.riverpod.where.slice(from - 1, from + 3).map(([img, file, lines, does], i) => {
+        const [layer, text] = does.split(' · ');
+        return (
+          <figure key={img}>
+            <figcaption>
+              <em>{from + i}</em>
+              <b>{layer}</b>
+              <span>{rich(text)}</span>
+            </figcaption>
+            <div className="mv-code-img">
+              <img src={`${base}${img}`} alt={`${file} lines ${lines}`} onError={markMissing} />
+              <span className="tech-missing-label">Screenshot to add: {img}</span>
+            </div>
+            <code className="mv-file">
+              {file}
+              <span className="tech-at">:{lines}</span>
+            </code>
+          </figure>
+        );
+      })}
+    </div>
+  );
+}
+
+const layerNotes = (from: number) =>
+  technologies.riverpod.where
+    .slice(from - 1, from + 3)
+    .map(([, file, lines, does], i) => `${from + i}, ${plain(does)}: ${file}, lines ${lines}.`)
+    .join(' ');
+
+const MVVM_TREE = `lib/
+├── main.dart                 composition root   ⑦
+├── models/note.dart          plain Dart         ⑧
+├── services/
+│   └── note_repository.dart  interface+Provider ⑤
+├── firebase/
+│   └── firestore_note_repository.dart           ⑥
+├── viewmodels/
+│   ├── view_state.dart       Loading | Empty | Failure | Data
+│   └── today_view_model.dart Notifier           ④
+├── screens/today/
+│   └── today_screen.dart     switch on state    ①
+├── widgets/app_button.dart   shared component   ②
+└── theme/app_tokens.dart     → packages/core    ③`;
+
+/** Riverpod WHERE: the MVVM diagram, then the code behind each numbered layer. */
+function mvvmWhereSlides(): ReactNode[] {
   return [
-    <Slide key={`${id}-what`} className="tech-slide" notes={`${what} ${example}`}>
-      <TechHeading id={id} step="01 / WHAT" />
+    <Slide
+      key="mvvm-layers"
+      id="evidence-riverpod"
+      className="tech-slide tech-slide-tight"
+      notes="The MVVM diagram of Nốt. Each numbered box is one layer, and the next two slides show the real code of each number for screen S02 Today. Screens only watch ViewModels; ViewModels call service interfaces; only lib/firebase implements them with the Firebase SDK; main.dart, the composition root, picks the implementation. Details: docs/architecture.md."
+    >
+      <TechHeading id="riverpod" step="04 / WHERE · From the diagram to the code (1/3)" />
+      <div className="mv-arch">
+        <pre className="tree">
+          {MVVM_TREE.split(/([①-⑧])/).map((part, i) =>
+            i % 2 ? (
+              <em key={i} className="mv-n">
+                {'①②③④⑤⑥⑦⑧'.indexOf(part) + 1}
+              </em>
+            ) : (
+              part
+            ),
+          )}
+        </pre>
+        <ArchDiagram />
+      </div>
+      <p className="tech-source">Numbers ①–⑧ are the layers; the next two slides show the code of each one · docs/architecture.md</p>
+    </Slide>,
+    <Slide key="mvvm-view" className="tech-slide tech-slide-tight" notes={`View side of S02 Today. ${layerNotes(1)}`}>
+      <TechHeading id="riverpod" step="04 / WHERE · From the diagram to the code (2/3) · View → ViewModel" />
+      <div className="mv">
+        <ArchDiagram highlight={[1, 2, 3, 4]} className="diagram mv-diagram" />
+        <LayerShots from={1} />
+      </div>
+      <p className="tech-source">Real code on GitHub · FU-PRM-Projects/Lab-03 · branch main · key lines boxed in red</p>
+    </Slide>,
+    <Slide
+      key="mvvm-data"
+      className="tech-slide tech-slide-tight"
+      notes={`Data side of S02 Today. ${layerNotes(5)} A grep finds no Firebase import in lib/screens, lib/widgets or lib/viewmodels.`}
+    >
+      <TechHeading id="riverpod" step="04 / WHERE · From the diagram to the code (3/3) · Service → Firebase" />
+      <div className="mv">
+        <ArchDiagram highlight={[5, 6, 7, 8]} className="diagram mv-diagram" />
+        <LayerShots from={5} />
+      </div>
+      <p className="tech-source">
+        <code>$ grep -rl &quot;package:firebase&quot; lib/screens lib/widgets lib/viewmodels</code> → 0 files: only lib/firebase uses the SDK
+      </p>
+    </Slide>,
+  ];
+}
+
+function TechnologySlides({
+  id,
+  howBody,
+  howNotes,
+  whereSlides,
+}: {
+  id: keyof typeof technologies;
+  /** Replaces the row of setup screenshots when they need a custom layout. */
+  howBody?: ReactNode;
+  howNotes?: string;
+  /** Replaces the single WHERE slide (MVVM uses three: diagram, then code per layer). */
+  whereSlides?: ReactNode[];
+}) {
+  const { what, points, example, why, alternatives, how, setupTitle, setup, where, images } = technologies[id];
+  const base = import.meta.env.BASE_URL;
+  return [
+    <Slide key={`${id}-what`} className="tech-slide" notes={`${what} ${points.map(plain).join('. ')}. ${example}`}>
+      <TechHeading id={id} step="01 / WHAT · What is it?" />
       <div className="tech-layout">
         <div>
           <p className="tech-lead">{what}</p>
+          <ul className="tech-points">
+            {points.map((p) => <li key={p}>{rich(p)}</li>)}
+          </ul>
           <p className="tech-example">{example}</p>
         </div>
         <TechImage image={images[0]} />
       </div>
     </Slide>,
-    <Slide key={`${id}-why`} className="tech-slide" notes={why.join(' ')}>
-      <TechHeading id={id} step="02 / WHY" />
-      <div className="tech-layout">
-        <ul className="tech-reasons">
-          {why.map((reason) => <li key={reason}>{reason}</li>)}
-        </ul>
-        <div className="tech-pair">
-          {images[1].map((image) => <TechImage key={image[0]} image={image} />)}
-        </div>
-      </div>
-    </Slide>,
-    <Slide key={`${id}-how`} className="tech-slide" notes={`${how} ${[...code, service].map(([place, detail]) => `${place}. ${detail}`).join(' ')}`}>
-      <TechHeading id={id} step="03 / HOW + WHERE" />
-      <div className="tech-layout tech-implementation">
+    <Slide
+      key={`${id}-why`}
+      className="tech-slide"
+      notes={`Why we use it. ${why.map(([head, text]) => `${head}: ${plain(text)}`).join(' ')} Why not something else. ${alternatives.map(([name, text]) => `${plain(name)}: ${plain(text)}`).join(' ')}`}
+    >
+      <TechHeading id={id} step="02 / WHY · Why this, and not something else?" />
+      <div className="tech-why">
         <div>
-          <ol className="tech-flow" aria-label="Implementation steps">
-            {flow.map((step, index) => (
-              <li key={step}>
-                {index > 0 && <ArrowRight size={20} aria-hidden="true" />}
-                <span>{step}</span>
+          <h3>Why we use it</h3>
+          <ul className="tech-reasons">
+            {why.map(([head, text]) => (
+              <li key={head}>
+                <b>{head}</b>
+                <span>{rich(text)}</span>
               </li>
             ))}
-          </ol>
-          <div className="tech-locations">
-            <h3>Source code</h3>
-            <ul>
-              {code.map(([path, detail]) => <li key={path}><code title={detail}>{path}</code></li>)}
-            </ul>
-            <h3>{id === 'cloudinary' ? 'Cloudinary and Firebase' : 'Firebase Console'}</h3>
-            <p>{service[0]}</p>
-          </div>
+          </ul>
         </div>
         <div>
-          <TechImage image={images[2]} />
-          <a className="tech-evidence" href={`#/evidence-${id}`}>View demo and evidence →</a>
+          <h3>Why not something else?</h3>
+          <ul className="tech-alternatives">
+            {alternatives.map(([name, text]) => (
+              <li key={name}>
+                <b>{rich(name)}</b>
+                <span>{rich(text)}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </Slide>,
+    <Slide
+      key={`${id}-how`}
+      className="tech-slide tech-slide-tight"
+      notes={howNotes ?? `How: ${plain(how)} ${setup.map(([, step], i) => `Step ${i + 1}: ${plain(step)}.`).join(' ')}`}
+    >
+      <TechHeading id={id} step={`03 / HOW · How did we set it up? · ${setupTitle}`} />
+      <p className="tech-how">{rich(how)}</p>
+      {howBody ?? (
+        <SetupGallery setup={setup} />
+      )}
+      <a className="tech-evidence" href={`#/evidence-${id}`}>View demo and evidence →</a>
+    </Slide>,
+    ...(whereSlides ?? [<Slide
+      key={`${id}-where`}
+      className="tech-slide tech-slide-tight"
+      notes={`Where in the code: ${where.map(([, file, lines, does]) => `${file}, lines ${lines}: ${plain(does)}.`).join(' ')}`}
+    >
+      <TechHeading id={id} step="04 / WHERE · Where is it in the code?" />
+      <div className={where.length > 3 ? 'tech-code tech-code-4' : 'tech-code'}>
+        {where.map(([img, file, lines, does]) => (
+          <figure key={img}>
+            <figcaption>
+              <code>{file}</code>
+              <span className="tech-at">:{lines}</span>
+              <span className="tech-does">{rich(does)}</span>
+            </figcaption>
+            <div className="tech-code-img">
+              <img src={`${base}${img}`} alt={`${file} lines ${lines}: ${plain(does)}`} onError={markMissing} />
+              <span className="tech-missing-label">Screenshot to add: {img}</span>
+            </div>
+          </figure>
+        ))}
+      </div>
+      <p className="tech-source">Real code on GitHub · FU-PRM-Projects/Lab-03 · branch main · key lines boxed in red</p>
+    </Slide>]),
   ];
 }
 
@@ -269,7 +570,7 @@ const ARCH_BOXES: ArchBox[] = [
   { x: 390, y: 44, w: 150, title: 'theme/', sub: 'design tokens', n: 3 },
   { x: 190, y: 160, w: 180, title: 'ViewModel', sub: 'Notifier + ViewState<T>', n: 4 },
   { x: 190, y: 260, w: 180, title: 'Service', sub: 'interfaces + Providers', n: 5 },
-  { x: 190, y: 370, w: 180, title: 'Implementation', sub: 'firebase/ · 15 classes', n: 6 },
+  { x: 190, y: 370, w: 180, title: 'Implementation', sub: 'firebase/ · 26 files', n: 6 },
   { x: 190, y: 480, w: 180, title: 'Firebase SDK', sub: 'Auth · Firestore · …', dim: true },
   { x: 430, y: 370, w: 130, title: 'main.dart', sub: 'composition root', dim: true, n: 7 },
 ];
@@ -285,10 +586,14 @@ function Badge({ x, y, n }: { x: number; y: number; n: number }) {
   );
 }
 
-function ArchDiagram() {
+/** MVVM diagram. With `highlight`, those numbered layers get a red frame and the rest fade out. */
+function ArchDiagram({ highlight, className = 'diagram' }: { highlight?: number[]; className?: string }) {
   const line = { stroke: '#000', strokeWidth: 1.5, markerEnd: 'url(#arr)', fill: 'none' };
+  const on = (n?: number) => !highlight || (n !== undefined && highlight.includes(n));
+  const fade = (n?: number) => (on(n) ? 1 : 0.22);
+  const red = (n?: number) => Boolean(highlight) && on(n);
   return (
-    <svg className="diagram" viewBox="-4 -4 568 662" role="img" aria-label="Architecture diagram">
+    <svg className={className} viewBox="-4 -4 568 662" role="img" aria-label="Architecture diagram">
       <defs>
         <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
           <path d="M0 0 L10 5 L0 10 z" fill="#000" />
@@ -301,13 +606,15 @@ function ArchDiagram() {
       <rect x="0" y="0" width="560" height="124" rx="16" fill="none" stroke="#888" strokeWidth="1.5" strokeDasharray="6 5" />
       <text x="16" y="26" fontSize="15" fill="#888" fontWeight="600">View</text>
 
-      <rect x="0" y="590" width="560" height="64" rx="12" fill="#f4f4f4" stroke="#888" strokeWidth="1.5" />
-      <text x="280" y="619" textAnchor="middle" fontSize="20" fontWeight="600">models/ · plain Dart</text>
-      <text x="280" y="641" textAnchor="middle" fontSize="14" fill="#555">Note · Mood · Challenge · AppUser</text>
-      <Badge x={0} y={590} n={8} />
+      <g opacity={fade(8)}>
+        <rect x="0" y="590" width="560" height="64" rx="12" fill="#f4f4f4" stroke={red(8) ? '#e5262b' : '#888'} strokeWidth={red(8) ? 3 : 1.5} />
+        <text x="280" y="619" textAnchor="middle" fontSize="20" fontWeight="600">models/ · plain Dart</text>
+        <text x="280" y="641" textAnchor="middle" fontSize="14" fill="#555">Note · Mood · Challenge · AppUser</text>
+        <Badge x={0} y={590} n={8} />
+      </g>
 
       {ARCH_BOXES.map((b) => (
-        <g key={b.title}>
+        <g key={b.title} opacity={fade(b.n)}>
           <rect
             x={b.x}
             y={b.y}
@@ -315,8 +622,8 @@ function ArchDiagram() {
             height="64"
             rx="12"
             fill={b.dim ? '#f4f4f4' : '#fff'}
-            stroke={b.dim ? '#888' : '#000'}
-            strokeWidth="1.5"
+            stroke={red(b.n) ? '#e5262b' : b.dim ? '#888' : '#000'}
+            strokeWidth={red(b.n) ? 3 : 1.5}
           />
           <text x={b.x + b.w / 2} y={b.y + 27} textAnchor="middle" fontSize="20" fontWeight="600">{b.title}</text>
           <text x={b.x + b.w / 2} y={b.y + 49} textAnchor="middle" fontSize="14" fill="#555">{b.sub}</text>
@@ -324,7 +631,7 @@ function ArchDiagram() {
         </g>
       ))}
 
-      <g {...line}>
+      <g {...line} opacity={highlight ? 0.3 : 1}>
         <line x1="170" y1="76" x2="204" y2="76" />
         <line x1="355" y1="76" x2="389" y2="76" />
         <path d="M95 108 V192 H189" />
@@ -527,20 +834,6 @@ function Crop({
   );
 }
 
-/** Ảnh chụp code thật trên GitHub (nhánh main), số khớp với sơ đồ MVVM. */
-function CodeShot({ n, layer, file, shot }: { n: number; layer: string; file: string; shot: string }) {
-  return (
-    <figure className="cs">
-      <figcaption>
-        <em>{n}</em>
-        <b>{layer}</b>
-        <code>lib/{file}</code>
-      </figcaption>
-      <img src={`code/${shot}.png`} alt={`${layer}: lib/${file} on GitHub, key lines marked in red`} />
-    </figure>
-  );
-}
-
 type Finding = {
   shot: string;
   where: string;
@@ -599,7 +892,7 @@ export default function App() {
           controls: false,
           progress: false,
         }}
-        plugins={[RevealNotes]}
+        plugins={[RevealNotes, RevealZoom]}
       >
         <Slide notes="Nốt is built for Minh, a 22-year-old final-year student. Lab 2 success criterion: log a mood and one win in under 30 seconds after tapping the evening notification.">
           <OrgLogo cover />
@@ -804,72 +1097,7 @@ export default function App() {
           <p className="foot">docs/design-traceability.md · §1 screens, §5 every deviation with its reason</p>
         </Page>
 
-        <Page
-          title="MVVM"
-          notes="Widgets never call an SDK. Each screen has an explicit state model. Services are injected through Riverpod, so ViewModels can be tested with fakes. Details: docs/architecture.md."
-        >
-          <div className="arch">
-            <pre className="tree">{`lib/
-├── main.dart               composition root
-├── app.dart                MaterialApp.router
-├── router/
-│   └── auth_redirect.dart  signed out → /welcome
-├── theme/
-│   └── app_tokens.dart     spacing, radius
-├── models/
-│   └── note.dart           plain Dart
-├── services/
-│   └── note_repository.dart
-│                           interface + Provider
-├── firebase/
-│   └── firestore_note_repository.dart
-│                           implementation
-├── viewmodels/
-│   ├── view_state.dart     Loading | Empty | Failure | Data
-│   └── today_view_model.dart
-│                           Notifier + ViewState
-├── screens/today/
-│   └── today_screen.dart   switch on ViewState
-├── widgets/
-│   └── app_button.dart     shared component
-└── utils/
-    └── dates.dart          pure helpers`}</pre>
-            <ArchDiagram />
-          </div>
-          <p className="foot">docs/architecture.md · layers, sequence diagram, ViewModel ↔ service table</p>
-        </Page>
-
-        <Page
-          dense
-          title="MVVM in the code: View → ViewModel"
-          line="S02 Today on GitHub (main). Numbers match the MVVM diagram"
-          notes="Real source on GitHub, branch main, for screen S02 Today. One, screens: TodayScreen.build only watches todayViewModelProvider and switches on its state. Two, widgets: AppButton is the shared button component, used by every screen. Three, theme: AppSpace holds the spacing tokens, so screens never hard-code numbers. Four, ViewModel: todayViewModelProvider is a Riverpod NotifierProvider, and TodayViewModel extends Notifier of ViewState."
-        >
-          <div className="cs-grid">
-            <CodeShot n={1} layer="screens/" file="screens/today/today_screen.dart" shot="screens" />
-            <CodeShot n={2} layer="widgets/" file="widgets/app_button.dart" shot="widgets" />
-            <CodeShot n={3} layer="theme/" file="theme/app_tokens.dart" shot="theme" />
-            <CodeShot n={4} layer="ViewModel" file="viewmodels/today_view_model.dart" shot="viewmodel" />
-          </div>
-        </Page>
-
-        <Page
-          dense
-          title="MVVM in the code: Service → Firebase"
-          line="The data side of S02 Today. Only lib/firebase imports the Firebase SDK"
-          notes="Five, Service: NoteRepository is an abstract interface; the ViewModel only knows this. Six, Implementation: FirestoreNoteRepository implements it with FirebaseFirestore. Seven, main.dart: the composition root overrides noteRepositoryProvider with the Firestore version; tests override it with a fake. Eight, models: Note is plain Dart, shared by every layer. A grep finds no Firebase import in lib/screens, lib/widgets or lib/viewmodels."
-        >
-          <div className="cs-grid">
-            <CodeShot n={5} layer="Service" file="services/note_repository.dart" shot="service" />
-            <CodeShot n={6} layer="Implementation" file="firebase/firestore_note_repository.dart" shot="implementation" />
-            <CodeShot n={7} layer="main.dart" file="main.dart" shot="main" />
-            <CodeShot n={8} layer="models/" file="models/note.dart" shot="models" />
-          </div>
-          <p className="cc-proof">
-            <code>$ grep -rl "package:firebase" lib/screens lib/widgets lib/viewmodels</code>
-            <span>→ 0 files</span>
-          </p>
-        </Page>
+        <TechnologySlides id="riverpod" whereSlides={mvvmWhereSlides()} />
 
         <TechnologySlides id="auth" />
 
@@ -1025,58 +1253,13 @@ export default function App() {
           <p className="foot">firebase/firestore.rules · lib/firebase/firestore_note_repository.dart · evidence/firestore/ · evidence/deploy/</p>
         </Page>
 
-        <Page
-          dense
-          title="Historical demo: Cloud Storage"
-          line="When it fails: offline → “Chưa tải lên được: kiểm tra Wi-Fi” · signed out → “đăng nhập lại” · any other error → “Chưa tạo được thẻ tuần” + Thử lại"
-          notes="The weekly card (S11b) is built as a PDF on the device and uploaded to reports/{uid}/ in Cloud Storage. The upload streams its progress, which the screen shows as a percentage bar, and then returns the download URL, shown with a copy button. storage.rules lets each user read and write only their own folder, and only PDFs under 5 MB. Failures never crash: no network, an expired session and any other error each show a message with a retry, and the error is also sent to Crashlytics as a non-fatal. The project is on the Spark plan, and Firebase now needs the Blaze plan to create a Storage bucket, so on the real project the upload currently fails and shows the error on the left; the full flow was tested on the Firebase Emulator."
-        >
-          <div className="stg">
-            <figure className="stg-phone">
-              <img src="app/report-error.png" alt="Upload failed: Chưa tạo được thẻ tuần. Thử lại nhé. with a retry button" />
-              <figcaption>
-                <b>Failure</b> → message + Thử lại
-              </figcaption>
-            </figure>
-            <div className="stg-col">
-              <figure>
-                <figcaption>
-                  <b>Console</b> · Storage › reports/
-                </figcaption>
-                <div className="stg-console">Console file list: add after the Storage bucket is created (Blaze plan)</div>
-              </figure>
-              <figure>
-                <figcaption>
-                  <b>Rules: own folder only</b> <code>firebase/storage.rules</code>
-                </figcaption>
-                <Crop src="code/storage-rules.png" alt="storage.rules: read and write only reports/{uid} of the signed-in user, PDF under 5 MB" natural={620} y={22} w={620} h={114} scale={0.72} />
-              </figure>
-            </div>
-            <div className="stg-col">
-              <figure>
-                <figcaption>
-                  <b>Upload to reports/&#123;uid&#125;, progress, URL</b> <code>report_impl.dart</code>
-                </figcaption>
-                <Crop src="code/storage-upload.png" alt="uploadReport: putData to reports/uid, yields progress, then the download URL" natural={620} y={22} w={620} h={314} scale={0.72} />
-              </figure>
-              <figure>
-                <figcaption>
-                  <b>Progress on screen</b> <code>weekly_card_page.dart</code>
-                </figcaption>
-                <Crop src="code/storage-progress.png" alt="Weekly card page shows Đang tải lên đám mây with a percentage bar" natural={620} y={22} w={620} h={154} scale={0.72} />
-              </figure>
-            </div>
-          </div>
-          <p className="foot">firebase/storage.rules · lib/firebase/report_impl.dart</p>
-        </Page>
-
         <TechnologySlides id="cloudinary" />
 
         <Page id="evidence-cloudinary"
           dense
           title="Photos on Cloudinary"
           line="Why: Firebase Storage needs the paid Blaze plan, so profile, note and group photos are uploaded to Cloudinary"
-          notes="Firebase Storage now needs the Blaze plan to create a bucket, so we moved photo uploads to Cloudinary's free plan. Three places take a photo: the profile picture in Settings, a photo attached to a note in step 3, and a photo for a first-time group. The previous slide shows the historical Storage prototype. The app uploads with an unsigned upload preset, so no API secret is in the app; the format and size limits are set on the preset, and the app also refuses files over 5 MB. Each upload gets a random public id under not/avatars, not/notes or not/groups, so it cannot be guessed or overwritten. The upload streams its progress, as in the first screenshot, and can be cancelled. Firestore only keeps the reference, url and publicId; firestore.rules accepts it only as exactly those two keys with a secure URL on res.cloudinary.com (validImage, PR 47, tests R-16 to R-18). Errors show a message: no network, expired session, wrong file type or size. A successful upload logs image_uploaded with the folder and size."
+          notes="Firebase Storage now needs the Blaze plan to create a bucket, so we moved photo uploads to Cloudinary's free plan. Three places take a photo: the profile picture in Settings, a photo attached to a note in step 3, and a photo for a first-time group. The app uploads with an unsigned upload preset, so no API secret is in the app; the format and size limits are set on the preset, and the app also refuses files over 5 MB. Each upload gets a random public id under not/avatars, not/notes or not/groups, so it cannot be guessed or overwritten. The upload streams its progress, as in the first screenshot, and can be cancelled. Firestore only keeps the reference, url and publicId; firestore.rules accepts it only as exactly those two keys with a secure URL on res.cloudinary.com (validImage, PR 47, tests R-16 to R-18). Errors show a message: no network, expired session, wrong file type or size. A successful upload logs image_uploaded with the folder and size."
         >
           <Gallery
             cols={4}
@@ -1113,83 +1296,13 @@ export default function App() {
           <p className="foot">lib/firebase/cloudinary_image_service.dart · firebase/firestore.rules · evidence/cloudinary/</p>
         </Page>
 
-        <Page
-          dense
-          title="Streak of days"
-          line="Counted from the notes themselves: no extra data in Firestore, so editing or deleting a note keeps it right"
-          notes="A new feature on top of the Lab 2 design, logged as deviation D-31. Today shows a streak card under the jar: the current streak, the record, the last seven days and how far the next milestone is. The milestones are 3, 7, 14, 30, 60, 100 and 365 days. When the first note of the day extends the streak, the saved screen celebrates; here it was the third day, so it says Mốc 3 ngày. The share button builds an image of the streak and opens the system share sheet. The streak is computed from the notes, by the same function as the statistics screen; if today has no note yet, it counts up to yesterday, so the streak does not break before the day ends. Two Analytics events: streak_extended and streak_shared. The shared image is also kept privately in users/uid/sharedStreaks."
-        >
-          <Gallery
-            cols={4}
-            height={300}
-            items={[
-              { src: 'app/streak-today.png', alt: 'Today with the streak card: 3 days, record 3, 4 days to the 7-day milestone', caption: '1 · Streak card on Today' },
-              { src: 'app/streak-milestone.png', alt: 'Saved screen celebrating the 3-day milestone', caption: '2 · Milestone on the saved screen' },
-              { src: 'app/streak-share.png', alt: 'Share screen with the streak image', caption: '3 · Share as an image' },
-              { src: 'app/streak-sharesheet.png', alt: 'Android share sheet with the streak image and text', caption: '4 · Android share sheet' },
-            ]}
-          />
-          <div className="cld-row">
-            <figure>
-              <figcaption>
-                <b>Counting the streak</b> <code>utils/journey_stats.dart</code>
-              </figcaption>
-              <Crop src="code/streak-count.png" alt="streak counts consecutive days with a note, starting from yesterday when today has none" natural={620} y={22} w={620} h={226} scale={0.56} />
-            </figure>
-            <ul>
-              <li>
-                <b>Milestones:</b> 3 · 7 · 14 · 30 · 60 · 100 · 365 days
-              </li>
-              <li>
-                <b>No penalty:</b> no note yet today still counts up to yesterday
-              </li>
-              <li>
-                <b>Same number everywhere:</b> Today, the saved screen and Statistics share one function
-              </li>
-              <li>
-                <b>Analytics:</b> <code>streak_extended</code>, <code>streak_shared</code> · deviation D-31
-              </li>
-            </ul>
-          </div>
-          <p className="foot">lib/utils/streak_stats.dart · lib/widgets/streak_card.dart · docs/design-traceability.md D-31 · evidence/streak/</p>
-        </Page>
-
         <TechnologySlides id="fcm" />
 
         <Page id="evidence-fcm"
           dense
-          title="Cloud Messaging"
-          line="When it fails: permission denied → dialog + “Mở cài đặt” · unknown route → opens Today · FCM start error → logged, the app keeps running"
-          notes="Row 1: permission denied prompt with Mở cài đặt, the system notification page, the inbox listing the three delivery states, and a tap on a message with data route=/jar landing on the jar. Row 2: foreground (heads-up from flutter_local_notifications), background and terminated (system tray), and a test message sent from the Firebase Console. Sent with the FCM HTTP v1 API and from Console, Messaging, Send test message, to the device token printed in the debug log (the token is not stored in the repo). routeFromData only accepts allow-listed internal routes."
-        >
-          <Gallery
-            cols={4}
-            height={260}
-            items={[
-              { src: 'app/fcm-denied.png', alt: 'Prompt asking to open settings', caption: 'Denied → open settings', ratio: '0.95', pos: '50% 38%' },
-              { src: 'app/fcm-os-settings.png', alt: 'Android notification settings', caption: 'System settings', ratio: '0.95', pos: '50% 36%' },
-              { src: 'app/fcm-inbox.png', alt: 'Inbox with three notifications', caption: 'Inbox: 3 states', ratio: '0.95', pos: '50% 18%' },
-              { src: 'app/fcm-route.png', alt: 'Jar screen opened from a notification', caption: 'Tap · route=/jar', ratio: '0.95', pos: '50% 20%' },
-            ]}
-          />
-          <Gallery
-            cols={4}
-            height={100}
-            items={[
-              { src: 'app/fcm-foreground.png', alt: 'Foreground heads-up', caption: 'Foreground' },
-              { src: 'app/fcm-background.png', alt: 'Background notification', caption: 'Background' },
-              { src: 'app/fcm-terminated.png', alt: 'Terminated notification', caption: 'Terminated' },
-              { src: 'app/fcm-console.png', alt: 'Message sent from the Firebase Console', caption: 'Sent from Console' },
-            ]}
-          />
-          <p className="foot">evidence/fcm/ · docs/analytics-plan.md §10</p>
-        </Page>
-
-        <Page
-          dense
           title="Cloud Messaging: requirements met"
-          line="Each Lab 3 requirement for FCM, and the screenshot that proves it"
-          notes="One: the same push arrives in all three app states. Foreground is shown by the app itself with flutter_local_notifications, because Android does not show FCM banners while the app is open; background and terminated go to the system tray. Two: on Android 13 and later the app asks for POST_NOTIFICATIONS; if the user said no, Settings explains it and opens the system page. Three: every message is saved to an inbox on the device, listing which state it arrived in. Four: a message carries data route, here /jar, and tapping it opens that screen; only allow-listed routes are accepted. Five: a test message sent from the Firebase Console, Messaging, Send test message, reached the device. The three state messages were sent the same way and through the FCM HTTP v1 API."
+          line="When it fails: permission denied → dialog + “Mở cài đặt” · unknown route → opens Today · FCM start error → logged, the app keeps running"
+          notes="One: the same push arrives in all three app states. Foreground is shown by the app itself with flutter_local_notifications, because Android does not show FCM banners while the app is open; background and terminated go to the system tray. Two: on Android 13 and later the app asks for POST_NOTIFICATIONS; if the user said no, the app explains it and “Mở cài đặt” opens the Android notification page. If FCM cannot start, the error is logged and the app keeps running; an unknown route opens Today. Three: every message is saved to an inbox on the device, listing which state it arrived in. Four: a message carries data route, here /jar, and tapping it opens that screen; only allow-listed routes are accepted. Five: a test message sent from the Firebase Console, Messaging, Send test message, reached the device. The three state messages were sent the same way and through the FCM HTTP v1 API."
         >
           <div className="fq">
             <figure className="fq-states">
@@ -1221,7 +1334,11 @@ export default function App() {
                 <i>✓</i>
                 <b>Asks permission (Android 13+)</b>
               </figcaption>
-              <img className="fq-phone" src="app/fcm-denied.png" alt="Permission denied: the app explains and opens settings" />
+              <div className="fq-pair">
+                <img className="fq-phone" src="app/fcm-denied.png" alt="Permission denied: the app explains and offers Mở cài đặt" />
+                <img className="fq-phone" src="app/fcm-os-settings.png" alt="Mở cài đặt opens the Android notification settings" />
+              </div>
+              <small>Denied → “Mở cài đặt” → Android settings</small>
             </figure>
             <figure>
               <figcaption>
@@ -1388,7 +1505,9 @@ export default function App() {
           <p className="foot">docs/analytics-plan.md §10 · firebase/remote-config-defaults.json · evidence/remote-config/</p>
         </Page>
 
-        <Page
+        <TechnologySlides id="artemis" />
+
+        <Page id="evidence-artemis"
           dense
           title="ARTEMIS E2E"
           notes="ARTEMIS drives the real app on the Android 15 emulator through ADB. Model: deepseek-v4.1-flash via OpenRouter, Flash profile. 14 cases (T01 to T14) cover F1 write a note (main path, empty note, leave with a draft, offline), F2 self-control and breathing, F3 challenges, the four tabs, Settings (feature flags) and a native Android case (Home, notification shade, relaunch). Each case ran 3 times and asserts on the value the agent reports, not only on success. First full run: 31 of 36. Two failures came from wrong assertions in our tests (T05 run 3 accepted only an answer starting with DIALOG; T12 demanded the Today screen although the app correctly restores the previous screen). We fixed those and re-ran T05 and T12: 6 of 6. T06 run 3 timed out after 420 seconds in the offline case and stays a failure. T13 (analytics event read from adb logcat) and T14 (weekly card export) were added later: 6 of 6 after a fixture fix. Final: 41 of 42. The exploratory session ran for 25 minutes with the Pro profile and reported 10 issues; the sign-in cases need an email test account. Details and the table: docs/test-plan.md (branch feat/e2e-artemis); proofs in evidence/artemis/."
@@ -1634,74 +1753,9 @@ export default function App() {
           <p className="foot">docs/test-plan.md §5 · evidence/artemis/x01-bugs.txt · evidence/artemis/x01/ · junit-x01.xml</p>
         </Page>
 
-        <Page
-          dense
-          title="AI code review"
-          line="CodeRabbit reviewed every PR: 52 findings on #28, #29 and #38"
-          notes="Three real screenshots, left to right. One: CodeRabbit reviews every PR on GitHub; here is its review on PR #38 with follow-up comments and an inline comment on the FCM service. It left 52 findings on #28, #29 and #38. Two: we checked every finding against the code and wrote a verdict in docs/code-review.md; 51 were technically right and 1 was wrong. Of the right ones, 40 are real bugs and 11 are not worth fixing for this Lab. Three: each fix is its own commit, and the message names the finding it addresses; 211a4d5, 736453a and 5e13651 are fixed so far. The next two slides zoom in on four findings."
-        >
-          <div className="pf">
-            <figure>
-              <Crop
-                src="review/proof-review.png"
-                alt="CodeRabbit review on PR #38 with follow-up and inline comments"
-                natural={840}
-                w={840}
-                h={720}
-                scale={0.62}
-              />
-              <figcaption>
-                <b><em>1</em> CodeRabbit reviews every PR</b>
-                <span>52 findings on #28, #29 and #38</span>
-              </figcaption>
-            </figure>
-            <span className="pf-arrow">→</span>
-            <div className="pf-right">
-              <figure>
-                <Crop
-                  src="review/proof-verdicts.png"
-                  alt="docs/code-review.md: the AI finding, our verdict and a note for each row"
-                  natural={1328}
-                  x={795}
-                  w={533}
-                  h={172}
-                  scale={1.05}
-                />
-                <figcaption>
-                  <b><em>2</em> We judge every finding</b>
-                  <span>51 right, 1 wrong · verdicts in docs/code-review.md</span>
-                </figcaption>
-              </figure>
-              <figure>
-                <div className="pf-commits">
-                  {(
-                    [
-                      ['736453a', 118],
-                      ['5e13651', 146],
-                    ] as const
-                  ).map(([sha, h]) => (
-                    <Crop
-                      key={sha}
-                      src={`review/proof-commit-${sha}.png`}
-                      alt={`Fix commit ${sha} naming the CodeRabbit finding it addresses`}
-                      natural={1609}
-                      y={52}
-                      w={560}
-                      h={h}
-                      scale={1}
-                    />
-                  ))}
-                </div>
-                <figcaption>
-                  <b><em>3</em> We fix with a commit</b>
-                  <span>3 fixed so far; each message names its finding</span>
-                </figcaption>
-              </figure>
-            </div>
-          </div>
-        </Page>
+        <TechnologySlides id="coderabbit" howBody={<CodeRabbitHow />} howNotes={CODERABBIT_HOW_NOTES} />
 
-        <Page
+        <Page id="evidence-coderabbit"
           dense
           title="AI review: what we fixed"
           line="Real CodeRabbit comments on PR #38, marked in red, and the commit that fixed each one"

@@ -1965,3 +1965,649 @@ html, body, #root, .stage {
 .x01 td:nth-child(2) {
   white-space: nowrap;
 }
+
+/* ---- Technology slides: WHAT points, WHY reasons, WHERE tables ---- */
+.reveal .tech-slide code {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: #eef0fe;
+  color: #2c3aa8;
+  font-size: 0.86em;
+}
+
+.reveal .tech-slide .tech-lead {
+  font-size: 27px;
+}
+
+.tech-points {
+  margin: 22px 0 0;
+  padding-left: 1.1em;
+  font-size: 21px;
+  line-height: 1.4;
+}
+
+.tech-points li + li {
+  margin-top: 8px;
+}
+
+.reveal .tech-slide .tech-example {
+  margin-top: 20px;
+  font-size: 20px;
+}
+
+.reveal .tech-slide .tech-reasons {
+  padding-left: 0;
+  list-style: none;
+  font-size: 22px;
+}
+
+.tech-reasons li {
+  display: grid;
+  gap: 4px;
+  padding-left: 16px;
+  border-left: 4px solid #454bc2;
+}
+
+.tech-reasons li b {
+  font-size: 25px;
+}
+
+.tech-reasons li span {
+  color: #444;
+  line-height: 1.35;
+}
+
+.reveal .slides section.tech-slide-where {
+  padding-top: 40px !important;
+  padding-bottom: 30px !important;
+}
+
+.reveal .tech-slide-where .tech-step {
+  margin-bottom: 8px;
+}
+
+.reveal .tech-slide-where h2 {
+  font-size: 42px;
+}
+
+.tech-slide-where .tech-title svg {
+  width: 38px;
+  height: 38px;
+}
+
+.reveal .tech-slide-where .tech-layout {
+  grid-template-columns: 1.85fr 1fr;
+  align-items: start;
+  gap: 30px;
+  margin-top: 16px;
+}
+
+.reveal .tech-slide-where .tech-flow {
+  font-size: 18px;
+}
+
+.tech-how {
+  margin: 8px 0 0;
+  color: #444;
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.tech-where {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid #ccc;
+}
+
+.reveal .tech-where h3 {
+  margin: 0 0 5px;
+  color: #b71c25;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.tech-where dl {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+}
+
+.tech-where dl > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 12px;
+  align-items: baseline;
+  font-size: 14.5px;
+  line-height: 1.3;
+}
+
+.tech-where dt,
+.tech-where dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.reveal .tech-where dt > code {
+  padding: 0;
+  background: none;
+  color: #000;
+  font-size: 13.5px;
+}
+
+.tech-at {
+  margin-left: 4px;
+  color: #b71c25;
+  font-weight: 700;
+}
+
+.tech-where dt b + .tech-at {
+  margin-left: 8px;
+  font-weight: 400;
+  color: #555;
+}
+
+.tech-where dd {
+  color: #444;
+}
+
+.reveal .tech-slide-where .tech-image img {
+  height: 380px;
+}
+
+/* Code screenshots are wide strips: show them at their own height instead of a tall grey box. */
+.reveal .slides .tech-image-code img,
+.reveal .tech-slide-where .tech-image-code img {
+  height: auto;
+  max-height: 380px;
+  background: #fff;
+  border: 1px solid #ddd;
+}
+
+/* ---- HOW (setup screenshots) and WHERE (code screenshots) slides ---- */
+.reveal .slides section.tech-slide-tight {
+  padding: 40px 64px 30px !important;
+}
+
+.reveal .tech-slide-tight .tech-step {
+  margin-bottom: 6px;
+  font-size: 18px;
+}
+
+.reveal .tech-slide-tight h2 {
+  font-size: 40px;
+}
+
+.tech-slide-tight .tech-title svg {
+  width: 36px;
+  height: 36px;
+}
+
+.reveal .tech-slide-tight .tech-how {
+  margin: 12px 0 0;
+  max-width: 1000px;
+  font-size: 19px;
+  color: #333;
+}
+
+.tech-setup {
+  display: grid;
+  gap: 20px;
+  margin-top: 18px;
+}
+
+.tech-setup figure,
+.tech-code figure {
+  margin: 0;
+  min-width: 0;
+}
+
+.tech-setup-img,
+.tech-code-img {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #f6f7fb;
+  overflow: hidden;
+}
+
+.reveal .tech-setup-img img,
+.reveal .tech-code-img img {
+  max-width: 100%;
+  max-height: 100%;
+  margin: 0;
+  object-fit: contain;
+}
+
+.tech-setup figcaption {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  margin-top: 10px;
+  font-size: 17px;
+  line-height: 1.3;
+}
+
+.tech-setup figcaption em {
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #e5262b;
+  color: #fff;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.reveal .tech-slide-tight .tech-evidence {
+  position: absolute;
+  right: 64px;
+  bottom: 34px;
+  margin: 0;
+}
+
+/* WHERE: 2 × 2 grid of code screenshots, caption above each. */
+.tech-code {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px 22px;
+  margin-top: 18px;
+}
+
+.tech-code-4 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.tech-code-4 .tech-code-img {
+  height: 196px;
+}
+
+.tech-code:not(.tech-code-4) .tech-code-img {
+  height: 420px;
+}
+
+.tech-code figcaption {
+  margin-bottom: 6px;
+  font-size: 15px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.reveal .tech-code figcaption code {
+  padding: 0;
+  background: none;
+  color: #000;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.tech-does {
+  display: block;
+  color: #555;
+}
+
+.reveal .tech-code-img {
+  background: #fff;
+}
+
+.tech-source {
+  position: absolute;
+  left: 64px;
+  bottom: 34px;
+  margin: 0;
+  color: #777;
+  font-size: 14px;
+}
+
+/* A screenshot that is not taken yet. */
+.tech-missing-label {
+  display: none;
+}
+
+.tech-missing img {
+  display: none;
+}
+
+.tech-missing .tech-missing-label {
+  display: block;
+  padding: 16px;
+  color: #b71c25;
+  font-size: 15px;
+  text-align: center;
+}
+
+.tech-code-4 .tech-code-img {
+  height: 214px;
+}
+
+.reveal .tech-slide-tight .tech-evidence {
+  right: 150px;
+}
+
+/* HOW row: widths follow each screenshot's aspect ratio (set in fitByRatio). */
+.tech-setup {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.tech-setup figure {
+  flex: 1 1 0;
+}
+
+.reveal .tech-setup .tech-setup-img {
+  height: auto;
+  max-height: 440px;
+  background: #fff;
+}
+
+.reveal .tech-setup-img img {
+  width: 100%;
+  height: auto;
+  max-height: 440px;
+}
+
+/* HOW: centre the screenshot row in the space under the title; link bottom left. */
+.reveal .tech-slide-tight .tech-setup {
+  align-items: center;
+  min-height: 470px;
+}
+
+.reveal .tech-setup .tech-setup-img,
+.reveal .tech-setup-img img {
+  max-height: 400px;
+}
+
+.reveal .tech-slide-tight .tech-evidence {
+  right: auto;
+  left: 64px;
+}
+
+/* WHY: reasons on the left, alternatives we did not pick on the right. */
+.tech-why {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  margin-top: 26px;
+}
+
+.tech-why > div {
+  min-width: 0;
+}
+
+.reveal .tech-why h3 {
+  margin: 0 0 16px;
+  color: #b71c25;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.reveal .tech-why .tech-reasons li + li {
+  margin-top: 20px;
+}
+
+.tech-alternatives {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 20px;
+}
+
+.tech-alternatives li {
+  display: grid;
+  gap: 4px;
+  padding-left: 16px;
+  border-left: 4px solid #bbb;
+}
+
+.tech-alternatives li + li {
+  margin-top: 20px;
+}
+
+.tech-alternatives li b {
+  font-size: 22px;
+  color: #555;
+}
+
+.tech-alternatives li b::before {
+  content: '✕ ';
+  color: #b71c25;
+}
+
+.tech-alternatives li span {
+  color: #444;
+  line-height: 1.35;
+}
+
+/* FCM requirements: permission prompt and the Android settings page side by side. */
+.fq-pair {
+  display: flex;
+  gap: 8px;
+}
+
+.fq-pair .fq-phone {
+  height: 380px;
+}
+
+/* HOW with 3 steps: step 1 large on the left, steps 2 and 3 stacked on the right. */
+.reveal .tech-slide-tight .tech-setup-feature {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 14px 24px;
+  align-items: start;
+  min-height: 0;
+  margin-top: 16px;
+}
+
+.tech-setup-feature figure:first-child {
+  grid-row: span 2;
+}
+
+.reveal .tech-setup-feature .tech-setup-img {
+  height: 186px;
+  max-height: none;
+}
+
+.reveal .tech-setup-feature figure:first-child .tech-setup-img {
+  height: 420px;
+}
+
+.reveal .tech-setup-feature .tech-setup-img img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.tech-setup-feature figcaption {
+  margin-top: 6px;
+  font-size: 16px;
+}
+
+/* HOW gallery: rows sized in SetupGallery from each screenshot's aspect ratio. */
+.tech-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.tech-row {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.tech-rows figure {
+  margin: 0;
+  flex: 0 0 auto;
+}
+
+.reveal .tech-rows .tech-setup-img {
+  max-height: none;
+  background: #fff;
+}
+
+.reveal .tech-rows .tech-setup-img img {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  object-fit: contain;
+}
+
+.tech-rows figcaption {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  margin-top: 6px;
+  font-size: 15.5px;
+  line-height: 1.3;
+}
+
+.tech-rows figcaption em {
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #e5262b;
+  color: #fff;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+/* MVVM WHERE (1/3): folder tree with layer numbers, full diagram. */
+.mv-arch {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 10px;
+}
+
+.reveal .mv-arch .tree {
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+.reveal .mv-arch .diagram {
+  width: 440px;
+}
+
+/* MVVM WHERE (2/3, 3/3): diagram with the current layers in red, code of each numbered layer beside it. */
+.mv {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 26px;
+  align-items: start;
+  margin-top: 14px;
+}
+
+.reveal .mv-diagram {
+  width: 360px;
+}
+
+.mv-code {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 18px;
+}
+
+.mv-code figure {
+  margin: 0;
+  min-width: 0;
+}
+
+.mv-code figcaption {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  margin-bottom: 5px;
+  font-size: 14.5px;
+  line-height: 1.3;
+}
+
+.mv-code figcaption em {
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #e5262b;
+  color: #fff;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.mv-code figcaption b {
+  flex: 0 0 auto;
+  font-size: 16px;
+}
+
+.mv-code figcaption span {
+  color: #555;
+}
+
+.mv-code-img {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 168px;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.reveal .mv-code-img img {
+  max-width: 100%;
+  max-height: 100%;
+  margin: 0;
+  object-fit: contain;
+}
+
+.reveal .mv-file {
+  display: block;
+  margin-top: 4px;
+  padding: 0;
+  background: none;
+  color: #333;
+  font-size: 12.5px;
+  overflow-wrap: anywhere;
+}
+
+/* Layer numbers in the MVVM folder tree, same red badge as the diagram. */
+.reveal .tree .mv-n {
+  display: inline-grid;
+  place-items: center;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: #e5262b;
+  color: #fff;
+  font: 700 11.5px/1 Inter, sans-serif;
+  font-style: normal;
+  vertical-align: 1px;
+}
+
+.reveal .mv-code-img {
+  height: 196px;
+}
