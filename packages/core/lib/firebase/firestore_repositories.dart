@@ -421,6 +421,18 @@ class FirestoreUserDirectory implements UserDirectory {
   });
 
   @override
+  Stream<UserRole?> watchRole(String uid) => _mapErrors(
+    _col
+        .doc(uid)
+        .snapshots()
+        .map(
+          (snapshot) => snapshot.exists
+              ? UserRole.fromId(snapshot.data()?['role'] as String?)
+              : null,
+        ),
+  );
+
+  @override
   Future<void> ensureProfile(
     String uid, {
     required String displayName,
