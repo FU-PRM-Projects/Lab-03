@@ -657,3 +657,27 @@
 .fd .ag ul li.grp { list-style: none; margin: 8px 0 2px -18px; font-weight: 800; color: var(--c); font-style: italic; }
 .fd .ag ul li.grp:first-child { margin-top: 0; }
 .fd.divider .dv-list li.grp { flex-basis: 100%; background: none; padding: 6px 0 0; font-weight: 800; font-size: 17px; font-style: italic; }
+
+/* persona card */
+.fd .persona { display: flex; gap: 18px; align-items: center; padding: 14px 18px; border-radius: 16px; background: var(--part-soft); }
+.fd .persona-avatar { width: 108px; height: 108px; flex: none; }
+.fd .persona-body { display: flex; flex-direction: column; min-width: 0; }
+.fd .persona-name { font-size: 24px; font-weight: 800; color: var(--ink); line-height: 1.1; }
+.fd .persona-meta { font-size: 15px; color: var(--muted); margin-bottom: 8px; }
+.fd .persona dl { margin: 0; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px 18px; }
+.fd .persona dl > div { display: flex; flex-direction: column; }
+.fd .persona dt { font-size: 12px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--part); }
+.fd .persona dd { margin: 0; font-size: 15.5px; color: var(--ink); line-height: 1.3; }
+
+/* process flow diagram */
+.fd .procflow { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; align-items: start; }
+.fd .flow-step { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 6px; }
+.fd .flow-node { position: relative; width: 74px; height: 74px; border-radius: 50%; background: var(--part); color: #fff; display: flex; align-items: center; justify-content: center; z-index: 1; box-shadow: 0 6px 14px rgba(37, 99, 235, 0.25); }
+.fd .flow-step.warn .flow-node { background: #fff; color: var(--bad); border: 3px solid var(--bad); box-shadow: none; }
+.fd .flow-n { position: absolute; top: -6px; right: -6px; width: 26px; height: 26px; border-radius: 50%; background: #fff; color: var(--part); border: 2px solid var(--part); font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+.fd .flow-step.warn .flow-n { color: var(--bad); border-color: var(--bad); }
+.fd .flow-line { position: absolute; top: 37px; left: calc(50% + 40px); width: calc(100% - 80px); height: 3px; background: var(--part); }
+.fd .flow-line::after { content: ''; position: absolute; right: -2px; top: -5px; border-left: 10px solid var(--part); border-top: 6.5px solid transparent; border-bottom: 6.5px solid transparent; }
+.fd .flow-step b { margin-top: 12px; font-size: 17px; color: var(--ink); }
+.fd .flow-step small { margin-top: 4px; font-size: 13px; line-height: 1.35; color: var(--muted); }
+.fd .flow-step.warn b { color: var(--bad); }

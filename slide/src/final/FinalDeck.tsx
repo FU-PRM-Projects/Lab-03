@@ -2,11 +2,11 @@ import type { ReactNode } from 'react';
 import { Deck, Slide } from '@revealjs/react';
 import RevealNotes from 'reveal.js/plugin/notes';
 import {
-  Beaker, Compass, Layers, PlayCircle, Bell, Bot, Boxes, CheckCircle2, ClipboardCheck, FileText, Flame, Link2, Megaphone, MoonStar, PenLine, ShieldCheck, Smartphone, Sparkles, UserCog, Users,
+  BellRing, Code2, Beaker, Compass, Layers, PlayCircle, Bell, Bot, Boxes, CheckCircle2, ClipboardCheck, FileText, Flame, Link2, Megaphone, MoonStar, PenLine, ShieldCheck, Smartphone, Sparkles, UserCog, Users,
 } from 'lucide-react';
 
 import ServerlessMap from './ServerlessMap';
-import { Agenda, Divider, EvidenceWall, ScreenRow, Storyboard } from './Visuals';
+import { Agenda, Divider, EvidenceWall, FlowDiagram, PersonaCard, ScreenRow, Storyboard } from './Visuals';
 import type { Part } from './Visuals';
 
 import 'reveal.js/reveal.css';
@@ -474,34 +474,34 @@ export default function FinalDeck() {
           notes="Context, not problem yet. Persona Minh, 22, final year (Lab 2). Goal: one mood and one small win in under 30 s. Walk the current process left to right: reminder, typing and classifying by hand, picking from a fixed seed list, new cards only by a developer script, news only by a Console push. Point at the Console screenshot: seed documents dc-1-1, dc-1-2…"
           foot="Source: Lab 2 persona and success criterion (README, docs/design-traceability.md) · Lab 3 build · Firestore Console."
         >
-          <div className="col grow" style={{ gap: 22 }}>
-            <div className="cards" style={{ gridTemplateColumns: '1fr 1fr 1fr', flex: 'none' }}>
-              <Card head="Who">
-                <p><b>Minh, 22</b>, final-year student (Lab 2 persona). Uses Nốt on Android in the evening.</p>
-              </Card>
-              <Card head="Goal (Lab 2)">
-                <p>One mood and one small win in <b>under 30 seconds</b> after the evening reminder.</p>
-              </Card>
-              <Card head="Tools after Lab 3">
-                <p>The Nốt app · a seed script for cards · the Firebase Console for push.</p>
-              </Card>
+          <div className="col grow" style={{ gap: 16 }}>
+            <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
+              <div style={{ flex: 1 }}>
+                <PersonaCard
+                  name="Minh, 22"
+                  meta="Final-year student · Lab 2 persona · Android"
+                  facts={[
+                    ['Goal', 'one mood + one small win in under 30 s'],
+                    ['Uses', 'the Nốt app in the evening'],
+                    ['Feels', 'behind, tired after a long day'],
+                  ]}
+                />
+              </div>
+              <Shot src="ev-firestore-console.png" alt="Seed challenge cards in Firestore" w={330} cap="Lab 3 cards: fixed seed documents dc-1-1…" />
             </div>
             <span className="k">How it works today (after Lab 3)</span>
-            <Steps
-              items={[
-                ['1 · Reminder', 'in the evening, Minh opens Nốt'],
-                ['2 · Write', 'types each note, picks win / self-control / journal by hand'],
-                ['3 · Challenge', 'picks a card from a fixed seed list'],
-                ['4 · New cards', 'only when a developer edits the seed and runs a script'],
-                ['5 · News', 'only a push sent from the Firebase Console'],
+            <FlowDiagram
+              steps={[
+                { icon: BellRing, title: 'Reminder', note: 'evening, Minh opens Nốt' },
+                { icon: PenLine, title: 'Write', note: 'types each note, sorts it by hand' },
+                { icon: Boxes, title: 'Challenge', note: 'picks from a fixed seed list' },
+                { icon: Code2, title: 'New cards', note: 'only via a developer script', warn: true },
+                { icon: Megaphone, title: 'News', note: 'only a Console push', warn: true },
               ]}
             />
-            <p className="answer" style={{ margin: 0, fontSize: 19 }}>
+            <p className="answer" style={{ margin: '4px 0 0', fontSize: 19, maxWidth: 'none' }}>
               One person, alone with their own data. Nobody curates content, and nobody can talk to users inside the app.
             </p>
-          </div>
-          <div className="col" style={{ width: 420, justifyContent: 'center' }}>
-            <Shot src="ev-firestore-console.png" alt="Seed challenge cards in Firestore" w={420} cap="Challenge cards in Lab 3: fixed seed documents dc-1-1, dc-1-2…, changed only by a script" />
           </div>
         </S>
 
