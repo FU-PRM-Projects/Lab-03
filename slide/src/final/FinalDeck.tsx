@@ -424,11 +424,34 @@ export default function FinalDeck() {
         {/* 01 · Overview */}
         <S
           part="P1 · Problem · 01 Overview"
-          title="Nốt is a daily-wins app with a staff web admin, running on one Firebase project"
-          notes="30 seconds. Product: Nốt. Users: final-year students (persona Minh). Value: notice small wins instead of unfinished tasks; a curated, growing challenge catalog. Platform: Android plus a Flutter Web admin, both live."
+          title="Students end the day counting what they did not finish; Nốt makes one small win visible"
+          notes="30 seconds. Problem first: Minh, a final-year student, ends each evening looking at unfinished tasks; Lab 3 helped one person alone, with fixed content and no way to reach users. Our answer: Nốt, log one win in 30 s, staff keep the challenge catalog fresh, Gemini cuts the typing. Product is live: Android app + web admin on one Firebase project. Details of each pain point on slide 03."
           foot="Live: prm393-not-lab3.web.app (app) · prm393-not-lab3.web.app/admin/ (web admin) · repo FU-PRM-Projects/Lab-03"
         >
           <div className="col grow">
+            <div className="problem">
+              <span className="k">Problem</span>
+              <p className="quote">“I end every evening looking at what I didn’t finish.”<span> — Minh, 22, final-year student (persona)</span></p>
+              <ul className="pains">
+                {[
+                  [MoonStar, 'Logging a good moment takes effort at night'],
+                  [Boxes, 'Challenge cards never change; nobody curates them'],
+                  [Megaphone, 'No way to tell users about new cards or news'],
+                ].map(([Icon, text]) => {
+                  const I = Icon as typeof Users;
+                  return (
+                    <li key={text as string}>
+                      <I size={22} />
+                      {text as string}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+            <div className="value">
+              <span className="k">Our answer · Nốt</span>
+              <p>Log one small win in <b>under 30 s</b>; staff keep fresh challenge cards and news coming <b>without an app update</b>.</p>
+            </div>
             <div className="facts">
               {[
                 [Users, 'Users', 'Students · staff · admins'],
@@ -438,7 +461,7 @@ export default function FinalDeck() {
                 const I = Icon as typeof Users;
                 return (
                   <div key={head as string}>
-                    <I size={30} />
+                    <I size={28} />
                     <span>
                       <span className="k">{head as string}</span>
                       <b>{text as string}</b>
@@ -447,30 +470,6 @@ export default function FinalDeck() {
                 );
               })}
             </div>
-            <div className="value">
-              <span className="k">Value</span>
-              <p>Log one small win in <b>under 30 s</b>, get fresh challenge cards and news <b>without updating the app</b>.</p>
-            </div>
-            <span className="k" style={{ marginTop: 8 }}>What the Final added on top of Lab 3</span>
-            <ul className="icon-list">
-              {[
-                [UserCog, 'Roles + web admin', 'user / staff / admin · 5 screens'],
-                [ClipboardCheck, 'Cross-role flow', 'share → approve → live update'],
-                [Sparkles, 'Nốt AI', 'one paragraph → sorted notes'],
-                [Bell, 'Inbox · onboarding · PDF', 'news live · starter plan · weekly card'],
-              ].map(([Icon, head, text]) => {
-                const I = Icon as typeof Users;
-                return (
-                  <li key={head as string}>
-                    <I size={26} />
-                    <span>
-                      <b>{head as string}</b>
-                      {text as string}
-                    </span>
-                  </li>
-                );
-              })}
-            </ul>
           </div>
           <div className="collage">
             <img className="c-web" src={img('wa-03-dashboard-crop.png')} alt="Web admin dashboard" />
