@@ -481,7 +481,6 @@ export default function FinalDeck() {
           title="Today Nốt is one person's evening journal: the content is fixed and nobody can reach users"
           sub="Where Nốt stands after Lab 3. The problems come on the next slide."
           notes="Context only, no problem yet. Environment: a self-care journal for young people, one Android app on one Firebase project after Lab 3. People: Minh, our Lab 2 persona, and us, the developers, who are the only ones able to change content. Tools: the app, a seed script, the Firebase Console. Walk the five steps. Then the numbers: 22 seed cards in 2 topics, 4 note types sorted by hand, 1 role, 0 in-app announcements, goal under 30 s. Need: someone who curates content and a channel to users, without a new app release."
-          foot="Source: README (Lab 2 persona, 30 s goal) · firebase/seed/challenges.json (22 cards) · docs/system-architecture.md (one role in Lab 2/3) · Lab 3 build."
         >
           <div className="col grow" style={{ gap: 14 }}>
             <div className="ctx3">
@@ -514,13 +513,13 @@ export default function FinalDeck() {
                 { icon: Megaphone, title: 'News', note: 'only a Console push', warn: true },
               ]}
             />
+            <span className="k" style={{ marginTop: 6 }}>Status today, in numbers</span>
             <div className="ctx-stats">
-              <span className="ctx-stats-k">Status today</span>
-              <div><b>22</b><span>seed cards, 2 topics, fixed</span></div>
-              <div><b>4</b><span>note types sorted by hand</span></div>
-              <div><b>1</b><span>role: user only</span></div>
-              <div><b>0</b><span>in-app announcements</span></div>
-              <div><b>&lt; 30 s</b><span>goal per evening log</span></div>
+              <div><b>22</b><span>challenge cards, fixed since Lab 3</span></div>
+              <div><b>4</b><span>note types, each sorted by hand</span></div>
+              <div><b>1</b><span>role: everyone is a user</span></div>
+              <div><b>0</b><span>ways to message users in the app</span></div>
+              <div><b>30 s</b><span>goal for one evening log</span></div>
             </div>
             <p className="ctx-need">
               <b>Need:</b> someone who curates content and a channel to users, without shipping a new app version.
