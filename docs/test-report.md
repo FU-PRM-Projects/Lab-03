@@ -13,11 +13,11 @@ Cập nhật 11/11/2026, trên `main` commit `eb04447`.
 | Loại kiểm thử | Phạm vi | Kết quả | Minh chứng |
 |---|---|---|---|
 | Security Rules (Emulator) | R-01…R-30, mọi collection trừ Discord | **30/30 đạt** (chạy lại 11/11) | [`evidence/firestore/rules-tests.txt`](../evidence/firestore/rules-tests.txt) |
-| Unit + widget test (Flutter) | App, `packages/core`, `web_admin` | **303 / 5 / 11 đạt** (app thêm 7 test vai trò, 6 test nháp nhật ký P4; web thêm 1 test vai trò theo thời gian thực), `flutter analyze` không lỗi | [`evidence/flutter/analyze-and-test.txt`](../evidence/flutter/analyze-and-test.txt) |
+| Unit + widget test (Flutter) | App, `packages/core`, `web_admin` | **303 / 5 / 14 đạt** (app thêm 7 test vai trò, 6 test nháp nhật ký P4; web thêm 1 test vai trò theo thời gian thực và 3 test màn lỗi Tổng quan), `flutter analyze` không lỗi | [`evidence/flutter/analyze-and-test.txt`](../evidence/flutter/analyze-and-test.txt) |
 | Mobile E2E (ARTEMIS) | T01–T14 (luồng Lab 2 / Lab 3) | **41/42 lần đạt (98%)** | [`test-plan.md`](test-plan.md) mục 5, `evidence/artemis/` |
 | Mobile E2E (ARTEMIS) | Luồng mới của Final | **Chưa chạy** (xem mục 2.2) | — |
 | Mobile trên máy thật | Onboarding, Nốt AI, Thẻ tuần PDF, tắt AI bằng Remote Config | Chạy tay, đạt | [`evidence/mobile-final/`](../evidence/mobile-final/README.md) |
-| Web admin (checklist) | 5 màn + form thông báo, từ chối sai vai trò, trống, đang tải | 13/13 mục đạt; **thiếu ảnh trạng thái lỗi** | [`evidence/web-admin/`](../evidence/web-admin/README.md) |
+| Web admin (checklist) | 5 màn + form thông báo, từ chối sai vai trò, trống, đang tải | 15/15 mục đạt (thêm đổi vai trò khi đang mở, hai chiều); **thiếu ảnh trạng thái lỗi** | [`evidence/web-admin/`](../evidence/web-admin/README.md) |
 | Luồng liên vai trò | Gửi thẻ trên app → duyệt trên web → app cập nhật + hộp thư | **3/3 lần đạt trên bản deploy** (D-1…D-3) | [`cross-role-flow.md`](cross-role-flow.md), `evidence/cross-role/` |
 | AI code review | Code thêm cho Final | 5 góp ý, có quyết định | Mục 6 |
 
@@ -128,8 +128,18 @@ Chạy ngày 10/11/2026 trên bản deploy `https://prm393-not-lab3.web.app/admi
 
 Năm màn dữ liệu dùng chung `MessageView.error`, nhưng chưa có ảnh
 chụp trạng thái lỗi trên bản deploy. Khi chụp thử (tắt mạng → Làm mới ở Tổng
-quan) đã tìm ra lỗi quay vòng mãi; bản sửa (chờ tối đa 15 giây rồi báo lỗi) đã có
-trong code (`dashboardTimeout`), cần deploy rồi chụp lại.
+quan) đã tìm ra lỗi quay vòng mãi; bản sửa (chờ tối đa 15 giây rồi báo lỗi,
+`dashboardTimeout`) đã deploy ở PR #75.
+
+Chụp lại ngày 11/11/2026 (chặn request `runAggregationQuery` trong tab) vẫn
+quay vòng **hơn 3 phút**: Riverpod 3 mặc định tự thử lại provider lỗi 10 lần
+và giữ trạng thái loading, `TimeoutException` cũng bị thử lại. Lỗi này ảnh
+hưởng mọi màn lỗi của cả hai app (app mobile chậm vài chục giây mới báo lỗi).
+**Đã sửa:** cả hai app dùng `ProviderScope(retry: noRetry)`
+(`packages/core/lib/services/retry.dart`), vì mọi màn lỗi đã có nút Thử lại.
+Test: `web_admin/test/dashboard_error_test.dart` (máy chủ không trả lời → lỗi
+sau 15 giây và không tải lại ngầm; lỗi mạng → báo ngay, Thử lại tải đúng một
+lần); hai test đầu trượt nếu bỏ `noRetry`. Cần deploy rồi chụp ảnh lỗi.
 
 ## 5. Luồng liên vai trò
 
@@ -174,7 +184,7 @@ Review của Lab 3 (CodeRabbit, các góp ý đã sửa và chưa sửa) ở
 ## 7. Việc còn lại
 
 1. Viết và chạy 3 lần các ca ARTEMIS T17–T20, chạy lại T14 (bản Final) và T15–T16.
-2. Chụp ảnh trạng thái lỗi cho từng màn web admin (bản sửa đã deploy qua PR #75).
+2. Chụp ảnh trạng thái lỗi cho từng màn web admin, sau khi bản sửa `noRetry` được deploy.
 
 ## Cách chạy lại
 

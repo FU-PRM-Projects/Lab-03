@@ -30,7 +30,7 @@ chay bo 2km quanh ho…"); Gemini vẫn hiểu và trả tiêu đề có dấu. 
 | Ảnh / file | Cho thấy |
 |---|---|
 | [`07-weekly-card.png`](07-weekly-card.png) | Thẻ tuần 09/11–15/11 có nút "Lưu thẻ tuần (PDF)" |
-| [`08-pdf-share-sheet.png`](08-pdf-share-sheet.png) | Hộp chia sẻ của Android mở với `weekly-2026-W46.pdf` (đã cắt phần danh bạ bên dưới) |
+| [`08-pdf-share-sheet.png`](08-pdf-share-sheet.png) | Hộp chia sẻ của Android mở với `weekly-2026-W46.pdf`, đủ màn hình (chụp lại 11/11/2026; hàng danh bạ Messenger đã làm mờ) |
 | [`09-pdf-saved.png`](09-pdf-saved.png) | "Đã lưu thẻ tuần vào máy. weekly-2026-W46.pdf · 15,4 KB" và nút "Chia sẻ PDF" |
 | [`10-pdf-file.png`](10-pdf-file.png), [`weekly-2026-W46.pdf`](weekly-2026-W46.pdf) | File thật lấy từ máy (`adb exec-out run-as com.quanphungg.lab03 cat app_flutter/reports/weekly-2026-W46.pdf`), 15 775 byte, tiếng Việt đúng |
 
@@ -54,3 +54,18 @@ Chạy ngày 11/11/2026 trên Galaxy A70, bản debug có `WrongRoleScreen` (nh�
 |---|---|
 | [`12-wrong-role-admin.png`](12-wrong-role-admin.png) | Mở app bằng tài khoản admin: màn "Tài khoản này dành cho web admin", địa chỉ web admin, nút Đăng xuất, không có thanh tab |
 | [`13-wrong-role-signed-out.png`](13-wrong-role-signed-out.png) | Bấm Đăng xuất: về S01 (Tiếp tục với Google / Đăng nhập bằng email) |
+
+## Tài khoản user và nháp nhật ký (P4)
+
+Chạy ngày 11/11/2026 trên Galaxy A70, bản **release** build từ `main` sau
+PR #75 và #76, tài khoản "Thị Kim Thúy Đoàn" (`role = user`).
+
+| Ảnh | Cho thấy |
+|---|---|
+| [`14-user-account-today.png`](14-user-account-today.png) | Tài khoản `user` mở app: vào thẳng S02 Hôm nay, có thanh tab, không bị màn từ chối chặn |
+| [`15-journal-draft-typing.png`](15-journal-draft-typing.png) | Đang viết nhật ký (29 ký tự), chưa bấm Xong |
+| [`16-journal-draft-resume.png`](16-journal-draft-resume.png) | Tắt hẳn app (`adb shell am force-stop`), mở lại rồi vào Viết nhật ký: hỏi "Tiếp tục bản nháp?" kèm số ký tự, nút "Bắt đầu trang mới" / "Viết tiếp" |
+| [`17-journal-draft-restored.png`](17-journal-draft-restored.png) | Bấm Viết tiếp: chữ cũ được điền lại đúng |
+
+Sau đó bấm Đóng → **Bỏ**, mở lại Viết nhật ký thì không còn hỏi: nháp đã bị
+xoá. Không có nốt thử nào được lưu vào tài khoản.

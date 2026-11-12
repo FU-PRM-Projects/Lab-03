@@ -19,6 +19,7 @@ import 'package:lab03/services/user_repository.dart';
 import 'package:lab03/theme/app_theme.dart';
 import 'package:lab03/widgets/app_text_field.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:not_core/services/retry.dart';
 
 import 'fakes.dart';
 
@@ -86,7 +87,11 @@ Future<TestServices> pumpApp(
   final s = services ?? TestServices();
   setScreenSize(tester, size);
   await tester.pumpWidget(
-    ProviderScope(overrides: s.overrides, child: const NotApp()),
+    ProviderScope(
+      retry: noRetry,
+      overrides: s.overrides,
+      child: const NotApp(),
+    ),
   );
   await tester.pumpAndSettle();
   return s;
