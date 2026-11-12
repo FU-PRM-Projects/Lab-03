@@ -427,34 +427,37 @@ export default function FinalDeck() {
         {/* 01 · Overview */}
         <S
           part="P1 · Problem · 01 Overview"
-          title="After a long day, many of us feel we got nothing done; Nốt helps us notice the small wins"
-          notes="30 seconds. Start with a feeling everyone knows: at the end of a long day we think we got nothing done, because we remember unfinished tasks, not the small things that went well. Writing those down takes effort when tired, and small goals that never change lose their pull. Our answer: Nốt. One small win in 30 s, fresh challenge cards curated by staff, Gemini to cut the typing. Live on Android + web admin. Next slide: who exactly (persona) and how it works today."
-          foot="Android app (users) + Flutter web admin (staff, admins) on one Firebase project · live: prm393-not-lab3.web.app · repo FU-PRM-Projects/Lab-03"
+          title="Nốt: a daily small-wins app with a staff web admin, live on one Firebase project"
+          notes="30 seconds. Name and type: Nốt, an Android app for logging small wins plus a Flutter web admin for staff. One sentence: for students who end the day feeling behind, Nốt makes one small win visible in under 30 s and keeps fresh challenges coming. Users, value, platform. It is live: point at the screenshots. Team and course at the bottom."
+          foot="Live: prm393-not-lab3.web.app (app) · prm393-not-lab3.web.app/admin/ (web admin) · repo github.com/FU-PRM-Projects/Lab-03"
         >
-          <div className="col grow" style={{ justifyContent: 'center', paddingBottom: 40 }}>
-            <div className="problem">
-              <span className="k">Why · the problem</span>
-              <p className="quote">“I didn’t get anything done today.”<span>A thought most of us have at the end of a long day</span></p>
-              <ul className="pains">
-                {[
-                  [CheckCircle2, 'We remember unfinished tasks, not the small things that went well'],
-                  [MoonStar, 'When tired, writing the day down feels like one more task'],
-                  [Boxes, 'Small goals that never change stop motivating us'],
-                ].map(([Icon, text]) => {
-                  const I = Icon as typeof Users;
-                  return (
-                    <li key={text as string}>
-                      <I size={22} />
-                      {text as string}
-                    </li>
-                  );
-                })}
-              </ul>
+          <div className="col grow" style={{ justifyContent: 'center', gap: 14 }}>
+            <div>
+              <span className="pname-chip">Project name</span>
+              <h3 className="pname">Nốt</h3>
+              <p className="ptype">Small-wins journal app (Android) + staff web admin, on Firebase</p>
             </div>
-            <span className="k" style={{ marginTop: 30, color: 'var(--part)' }}>What · our answer</span>
-            <p className="answer" style={{ marginTop: 6 }}>
-              Nốt helps us see what went well: <b>one small win, logged in under 30 seconds</b>, and a fresh small
-              challenge for tomorrow.
+            <p className="pitch">
+              For students who end a long day feeling they got nothing done, Nốt makes <b>one small win visible in under
+              30 seconds</b> and keeps <b>fresh small challenges</b> coming, curated by staff.
+            </p>
+            <div className="uvp">
+              <div className="u">
+                <span>Users</span>
+                <p>Final-year students · staff who curate cards · admins</p>
+              </div>
+              <div className="v">
+                <span>Value</span>
+                <p>One win in 30 s · new cards without an app update · Gemini sorts the day</p>
+              </div>
+              <div className="pl">
+                <span>Platform</span>
+                <p>Flutter Android app · Flutter Web admin · Firebase</p>
+              </div>
+            </div>
+            <p className="team">
+              <b>PRM393 · Final Assignment</b> · Đoàn Thị Kim Thúy (SE190992) · Phùng Thế Quân (SE193519) · Phan Đức
+              Duy (SE193591) · Phan Hữu Phước (SE161951)
             </p>
           </div>
           <div className="collage">
@@ -508,8 +511,8 @@ export default function FinalDeck() {
         {/* 03 · Problem */}
         <S
           part="P1 · Problem · 03 Problem · WHY"
-          title="Three gaps kept Nốt from being a system: no curator, no channel, slow evenings"
-          sub="Each pain point is answered directly on the next slide."
+          title="“I didn’t get anything done today”: four gaps behind that feeling in Nốt"
+          sub="Most of us think it after a long day: we remember unfinished tasks, writing the day down feels like one more task, and goals that never change stop motivating us."
           notes="Pain points with cause and impact. Evidence is our own Lab 3 state (gap review), not a survey; we say that openly."
           foot="Evidence: docs/gap-review.md (Lab 2 / Lab 3 gaps before the Final). No user survey was run; impacts are observed in the Lab 3 build."
         >
