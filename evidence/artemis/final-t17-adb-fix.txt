@@ -1,0 +1,24 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.16, pytest-9.2.0, pluggy-1.7.0 -- D:\Lab-03\e2e_test\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: D:\Lab-03\e2e_test
+configfile: pyproject.toml
+plugins: asyncio-1.4.1.post1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=session, asyncio_default_test_loop_scope=session
+collecting ... collected 20 items / 19 deselected / 1 selected
+
+test_main_flows.py::test_t17_onboarding_starter_plan[run1] FAILED        [100%]
+
+================================== FAILURES ===================================
+___________________ test_t17_onboarding_starter_plan[run1] ____________________
+test_main_flows.py:287: in test_t17_onboarding_starter_plan
+    answer, result = await ask(
+conftest.py:154: in run
+    assert result.succeeded, f"[run{attempt}] {result.error or result.status}"
+E   AssertionError: [run1] failed
+E   assert False
+E    +  where False = TaskResult(task_id='78b4893f-d33b-4253-90ef-7df85aece5de', status='failed', goal="Ở màn Hôm nay, bấm 'Cài đặt', bấm 'Làm lại khảo sát làm quen'. Trả lời lần lượt 4 câu hỏi (chọn đáp án bất kỳ, câu nào cần chọn nhiều thì chọn 1–2 mục) và bấm nút đi tiếp sau mỗi câu, KHÔNG bấm 'Bỏ qua câu này'. Khi màn 'Hồ sơ khởi đầu' hiện ra thì DỪNG, KHÔNG bấm 'Bắt đầu' và không bấm Back. Trả lời PLAN_SHOWN nếu màn đó có mục '3 thẻ để bắt đầu' và nút 'Bắt đầu', NO_PLAN nếu không tới được màn đó. Không đăng xuất và không đổi cài đặt nào. Cuối cùng trả lời đúng định dạng được yêu cầu, không thêm chữ nào khác.", profile=None, device_serial='emulator-5554', output=None, error=None, turns=None).succeeded
+---- generated xml file: D:\Lab-03\evidence\artemis\final-t17-adb-fix.xml -----
+=========================== short test summary info ===========================
+FAILED test_main_flows.py::test_t17_onboarding_starter_plan[run1] - Assertion...
+====================== 1 failed, 19 deselected in 11.50s ======================

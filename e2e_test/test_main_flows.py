@@ -11,20 +11,47 @@ from __future__ import annotations
 import os
 import shutil
 import subprocess
+from pathlib import Path
 
 import pytest
 
 NOTE_TEXT = "E2E test note"
-ADB = shutil.which("adb") or os.path.join(
-    os.environ.get("LOCALAPPDATA", ""), "Android", "Sdk", "platform-tools", "adb.exe"
-)
+def resolve_adb() -> str:
+    """Find ADB from an override, Flutter SDK config, environment, or PATH."""
+    executable = "adb.exe" if os.name == "nt" else "adb"
+    candidates = []
+    override = os.environ.get("ARTEMIS_ADB_PATH")
+    if override:
+        if not Path(override).is_file():
+            raise FileNotFoundError("ARTEMIS_ADB_PATH does not point to an existing adb executable")
+        return override
+    properties = Path(__file__).resolve().parents[1] / "android" / "local.properties"
+    if properties.is_file():
+        for line in properties.read_text(encoding="utf-8").splitlines():
+            if line.strip().startswith("sdk.dir="):
+                sdk = line.split("=", 1)[1].strip().replace("\\\\", "\\").replace("\\:", ":")
+                candidates.append(Path(sdk) / "platform-tools" / executable)
+    for name in ("ANDROID_HOME", "ANDROID_SDK_ROOT"):
+        if os.environ.get(name):
+            candidates.append(Path(os.environ[name]) / "platform-tools" / executable)
+    on_path = shutil.which("adb")
+    if on_path:
+        candidates.append(Path(on_path))
+    if os.environ.get("LOCALAPPDATA"):
+        candidates.append(Path(os.environ["LOCALAPPDATA"]) / "Android" / "Sdk" / "platform-tools" / executable)
+    for candidate in candidates:
+        if candidate.is_file():
+            return str(candidate)
+    raise FileNotFoundError("ADB not found. Set ARTEMIS_ADB_PATH to your SDK platform-tools adb executable.")
+
+
 SERIAL = os.environ.get("ARTEMIS_DEVICE_SERIAL")
 
 
 def adb(*args: str) -> str:
     """Chạy một lệnh adb trên đúng thiết bị ARTEMIS đang dùng, trả về stdout."""
-    cmd = [ADB, *(["-s", SERIAL] if SERIAL else []), *args]
-    done = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
+    cmd = [resolve_adb(), *(["-s", SERIAL] if SERIAL else []), *args]
+    done = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace", check=True)
     return done.stdout
 
 # Chỉ dẫn chung: không đăng xuất, không đổi cài đặt, trả lời đúng định dạng.
@@ -83,7 +110,7 @@ async def test_t05_f1_leaving_asks_to_keep_draft(ask) -> None:
 
 async def test_t06_f1_offline_note_is_kept_on_device(ask) -> None:
     """F1 nhánh lỗi mạng: mất mạng thì lưu trên máy và báo cho người dùng biết."""
-    subprocess.run([ADB, "shell", "cmd", "connectivity", "airplane-mode", "enable"], check=False)
+    subprocess.run([resolve_adb(), "shell", "cmd", "connectivity", "airplane-mode", "enable"], check=False)
     try:
         answer, result = await ask(
             "Máy đang mất mạng. Ở màn Hôm nay, bấm 'Ghi nốt', chọn 'Chiến thắng nhỏ' "
@@ -95,7 +122,7 @@ async def test_t06_f1_offline_note_is_kept_on_device(ask) -> None:
         )
     finally:
         subprocess.run(
-            [ADB, "shell", "cmd", "connectivity", "airplane-mode", "disable"], check=False
+            [resolve_adb(), "shell", "cmd", "connectivity", "airplane-mode", "disable"], check=False
         )
     assert "OFFLINE_BANNER" in answer, f"{answer!r} (trace {result.trace_id})"
 

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="11.460" timestamp="2026-11-12T13:59:21.697741+07:00" hostname="DuyPhan"><testcase classname="test_main_flows" name="test_t17_onboarding_starter_plan[run1]" time="11.307"><failure message="AssertionError: [run1] failed&#10;assert False&#10;[+1 more line; full report in element text]">test_main_flows.py:287: in test_t17_onboarding_starter_plan
+    answer, result = await ask(
+conftest.py:154: in run
+    assert result.succeeded, f"[run{attempt}] {result.error or result.status}"
+E   AssertionError: [run1] failed
+E   assert False
+E    +  where False = TaskResult(task_id='78b4893f-d33b-4253-90ef-7df85aece5de', status='failed', goal="Ở màn Hôm nay, bấm 'Cài đặt', bấm 'Làm lại khảo sát làm quen'. Trả lời lần lượt 4 câu hỏi (chọn đáp án bất kỳ, câu nào cần chọn nhiều thì chọn 1–2 mục) và bấm nút đi tiếp sau mỗi câu, KHÔNG bấm 'Bỏ qua câu này'. Khi màn 'Hồ sơ khởi đầu' hiện ra thì DỪNG, KHÔNG bấm 'Bắt đầu' và không bấm Back. Trả lời PLAN_SHOWN nếu màn đó có mục '3 thẻ để bắt đầu' và nút 'Bắt đầu', NO_PLAN nếu không tới được màn đó. Không đăng xuất và không đổi cài đặt nào. Cuối cùng trả lời đúng định dạng được yêu cầu, không thêm chữ nào khác.", profile=None, device_serial='emulator-5554', output=None, error=None, turns=None).succeeded</failure></testcase></testsuite></testsuites>

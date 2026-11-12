@@ -101,8 +101,7 @@ Remove-Item Env:E2E_AI_DISABLED
 
 Log gốc của Thúy được giữ ở `evidence/artemis/final-t14-t17-t18-t20.txt` và
 `final-t19.txt`; dùng tên `final-rerun-*` cho đợt mới để tránh ghi đè.
-Bộ bổ sung trước đây chuyển sang `archived_final_scenarios.py.txt`, chỉ để tham khảo,
-không được pytest thu thập. Không dùng mã T17–T27 trong file lưu trữ để ghi slide.
+Chỉ dùng mã ca trong `test_main_flows.py` để chạy test và tổng hợp slide.
 
 T02 dùng gợi ý nhanh “Dọn phòng” để kiểm tra thao tác lưu. T03 chỉ dọn nốt
 có dấu hiệu riêng `E2E test note`, nên các nốt thử từ gợi ý cần dọn riêng

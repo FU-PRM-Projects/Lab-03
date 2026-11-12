@@ -1,0 +1,782 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="9" skipped="0" tests="9" time="333.399" timestamp="2026-11-12T13:42:36.382968+07:00" hostname="DuyPhan"><testcase classname="test_main_flows" name="test_t17_onboarding_starter_plan[run1]" time="93.703"><failure message="FileNotFoundError: [WinError 2] The system cannot find the file specified">ask = &lt;function ask.&lt;locals&gt;.run at 0x00000153B78F3560&gt;, app_id = 'com.quanphungg.lab03'
+
+    async def test_t17_onboarding_starter_plan(ask, app_id: str) -&gt; None:
+        """A2 / S13: trả lời 4 câu làm quen → màn "Hồ sơ khởi đầu" có 3 thẻ đầu tiên."""
+        try:
+            answer, result = await ask(
+                "Ở màn Hôm nay, bấm 'Cài đặt', bấm 'Làm lại khảo sát làm quen'. Trả lời lần "
+                "lượt 4 câu hỏi (chọn đáp án bất kỳ, câu nào cần chọn nhiều thì chọn 1–2 mục) "
+                "và bấm nút đi tiếp sau mỗi câu, KHÔNG bấm 'Bỏ qua câu này'. Khi màn 'Hồ sơ "
+                "khởi đầu' hiện ra thì DỪNG, KHÔNG bấm 'Bắt đầu' và không bấm Back. Trả lời "
+                "PLAN_SHOWN nếu màn đó có mục '3 thẻ để bắt đầu' và nút 'Bắt đầu', "
+                "NO_PLAN nếu không tới được màn đó." + RULES,
+                "PLAN_SHOWN hoặc NO_PLAN",
+            )
+        finally:
+&gt;           restart_app(app_id)
+
+test_main_flows.py:270: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+test_main_flows.py:253: in restart_app
+    adb("shell", "am", "force-stop", app_id)
+test_main_flows.py:27: in adb
+    done = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\subprocess.py:548: in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\subprocess.py:1026: in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;Popen: returncode: None args: ['C:\\Users\\duypd\\AppData\\Local\\Android\\...&gt;
+args = 'C:\\Users\\duypd\\AppData\\Local\\Android\\Sdk\\platform-tools\\adb.exe -s emulator-5554 shell am force-stop com.quanphungg.lab03'
+executable = None, preexec_fn = None, close_fds = False, pass_fds = (), cwd = None, env = None
+startupinfo = &lt;subprocess.STARTUPINFO object at 0x00000153B7922A80&gt;, creationflags = 0, shell = False
+p2cread = Handle(1092), p2cwrite = -1, c2pread = 15, c2pwrite = Handle(512), errread = 16, errwrite = Handle(528)
+unused_restore_signals = True, unused_gid = None, unused_gids = None, unused_uid = None, unused_umask = -1
+unused_start_new_session = False, unused_process_group = -1
+
+    def _execute_child(self, args, executable, preexec_fn, close_fds,
+                       pass_fds, cwd, env,
+                       startupinfo, creationflags, shell,
+                       p2cread, p2cwrite,
+                       c2pread, c2pwrite,
+                       errread, errwrite,
+                       unused_restore_signals,
+                       unused_gid, unused_gids, unused_uid,
+                       unused_umask,
+                       unused_start_new_session, unused_process_group):
+        """Execute program (MS Windows version)"""
+    
+        assert not pass_fds, "pass_fds not supported on Windows."
+    
+        if isinstance(args, str):
+            pass
+        elif isinstance(args, bytes):
+            if shell:
+                raise TypeError('bytes args is not allowed on Windows')
+            args = list2cmdline([args])
+        elif isinstance(args, os.PathLike):
+            if shell:
+                raise TypeError('path-like args is not allowed when '
+                                'shell is true')
+            args = list2cmdline([args])
+        else:
+            args = list2cmdline(args)
+    
+        if executable is not None:
+            executable = os.fsdecode(executable)
+    
+        # Process startup details
+        if startupinfo is None:
+            startupinfo = STARTUPINFO()
+        else:
+            # bpo-34044: Copy STARTUPINFO since it is modified above,
+            # so the caller can reuse it multiple times.
+            startupinfo = startupinfo.copy()
+    
+        use_std_handles = -1 not in (p2cread, c2pwrite, errwrite)
+        if use_std_handles:
+            startupinfo.dwFlags |= _winapi.STARTF_USESTDHANDLES
+            startupinfo.hStdInput = p2cread
+            startupinfo.hStdOutput = c2pwrite
+            startupinfo.hStdError = errwrite
+    
+        attribute_list = startupinfo.lpAttributeList
+        have_handle_list = bool(attribute_list and
+                                "handle_list" in attribute_list and
+                                attribute_list["handle_list"])
+    
+        # If we were given an handle_list or need to create one
+        if have_handle_list or (use_std_handles and close_fds):
+            if attribute_list is None:
+                attribute_list = startupinfo.lpAttributeList = {}
+            handle_list = attribute_list["handle_list"] = \
+                list(attribute_list.get("handle_list", []))
+    
+            if use_std_handles:
+                handle_list += [int(p2cread), int(c2pwrite), int(errwrite)]
+    
+            handle_list[:] = self._filter_handle_list(handle_list)
+    
+            if handle_list:
+                if not close_fds:
+                    warnings.warn("startupinfo.lpAttributeList['handle_list'] "
+                                  "overriding close_fds", RuntimeWarning)
+    
+                # When using the handle_list we always request to inherit
+                # handles but the only handles that will be inherited are
+                # the ones in the handle_list
+                close_fds = False
+    
+        if shell:
+            startupinfo.dwFlags |= _winapi.STARTF_USESHOWWINDOW
+            startupinfo.wShowWindow = _winapi.SW_HIDE
+            if not executable:
+                # gh-101283: without a fully-qualified path, before Windows
+                # checks the system directories, it first looks in the
+                # application directory, and also the current directory if
+                # NeedCurrentDirectoryForExePathW(ExeName) is true, so try
+                # to avoid executing unqualified "cmd.exe".
+                comspec = os.environ.get('ComSpec')
+                if not comspec:
+                    system_root = os.environ.get('SystemRoot', '')
+                    comspec = os.path.join(system_root, 'System32', 'cmd.exe')
+                    if not os.path.isabs(comspec):
+                        raise FileNotFoundError('shell not found: neither %ComSpec% nor %SystemRoot% is set')
+                if os.path.isabs(comspec):
+                    executable = comspec
+            else:
+                comspec = executable
+    
+            args = '{} /c "{}"'.format (comspec, args)
+    
+        if cwd is not None:
+            cwd = os.fsdecode(cwd)
+    
+        sys.audit("subprocess.Popen", executable, args, cwd, env)
+    
+        # Start the process
+        try:
+&gt;           hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+                                     # no special security
+                                     None, None,
+                                     int(not close_fds),
+                                     creationflags,
+                                     env,
+                                     cwd,
+                                     startupinfo)
+E                                    FileNotFoundError: [WinError 2] The system cannot find the file specified
+
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\subprocess.py:1538: FileNotFoundError</failure></testcase><testcase classname="test_main_flows" name="test_t17_onboarding_starter_plan[run2]" time="152.938"><failure message="FileNotFoundError: [WinError 2] The system cannot find the file specified">ask = &lt;function ask.&lt;locals&gt;.run at 0x00000153B7952480&gt;, app_id = 'com.quanphungg.lab03'
+
+    async def test_t17_onboarding_starter_plan(ask, app_id: str) -&gt; None:
+        """A2 / S13: trả lời 4 câu làm quen → màn "Hồ sơ khởi đầu" có 3 thẻ đầu tiên."""
+        try:
+            answer, result = await ask(
+                "Ở màn Hôm nay, bấm 'Cài đặt', bấm 'Làm lại khảo sát làm quen'. Trả lời lần "
+                "lượt 4 câu hỏi (chọn đáp án bất kỳ, câu nào cần chọn nhiều thì chọn 1–2 mục) "
+                "và bấm nút đi tiếp sau mỗi câu, KHÔNG bấm 'Bỏ qua câu này'. Khi màn 'Hồ sơ "
+                "khởi đầu' hiện ra thì DỪNG, KHÔNG bấm 'Bắt đầu' và không bấm Back. Trả lời "
+                "PLAN_SHOWN nếu màn đó có mục '3 thẻ để bắt đầu' và nút 'Bắt đầu', "
+                "NO_PLAN nếu không tới được màn đó." + RULES,
+                "PLAN_SHOWN hoặc NO_PLAN",
+            )
+        finally:
+&gt;           restart_app(app_id)
+
+test_main_flows.py:270: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+test_main_flows.py:253: in restart_app
+    adb("shell", "am", "force-stop", app_id)
+test_main_flows.py:27: in adb
+    done = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\subprocess.py:548: in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\subprocess.py:1026: in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;Popen: returncode: None args: ['C:\\Users\\duypd\\AppData\\Local\\Android\\...&gt;
+args = 'C:\\Users\\duypd\\AppData\\Local\\Android\\Sdk\\platform-tools\\adb.exe -s emulator-5554 shell am force-stop com.quanphungg.lab03'
+executable = None, preexec_fn = None, close_fds = False, pass_fds = (), cwd = None, env = None
+startupinfo = &lt;subprocess.STARTUPINFO object at 0x00000153B79491C0&gt;, creationflags = 0, shell = False
+p2cread = Handle(1284), p2cwrite = -1, c2pread = 15, c2pwrite = Handle(1296), errread = 16, errwrite = Handle(1308)
+unused_restore_signals = True, unused_gid = None, unused_gids = None, unused_uid = None, unused_umask = -1
+unused_start_new_session = False, unused_process_group = -1
+
+    def _execute_child(self, args, executable, preexec_fn, close_fds,
+                       pass_fds, cwd, env,
+                       startupinfo, creationflags, shell,
+                       p2cread, p2cwrite,
+                       c2pread, c2pwrite,
+                       errread, errwrite,
+                       unused_restore_signals,
+                       unused_gid, unused_gids, unused_uid,
+                       unused_umask,
+                       unused_start_new_session, unused_process_group):
+        """Execute program (MS Windows version)"""
+    
+        assert not pass_fds, "pass_fds not supported on Windows."
+    
+        if isinstance(args, str):
+            pass
+        elif isinstance(args, bytes):
+            if shell:
+                raise TypeError('bytes args is not allowed on Windows')
+            args = list2cmdline([args])
+        elif isinstance(args, os.PathLike):
+            if shell:
+                raise TypeError('path-like args is not allowed when '
+                                'shell is true')
+            args = list2cmdline([args])
+        else:
+            args = list2cmdline(args)
+    
+        if executable is not None:
+            executable = os.fsdecode(executable)
+    
+        # Process startup details
+        if startupinfo is None:
+            startupinfo = STARTUPINFO()
+        else:
+            # bpo-34044: Copy STARTUPINFO since it is modified above,
+            # so the caller can reuse it multiple times.
+            startupinfo = startupinfo.copy()
+    
+        use_std_handles = -1 not in (p2cread, c2pwrite, errwrite)
+        if use_std_handles:
+            startupinfo.dwFlags |= _winapi.STARTF_USESTDHANDLES
+            startupinfo.hStdInput = p2cread
+            startupinfo.hStdOutput = c2pwrite
+            startupinfo.hStdError = errwrite
+    
+        attribute_list = startupinfo.lpAttributeList
+        have_handle_list = bool(attribute_list and
+                                "handle_list" in attribute_list and
+                                attribute_list["handle_list"])
+    
+        # If we were given an handle_list or need to create one
+        if have_handle_list or (use_std_handles and close_fds):
+            if attribute_list is None:
+                attribute_list = startupinfo.lpAttributeList = {}
+            handle_list = attribute_list["handle_list"] = \
+                list(attribute_list.get("handle_list", []))
+    
+            if use_std_handles:
+                handle_list += [int(p2cread), int(c2pwrite), int(errwrite)]
+    
+            handle_list[:] = self._filter_handle_list(handle_list)
+    
+            if handle_list:
+                if not close_fds:
+                    warnings.warn("startupinfo.lpAttributeList['handle_list'] "
+                                  "overriding close_fds", RuntimeWarning)
+    
+                # When using the handle_list we always request to inherit
+                # handles but the only handles that will be inherited are
+                # the ones in the handle_list
+                close_fds = False
+    
+        if shell:
+            startupinfo.dwFlags |= _winapi.STARTF_USESHOWWINDOW
+            startupinfo.wShowWindow = _winapi.SW_HIDE
+            if not executable:
+                # gh-101283: without a fully-qualified path, before Windows
+                # checks the system directories, it first looks in the
+                # application directory, and also the current directory if
+                # NeedCurrentDirectoryForExePathW(ExeName) is true, so try
+                # to avoid executing unqualified "cmd.exe".
+                comspec = os.environ.get('ComSpec')
+                if not comspec:
+                    system_root = os.environ.get('SystemRoot', '')
+                    comspec = os.path.join(system_root, 'System32', 'cmd.exe')
+                    if not os.path.isabs(comspec):
+                        raise FileNotFoundError('shell not found: neither %ComSpec% nor %SystemRoot% is set')
+                if os.path.isabs(comspec):
+                    executable = comspec
+            else:
+                comspec = executable
+    
+            args = '{} /c "{}"'.format (comspec, args)
+    
+        if cwd is not None:
+            cwd = os.fsdecode(cwd)
+    
+        sys.audit("subprocess.Popen", executable, args, cwd, env)
+    
+        # Start the process
+        try:
+&gt;           hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+                                     # no special security
+                                     None, None,
+                                     int(not close_fds),
+                                     creationflags,
+                                     env,
+                                     cwd,
+                                     startupinfo)
+E                                    FileNotFoundError: [WinError 2] The system cannot find the file specified
+
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\subprocess.py:1538: FileNotFoundError</failure></testcase><testcase classname="test_main_flows" name="test_t17_onboarding_starter_plan[run3]" time="36.763"><failure message="FileNotFoundError: [WinError 2] The system cannot find the file specified">ask = &lt;function ask.&lt;locals&gt;.run at 0x00000153B7952520&gt;, app_id = 'com.quanphungg.lab03'
+
+    async def test_t17_onboarding_starter_plan(ask, app_id: str) -&gt; None:
+        """A2 / S13: trả lời 4 câu làm quen → màn "Hồ sơ khởi đầu" có 3 thẻ đầu tiên."""
+        try:
+&gt;           answer, result = await ask(
+                "Ở màn Hôm nay, bấm 'Cài đặt', bấm 'Làm lại khảo sát làm quen'. Trả lời lần "
+                "lượt 4 câu hỏi (chọn đáp án bất kỳ, câu nào cần chọn nhiều thì chọn 1–2 mục) "
+                "và bấm nút đi tiếp sau mỗi câu, KHÔNG bấm 'Bỏ qua câu này'. Khi màn 'Hồ sơ "
+                "khởi đầu' hiện ra thì DỪNG, KHÔNG bấm 'Bắt đầu' và không bấm Back. Trả lời "
+                "PLAN_SHOWN nếu màn đó có mục '3 thẻ để bắt đầu' và nút 'Bắt đầu', "
+                "NO_PLAN nếu không tới được màn đó." + RULES,
+                "PLAN_SHOWN hoặc NO_PLAN",
+            )
+
+test_main_flows.py:260: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+goal = "Ở màn Hôm nay, bấm 'Cài đặt', bấm 'Làm lại khảo sát làm quen'. Trả lời lần lượt 4 câu hỏi (chọn đáp án bất kỳ, câu nà... đó. Không đăng xuất và không đổi cài đặt nào. Cuối cùng trả lời đúng định dạng được yêu cầu, không thêm chữ nào khác."
+expected = 'PLAN_SHOWN hoặc NO_PLAN', locked = True, timeout = 420
+
+    async def run(goal: str, expected: str, *, locked: bool = True, timeout: int = 420):
+        try:
+            result = await client.run(
+                goal,
+                locked_app_package=app_id if locked else None,
+                expected_output=expected,
+                timeout=timeout,
+            )
+        except TaskTimeoutError as error:
+            if not await client.stop(error.task_id):
+                pytest.exit(
+                    f"Không xác nhận được dừng phiên quá giờ {error.task_id}. "
+                    "Dừng bộ test để tránh thao tác chồng lên nhau.",
+                    returncode=2,
+                )
+            raise
+&gt;       assert result.succeeded, f"[run{attempt}] {result.error or result.status}"
+E       AssertionError: [run3] failed
+E       assert False
+E        +  where False = TaskResult(task_id='1143055a-7c9a-4c15-a485-0250b74c936c', status='failed', goal="Ở màn Hôm nay, bấm 'Cài đặt', bấm 'Làm lại khảo sát làm quen'. Trả lời lần lượt 4 câu hỏi (chọn đáp án bất kỳ, câu nào cần chọn nhiều thì chọn 1–2 mục) và bấm nút đi tiếp sau mỗi câu, KHÔNG bấm 'Bỏ qua câu này'. Khi màn 'Hồ sơ khởi đầu' hiện ra thì DỪNG, KHÔNG bấm 'Bắt đầu' và không bấm Back. Trả lời PLAN_SHOWN nếu màn đó có mục '3 thẻ để bắt đầu' và nút 'Bắt đầu', NO_PLAN nếu không tới được màn đó. Không đăng xuất và không đổi cài đặt nào. Cuối cùng trả lời đúng định dạng được yêu cầu, không thêm chữ nào khác.", profile=None, device_serial='emulator-5554', output=None, error=None, turns=None).succeeded
+
+conftest.py:154: AssertionError
+
+During handling of the above exception, another exception occurred:
+
+ask = &lt;function ask.&lt;locals&gt;.run at 0x00000153B7952520&gt;, app_id = 'com.quanphungg.lab03'
+
+    async def test_t17_onboarding_starter_plan(ask, app_id: str) -&gt; None:
+        """A2 / S13: trả lời 4 câu làm quen → màn "Hồ sơ khởi đầu" có 3 thẻ đầu tiên."""
+        try:
+            answer, result = await ask(
+                "Ở màn Hôm nay, bấm 'Cài đặt', bấm 'Làm lại khảo sát làm quen'. Trả lời lần "
+                "lượt 4 câu hỏi (chọn đáp án bất kỳ, câu nào cần chọn nhiều thì chọn 1–2 mục) "
+                "và bấm nút đi tiếp sau mỗi câu, KHÔNG bấm 'Bỏ qua câu này'. Khi màn 'Hồ sơ "
+                "khởi đầu' hiện ra thì DỪNG, KHÔNG bấm 'Bắt đầu' và không bấm Back. Trả lời "
+                "PLAN_SHOWN nếu màn đó có mục '3 thẻ để bắt đầu' và nút 'Bắt đầu', "
+                "NO_PLAN nếu không tới được màn đó." + RULES,
+                "PLAN_SHOWN hoặc NO_PLAN",
+            )
+        finally:
+&gt;           restart_app(app_id)
+
+test_main_flows.py:270: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+test_main_flows.py:253: in restart_app
+    adb("shell", "am", "force-stop", app_id)
+test_main_flows.py:27: in adb
+    done = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\subprocess.py:548: in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\subprocess.py:1026: in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;Popen: returncode: None args: ['C:\\Users\\duypd\\AppData\\Local\\Android\\...&gt;
+args = 'C:\\Users\\duypd\\AppData\\Local\\Android\\Sdk\\platform-tools\\adb.exe -s emulator-5554 shell am force-stop com.quanphungg.lab03'
+executable = None, preexec_fn = None, close_fds = False, pass_fds = (), cwd = None, env = None
+startupinfo = &lt;subprocess.STARTUPINFO object at 0x00000153B794A660&gt;, creationflags = 0, shell = False
+p2cread = Handle(1228), p2cwrite = -1, c2pread = 15, c2pwrite = Handle(1216), errread = 16, errwrite = Handle(1208)
+unused_restore_signals = True, unused_gid = None, unused_gids = None, unused_uid = None, unused_umask = -1
+unused_start_new_session = False, unused_process_group = -1
+
+    def _execute_child(self, args, executable, preexec_fn, close_fds,
+                       pass_fds, cwd, env,
+                       startupinfo, creationflags, shell,
+                       p2cread, p2cwrite,
+                       c2pread, c2pwrite,
+                       errread, errwrite,
+                       unused_restore_signals,
+                       unused_gid, unused_gids, unused_uid,
+                       unused_umask,
+                       unused_start_new_session, unused_process_group):
+        """Execute program (MS Windows version)"""
+    
+        assert not pass_fds, "pass_fds not supported on Windows."
+    
+        if isinstance(args, str):
+            pass
+        elif isinstance(args, bytes):
+            if shell:
+                raise TypeError('bytes args is not allowed on Windows')
+            args = list2cmdline([args])
+        elif isinstance(args, os.PathLike):
+            if shell:
+                raise TypeError('path-like args is not allowed when '
+                                'shell is true')
+            args = list2cmdline([args])
+        else:
+            args = list2cmdline(args)
+    
+        if executable is not None:
+            executable = os.fsdecode(executable)
+    
+        # Process startup details
+        if startupinfo is None:
+            startupinfo = STARTUPINFO()
+        else:
+            # bpo-34044: Copy STARTUPINFO since it is modified above,
+            # so the caller can reuse it multiple times.
+            startupinfo = startupinfo.copy()
+    
+        use_std_handles = -1 not in (p2cread, c2pwrite, errwrite)
+        if use_std_handles:
+            startupinfo.dwFlags |= _winapi.STARTF_USESTDHANDLES
+            startupinfo.hStdInput = p2cread
+            startupinfo.hStdOutput = c2pwrite
+            startupinfo.hStdError = errwrite
+    
+        attribute_list = startupinfo.lpAttributeList
+        have_handle_list = bool(attribute_list and
+                                "handle_list" in attribute_list and
+                                attribute_list["handle_list"])
+    
+        # If we were given an handle_list or need to create one
+        if have_handle_list or (use_std_handles and close_fds):
+            if attribute_list is None:
+                attribute_list = startupinfo.lpAttributeList = {}
+            handle_list = attribute_list["handle_list"] = \
+                list(attribute_list.get("handle_list", []))
+    
+            if use_std_handles:
+                handle_list += [int(p2cread), int(c2pwrite), int(errwrite)]
+    
+            handle_list[:] = self._filter_handle_list(handle_list)
+    
+            if handle_list:
+                if not close_fds:
+                    warnings.warn("startupinfo.lpAttributeList['handle_list'] "
+                                  "overriding close_fds", RuntimeWarning)
+    
+                # When using the handle_list we always request to inherit
+                # handles but the only handles that will be inherited are
+                # the ones in the handle_list
+                close_fds = False
+    
+        if shell:
+            startupinfo.dwFlags |= _winapi.STARTF_USESHOWWINDOW
+            startupinfo.wShowWindow = _winapi.SW_HIDE
+            if not executable:
+                # gh-101283: without a fully-qualified path, before Windows
+                # checks the system directories, it first looks in the
+                # application directory, and also the current directory if
+                # NeedCurrentDirectoryForExePathW(ExeName) is true, so try
+                # to avoid executing unqualified "cmd.exe".
+                comspec = os.environ.get('ComSpec')
+                if not comspec:
+                    system_root = os.environ.get('SystemRoot', '')
+                    comspec = os.path.join(system_root, 'System32', 'cmd.exe')
+                    if not os.path.isabs(comspec):
+                        raise FileNotFoundError('shell not found: neither %ComSpec% nor %SystemRoot% is set')
+                if os.path.isabs(comspec):
+                    executable = comspec
+            else:
+                comspec = executable
+    
+            args = '{} /c "{}"'.format (comspec, args)
+    
+        if cwd is not None:
+            cwd = os.fsdecode(cwd)
+    
+        sys.audit("subprocess.Popen", executable, args, cwd, env)
+    
+        # Start the process
+        try:
+&gt;           hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+                                     # no special security
+                                     None, None,
+                                     int(not close_fds),
+                                     creationflags,
+                                     env,
+                                     cwd,
+                                     startupinfo)
+E                                    FileNotFoundError: [WinError 2] The system cannot find the file specified
+
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\subprocess.py:1538: FileNotFoundError</failure></testcase><testcase classname="test_main_flows" name="test_t18_free_tell_ai_suggestions[run1]" time="8.387"><failure message="AssertionError: [run1] failed&#10;assert False&#10;[+1 more line; full report in element text]">ask = &lt;function ask.&lt;locals&gt;.run at 0x00000153B7953380&gt;
+
+    async def test_t18_free_tell_ai_suggestions(ask) -&gt; None:
+        """A1 / S03b: Kể tự do → Gemini tách thành nốt gợi ý có nhãn, sửa được.
+    
+        Nội dung Gemini trả về đổi giữa các lần, nên chỉ khẳng định trên nhãn cố
+        định "Gợi ý từ Nốt AI". Không lưu để khỏi để lại nốt trong hũ.
+        """
+&gt;       answer, result = await ask(
+            "Ở màn Hôm nay, bấm 'Ghi nốt', chọn 'Kể tự do · Nốt AI'. Gõ vào ô: 'Sang nay "
+            "minh day som chay bo 2km, chieu hoi thay mot cau, toi met nen ngu som'. Bấm "
+            "'Nhờ Tụi Nốt sắp xếp' (nếu hiện bảng hỏi đồng ý gửi cho Gemini thì đồng ý). Chờ "
+            "tối đa 30 giây. Trả lời SUGGESTIONS nếu hiện danh sách nốt gợi ý có dòng 'Gợi ý "
+            "từ Nốt AI', FALLBACK nếu hiện câu báo Nốt AI đang nghỉ hoặc lỗi, kèm lối ghi "
+            "tay. KHÔNG bấm lưu: sau khi xem xong, bấm Back / Đóng cho tới khi về màn Hôm "
+            "nay, chọn bỏ nếu app hỏi." + RULES,
+            "SUGGESTIONS hoặc FALLBACK",
+            timeout=480,
+        )
+
+test_main_flows.py:280: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+goal = "Ở màn Hôm nay, bấm 'Ghi nốt', chọn 'Kể tự do · Nốt AI'. Gõ vào ô: 'Sang nay minh day som chay bo 2km, chieu hoi thay ...hỏi. Không đăng xuất và không đổi cài đặt nào. Cuối cùng trả lời đúng định dạng được yêu cầu, không thêm chữ nào khác."
+expected = 'SUGGESTIONS hoặc FALLBACK', locked = True, timeout = 480
+
+    async def run(goal: str, expected: str, *, locked: bool = True, timeout: int = 420):
+        try:
+            result = await client.run(
+                goal,
+                locked_app_package=app_id if locked else None,
+                expected_output=expected,
+                timeout=timeout,
+            )
+        except TaskTimeoutError as error:
+            if not await client.stop(error.task_id):
+                pytest.exit(
+                    f"Không xác nhận được dừng phiên quá giờ {error.task_id}. "
+                    "Dừng bộ test để tránh thao tác chồng lên nhau.",
+                    returncode=2,
+                )
+            raise
+&gt;       assert result.succeeded, f"[run{attempt}] {result.error or result.status}"
+E       AssertionError: [run1] failed
+E       assert False
+E        +  where False = TaskResult(task_id='008f3246-1c46-45fe-90c9-56bf79543f01', status='failed', goal="Ở màn Hôm nay, bấm 'Ghi nốt', chọn 'Kể tự do · Nốt AI'. Gõ vào ô: 'Sang nay minh day som chay bo 2km, chieu hoi thay mot cau, toi met nen ngu som'. Bấm 'Nhờ Tụi Nốt sắp xếp' (nếu hiện bảng hỏi đồng ý gửi cho Gemini thì đồng ý). Chờ tối đa 30 giây. Trả lời SUGGESTIONS nếu hiện danh sách nốt gợi ý có dòng 'Gợi ý từ Nốt AI', FALLBACK nếu hiện câu báo Nốt AI đang nghỉ hoặc lỗi, kèm lối ghi tay. KHÔNG bấm lưu: sau khi xem xong, bấm Back / Đóng cho tới khi về màn Hôm nay, chọn bỏ nếu app hỏi. Không đăng xuất và không đổi cài đặt nào. Cuối cùng trả lời đúng định dạng được yêu cầu, không thêm chữ nào khác.", profile=None, device_serial='emulator-5554', output=None, error=None, turns=None).succeeded
+
+conftest.py:154: AssertionError</failure></testcase><testcase classname="test_main_flows" name="test_t18_free_tell_ai_suggestions[run2]" time="8.463"><failure message="AssertionError: [run2] failed&#10;assert False&#10;[+1 more line; full report in element text]">ask = &lt;function ask.&lt;locals&gt;.run at 0x00000153B7953100&gt;
+
+    async def test_t18_free_tell_ai_suggestions(ask) -&gt; None:
+        """A1 / S03b: Kể tự do → Gemini tách thành nốt gợi ý có nhãn, sửa được.
+    
+        Nội dung Gemini trả về đổi giữa các lần, nên chỉ khẳng định trên nhãn cố
+        định "Gợi ý từ Nốt AI". Không lưu để khỏi để lại nốt trong hũ.
+        """
+&gt;       answer, result = await ask(
+            "Ở màn Hôm nay, bấm 'Ghi nốt', chọn 'Kể tự do · Nốt AI'. Gõ vào ô: 'Sang nay "
+            "minh day som chay bo 2km, chieu hoi thay mot cau, toi met nen ngu som'. Bấm "
+            "'Nhờ Tụi Nốt sắp xếp' (nếu hiện bảng hỏi đồng ý gửi cho Gemini thì đồng ý). Chờ "
+            "tối đa 30 giây. Trả lời SUGGESTIONS nếu hiện danh sách nốt gợi ý có dòng 'Gợi ý "
+            "từ Nốt AI', FALLBACK nếu hiện câu báo Nốt AI đang nghỉ hoặc lỗi, kèm lối ghi "
+            "tay. KHÔNG bấm lưu: sau khi xem xong, bấm Back / Đóng cho tới khi về màn Hôm "
+            "nay, chọn bỏ nếu app hỏi." + RULES,
+            "SUGGESTIONS hoặc FALLBACK",
+            timeout=480,
+        )
+
+test_main_flows.py:280: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+goal = "Ở màn Hôm nay, bấm 'Ghi nốt', chọn 'Kể tự do · Nốt AI'. Gõ vào ô: 'Sang nay minh day som chay bo 2km, chieu hoi thay ...hỏi. Không đăng xuất và không đổi cài đặt nào. Cuối cùng trả lời đúng định dạng được yêu cầu, không thêm chữ nào khác."
+expected = 'SUGGESTIONS hoặc FALLBACK', locked = True, timeout = 480
+
+    async def run(goal: str, expected: str, *, locked: bool = True, timeout: int = 420):
+        try:
+            result = await client.run(
+                goal,
+                locked_app_package=app_id if locked else None,
+                expected_output=expected,
+                timeout=timeout,
+            )
+        except TaskTimeoutError as error:
+            if not await client.stop(error.task_id):
+                pytest.exit(
+                    f"Không xác nhận được dừng phiên quá giờ {error.task_id}. "
+                    "Dừng bộ test để tránh thao tác chồng lên nhau.",
+                    returncode=2,
+                )
+            raise
+&gt;       assert result.succeeded, f"[run{attempt}] {result.error or result.status}"
+E       AssertionError: [run2] failed
+E       assert False
+E        +  where False = TaskResult(task_id='ee678ea9-4651-4f2d-967b-fcb637820db8', status='failed', goal="Ở màn Hôm nay, bấm 'Ghi nốt', chọn 'Kể tự do · Nốt AI'. Gõ vào ô: 'Sang nay minh day som chay bo 2km, chieu hoi thay mot cau, toi met nen ngu som'. Bấm 'Nhờ Tụi Nốt sắp xếp' (nếu hiện bảng hỏi đồng ý gửi cho Gemini thì đồng ý). Chờ tối đa 30 giây. Trả lời SUGGESTIONS nếu hiện danh sách nốt gợi ý có dòng 'Gợi ý từ Nốt AI', FALLBACK nếu hiện câu báo Nốt AI đang nghỉ hoặc lỗi, kèm lối ghi tay. KHÔNG bấm lưu: sau khi xem xong, bấm Back / Đóng cho tới khi về màn Hôm nay, chọn bỏ nếu app hỏi. Không đăng xuất và không đổi cài đặt nào. Cuối cùng trả lời đúng định dạng được yêu cầu, không thêm chữ nào khác.", profile=None, device_serial='emulator-5554', output=None, error=None, turns=None).succeeded
+
+conftest.py:154: AssertionError</failure></testcase><testcase classname="test_main_flows" name="test_t18_free_tell_ai_suggestions[run3]" time="7.502"><failure message="AssertionError: [run3] failed&#10;assert False&#10;[+1 more line; full report in element text]">ask = &lt;function ask.&lt;locals&gt;.run at 0x00000153B79537E0&gt;
+
+    async def test_t18_free_tell_ai_suggestions(ask) -&gt; None:
+        """A1 / S03b: Kể tự do → Gemini tách thành nốt gợi ý có nhãn, sửa được.
+    
+        Nội dung Gemini trả về đổi giữa các lần, nên chỉ khẳng định trên nhãn cố
+        định "Gợi ý từ Nốt AI". Không lưu để khỏi để lại nốt trong hũ.
+        """
+&gt;       answer, result = await ask(
+            "Ở màn Hôm nay, bấm 'Ghi nốt', chọn 'Kể tự do · Nốt AI'. Gõ vào ô: 'Sang nay "
+            "minh day som chay bo 2km, chieu hoi thay mot cau, toi met nen ngu som'. Bấm "
+            "'Nhờ Tụi Nốt sắp xếp' (nếu hiện bảng hỏi đồng ý gửi cho Gemini thì đồng ý). Chờ "
+            "tối đa 30 giây. Trả lời SUGGESTIONS nếu hiện danh sách nốt gợi ý có dòng 'Gợi ý "
+            "từ Nốt AI', FALLBACK nếu hiện câu báo Nốt AI đang nghỉ hoặc lỗi, kèm lối ghi "
+            "tay. KHÔNG bấm lưu: sau khi xem xong, bấm Back / Đóng cho tới khi về màn Hôm "
+            "nay, chọn bỏ nếu app hỏi." + RULES,
+            "SUGGESTIONS hoặc FALLBACK",
+            timeout=480,
+        )
+
+test_main_flows.py:280: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+goal = "Ở màn Hôm nay, bấm 'Ghi nốt', chọn 'Kể tự do · Nốt AI'. Gõ vào ô: 'Sang nay minh day som chay bo 2km, chieu hoi thay ...hỏi. Không đăng xuất và không đổi cài đặt nào. Cuối cùng trả lời đúng định dạng được yêu cầu, không thêm chữ nào khác."
+expected = 'SUGGESTIONS hoặc FALLBACK', locked = True, timeout = 480
+
+    async def run(goal: str, expected: str, *, locked: bool = True, timeout: int = 420):
+        try:
+            result = await client.run(
+                goal,
+                locked_app_package=app_id if locked else None,
+                expected_output=expected,
+                timeout=timeout,
+            )
+        except TaskTimeoutError as error:
+            if not await client.stop(error.task_id):
+                pytest.exit(
+                    f"Không xác nhận được dừng phiên quá giờ {error.task_id}. "
+                    "Dừng bộ test để tránh thao tác chồng lên nhau.",
+                    returncode=2,
+                )
+            raise
+&gt;       assert result.succeeded, f"[run{attempt}] {result.error or result.status}"
+E       AssertionError: [run3] failed
+E       assert False
+E        +  where False = TaskResult(task_id='b9e026a9-1507-405a-ac5d-e9444b4792c5', status='failed', goal="Ở màn Hôm nay, bấm 'Ghi nốt', chọn 'Kể tự do · Nốt AI'. Gõ vào ô: 'Sang nay minh day som chay bo 2km, chieu hoi thay mot cau, toi met nen ngu som'. Bấm 'Nhờ Tụi Nốt sắp xếp' (nếu hiện bảng hỏi đồng ý gửi cho Gemini thì đồng ý). Chờ tối đa 30 giây. Trả lời SUGGESTIONS nếu hiện danh sách nốt gợi ý có dòng 'Gợi ý từ Nốt AI', FALLBACK nếu hiện câu báo Nốt AI đang nghỉ hoặc lỗi, kèm lối ghi tay. KHÔNG bấm lưu: sau khi xem xong, bấm Back / Đóng cho tới khi về màn Hôm nay, chọn bỏ nếu app hỏi. Không đăng xuất và không đổi cài đặt nào. Cuối cùng trả lời đúng định dạng được yêu cầu, không thêm chữ nào khác.", profile=None, device_serial='emulator-5554', output=None, error=None, turns=None).succeeded
+
+conftest.py:154: AssertionError</failure></testcase><testcase classname="test_main_flows" name="test_t20_cross_role_mobile_part[run1]" time="8.384"><failure message="AssertionError: [run1] failed&#10;assert False&#10;[+1 more line; full report in element text]">ask = &lt;function ask.&lt;locals&gt;.run at 0x00000153B79B4040&gt;
+
+    async def test_t20_cross_role_mobile_part(ask) -&gt; None:
+        """Liên vai trò, phần mobile: gửi thẻ → "Đang chờ duyệt"; thẻ đã duyệt hiện
+        "Đã vào kho chung"; hộp thư có tin duyệt. Bước duyệt trên web xem
+        docs/cross-role-flow.md (D-1…D-3). Thẻ thử được rút lại và xoá để hàng chờ
+        của staff vẫn trống."""
+&gt;       answer, result = await ask(
+            "Mở tab 'Thử thách', bấm 'Thêm điều tốt của bạn', tạo thẻ tên "
+            f"'{CARD_NAME}' (điền các ô bắt buộc tối thiểu) rồi lưu. Mở thẻ đó, bấm 'Gửi "
+            "cho mọi người' rồi 'Gửi'. Ghi PENDING nếu thẻ hiện 'Đang chờ duyệt'. Sau đó "
+            "bấm 'Rút lại', rồi 'Xoá thẻ này' và xác nhận xoá. Tiếp theo tìm trong tab Thử "
+            "thách một thẻ có dòng 'Đã vào kho chung' (thẻ đã gửi trước đây, có thể phải "
+            "vuốt): ghi APPROVED nếu thấy. Cuối cùng về màn Hôm nay, bấm 'Hộp thư': ghi "
+            "INBOX nếu có tin 'Thẻ của bạn đã vào kho chung', rồi đóng hộp thư. Trả lời các "
+            "từ khoá đã ghi, cách nhau dấu cách, ví dụ 'PENDING APPROVED INBOX'." + RULES,
+            "PENDING, APPROVED, INBOX (những từ thấy được)",
+            timeout=600,
+        )
+
+test_main_flows.py:322: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+goal = "Mở tab 'Thử thách', bấm 'Thêm điều tốt của bạn', tạo thẻ tên 'E2E thẻ thử' (điền các ô bắt buộc tối thiểu) rồi lưu. M...OX'. Không đăng xuất và không đổi cài đặt nào. Cuối cùng trả lời đúng định dạng được yêu cầu, không thêm chữ nào khác."
+expected = 'PENDING, APPROVED, INBOX (những từ thấy được)', locked = True, timeout = 600
+
+    async def run(goal: str, expected: str, *, locked: bool = True, timeout: int = 420):
+        try:
+            result = await client.run(
+                goal,
+                locked_app_package=app_id if locked else None,
+                expected_output=expected,
+                timeout=timeout,
+            )
+        except TaskTimeoutError as error:
+            if not await client.stop(error.task_id):
+                pytest.exit(
+                    f"Không xác nhận được dừng phiên quá giờ {error.task_id}. "
+                    "Dừng bộ test để tránh thao tác chồng lên nhau.",
+                    returncode=2,
+                )
+            raise
+&gt;       assert result.succeeded, f"[run{attempt}] {result.error or result.status}"
+E       AssertionError: [run1] failed
+E       assert False
+E        +  where False = TaskResult(task_id='2cf90d7a-c4d5-4624-8527-97fdb3e819b2', status='failed', goal="Mở tab 'Thử thách', bấm 'Thêm điều tốt của bạn', tạo thẻ tên 'E2E thẻ thử' (điền các ô bắt buộc tối thiểu) rồi lưu. Mở thẻ đó, bấm 'Gửi cho mọi người' rồi 'Gửi'. Ghi PENDING nếu thẻ hiện 'Đang chờ duyệt'. Sau đó bấm 'Rút lại', rồi 'Xoá thẻ này' và xác nhận xoá. Tiếp theo tìm trong tab Thử thách một thẻ có dòng 'Đã vào kho chung' (thẻ đã gửi trước đây, có thể phải vuốt): ghi APPROVED nếu thấy. Cuối cùng về màn Hôm nay, bấm 'Hộp thư': ghi INBOX nếu có tin 'Thẻ của bạn đã vào kho chung', rồi đóng hộp thư. Trả lời các từ khoá đã ghi, cách nhau dấu cách, ví dụ 'PENDING APPROVED INBOX'. Không đăng xuất và không đổi cài đặt nào. Cuối cùng trả lời đúng định dạng được yêu cầu, không thêm chữ nào khác.", profile=None, device_serial='emulator-5554', output=None, error=None, turns=None).succeeded
+
+conftest.py:154: AssertionError</failure></testcase><testcase classname="test_main_flows" name="test_t20_cross_role_mobile_part[run2]" time="8.485"><failure message="AssertionError: [run2] failed&#10;assert False&#10;[+1 more line; full report in element text]">ask = &lt;function ask.&lt;locals&gt;.run at 0x00000153B79B4720&gt;
+
+    async def test_t20_cross_role_mobile_part(ask) -&gt; None:
+        """Liên vai trò, phần mobile: gửi thẻ → "Đang chờ duyệt"; thẻ đã duyệt hiện
+        "Đã vào kho chung"; hộp thư có tin duyệt. Bước duyệt trên web xem
+        docs/cross-role-flow.md (D-1…D-3). Thẻ thử được rút lại và xoá để hàng chờ
+        của staff vẫn trống."""
+&gt;       answer, result = await ask(
+            "Mở tab 'Thử thách', bấm 'Thêm điều tốt của bạn', tạo thẻ tên "
+            f"'{CARD_NAME}' (điền các ô bắt buộc tối thiểu) rồi lưu. Mở thẻ đó, bấm 'Gửi "
+            "cho mọi người' rồi 'Gửi'. Ghi PENDING nếu thẻ hiện 'Đang chờ duyệt'. Sau đó "
+            "bấm 'Rút lại', rồi 'Xoá thẻ này' và xác nhận xoá. Tiếp theo tìm trong tab Thử "
+            "thách một thẻ có dòng 'Đã vào kho chung' (thẻ đã gửi trước đây, có thể phải "
+            "vuốt): ghi APPROVED nếu thấy. Cuối cùng về màn Hôm nay, bấm 'Hộp thư': ghi "
+            "INBOX nếu có tin 'Thẻ của bạn đã vào kho chung', rồi đóng hộp thư. Trả lời các "
+            "từ khoá đã ghi, cách nhau dấu cách, ví dụ 'PENDING APPROVED INBOX'." + RULES,
+            "PENDING, APPROVED, INBOX (những từ thấy được)",
+            timeout=600,
+        )
+
+test_main_flows.py:322: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+goal = "Mở tab 'Thử thách', bấm 'Thêm điều tốt của bạn', tạo thẻ tên 'E2E thẻ thử' (điền các ô bắt buộc tối thiểu) rồi lưu. M...OX'. Không đăng xuất và không đổi cài đặt nào. Cuối cùng trả lời đúng định dạng được yêu cầu, không thêm chữ nào khác."
+expected = 'PENDING, APPROVED, INBOX (những từ thấy được)', locked = True, timeout = 600
+
+    async def run(goal: str, expected: str, *, locked: bool = True, timeout: int = 420):
+        try:
+            result = await client.run(
+                goal,
+                locked_app_package=app_id if locked else None,
+                expected_output=expected,
+                timeout=timeout,
+            )
+        except TaskTimeoutError as error:
+            if not await client.stop(error.task_id):
+                pytest.exit(
+                    f"Không xác nhận được dừng phiên quá giờ {error.task_id}. "
+                    "Dừng bộ test để tránh thao tác chồng lên nhau.",
+                    returncode=2,
+                )
+            raise
+&gt;       assert result.succeeded, f"[run{attempt}] {result.error or result.status}"
+E       AssertionError: [run2] failed
+E       assert False
+E        +  where False = TaskResult(task_id='e4ed9208-56f7-47b6-9299-6c2e2549ccab', status='failed', goal="Mở tab 'Thử thách', bấm 'Thêm điều tốt của bạn', tạo thẻ tên 'E2E thẻ thử' (điền các ô bắt buộc tối thiểu) rồi lưu. Mở thẻ đó, bấm 'Gửi cho mọi người' rồi 'Gửi'. Ghi PENDING nếu thẻ hiện 'Đang chờ duyệt'. Sau đó bấm 'Rút lại', rồi 'Xoá thẻ này' và xác nhận xoá. Tiếp theo tìm trong tab Thử thách một thẻ có dòng 'Đã vào kho chung' (thẻ đã gửi trước đây, có thể phải vuốt): ghi APPROVED nếu thấy. Cuối cùng về màn Hôm nay, bấm 'Hộp thư': ghi INBOX nếu có tin 'Thẻ của bạn đã vào kho chung', rồi đóng hộp thư. Trả lời các từ khoá đã ghi, cách nhau dấu cách, ví dụ 'PENDING APPROVED INBOX'. Không đăng xuất và không đổi cài đặt nào. Cuối cùng trả lời đúng định dạng được yêu cầu, không thêm chữ nào khác.", profile=None, device_serial='emulator-5554', output=None, error=None, turns=None).succeeded
+
+conftest.py:154: AssertionError</failure></testcase><testcase classname="test_main_flows" name="test_t20_cross_role_mobile_part[run3]" time="8.477"><failure message="AssertionError: [run3] failed&#10;assert False&#10;[+1 more line; full report in element text]">ask = &lt;function ask.&lt;locals&gt;.run at 0x00000153B79B44A0&gt;
+
+    async def test_t20_cross_role_mobile_part(ask) -&gt; None:
+        """Liên vai trò, phần mobile: gửi thẻ → "Đang chờ duyệt"; thẻ đã duyệt hiện
+        "Đã vào kho chung"; hộp thư có tin duyệt. Bước duyệt trên web xem
+        docs/cross-role-flow.md (D-1…D-3). Thẻ thử được rút lại và xoá để hàng chờ
+        của staff vẫn trống."""
+&gt;       answer, result = await ask(
+            "Mở tab 'Thử thách', bấm 'Thêm điều tốt của bạn', tạo thẻ tên "
+            f"'{CARD_NAME}' (điền các ô bắt buộc tối thiểu) rồi lưu. Mở thẻ đó, bấm 'Gửi "
+            "cho mọi người' rồi 'Gửi'. Ghi PENDING nếu thẻ hiện 'Đang chờ duyệt'. Sau đó "
+            "bấm 'Rút lại', rồi 'Xoá thẻ này' và xác nhận xoá. Tiếp theo tìm trong tab Thử "
+            "thách một thẻ có dòng 'Đã vào kho chung' (thẻ đã gửi trước đây, có thể phải "
+            "vuốt): ghi APPROVED nếu thấy. Cuối cùng về màn Hôm nay, bấm 'Hộp thư': ghi "
+            "INBOX nếu có tin 'Thẻ của bạn đã vào kho chung', rồi đóng hộp thư. Trả lời các "
+            "từ khoá đã ghi, cách nhau dấu cách, ví dụ 'PENDING APPROVED INBOX'." + RULES,
+            "PENDING, APPROVED, INBOX (những từ thấy được)",
+            timeout=600,
+        )
+
+test_main_flows.py:322: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+goal = "Mở tab 'Thử thách', bấm 'Thêm điều tốt của bạn', tạo thẻ tên 'E2E thẻ thử' (điền các ô bắt buộc tối thiểu) rồi lưu. M...OX'. Không đăng xuất và không đổi cài đặt nào. Cuối cùng trả lời đúng định dạng được yêu cầu, không thêm chữ nào khác."
+expected = 'PENDING, APPROVED, INBOX (những từ thấy được)', locked = True, timeout = 600
+
+    async def run(goal: str, expected: str, *, locked: bool = True, timeout: int = 420):
+        try:
+            result = await client.run(
+                goal,
+                locked_app_package=app_id if locked else None,
+                expected_output=expected,
+                timeout=timeout,
+            )
+        except TaskTimeoutError as error:
+            if not await client.stop(error.task_id):
+                pytest.exit(
+                    f"Không xác nhận được dừng phiên quá giờ {error.task_id}. "
+                    "Dừng bộ test để tránh thao tác chồng lên nhau.",
+                    returncode=2,
+                )
+            raise
+&gt;       assert result.succeeded, f"[run{attempt}] {result.error or result.status}"
+E       AssertionError: [run3] failed
+E       assert False
+E        +  where False = TaskResult(task_id='fcfaf2fd-42f2-4d8e-8bc5-ee99224a74ea', status='failed', goal="Mở tab 'Thử thách', bấm 'Thêm điều tốt của bạn', tạo thẻ tên 'E2E thẻ thử' (điền các ô bắt buộc tối thiểu) rồi lưu. Mở thẻ đó, bấm 'Gửi cho mọi người' rồi 'Gửi'. Ghi PENDING nếu thẻ hiện 'Đang chờ duyệt'. Sau đó bấm 'Rút lại', rồi 'Xoá thẻ này' và xác nhận xoá. Tiếp theo tìm trong tab Thử thách một thẻ có dòng 'Đã vào kho chung' (thẻ đã gửi trước đây, có thể phải vuốt): ghi APPROVED nếu thấy. Cuối cùng về màn Hôm nay, bấm 'Hộp thư': ghi INBOX nếu có tin 'Thẻ của bạn đã vào kho chung', rồi đóng hộp thư. Trả lời các từ khoá đã ghi, cách nhau dấu cách, ví dụ 'PENDING APPROVED INBOX'. Không đăng xuất và không đổi cài đặt nào. Cuối cùng trả lời đúng định dạng được yêu cầu, không thêm chữ nào khác.", profile=None, device_serial='emulator-5554', output=None, error=None, turns=None).succeeded
+
+conftest.py:154: AssertionError</failure></testcase></testsuite></testsuites>

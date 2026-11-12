@@ -68,7 +68,7 @@ Ca ghi dữ liệu dùng nốt `E2E test note`; ca T03 xoá mọi nốt đó sau
 | T20 | Liên vai trò · Android | Gửi thẻ → chờ → rút/xoá thẻ thử → kiểm tra thẻ đã duyệt trước và hộp thư | `PENDING APPROVED INBOX` |
 | X01 | Khám phá | Profile Pro, khoảng 20 phút, agent tự đi khắp app | Danh sách `BUG: màn \| bước \| thấy gì` hoặc `NO_BUGS` |
 
-T17–T20 dùng flow chuẩn của Thúy trong `test_main_flows.py`; kết quả máy thật xem [báo cáo](test-report.md#22-luồng-mới-của-final): tổng T14 và T17–T20 là 14/15. Bộ kịch bản bổ sung cũ được lưu ở `e2e_test/archived_final_scenarios.py.txt`, không được pytest thu thập và không dùng mã cũ của bộ đó để tổng hợp kết quả. Đối chiếu với [danh sách luồng Lab 2](design-traceability.md#2-flow--màn-hình--kiểm-thử),
+T17–T20 dùng flow chuẩn của Thúy trong `test_main_flows.py`; kết quả máy thật xem [báo cáo](test-report.md#22-luồng-mới-của-final): tổng T14 và T17–T20 là 14/15. Chỉ dùng mã ca trong bộ chuẩn này để tổng hợp kết quả. Đối chiếu với [danh sách luồng Lab 2](design-traceability.md#2-flow--màn-hình--kiểm-thử),
 bộ này còn thiếu ca chuyên biệt cho P1/P2 (đăng ký và quên mật khẩu),
 P7 (mở đích từ thông báo), trạng thái Hũ rỗng T1,
 các nhánh nhóm G1 và Discord D1/D2. A3 còn được ghi là Planned trong
