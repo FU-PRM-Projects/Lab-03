@@ -439,15 +439,18 @@ export default function FinalDeck() {
               </p>
             </li>
             <li>
-              <span className="ovl-k">In one sentence</span>
+              <span className="ovl-k">Who it is for &amp; what it solves</span>
               <p>
-                For students who end a long day feeling they got nothing done, Nốt makes <b>one small win visible in under
+                For students and young workers who end a long day feeling they got nothing done, Nốt makes <b>one small win visible in under
                 30 seconds</b> and keeps <b>fresh small challenges</b> coming.
               </p>
             </li>
             <li>
               <span className="ovl-k">Users &amp; value</span>
-              <p>Final-year students log their day; staff curate challenge cards; admins manage roles.</p>
+              <p>
+                <b>user</b> logs the day on Android · <b>staff</b> review cards and post news on the web admin ·{' '}
+                <b>admin</b> does all staff work and changes roles
+              </p>
               <ul className="ovl-v">
                 <li>One win in 30 s, typed or sorted by Gemini</li>
                 <li>New challenge cards without an app update</li>
