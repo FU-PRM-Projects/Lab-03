@@ -17,7 +17,7 @@ Cập nhật 11/11/2026, trên `main` commit `eb04447`.
 | Mobile E2E (ARTEMIS) | T01–T14 (luồng Lab 2 / Lab 3) | **41/42 lần đạt (98%)** | [`test-plan.md`](test-plan.md) mục 5, `evidence/artemis/` |
 | Mobile E2E (ARTEMIS) | Luồng mới của Final | **Chưa chạy** (xem mục 2.2) | — |
 | Mobile trên máy thật | Onboarding, Nốt AI, Thẻ tuần PDF, tắt AI bằng Remote Config | Chạy tay, đạt | [`evidence/mobile-final/`](../evidence/mobile-final/README.md) |
-| Web admin (checklist) | 5 màn + form thông báo, từ chối sai vai trò, trống, đang tải | 15/15 mục đạt (thêm đổi vai trò khi đang mở, hai chiều); **thiếu ảnh trạng thái lỗi** | [`evidence/web-admin/`](../evidence/web-admin/README.md) |
+| Web admin (checklist) | 5 màn + form thông báo, từ chối sai vai trò, trống, đang tải | 16/16 mục đạt (thêm đổi vai trò khi đang mở hai chiều, trạng thái lỗi Tổng quan) | [`evidence/web-admin/`](../evidence/web-admin/README.md) |
 | Luồng liên vai trò | Gửi thẻ trên app → duyệt trên web → app cập nhật + hộp thư | **3/3 lần đạt trên bản deploy** (D-1…D-3) | [`cross-role-flow.md`](cross-role-flow.md), `evidence/cross-role/` |
 | AI code review | Code thêm cho Final | 5 góp ý, có quyết định | Mục 6 |
 
@@ -120,7 +120,7 @@ Chạy ngày 10/11/2026 trên bản deploy `https://prm393-not-lab3.web.app/admi
 | Màn | Thao tác chính | Từ chối sai vai trò | Trống | Đang tải | Lỗi |
 |---|---|---|---|---|---|
 | Đăng nhập | Google Sign-In (01) | Đạt (02) | — | — | Chưa có ảnh |
-| Tổng quan | 5 số `count()` + 3 biểu đồ (03) | — | — | Đạt (13) | Chưa có ảnh |
+| Tổng quan | 5 số `count()` + 3 biểu đồ (03) | — | — | Đạt (13) | Đạt (16) |
 | Kho thẻ | Tìm (04), sửa (05), lưu trữ (06) | — | — | — | Chưa có ảnh |
 | Hàng chờ duyệt | Duyệt kèm giờ xử lý (08) | — | Đạt (07) | — | Chưa có ảnh |
 | Thông báo | Gửi, hiện trong app (10, 11) | — | Đạt (09) | — | Chưa có ảnh |
@@ -139,7 +139,10 @@ hưởng mọi màn lỗi của cả hai app (app mobile chậm vài chục giâ
 (`packages/core/lib/services/retry.dart`), vì mọi màn lỗi đã có nút Thử lại.
 Test: `web_admin/test/dashboard_error_test.dart` (máy chủ không trả lời → lỗi
 sau 15 giây và không tải lại ngầm; lỗi mạng → báo ngay, Thử lại tải đúng một
-lần); hai test đầu trượt nếu bỏ `noRetry`. Cần deploy rồi chụp ảnh lỗi.
+lần); hai test đầu trượt nếu bỏ `noRetry`. Chụp lại trên bản deploy sau PR #77:
+lỗi hiện sau ~15 giây, Thử lại tải lại được (ảnh `web-admin/16`). Các màn còn
+lại dùng chung `MessageView.error` nhưng đọc bằng listener thời gian thực, khó
+giả lập lỗi trên bản deploy nên chưa có ảnh riêng.
 
 ## 5. Luồng liên vai trò
 
@@ -184,7 +187,7 @@ Review của Lab 3 (CodeRabbit, các góp ý đã sửa và chưa sửa) ở
 ## 7. Việc còn lại
 
 1. Viết và chạy 3 lần các ca ARTEMIS T17–T20, chạy lại T14 (bản Final) và T15–T16.
-2. Chụp ảnh trạng thái lỗi cho từng màn web admin, sau khi bản sửa `noRetry` được deploy.
+2. (Tuỳ chọn) Ảnh trạng thái lỗi cho các màn web admin dùng listener thời gian thực.
 
 ## Cách chạy lại
 
