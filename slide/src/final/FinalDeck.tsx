@@ -516,7 +516,7 @@ const PARTS: Part[] = [
   { code: 'p3', num: '03', name: 'Demo', question: 'How do the workflows run for real?', minutes: '≈ 6.5 min', icon: PlayCircle,
     slides: ['17 Demo plan', '18 WF-01 Nốt AI', '18b WF-01 storyboard', '19 WF-02 Publish a card', '19b WF-02 storyboard', '20 WF-03 Announce', '20b WF-03 storyboard'] },
   { code: 'p4', num: '04', name: 'Proof', question: 'What can we prove?', minutes: '≈ 2.5 min', icon: Beaker,
-    slides: ['21 Testing', '21b Evidence wall', '22 Achievements', '23 Limitations', '24 Lessons learned', '25 Conclusion'] },
+    slides: ['21 Testing', '21A Test cases', '21B Defects', '21C Evidence wall', '22 Achievements', '23 Limitations', '24 Lessons learned', '25 Conclusion'] },
 ];
 
 export default function FinalDeck() {
@@ -574,7 +574,7 @@ export default function FinalDeck() {
                 { c: 'p3', num: '03', name: 'Demo', q: 'How do the workflows run for real?', icon: PlayCircle,
                   items: ['17 Demo plan', '18 WF-01 Nốt AI', '18b WF-01 storyboard', '19 WF-02 Publish a card', '19b WF-02 storyboard', '20 WF-03 Announce', '20b WF-03 storyboard'] },
                 { c: 'p4', num: '04', name: 'Proof', q: 'What can we prove?', icon: Beaker,
-                  items: ['21 Testing', '21b Evidence wall', '22 Achievements', '23 Limitations', '24 Lessons learned', '25 Conclusion'] },
+                  items: ['21 Testing', '21A Test cases', '21B Defects', '21C Evidence wall', '22 Achievements', '23 Limitations', '24 Lessons learned', '25 Conclusion'] },
               ].map((p) => {
                 const I = p.icon;
                 return (
@@ -1065,7 +1065,7 @@ export default function FinalDeck() {
           dense
           part="DESIGN · 13"
           title="Class design"
-          notes="Business rules sit in the repository + Security Rules, not in widgets. Screen → Notifier/actions → service interface → Firestore implementation in packages/core. main.dart wires each provider to its Firebase implementation; fakes replace the interfaces in tests (290 app, 10 web admin, 5 core tests). On-screen footnote moved here: Tests swap in fakes · 290 app · 10 web admin · 5 core"
+          notes="Business rules sit in the repository + Security Rules, not in widgets. Screen → Notifier/actions → service interface → Firestore implementation in packages/core. main.dart wires each provider to its Firebase implementation; fakes replace the interfaces in tests (305 app, 14 web admin, 5 core tests). On-screen footnote moved here: Tests swap in fakes · 290 app · 10 web admin · 5 core"
         >
           <table className="fx-table">
             <thead>
@@ -1322,7 +1322,7 @@ export default function FinalDeck() {
           <div className="col" style={{ width: 360 }}>
             <div className="stats" style={{ gridTemplateColumns: '1fr 1fr' }}>
               <div className="stat"><b className="num">30/30</b><span>Security Rules tests</span></div>
-              <div className="stat"><b className="num">303</b><span>Flutter app tests</span></div>
+              <div className="stat"><b className="num">305</b><span>Flutter app tests</span></div>
               <div className="stat"><b className="num">14 + 5</b><span>web admin + core tests</span></div>
               <div className="stat"><b className="num">14/15</b><span>ARTEMIS Final runs, real phone</span></div>
             </div>
@@ -1342,7 +1342,7 @@ export default function FinalDeck() {
               <tr><td><b>Cross-role</b></td><td>3 runs on the deployed system, timed</td><td><span className="pill ok">3 / 3</span></td></tr>
               <tr><td><b>Web checklist</b></td><td>Actions, rejection, empty, loading, error, live role change</td><td><span className="pill ok">16 / 16</span></td></tr>
               <tr><td><b>Real device</b></td><td>Onboarding, Nốt AI, PDF, AI off, journal draft, role rejection on Galaxy A70</td><td><span className="pill ok">pass</span></td></tr>
-              <tr><td><b>E2E (ARTEMIS)</b></td><td>Lab 3: 41/42 · Final T14, T17–T20 on Galaxy A70: 14/15 · T15/T16 not run</td><td><span className="pill warn">14 / 15</span></td></tr>
+              <tr><td><b>E2E (ARTEMIS)</b></td><td>Lab 3: 41/42 · Final on Galaxy A70: 14/15 · emulator T17/T18/T20: 7/9 · T15/T16 not run</td><td><span className="pill warn">see batches</span></td></tr>
             </tbody>
           </table>
           <div style={{ display: 'flex', gap: 14 }}>
@@ -1352,9 +1352,51 @@ export default function FinalDeck() {
           </div>
         </S>
 
-        {/* 21b · Evidence wall */}
+        {/* 21A · Test cases (Duy) */}
+        <Page
+          dense
+          part="PROOF · 21A"
+          title="Test Cases & Results"
+          line="20 defined cases. Results stay attached to their device and test batch."
+          notes="The full case file contains preconditions, steps, expected result, three run outcomes, environment, actual result and evidence. T01–T14 is the historical Lab 3 baseline, 41/42 after documented reruns. Thuy's Final phone batch covers T14 and T17–T20, 14/15. Duy's latest emulator batch covers T17, T18, T20, 7/9; T17 is now 3/3 after the ADB path fix. T15 and T16 have definitions but no ARTEMIS execution evidence. T20 checks submission then withdraws the test card; it checks approval and inbox on previously approved data, while fresh end-to-end approval is evidenced separately by D-1…D-3. T14 Final validates local PDF saving/sharing, unlike the historical Storage error-path test. Sources: docs/test-cases.md · outputs/final-testing/Test-Cases-and-Defects.xlsx · evidence/artemis/"
+        >
+          <table className="fx-table">
+            <thead><tr><th>Batch / device</th><th>Cases and expected result</th><th>Result</th></tr></thead>
+            <tbody>
+              <tr><td>Lab 3 · emulator</td><td>T01–T14, historical baseline with documented reruns</td><td>41/42</td></tr>
+              <tr><td>Final · Galaxy A70</td><td>T14 PDF · T17 onboarding · T18 AI · T19 AI off · T20 mobile review</td><td>14/15</td></tr>
+              <tr><td>Final · emulator</td><td>T17: PLAN_SHOWN, including app restart</td><td className="ok">3/3</td></tr>
+              <tr><td>Same emulator batch</td><td>T18: SUGGESTIONS · T20: PENDING APPROVED INBOX</td><td className="warn">2/3 each</td></tr>
+              <tr><td>Not run</td><td>T15 email sign-in · T16 wrong password and recovery</td><td className="warn">Not Run</td></tr>
+            </tbody>
+          </table>
+          <p style={{ fontSize: 21, marginTop: 22 }}>Each case records preconditions, steps, expected and actual results, run outcomes and proof. A pass in an earlier batch does not replace a later failure.</p>
+        </Page>
+
+        {/* 21B · Defects (Duy) */}
+        <Page
+          dense
+          part="PROOF · 21B"
+          title="Defects & Retest"
+          line="Separate application defects, automation failures and unverified reports."
+          notes="The defect register has 17 records: three confirmed application defects, one test-harness defect, three automation/environment incidents, and ten unverified exploratory candidates. ADB path failure is verified fixed by the latest T17 3/3 run. T18 run 3 exceeded the 480-second task deadline; the root cause remains open. T20 run 3 failed because the ARTEMIS controller model call timed out after 180 seconds, not because Gemini in the app necessarily failed. An earlier key-limit incident is kept as environment history, not claimed as the cause of these new timeouts. Dashboard error handling, approval timeout and live role changes have recorded fixes/tests. The X01 candidate list is not counted as ten confirmed app bugs. Sources: docs/defect-report.md · evidence/artemis/emulator-final-2026-11-12-7of9.txt"
+        >
+          <table className="fx-table">
+            <thead><tr><th>Record / category</th><th>Observed issue</th><th>Decision / retest</th></tr></thead>
+            <tbody>
+              <tr><td>D-01 · test harness</td><td>T17 cleanup could not find adb.exe</td><td className="ok">SDK lookup fixed; T17 3/3</td></tr>
+              <tr><td>D-02 · automation</td><td>T18 run 3 exceeded 480 s</td><td className="warn">Open; inspect replay and rerun</td></tr>
+              <tr><td>D-03 · provider</td><td>T20 controller model call exceeded 180 s</td><td className="warn">Open; rerun after provider check</td></tr>
+              <tr><td>APP-01…03 · application</td><td>Approval timeout, dashboard loading, stale role UI</td><td className="ok">Fixed; tests and deploy evidence</td></tr>
+              <tr><td>X-01…10 · exploratory</td><td>Agent-reported UI issues from the Lab 3 build</td><td className="warn">Unverified; reproduce first</td></tr>
+            </tbody>
+          </table>
+          <p style={{ fontSize: 21, marginTop: 22 }}>A failed test is evidence to investigate. It does not by itself prove an application defect.</p>
+        </Page>
+
+        {/* 21C · Evidence wall */}
         <S
-          part="P4 · Proof · 21b Evidence wall"
+          part="P4 · Proof · 21C Evidence wall"
           title="Evidence wall"
           sub="Every number on the testing slide has a screenshot or a log behind it."
           notes="Point at two or three tiles; all files are in evidence/ in the repo. On-screen footnote moved here: All files: evidence/ in the repo · details: docs/test-report.md"
@@ -1418,7 +1460,7 @@ export default function FinalDeck() {
               </tr>
             </thead>
             <tbody>
-              <tr><td>ARTEMIS T15/T16 (email sign-in) not run</td><td>Sign-out / sign-in by email has widget tests only, no E2E on a device</td><td><span className="pill warn">Medium</span></td><td>Create a test-only account, run 3× each</td></tr>
+              <tr><td>ARTEMIS T15/T16 (email sign-in) not run</td><td>Sign-out / sign-in by email has widget tests only; latest emulator T18/T20 were 2/3 each</td><td><span className="pill warn">Medium</span></td><td>Create a test-only account, run 3× each; investigate the timeouts</td></tr>
               <tr><td>Names can reach Gemini (CR-F2)</td><td>Email and phone are scrubbed, but a friend's name is sent as typed</td><td><span className="pill warn">Medium</span></td><td>Consent sheet says so; add on-device name masking</td></tr>
               <tr><td>Exploratory session X01: 10 UI issues not rechecked</td><td>Possible small layout bugs on rarely used screens</td><td><span className="pill">Low</span></td><td>Re-run X01 on the Final build, fix or close each</td></tr>
               <tr><td>D-1 took 22 s on an idle phone</td><td>Real time not guaranteed after long idle</td><td><span className="pill">Low</span></td><td>Measure more runs; re-listen on resume</td></tr>

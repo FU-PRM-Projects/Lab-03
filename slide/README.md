@@ -114,13 +114,21 @@ import { Slide, Stack, Fragment, Code } from '@revealjs/react';
 
 ## Bộ slide Final Assignment (`final.html`)
 
-Bộ slide riêng cho Final (tiếng Anh, theo *Software Project Presentation Guideline V11*: Problem 01–06 → Design 07–16 → Demo 17–20 → Proof 21–25). Bản gộp của nhóm: khung trang của Quân (`Page`) cho Problem, Design, Lessons learned; phần Demo, Testing, Evidence wall, Achievements, Limitations, Conclusion và phụ lục A1–A2 lấy từ bản theo guideline (component trong `src/final/Legacy.tsx`). 39 trang: bìa, agenda, 4 slide mở đầu từng phần, slide nội dung, 18b/19b/20b storyboard, 21b tường minh chứng, 2 phụ lục và trang Thank you. Mã ở `src/final/`, ảnh minh chứng chép từ `evidence/` vào `public/final/`.
+Bộ slide riêng cho Final (tiếng Anh, theo *Software Project Presentation Guideline V11*: Problem 01–06 → Design 07–16 → Demo 17–20 → Proof 21–25). Bản gộp của nhóm: khung trang của Quân (`Page`) cho Problem, Design, Lessons learned; phần Demo, Testing, Evidence wall, Achievements, Limitations, Conclusion và phụ lục A1–A2 lấy từ bản theo guideline (component trong `src/final/Legacy.tsx`). 41 trang: bìa, agenda, 4 slide mở đầu từng phần, slide nội dung, 18b/19b/20b storyboard, 21A test case và 21B defect (Duy), 21C tường minh chứng, 2 phụ lục và trang Thank you. Mã ở `src/final/`, ảnh minh chứng chép từ `evidence/` vào `public/final/`.
 
 ```sh
 cd slide
 npm run dev                         # mở http://localhost:5173/final.html
 npx vite build && npx vite preview  # bản build ở http://localhost:4173/final.html
-node scripts/export-pdf.mjs http://localhost:4173/final.html 39 ../slides/Final_SE190992_slides.pdf
+node scripts/export-pdf.mjs http://localhost:4173/final.html 41 ../slides/Final_SE190992_slides.pdf
 ```
 
 Phím `S` mở Speaker View (mỗi slide có ghi chú thuyết trình).
+
+
+### Test Cases và Defect Report (Final)
+
+Hai slide **PROOF 21A — Test Cases & Results** và **PROOF 21B — Defects & Retest** nằm ngay sau slide Testing.
+Chi tiết trong `docs/test-cases.md`, `docs/defect-report.md` và
+`outputs/final-testing/Test-Cases-and-Defects.xlsx`. Lab 3 41/42, Final máy thật
+14/15 và emulator mới 7/9 là ba phạm vi khác nhau, không cộng hoặc ghi đè nhau.
