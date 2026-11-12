@@ -637,3 +637,17 @@
 .fd .pains { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 .fd .pains li { display: flex; align-items: center; gap: 12px; font-size: 18px; color: var(--ink); }
 .fd .pains li svg { color: var(--bad); flex: none; }
+
+/* slide 01: two lists, no template blocks */
+.fd .contrast { display: grid; grid-template-columns: 1fr 1fr; gap: 34px; margin-top: 18px; }
+.fd .contrast .lbl { display: block; font-size: 15px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 10px; }
+.fd .contrast ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.fd .contrast li { display: flex; align-items: center; gap: 12px; font-size: 22px; white-space: nowrap; }
+.fd .contrast li svg { flex: none; }
+.fd .list-undone .lbl { color: var(--muted); }
+.fd .list-undone li { color: #8a90a2; }
+.fd .list-done .lbl { color: var(--ok); }
+.fd .list-done li { color: var(--ink); font-weight: 600; }
+.fd .list-done li svg { color: var(--ok); }
+.fd .answer { margin: 34px 0 0; font-size: 23px; line-height: 1.45; color: var(--ink); max-width: 640px; }
+.fd .answer b { color: var(--part); }

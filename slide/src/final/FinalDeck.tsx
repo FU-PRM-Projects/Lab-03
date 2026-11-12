@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { Deck, Slide } from '@revealjs/react';
 import RevealNotes from 'reveal.js/plugin/notes';
 import {
-  Beaker, Compass, Layers, PlayCircle, Bell, Bot, Boxes, CheckCircle2, ClipboardCheck, FileText, Flame, Link2, Megaphone, MoonStar, PenLine, ShieldCheck, Smartphone, Sparkles, UserCog, Users,
+  CheckSquare, Square, Beaker, Compass, Layers, PlayCircle, Bell, Bot, Boxes, CheckCircle2, ClipboardCheck, FileText, Flame, Link2, Megaphone, MoonStar, PenLine, ShieldCheck, Smartphone, Sparkles, UserCog, Users,
 } from 'lucide-react';
 
 import ServerlessMap from './ServerlessMap';
@@ -426,50 +426,31 @@ export default function FinalDeck() {
           part="P1 · Problem · 01 Overview"
           title="After a long day, many of us feel we got nothing done; Nốt helps us notice the small wins"
           notes="30 seconds. Start with a feeling everyone knows: at the end of a long day we think we got nothing done, because we remember unfinished tasks, not the small things that went well. Writing those down takes effort when tired, and small goals that never change lose their pull. Our answer: Nốt. One small win in 30 s, fresh challenge cards curated by staff, Gemini to cut the typing. Live on Android + web admin. Next slide: who exactly (persona) and how it works today."
-          foot="Live: prm393-not-lab3.web.app (app) · prm393-not-lab3.web.app/admin/ (web admin) · repo FU-PRM-Projects/Lab-03"
+          foot="Android app (users) + Flutter web admin (staff, admins) on one Firebase project · live: prm393-not-lab3.web.app · repo FU-PRM-Projects/Lab-03"
         >
-          <div className="col grow">
-            <div className="problem">
-              <span className="k">Problem</span>
-              <p className="quote">“I didn’t get anything done today.”<span>A thought most of us have at the end of a long day</span></p>
-              <ul className="pains">
-                {[
-                  [CheckCircle2, 'We remember unfinished tasks, not the small things that went well'],
-                  [MoonStar, 'When tired, writing the day down feels like one more task'],
-                  [Boxes, 'Small goals that never change stop motivating us'],
-                ].map(([Icon, text]) => {
-                  const I = Icon as typeof Users;
-                  return (
-                    <li key={text as string}>
-                      <I size={22} />
-                      {text as string}
-                    </li>
-                  );
-                })}
-              </ul>
+          <div className="col grow" style={{ justifyContent: 'center', paddingBottom: 40 }}>
+            <div className="contrast">
+              <div className="list-undone">
+                <span className="lbl">What we remember at night</span>
+                <ul>
+                  <li><Square size={22} />Finish the report</li>
+                  <li><Square size={22} />Reply to the group chat</li>
+                  <li><Square size={22} />Study chapter 4</li>
+                </ul>
+              </div>
+              <div className="list-done">
+                <span className="lbl">What also happened today</span>
+                <ul>
+                  <li><CheckSquare size={22} />Ran 2 km this morning</li>
+                  <li><CheckSquare size={22} />Asked a question in class</li>
+                  <li><CheckSquare size={22} />Slept before midnight</li>
+                </ul>
+              </div>
             </div>
-            <div className="value">
-              <span className="k">Our answer · Nốt</span>
-              <p>Log one small win in <b>under 30 s</b>, see them add up, and get <b>fresh small challenges</b> curated by staff.</p>
-            </div>
-            <div className="facts">
-              {[
-                [Users, 'Users', 'Students · staff · admins'],
-                [Smartphone, 'Platform', 'Flutter Android + Web'],
-                [Flame, 'Backend', 'Firebase, no server'],
-              ].map(([Icon, head, text]) => {
-                const I = Icon as typeof Users;
-                return (
-                  <div key={head as string}>
-                    <I size={28} />
-                    <span>
-                      <span className="k">{head as string}</span>
-                      <b>{text as string}</b>
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
+            <p className="answer">
+              Nốt makes the second list visible: <b>one small win, logged in under 30 seconds</b>, and a fresh small
+              challenge for tomorrow.
+            </p>
           </div>
           <div className="collage">
             <img className="c-web" src={img('wa-03-dashboard-crop.png')} alt="Web admin dashboard" />
