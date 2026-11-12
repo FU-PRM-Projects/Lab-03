@@ -694,3 +694,8 @@
 .fd ul.ovl-v { margin: 8px 0 0; padding-left: 22px; }
 .fd ul.ovl-v li { font-size: 19px; line-height: 1.5; color: var(--ink); }
 .fd ul.ovl-v li::marker { color: var(--part); }
+.fd ul.ovl-roles { list-style: disc; margin: 2px 0 0; padding-left: 22px; }
+.fd ul.ovl-roles li::marker { color: var(--part); }
+.fd ul.ovl-roles li { font-size: 19px; line-height: 1.5; color: var(--ink); }
+.fd ul.ovl-roles li b { color: var(--part); }
+.fd ul.ovl { gap: 20px; }

@@ -447,10 +447,11 @@ export default function FinalDeck() {
             </li>
             <li>
               <span className="ovl-k">Users &amp; value</span>
-              <p>
-                <b>user</b> logs the day on Android · <b>staff</b> review cards and post news on the web admin ·{' '}
-                <b>admin</b> does all staff work and changes roles
-              </p>
+              <ul className="ovl-roles">
+                <li><b>user</b>: logs the day on the Android app</li>
+                <li><b>staff</b>: reviews and creates cards, posts news on the web admin</li>
+                <li><b>admin</b>: does everything staff can, plus changes roles</li>
+              </ul>
               <ul className="ovl-v">
                 <li>One win in 30 s, typed or sorted by Gemini</li>
                 <li>New challenge cards without an app update</li>
