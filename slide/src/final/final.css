@@ -464,3 +464,12 @@
 }
 .reveal .slides section.fd.wide h2 { font-size: 32px; }
 .reveal .slides section.fd.wide .body { margin-top: 12px; margin-bottom: 26px; }
+
+/* thumbnails inside tables and cards */
+.fd .thumb {
+  display: block;
+  width: auto;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  box-shadow: 0 3px 10px rgba(27, 29, 42, 0.12);
+}

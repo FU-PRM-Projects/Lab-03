@@ -63,6 +63,20 @@ function Shot({ src, alt, h, w, cap }: { src: string; alt: string; h?: number; w
   );
 }
 
+/** Code captured from GitHub main, red box around the key lines (scripts/capture-where.mjs). */
+function Code({ name, w, h, cap }: { name: string; w?: number; h?: number; cap?: string }) {
+  return (
+    <figure className="shot">
+      <img src={`${base}where/${name}.png`} alt={cap ?? name} style={w ? { width: w, height: 'auto' } : { height: h }} />
+      {cap && <figcaption>{cap}</figcaption>}
+    </figure>
+  );
+}
+
+function Thumb({ src, h = 78 }: { src: string; h?: number }) {
+  return <img className="thumb" src={img(src)} alt="" style={{ height: h }} />;
+}
+
 function Card({
   head,
   tone,
@@ -501,12 +515,13 @@ export default function FinalDeck() {
           notes="Pain point to solution to value. Then scope: what we built and what we left out on purpose (paid plan services)."
         >
           <div className="col grow">
-            <table>
+            <table style={{ fontSize: 16 }}>
               <thead>
                 <tr>
                   <th>Pain point</th>
                   <th>Solution</th>
                   <th>Expected value</th>
+                  <th>Live</th>
                 </tr>
               </thead>
               <tbody>
@@ -514,26 +529,30 @@ export default function FinalDeck() {
                   <td>Static content</td>
                   <td>Web admin catalog + users share cards, staff approve</td>
                   <td>Catalog grows without a release</td>
+                  <td><Thumb src="wa-04-catalog-search-crop.png" h={66} /></td>
                 </tr>
                 <tr>
                   <td>No channel</td>
                   <td>Announcements + personal inbox (Firestore, real time)</td>
                   <td>News lands in the app in the same minute</td>
+                  <td><Thumb src="wa-10-announcement-sent-crop.png" h={60} /></td>
                 </tr>
                 <tr>
                   <td>Slow evenings</td>
                   <td>Nốt AI: tell the day once, confirm sorted notes</td>
                   <td>Several notes from one paragraph</td>
+                  <td><Thumb src="05-ai-free-tell-result.png" h={92} /></td>
                 </tr>
                 <tr>
                   <td>Broken PDF</td>
                   <td>Build and save the PDF on the device, metadata in Firestore</td>
                   <td>Works on the free plan, offline</td>
+                  <td><Thumb src="09-pdf-saved.png" h={92} /></td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <div className="col" style={{ width: 360 }}>
+          <div className="col" style={{ width: 300 }}>
             <Card head="In scope (MVP)" tone="ok">
               <ul className="tight">
                 <li>WF-01 Log the day with Nốt AI</li>
@@ -560,7 +579,8 @@ export default function FinalDeck() {
           notes="Actors match the real permission model in firestore.rules and the web admin's role check."
           foot="First admin: set in the Firebase Console (Thị Kim Thúy Đoàn). Rules tests R-01…R-30 cover every role and collection (BR-05: R-26)."
         >
-          <table>
+          <div className="col grow">
+          <table style={{ fontSize: 15.5 }}>
             <thead>
               <tr>
                 <th style={{ width: '19%' }}>Actor</th>
@@ -602,6 +622,14 @@ export default function FinalDeck() {
               </tr>
             </tbody>
           </table>
+          </div>
+          <div className="col" style={{ width: 330 }}>
+            <Shot src="wa-12-users-crop.png" alt="Users screen" w={330} cap="Admin changes roles (own role locked)" />
+            <div style={{ display: 'flex', gap: 12, alignItems: 'flex-end' }}>
+              <Shot src="m-wrong-role.png" alt="Wrong role on mobile" h={210} cap="Staff/admin on the phone" />
+              <Shot src="wa-02-rejected-user-account-crop.png" alt="User on the web admin" w={170} cap="User on the web" />
+            </div>
+          </div>
         </S>
 
         {/* 06 · Features */}
@@ -654,7 +682,12 @@ export default function FinalDeck() {
           notes="Event, guard, action. Forbidden transitions are tested in the Emulator (R-20 to R-23)."
           foot="Tests: R-20 create pending only · R-21 read own or staff · R-22 staff review, reason on reject · R-23 withdraw while pending. 30/30 rules tests pass."
         >
-          <StateMachine />
+          <div className="grow" style={{ minWidth: 0 }}>
+            <StateMachine />
+          </div>
+          <div className="col" style={{ width: 430, justifyContent: 'center' }}>
+            <Code name="f-rules-review" w={430} cap="firestore.rules · the guard on every review (BR-03)" />
+          </div>
         </S>
 
         {/* 09 · Architecture */}
@@ -701,7 +734,12 @@ export default function FinalDeck() {
           title="Approving a card is one batch write; rules guard it, snapshots carry it back"
           notes="Real method names. The alt box shows the exception branches, including the two bugs found on the deployed system and fixed."
         >
-          <Sequence />
+          <div className="grow" style={{ minWidth: 0 }}>
+            <Sequence />
+          </div>
+          <div className="col" style={{ width: 330, justifyContent: 'center' }}>
+            <Code name="f-approve-batch" w={330} cap="FirestoreSubmissionRepository.approve: one batch" />
+          </div>
         </S>
 
         {/* 13 · Class design */}
@@ -748,10 +786,11 @@ export default function FinalDeck() {
           notes="No schema in Firestore, so the shape, sizes and transitions are enforced by rules and covered by tests."
           foot="Indexes: submissions (uid, createdAt↓), (status, createdAt↓) · notes (groupId, createdAt↓) · full table: docs/data-model.md"
         >
-          <table style={{ fontSize: 15.5 }}>
+          <div className="col grow">
+          <table style={{ fontSize: 14 }}>
             <thead>
               <tr>
-                <th style={{ width: '26%' }}>Collection</th>
+                <th style={{ width: '30%' }}>Collection</th>
                 <th>Key fields</th>
                 <th style={{ width: '34%' }}>Constraints (rules)</th>
               </tr>
@@ -766,6 +805,11 @@ export default function FinalDeck() {
               <tr><td><code>users/{'{uid}'}/private/onboarding</code></td><td>answers, profileLabel, planSource</td><td>owner only; enums and sizes checked</td></tr>
             </tbody>
           </table>
+          </div>
+          <div className="col" style={{ width: 360 }}>
+            <Shot src="ev-firestore-console.png" alt="Firestore console" w={360} cap="Firestore Console · challenges" />
+            <Code name="f-rules-announce" w={360} cap="Rules for announcements (BR-04)" />
+          </div>
         </S>
 
         {/* 16 · Traceability */}
@@ -813,9 +857,24 @@ export default function FinalDeck() {
               ]}
             />
             <div className="cards" style={{ gridTemplateColumns: '1fr 1fr 1fr', marginTop: 12 }}>
-              <Card head="Result WF-01" tone="ok"><p>Jar 11 → 14 notes, streak starts</p></Card>
-              <Card head="Result WF-02" tone="ok"><p>Card "Người dùng đề xuất" in catalog; inbox message</p></Card>
-              <Card head="Result WF-03" tone="ok"><p>Announcement in app inbox at 10:56, same minute</p></Card>
+              <Card head="Result WF-01" tone="ok">
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                  <Thumb src="06-ai-notes-saved.png" h={150} />
+                  <p>Jar 11 → 14 notes, streak starts</p>
+                </div>
+              </Card>
+              <Card head="Result WF-02" tone="ok">
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                  <Thumb src="cr-05-phone-approved-run3.png" h={150} />
+                  <p>Card "Người dùng đề xuất" in catalog; inbox message</p>
+                </div>
+              </Card>
+              <Card head="Result WF-03" tone="ok">
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                  <Thumb src="wa-11-app-inbox-announcement.png" h={150} />
+                  <p>Announcement in app inbox at 10:56, same minute</p>
+                </div>
+              </Card>
             </div>
             <Card head="Exception paths shown live">
               <ul className="tight">
@@ -913,7 +972,8 @@ export default function FinalDeck() {
               <div className="stat"><b className="num">14/15</b><span>ARTEMIS Final runs, real phone</span></div>
             </div>
           </div>
-          <table className="grow">
+          <div className="col grow">
+          <table style={{ fontSize: 15.5 }}>
             <thead>
               <tr>
                 <th>Level</th>
@@ -930,6 +990,11 @@ export default function FinalDeck() {
               <tr><td><b>E2E (ARTEMIS)</b></td><td>Lab 3: 41/42 · Final T14, T17–T20 on Galaxy A70: 14/15 · T15/T16 not run</td><td><span className="pill warn">14 / 15</span></td></tr>
             </tbody>
           </table>
+          <div style={{ display: 'flex', gap: 14 }}>
+            <Shot src="ev-artemis.jpg" alt="ARTEMIS run" h={112} cap="ARTEMIS: agent reports SAVED" />
+            <Shot src="ev-deploy-run.png" alt="GitHub Actions deploy" h={112} cap="GitHub Actions: deploy on main" />
+          </div>
+          </div>
         </S>
 
         {/* 22 · Achievements */}
@@ -1023,7 +1088,8 @@ export default function FinalDeck() {
           notes="Backup slide for AI questions. From docs/ai-feature.md."
           foot="Inputs are scrubbed (email, phone) and capped at 500 characters; no names, emails or photos are sent."
         >
-          <table>
+          <div className="col grow">
+          <table style={{ fontSize: 15 }}>
             <thead>
               <tr>
                 <th style={{ width: '40%' }}>Input (Kể tự do)</th>
@@ -1037,6 +1103,11 @@ export default function FinalDeck() {
               <tr><td><b>Handled failure</b></td><td>404 model retired / 401 missing App Check → <code>ai_error</code> logged, paragraph kept, "Ghi tay" offered; fixed by Remote Config model name</td></tr>
             </tbody>
           </table>
+          </div>
+          <div className="col" style={{ width: 340 }}>
+            <Code name="f-ai-model" w={340} cap="JSON schema forces the answer shape" />
+            <Shot src="ev-rc-params.png" alt="Remote Config parameters" w={340} cap="Remote Config: model, prompts, on/off" />
+          </div>
         </S>
 
         {/* A2 · App Check */}
