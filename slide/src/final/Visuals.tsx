@@ -166,6 +166,21 @@ export function EvidenceWall({ items }: { items: Proof[] }) {
   );
 }
 
+/** The persona's drawn face on its own, for places where a full card is too much. */
+export function MiniAvatar({ size = 64 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 120 120" aria-hidden="true">
+      <circle cx="60" cy="60" r="58" fill="#e6efff" />
+      <path d="M22 112c4-24 20-36 38-36s34 12 38 36" fill="#3d4fd6" />
+      <circle cx="60" cy="48" r="22" fill="#f5c9a8" />
+      <path d="M38 46c0-16 10-25 23-25 14 0 22 9 22 22-6-6-14-9-24-9-9 0-15 4-21 12z" fill="#2b2e3b" />
+      <circle cx="52" cy="50" r="2.4" fill="#2b2e3b" />
+      <circle cx="68" cy="50" r="2.4" fill="#2b2e3b" />
+      <path d="M53 61c4 2.5 10 2.5 14 0" stroke="#2b2e3b" strokeWidth="2.4" fill="none" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 /** Small persona card: drawn avatar, name, three short facts. */
 export function PersonaCard({
   name,

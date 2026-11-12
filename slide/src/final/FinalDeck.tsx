@@ -2,11 +2,11 @@ import type { ReactNode } from 'react';
 import { Deck, Slide } from '@revealjs/react';
 import RevealNotes from 'reveal.js/plugin/notes';
 import {
-  BellRing, Code2, Beaker, Compass, Layers, PlayCircle, Bell, Bot, Boxes, CheckCircle2, ClipboardCheck, FileText, Flame, Link2, Megaphone, MoonStar, PenLine, ShieldCheck, Smartphone, Sparkles, UserCog, Users,
+  BellRing, Code2, Beaker, Compass, Layers, PlayCircle, Bell, Bot, Boxes, CheckCircle2, ClipboardCheck, FileText, Flame, Link2, Megaphone, MoonStar, PenLine, ShieldCheck, Smartphone, Sparkles, UserCog, Users, Wrench,
 } from 'lucide-react';
 
 import ServerlessMap from './ServerlessMap';
-import { Agenda, Divider, EvidenceWall, FlowDiagram, PersonaCard, ScreenRow, Storyboard } from './Visuals';
+import { Agenda, Divider, EvidenceWall, FlowDiagram, MiniAvatar, ScreenRow, Storyboard } from './Visuals';
 import type { Part } from './Visuals';
 
 import 'reveal.js/reveal.css';
@@ -478,27 +478,33 @@ export default function FinalDeck() {
         {/* 02 · Context */}
         <S
           part="P1 · Problem · 02 Context · WHY"
-          title="Today Minh logs his evening alone, and the app around him never changes"
-          sub="Who uses Nốt, what they want, and how it works after Lab 3; the problems come next."
-          notes="Context, not problem yet. Persona Minh, 22, final year (Lab 2). Goal: one mood and one small win in under 30 s. Walk the current process left to right: reminder, typing and classifying by hand, picking from a fixed seed list, new cards only by a developer script, news only by a Console push. Point at the Console screenshot: seed documents dc-1-1, dc-1-2…"
-          foot="Source: Lab 2 persona and success criterion (README, docs/design-traceability.md) · Lab 3 build · Firestore Console."
+          title="Today Nốt is one person's evening journal: the content is fixed and nobody can reach users"
+          sub="Where Nốt stands after Lab 3. The problems come on the next slide."
+          notes="Context only, no problem yet. Environment: a self-care journal for young people, one Android app on one Firebase project after Lab 3. People: Minh, our Lab 2 persona, and us, the developers, who are the only ones able to change content. Tools: the app, a seed script, the Firebase Console. Walk the five steps. Then the numbers: 22 seed cards in 2 topics, 4 note types sorted by hand, 1 role, 0 in-app announcements, goal under 30 s. Need: someone who curates content and a channel to users, without a new app release."
+          foot="Source: README (Lab 2 persona, 30 s goal) · firebase/seed/challenges.json (22 cards) · docs/system-architecture.md (one role in Lab 2/3) · Lab 3 build."
         >
-          <div className="col grow" style={{ gap: 16 }}>
-            <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
-              <div style={{ flex: 1 }}>
-                <PersonaCard
-                  name="Minh, 22"
-                  meta="Final-year student · Lab 2 persona · Android"
-                  facts={[
-                    ['Goal', 'one mood + one small win in under 30 s'],
-                    ['Uses', 'the Nốt app in the evening'],
-                    ['Feels', 'behind, tired after a long day'],
-                  ]}
-                />
+          <div className="col grow" style={{ gap: 14 }}>
+            <div className="ctx3">
+              <div className="ctx-col c1">
+                <span className="ctx-h"><span className="ctx-ic"><Compass size={20} /></span><span className="ctx-k">Environment</span></span>
+                <p>Self-care journal for students and young workers</p>
+                <small>1 Android app · 1 Firebase project · no web admin</small>
               </div>
-              <Shot src="ev-firestore-console.png" alt="Seed challenge cards in Firestore" w={330} cap="Lab 3 cards: fixed seed documents dc-1-1…" />
+              <div className="ctx-col c2">
+                <span className="ctx-h"><span className="ctx-ic"><Users size={20} /></span><span className="ctx-k">Who is involved</span></span>
+                <div className="ctx-people">
+                  <MiniAvatar size={52} />
+                  <p><b>Minh, 22</b> · final-year student, logs one mood + one small win each evening</p>
+                </div>
+                <small><b>Our dev team</b>: the only people who can change cards or send news</small>
+              </div>
+              <div className="ctx-col c3">
+                <span className="ctx-h"><span className="ctx-ic"><Wrench size={20} /></span><span className="ctx-k">Current tools</span></span>
+                <p>Nốt app (Lab 3)</p>
+                <small>seed script for cards · Firebase Console for push</small>
+              </div>
             </div>
-            <span className="k">How it works today (after Lab 3)</span>
+            <span className="k">How an evening runs today (after Lab 3)</span>
             <FlowDiagram
               steps={[
                 { icon: BellRing, title: 'Reminder', note: 'evening, Minh opens Nốt' },
@@ -508,8 +514,16 @@ export default function FinalDeck() {
                 { icon: Megaphone, title: 'News', note: 'only a Console push', warn: true },
               ]}
             />
-            <p className="answer" style={{ margin: '4px 0 0', fontSize: 19, maxWidth: 'none' }}>
-              One person, alone with their own data. Nobody curates content, and nobody can talk to users inside the app.
+            <div className="ctx-stats">
+              <span className="ctx-stats-k">Status today</span>
+              <div><b>22</b><span>seed cards, 2 topics, fixed</span></div>
+              <div><b>4</b><span>note types sorted by hand</span></div>
+              <div><b>1</b><span>role: user only</span></div>
+              <div><b>0</b><span>in-app announcements</span></div>
+              <div><b>&lt; 30 s</b><span>goal per evening log</span></div>
+            </div>
+            <p className="ctx-need">
+              <b>Need:</b> someone who curates content and a channel to users, without shipping a new app version.
             </p>
           </div>
         </S>

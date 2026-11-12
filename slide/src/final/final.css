@@ -701,3 +701,27 @@
 .fd .ov-vals { display: flex; flex-direction: column; gap: 6px; }
 .fd .ov-vals p { margin: 0; display: flex; align-items: center; gap: 10px; font-size: 18px; color: var(--ink); }
 .fd .ov-vals svg { flex: none; color: #0f8a6a; }
+
+/* 02 Context: three columns split by thin rules, stat strip, need line (no cards) */
+.fd .ctx3 { display: grid; grid-template-columns: 1fr 1.35fr 1fr; }
+.fd .ctx-col { padding: 0 22px; border-left: 1px solid var(--line, #e3e6ee); display: flex; flex-direction: column; gap: 4px; }
+.fd .ctx-col:first-child { padding-left: 0; border-left: 0; }
+.fd .ctx-h { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.fd .ctx-ic { flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; }
+.fd .ctx-col.c1 .ctx-ic { background: #e6efff; color: #2563eb; }
+.fd .ctx-col.c2 .ctx-ic { background: #e3f6ef; color: #0f8a6a; }
+.fd .ctx-col.c3 .ctx-ic { background: #f1e9ff; color: #7c3aed; }
+.fd .ctx-k { font-size: 13px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.fd .ctx-col.c1 .ctx-k { color: #2563eb; } .fd .ctx-col.c2 .ctx-k { color: #0f8a6a; } .fd .ctx-col.c3 .ctx-k { color: #7c3aed; }
+.fd .ctx-col p { margin: 0; font-size: 18px; line-height: 1.38; color: var(--ink); }
+.fd .ctx-col small { font-size: 15px; line-height: 1.38; color: var(--muted); }
+.fd .ctx-col small b { color: var(--ink); }
+.fd .ctx-people { display: flex; gap: 12px; align-items: center; }
+.fd .ctx-people svg { flex: none; }
+.fd .ctx-stats { display: flex; align-items: center; gap: 28px; padding: 12px 0; border-top: 1px solid var(--line, #e3e6ee); border-bottom: 1px solid var(--line, #e3e6ee); }
+.fd .ctx-stats-k { font-size: 13px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.fd .ctx-stats > div { display: flex; align-items: baseline; gap: 8px; }
+.fd .ctx-stats b { font-size: 30px; font-weight: 800; color: var(--part); line-height: 1; }
+.fd .ctx-stats span { font-size: 14px; color: var(--muted); max-width: 130px; line-height: 1.25; }
+.fd .ctx-need { margin: 0; font-size: 19px; color: var(--ink); }
+.fd .ctx-need b { color: var(--part); }
