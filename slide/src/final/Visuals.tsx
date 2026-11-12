@@ -24,10 +24,10 @@ export type Part = {
 
 export function Agenda({ parts }: { parts: Part[] }) {
   return (
-    <Slide className="fd px agenda" notes="Four parts, the lecturer's order. Demo takes a third of the time.">
+    <Slide className="fd px agenda" notes="Four parts, the lecturer's order. Time budget (for us, not on the slide): Problem ≈ 3.5 min · Design ≈ 6 min · Demo ≈ 6.5 min · Proof ≈ 2.5 min · total 18–20 min, demo about a third.">
       <Logo />
       <p className="kicker">
-        <span className="chip">AGENDA</span>18–20 minutes · demo ≈ 1/3
+        <span className="chip">AGENDA</span>Four parts
       </p>
       <h2>Problem → Design → Demo → Proof</h2>
       <div className="agenda-row">
@@ -46,7 +46,6 @@ export function Agenda({ parts }: { parts: Part[] }) {
                   <li key={s}>{s}</li>
                 ))}
               </ul>
-              <span className="ag-min">{p.minutes}</span>
             </div>
           );
         })}
@@ -58,7 +57,7 @@ export function Agenda({ parts }: { parts: Part[] }) {
 export function Divider({ part, shots }: { part: Part; shots: string[] }) {
   const I = part.icon;
   return (
-    <Slide className={`fd ${part.code} divider`} notes={`Part ${part.num}: ${part.name}. ${part.question}`}>
+    <Slide className={`fd ${part.code} divider`} notes={`Part ${part.num}: ${part.name}. ${part.question} Time budget ${part.minutes}.`}>
       <Logo white />
       <div className="dv-left">
         <span className="dv-num">{part.num}</span>
