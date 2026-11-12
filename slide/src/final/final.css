@@ -683,19 +683,21 @@
 .fd .flow-step.warn b { color: var(--bad); }
 
 
-/* 01 Overview: three plain bullets, no cards */
-.fd ul.ovl { list-style: none; margin: 0; padding: 0; flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 26px; }
-.fd ul.ovl > li { position: relative; padding-left: 30px; }
-.fd ul.ovl > li::before { content: ''; position: absolute; left: 0; top: 9px; width: 12px; height: 12px; border-radius: 50%; background: var(--part); }
-.fd .ovl-k { display: block; font-size: 14px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--part); margin-bottom: 4px; }
-.fd ul.ovl p { margin: 0; font-size: 21px; line-height: 1.45; color: var(--ink); }
-.fd ul.ovl p b { color: var(--part); }
-.fd ul.ovl p b.ovl-name { color: var(--ink); font-size: 30px; font-weight: 800; }
-.fd ul.ovl-v { margin: 8px 0 0; padding-left: 22px; }
-.fd ul.ovl-v li { font-size: 19px; line-height: 1.5; color: var(--ink); }
-.fd ul.ovl-v li::marker { color: var(--part); }
-.fd ul.ovl-roles { list-style: disc; margin: 2px 0 0; padding-left: 22px; }
-.fd ul.ovl-roles li::marker { color: var(--part); }
-.fd ul.ovl-roles li { font-size: 19px; line-height: 1.5; color: var(--ink); }
-.fd ul.ovl-roles li b { color: var(--part); }
-.fd ul.ovl { gap: 20px; }
+/* 01 Overview: name, one description, roles with icons, values with checks (no cards) */
+.fd .ov { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 22px; }
+.fd .ov-k { display: block; font-size: 13px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--part); margin-bottom: 8px; }
+.reveal .slides section.fd h3.ov-name { margin: 0; font-size: 60px; font-weight: 800; line-height: 1; letter-spacing: -0.03em; color: var(--ink); text-transform: none; }
+.fd .ov-type { margin: 8px 0 0; font-size: 18px; color: var(--muted); }
+.fd .ov-desc { margin: 0; padding-left: 18px; border-left: 4px solid var(--part); font-size: 21px; line-height: 1.45; color: var(--ink); }
+.fd .ov-desc b { color: var(--part); }
+.fd .ov-roles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.fd .ov-roles > div { display: flex; gap: 10px; align-items: flex-start; }
+.fd .ov-ic { flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; }
+.fd .ov-ic.r1 { background: #e6efff; color: #2563eb; }
+.fd .ov-ic.r2 { background: #e3f6ef; color: #0f8a6a; }
+.fd .ov-ic.r3 { background: #ffeedf; color: #ea580c; }
+.fd .ov-roles p { margin: 0; font-size: 15px; line-height: 1.35; color: var(--muted); }
+.fd .ov-roles p b { display: block; font-size: 17px; color: var(--ink); }
+.fd .ov-vals { display: flex; flex-direction: column; gap: 6px; }
+.fd .ov-vals p { margin: 0; display: flex; align-items: center; gap: 10px; font-size: 18px; color: var(--ink); }
+.fd .ov-vals svg { flex: none; color: #0f8a6a; }

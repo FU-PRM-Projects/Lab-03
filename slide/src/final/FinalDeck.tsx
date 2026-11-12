@@ -430,35 +430,42 @@ export default function FinalDeck() {
           title="Nốt: a daily small-wins app with a staff web admin, live on one Firebase project"
           notes="30 seconds. Name and type: Nốt, an Android app for logging small wins plus a Flutter web admin for staff. One sentence: for students who end the day feeling behind, Nốt makes one small win visible in under 30 s and keeps fresh challenges coming. Users, value, platform. It is live: point at the screenshots."
         >
-          <ul className="ovl">
-            <li>
-              <span className="ovl-k">Project</span>
-              <p>
-                <b className="ovl-name">Nốt</b> · a small-wins journal: an Android app for users and a web admin for staff,
-                on one Firebase project
-              </p>
-            </li>
-            <li>
-              <span className="ovl-k">Who it is for &amp; what it solves</span>
-              <p>
-                For students and young workers who end a long day feeling they got nothing done, Nốt makes <b>one small win visible in under
-                30 seconds</b> and keeps <b>fresh small challenges</b> coming.
-              </p>
-            </li>
-            <li>
-              <span className="ovl-k">Users &amp; value</span>
-              <ul className="ovl-roles">
-                <li><b>user</b>: logs the day on the Android app</li>
-                <li><b>staff</b>: reviews and creates cards, posts news on the web admin</li>
-                <li><b>admin</b>: does everything staff can, plus changes roles</li>
-              </ul>
-              <ul className="ovl-v">
-                <li>One win in 30 s, typed or sorted by Gemini</li>
-                <li>New challenge cards without an app update</li>
-                <li>Staff news reaches every inbox in the same minute</li>
-              </ul>
-            </li>
-          </ul>
+          <div className="ov">
+            <div className="ov-head">
+              <span className="ov-k">Project</span>
+              <h3 className="ov-name">Nốt</h3>
+              <p className="ov-type">Small-wins journal · Android app + web admin · one Firebase project</p>
+            </div>
+            <p className="ov-desc">
+              For <b>students and young workers</b> who end a long day feeling they got nothing done: Nốt makes{' '}
+              <b>one small win visible in under 30 seconds</b> and keeps <b>fresh small challenges</b> coming.
+            </p>
+            <div className="ov-sec">
+              <span className="ov-k">Users</span>
+              <div className="ov-roles">
+                <div>
+                  <span className="ov-ic r1"><Smartphone size={22} /></span>
+                  <p><b>user</b>logs the day on the Android app</p>
+                </div>
+                <div>
+                  <span className="ov-ic r2"><ClipboardCheck size={22} /></span>
+                  <p><b>staff</b>reviews and creates cards, posts news on the web admin</p>
+                </div>
+                <div>
+                  <span className="ov-ic r3"><UserCog size={22} /></span>
+                  <p><b>admin</b>everything staff can, plus changes roles</p>
+                </div>
+              </div>
+            </div>
+            <div className="ov-sec">
+              <span className="ov-k">Core value</span>
+              <div className="ov-vals">
+                <p><CheckCircle2 size={20} />One win in 30 s, typed or sorted by Gemini</p>
+                <p><CheckCircle2 size={20} />New challenge cards without an app update</p>
+                <p><CheckCircle2 size={20} />Staff news in every inbox in the same minute</p>
+              </div>
+            </div>
+          </div>
           <div className="collage">
             <img className="c-web" src={img('wa-03-dashboard-crop.png')} alt="Web admin dashboard" />
             <img className="c-phone c-a" src={img('m-today.png')} alt="Today screen" />
