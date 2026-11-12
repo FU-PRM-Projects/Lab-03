@@ -469,39 +469,40 @@ export default function FinalDeck() {
         {/* 02 · Context */}
         <S
           part="P1 · Problem · 02 Context · WHY"
-          title="Minh ends most evenings remembering what he did not finish"
-          sub="Lab 2 persona and the habit Nốt was designed around; Lab 3 shipped it for one person, alone."
-          notes="Context, not problem yet. Persona Minh, 22, final year. Evening routine: scroll, feel behind. Lab 3 already let him log wins; but content (challenge cards) was a fixed seed list and there was nobody on the other side."
-          foot="Source: Lab 2 persona and success criterion (README, docs/design-traceability.md)."
+          title="Today Minh logs his evening alone, and the app around him never changes"
+          sub="Who uses Nốt, what they want, and how it works after Lab 3; the problems come next."
+          notes="Context, not problem yet. Persona Minh, 22, final year (Lab 2). Goal: one mood and one small win in under 30 s. Walk the current process left to right: reminder, typing and classifying by hand, picking from a fixed seed list, new cards only by a developer script, news only by a Console push. Point at the Console screenshot: seed documents dc-1-1, dc-1-2…"
+          foot="Source: Lab 2 persona and success criterion (README, docs/design-traceability.md) · Lab 3 build · Firestore Console."
         >
-          <div className="col grow">
-            <div className="cards" style={{ gridTemplateColumns: '1fr 1fr' }}>
-              <Card head="Persona">
-                <p>
-                  <b>Minh, 22</b>, final-year student, worn out. Ends the evening looking at the list of unfinished
-                  tasks instead of what went well.
-                </p>
+          <div className="col grow" style={{ gap: 22 }}>
+            <div className="cards" style={{ gridTemplateColumns: '1fr 1fr 1fr', flex: 'none' }}>
+              <Card head="Who">
+                <p><b>Minh, 22</b>, final-year student (Lab 2 persona). Uses Nốt on Android in the evening.</p>
               </Card>
-              <Card head="Success criterion (Lab 2)">
-                <p>Log a mood and one small win in <b>under 30 seconds</b> after tapping the evening reminder.</p>
+              <Card head="Goal (Lab 2)">
+                <p>One mood and one small win in <b>under 30 seconds</b> after the evening reminder.</p>
               </Card>
-              <Card head="How Nốt worked after Lab 3">
-                <ul className="tight">
-                  <li>One user, own data only (notes, habits, groups)</li>
-                  <li>Challenge cards: a fixed seed list in Firestore</li>
-                  <li>Own cards stayed private to their author</li>
-                </ul>
-              </Card>
-              <Card head="Who else is involved now">
-                <ul className="tight">
-                  <li>Staff who write and curate challenge cards</li>
-                  <li>An admin who decides who is staff</li>
-                  <li>Gemini, to cut typing in the evening</li>
-                </ul>
+              <Card head="Tools after Lab 3">
+                <p>The Nốt app · a seed script for cards · the Firebase Console for push.</p>
               </Card>
             </div>
+            <span className="k">How it works today (after Lab 3)</span>
+            <Steps
+              items={[
+                ['1 · Reminder', 'in the evening, Minh opens Nốt'],
+                ['2 · Write', 'types each note, picks win / self-control / journal by hand'],
+                ['3 · Challenge', 'picks a card from a fixed seed list'],
+                ['4 · New cards', 'only when a developer edits the seed and runs a script'],
+                ['5 · News', 'only a push sent from the Firebase Console'],
+              ]}
+            />
+            <p className="answer" style={{ margin: 0, fontSize: 19 }}>
+              One person, alone with their own data. Nobody curates content, and nobody can talk to users inside the app.
+            </p>
           </div>
-          <Shot src="07-weekly-card.png" alt="Weekly card" h={430} cap="Weekly card, Lab 3 flow kept in the Final" />
+          <div className="col" style={{ width: 420, justifyContent: 'center' }}>
+            <Shot src="ev-firestore-console.png" alt="Seed challenge cards in Firestore" w={420} cap="Challenge cards in Lab 3: fixed seed documents dc-1-1, dc-1-2…, changed only by a script" />
+          </div>
         </S>
 
         {/* 03 · Problem */}
