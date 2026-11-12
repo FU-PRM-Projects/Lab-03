@@ -173,7 +173,7 @@ function BusinessFlow() {
       ))}
       {/* WF-01 */}
       <Box x={150} y={34} w={150} h={52} t="Tell the day" s="WF-01 Kể tự do" fill={C.soft} stroke={C.soft} />
-      <Box x={150} y={142} w={150} h={52} t="Gemini sorts notes" s="BR-AI1 · App Check" />
+      <Box x={150} y={142} w={150} h={52} t="Gemini sorts notes" s="BR-01 · App Check" />
       <Box x={150} y={250} w={150} h={52} t="notes saved" s="after user confirms" />
       <Arrow d="M225 86 V140" />
       <Arrow d="M225 194 V248" />
@@ -191,7 +191,7 @@ function BusinessFlow() {
       <Arrow d="M845 250 V88" />
       {/* WF-03 */}
       <Box x={990} y={358} w={160} h={52} t="Post announcement" s="WF-03" fill={C.soft} stroke={C.soft} />
-      <Box x={990} y={250} w={160} h={52} t="announcements" s="staff only" />
+      <Box x={990} y={250} w={160} h={52} t="announcements" s="BR-04 staff · 1–1000" />
       <Box x={990} y={34} w={160} h={52} t="Inbox for all users" s="same minute" fill={C.okSoft} stroke={C.okSoft} />
       <Arrow d="M1070 358 V304" />
       <Arrow d="M1070 250 V88" />
@@ -536,7 +536,7 @@ export default function FinalDeck() {
               <ul className="tight">
                 <li>WF-01 Log the day with Nốt AI</li>
                 <li>WF-02 Publish a user card to the catalog</li>
-                <li>WF-03 Announce to all users</li>
+                <li>WF-03 Announce news to every user</li>
                 <li>Onboarding, weekly PDF, roles, App Check</li>
               </ul>
             </Card>
@@ -556,7 +556,7 @@ export default function FinalDeck() {
           title="Three human roles and two external services, enforced by Security Rules"
           sub="The role lives in users/{uid}.role; only an admin changes it, and never their own."
           notes="Actors match the real permission model in firestore.rules and the web admin's role check."
-          foot="First admin: set in the Firebase Console (Thị Kim Thúy Đoàn). Rules tests R-19…R-28 cover every role and collection."
+          foot="First admin: set in the Firebase Console (Thị Kim Thúy Đoàn). Rules tests R-01…R-30 cover every role and collection (BR-05: R-26)."
         >
           <table>
             <thead>
@@ -611,9 +611,9 @@ export default function FinalDeck() {
           foot="Other features: onboarding & starter plan · weekly card PDF · streaks & journey · self-control & breathing · groups · Discord link · dashboard · roles."
         >
           {[
-            ['WF-01', 'Log the day with Nốt AI', 'User', 'Evening, user taps Ghi nốt → Kể tự do', 'Notes saved after the user confirms', 'Consent · Gemini JSON · edit · fallback'],
-            ['WF-02', 'Publish a user card to the shared catalog', 'User + Staff', 'User shares an own card', 'Card in catalog, app updates, inbox message', 'Submit · review · approve / reject + reason'],
-            ['WF-03', 'Announce to all users', 'Staff', 'Staff has news for everyone', 'Message in every user inbox', 'Form · validation · real-time inbox'],
+            ['WF-01', 'Log the day with Nốt AI', 'User', 'Evening, user taps Ghi nốt → Kể tự do', 'Notes saved after the user confirms', 'Consent · BR-01 · Gemini JSON · edit · fallback'],
+            ['WF-02', 'Publish a user card to the shared catalog', 'User + Staff', 'User shares an own card', 'Card in catalog, app updates, inbox message', 'BR-02 submit · review · BR-03 approve / reject + reason'],
+            ['WF-03', 'Announce news to every user', 'Staff', 'Staff has news for everyone', 'Announcement published; every user inbox shows it', 'Form · BR-04 validation · real-time inbox'],
           ].map(([id, name, actor, trigger, result, feat]) => (
             <div key={id} className="card accent grow" style={{ fontSize: 15 }}>
               <h4>{id}</h4>
@@ -632,7 +632,7 @@ export default function FinalDeck() {
           title="One swimlane view: who acts, where the data lands, where it branches"
           sub="The three workflows share one Firestore; rules are the decision points."
           notes="Walk the lanes left to right: WF-01 stays in the user's own data; WF-02 crosses from user to staff and back; WF-03 goes from staff to everyone."
-          foot="BR-AI1: AI only when enabled, consented and App Check passes · BR-02: user creates pending only · BR-03: reject needs a reason."
+          foot="BR-01 AI only when enabled, consented and App Check passes · BR-02 user creates pending only · BR-03 reject needs a reason · BR-04 announcements: staff only, title 1–80, body 1–1000 · BR-05 only admins change roles, never their own."
         >
           <BusinessFlow />
         </S>
@@ -643,7 +643,7 @@ export default function FinalDeck() {
           title="A shared card moves pending → approved or rejected, and nowhere else"
           sub="Entity: challengeSubmissions/{id}. Every transition and every forbidden one has a rules test."
           notes="Event, guard, action. Forbidden transitions are tested in the Emulator (R-20 to R-23)."
-          foot="Tests: R-20 create pending only · R-21 read own or staff · R-22 staff review, reason on reject · R-23 withdraw while pending. 28/28 rules tests pass."
+          foot="Tests: R-20 create pending only · R-21 read own or staff · R-22 staff review, reason on reject · R-23 withdraw while pending. 30/30 rules tests pass."
         >
           <StateMachine />
         </S>
@@ -692,13 +692,13 @@ export default function FinalDeck() {
           title="One design system across phone and web, with every UI state designed"
           sub="Lab 2 tokens live in packages/core; the web admin reuses them in a wide layout."
           notes="Same indigo, Be Vietnam Pro, mascot for empty/error. Show loading, empty, error, success on the web admin."
-          foot="States: empty (review queue), loading (dashboard), error (shared MessageView.error on 5 screens), success (approved list)."
+          foot="States: empty · loading · error (within 15 s, Thử lại) · success · wrong role rejected on web and mobile."
         >
           <div className="grow" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             <Shot src="wa-07-review-empty.png" alt="Empty review queue" w={410} cap="Web · empty: Hàng chờ duyệt" />
             <Shot src="wa-13-dashboard-loading.png" alt="Dashboard loading" w={410} cap="Web · loading: Tổng quan" />
+            <Shot src="wa-16-dashboard-error.png" alt="Dashboard error" w={410} cap="Web · error: server unreachable, Thử lại" />
             <Shot src="wa-08-review-approved.png" alt="Approved list" w={410} cap="Web · success: approved cards" />
-            <Shot src="wa-02-rejected-user-account.png" alt="Rejected account" w={410} cap="Web · role rejected (mascot, clear message)" />
           </div>
           <Shot src="11-ai-off-remote-config.png" alt="Nốt AI off" h={440} cap="App · AI off state" />
         </S>
@@ -718,7 +718,7 @@ export default function FinalDeck() {
           title="MVVM in both clients: screens never touch Firebase directly"
           sub="Business rules sit in the repository + Security Rules, not in widgets."
           notes="Screen → Notifier/actions → service interface → Firestore implementation in packages/core. Fakes replace the interfaces in tests."
-          foot="main.dart wires each provider to its Firebase implementation; tests swap in fakes (290 app · 10 web admin · 5 core tests)."
+          foot="main.dart wires each provider to its Firebase implementation; tests swap in fakes (303 app · 14 web admin · 5 core tests)."
         >
           <table>
             <thead>
@@ -780,7 +780,7 @@ export default function FinalDeck() {
         <S
           part="P2 · Design · 16 Traceability"
           title="Each workflow traces from screen to rule to test"
-          notes="Feature → screen → class → collection → tests. Also shows where tests are still missing (ARTEMIS for new flows)."
+          notes="Feature → screen → class → collection → tests. R-xx are rules tests, T-xx ARTEMIS cases on the real phone, D-x timed cross-role runs."
           foot="Full matrix: docs/design-traceability.md · rules: firebase/tests/firestore.rules.test.js · E2E: e2e_test/"
         >
           <table>
@@ -794,12 +794,12 @@ export default function FinalDeck() {
               </tr>
             </thead>
             <tbody>
-              <tr><td><b>WF-01</b> Nốt AI</td><td>S03b Kể tự do</td><td>FreeTellViewModel · AiService</td><td>notes</td><td>free_tell_flow_test · real-device run · 3 real Gemini examples</td></tr>
-              <tr><td><b>WF-02</b> Share & review</td><td>S07 · Review queue · Inbox</td><td>CommunityActions · ReviewActions</td><td>challengeSubmissions · challenges · inbox</td><td>R-20…R-24 · session_test (approve) · D-1…D-3</td></tr>
-              <tr><td><b>WF-03</b> Announce</td><td>Announcements · Inbox</td><td>AnnouncementActions</td><td>announcements</td><td>R-25 · notification_inbox_test · web checklist #9–11</td></tr>
-              <tr><td>Weekly PDF</td><td>S11b Thẻ tuần</td><td>WeeklyReportViewModel</td><td>reports</td><td>R-28 · weekly_report_test · real-device run</td></tr>
-              <tr><td>Onboarding</td><td>S13a–g</td><td>OnboardingViewModel</td><td>private/onboarding</td><td>R-27 · onboarding_flow_test</td></tr>
-              <tr><td>Roles</td><td>Sign-in · Users</td><td>sessionProvider · UserActions</td><td>users</td><td>R-01, R-26 · session_test (reject user)</td></tr>
+              <tr><td><b>WF-01</b> Nốt AI</td><td>S03b Kể tự do</td><td>FreeTellViewModel · AiService</td><td>notes</td><td>BR-01 · free_tell_flow_test · ARTEMIS T18 (2/3), T19 (3/3)</td></tr>
+              <tr><td><b>WF-02</b> Share & review</td><td>S07 · Review queue · Inbox</td><td>CommunityActions · ReviewActions</td><td>challengeSubmissions · challenges · inbox</td><td>BR-02/03 · R-20…R-24 · ARTEMIS T20 (3/3) · D-1…D-3</td></tr>
+              <tr><td><b>WF-03</b> Announce news</td><td>Announcements · Inbox</td><td>AnnouncementActions</td><td>announcements · inbox</td><td>BR-04 · R-25 · notification_inbox_test · web checklist #9–11</td></tr>
+              <tr><td>Weekly PDF</td><td>S11b Thẻ tuần</td><td>WeeklyReportViewModel</td><td>reports</td><td>R-28 · weekly_report_test · ARTEMIS T14 (3/3)</td></tr>
+              <tr><td>Onboarding</td><td>S13a–g</td><td>OnboardingViewModel</td><td>private/onboarding</td><td>R-27 · onboarding_flow_test · ARTEMIS T17 (3/3)</td></tr>
+              <tr><td>Roles</td><td>Sign-in · Users</td><td>sessionProvider · UserActions</td><td>users</td><td>BR-05 · R-01, R-26, R-29 · session_test · auth_flow_test</td></tr>
             </tbody>
           </table>
         </S>
@@ -809,8 +809,8 @@ export default function FinalDeck() {
           part="P3 · Demo · 17 Demo plan"
           title="The demo is one evening: Minh logs his day, shares a card, staff publish it and announce"
           sub="The result of each workflow is the input of the next."
-          notes="Order: WF-01 on the phone, WF-02 phone + web side by side, WF-03 on the web then the phone. Accounts ready, debug token registered on the demo phone."
-          foot="Prepared: admin account (web) · user account on Galaxy A70 with App Check debug token · Remote Config ai_enabled ready to toggle · backup video."
+          notes="Order: WF-01 on the phone, WF-02 phone + web side by side, WF-03 on the web then the phone. One account per actor, prepared before the session; the backup video is the fallback if the network fails."
+          foot="Prepared: user account on a Galaxy A70 (release build, Play Integrity) · staff/admin account on the web admin · ai_enabled ready to toggle in Remote Config · empty review queue · backup video."
         >
           <div className="col grow">
             <Steps
@@ -828,7 +828,7 @@ export default function FinalDeck() {
             <Card head="Exception paths shown live">
               <ul className="tight">
                 <li>Remote Config <code>ai_enabled = false</code> → "Nốt AI đang nghỉ", user writes by hand</li>
-                <li>Reject without reason → blocked · non-staff account → rejected at sign-in</li>
+                <li>Reject without reason → blocked (BR-03) · user account on the web, staff account on the phone → rejected (BR-05)</li>
               </ul>
             </Card>
           </div>
@@ -839,20 +839,20 @@ export default function FinalDeck() {
           part="P3 · Demo · 18 WF-01 · User"
           title="WF-01 Log the day with Nốt AI: one paragraph becomes three editable notes"
           notes="Trigger: evening. Steps: consent sheet, Gemini, labelled suggestions, edit, save. Exception: AI off via Remote Config. Evidence: Galaxy A70, real Gemini."
-          foot="Run 10/11/2026 on Galaxy A70 against the real project · model gemini-flash-lite-latest (~2 s) · AI level 2: JSON schema → AiSortResult, confirmed by the user."
+          foot="Evidence: Galaxy A70, real Gemini (~2 s) · ARTEMIS T18 2/3, T19 (AI off) 3/3 · AI level 2: JSON schema → AiSortResult."
         >
           <div className="col" style={{ width: 360 }}>
-            <Card head="Trigger"><p>Evening; user taps Ghi nốt → Kể tự do</p></Card>
-            <Card head="Steps">
+            <Card head="Trigger · precondition"><p>Evening, Ghi nốt → Kể tự do · role <code>user</code>, AI on (BR-01)</p></Card>
+            <Card head="Steps → result">
               <ul className="tight">
-                <li>First use: consent sheet (what is / is not sent)</li>
-                <li>Paragraph scrubbed (email, phone), ≤ 500 chars</li>
-                <li>Gemini returns notes + mood as JSON</li>
-                <li>Labelled "Gợi ý từ Nốt AI", editable, untickable</li>
+                <li>Consent sheet on first use</li>
+                <li>Scrubbed paragraph → Gemini → JSON notes + mood</li>
+                <li>Labelled "Gợi ý từ Nốt AI", editable</li>
+                <li><b>Result:</b> chosen notes saved, jar and streak update</li>
               </ul>
             </Card>
             <Card head="Exception" tone="bad">
-              <p>AI off / quota / network / App Check → message + "Ghi tay"; the paragraph is kept</p>
+              <p>BR-01 fails (AI off, App Check, network) → "Ghi tay", paragraph kept</p>
             </Card>
           </div>
           <Shot src="04-ai-consent.png" alt="Consent sheet" h={440} cap="Consent" />
@@ -865,19 +865,19 @@ export default function FinalDeck() {
           part="P3 · Demo · 19 WF-02 · User + Staff"
           title="WF-02 Publish a card: staff approve on the web, the phone updates within seconds"
           notes="Cross-role. Measured three times on the deployed system. D-1 slow (listener idle); D-2, D-3 2–4 s. Also mention the approve bug found here and fixed."
-          foot="Server write 1.4 s after Duyệt in all runs · phone update ≤ 3.4 s (D-2), ≤ 2.3 s (D-3); D-1 22 s after the listener sat idle · docs/cross-role-flow.md"
+          foot="Evidence: write 1.4 s after Duyệt · phone ≤ 3.4 s (D-2, D-3), 22 s when idle (D-1) · ARTEMIS T20 3/3 · docs/cross-role-flow.md"
         >
           <div className="col" style={{ width: 300 }}>
-            <Card head="State"><p><b>pending → approved</b> (or rejected + reason)</p></Card>
+            <Card head="Trigger · state"><p>User shares own card · <b>pending → approved</b> / rejected</p></Card>
             <Card head="Steps">
               <ul className="tight">
                 <li>User: Gửi cho mọi người → pending</li>
-                <li>Staff: Hàng chờ duyệt → Duyệt, pick level</li>
-                <li>Batch: catalog card + status + inbox</li>
-                <li>App: "Đã vào kho chung ✓", bell badge</li>
+                <li>Staff: Hàng chờ duyệt → Duyệt</li>
+                <li>Batch: card + status + inbox</li>
+                <li>App: "Đã vào kho chung ✓"</li>
               </ul>
             </Card>
-            <Card head="Exception" tone="bad"><p>Reject needs a reason (rules + UI) · user cannot approve (R-22)</p></Card>
+            <Card head="Exception" tone="bad"><p>BR-03 reject needs a reason · BR-02 user cannot approve (R-22)</p></Card>
           </div>
           <Shot src="cr-02-phone-pending.png" alt="Pending" h={430} cap="Đang chờ duyệt" />
           <div className="col">
@@ -889,9 +889,9 @@ export default function FinalDeck() {
         {/* 20 · WF-03 */}
         <S
           part="P3 · Demo · 20 WF-03 · Staff"
-          title="WF-03 Announce: staff post once, every user sees it in the inbox in real time"
-          notes="Form validation (title ≤ 80, body ≤ 1000), staff only. Shows in the app inbox at the same minute."
-          foot="Rules R-25: only staff create, authorUid = self, non-empty body; every signed-in user reads · web checklist #9–11."
+          title="WF-03 Announce news to every user: staff post once, every inbox shows it in the same minute"
+          notes="Trigger: staff has news. Precondition: staff or admin session. BR-04 is checked twice: in the form and in the rules. Result: the announcement exists and every user sees it in the inbox in real time. Exception: empty body, too long, or a user account → blocked."
+          foot="Evidence: sent at 10:56, in the app inbox at 10:56 · rules R-25 (staff only, authorUid = self, title 1–80, body 1–1000) · web checklist #9–11."
         >
           <div className="col">
             <Shot src="wa-09-announcement-form.png" alt="Announcement form" w={420} cap="1 · Compose (list still empty)" />
@@ -899,9 +899,10 @@ export default function FinalDeck() {
           </div>
           <Shot src="wa-11-app-inbox-announcement.png" alt="App inbox" h={470} cap="3 · App inbox, 10:56" />
           <div className="col grow">
-            <Card head="Trigger"><p>Staff has news for every user</p></Card>
-            <Card head="Rules"><p>Staff only · authorUid = self · title ≤ 80 · body 1–1000</p></Card>
-            <Card head="Exception" tone="bad"><p>Empty body or non-staff → rules deny (R-25)</p></Card>
+            <Card head="Trigger · precondition"><p>Staff has news for every user · signed in as staff or admin</p></Card>
+            <Card head="Decision (BR-04)"><p>Title 1–80 · body 1–1000 · authorUid = self, in the form and in the rules</p></Card>
+            <Card head="Result" tone="ok"><p>Announcement published; every user's inbox shows it in real time</p></Card>
+            <Card head="Exception" tone="bad"><p>Empty or too long → form error, nothing saved · user account → rejected at sign-in, rules deny (R-25)</p></Card>
           </div>
         </S>
 
@@ -909,15 +910,15 @@ export default function FinalDeck() {
         <S
           part="P4 · Proof · 21 Testing"
           title="Rules, code and the deployed system are each tested, with evidence in the repo"
-          notes="Numbers from the latest runs on main. Be honest about what is not run yet: ARTEMIS for the Final flows."
-          foot="CI on every PR: format, analyze, all test suites, rules in the Emulator, web build, Android build, Hosting preview."
+          notes="Numbers from the latest runs on main (12/11/2026). Say what is not run: T15/T16 need a test-only email account. The one ARTEMIS failure was the agent typing key by key and timing out; the app showed the right screen."
+          foot="CI on every PR: format, analyze, all test suites, rules in the Emulator, web build, Android build, Hosting preview · details: docs/test-report.md."
         >
           <div className="col" style={{ width: 360 }}>
             <div className="stats" style={{ gridTemplateColumns: '1fr 1fr' }}>
-              <div className="stat"><b className="num">28/28</b><span>Security Rules tests</span></div>
-              <div className="stat"><b className="num">290</b><span>Flutter app tests</span></div>
-              <div className="stat"><b className="num">10 + 5</b><span>web admin + core tests</span></div>
-              <div className="stat"><b className="num">41/42</b><span>ARTEMIS runs (Lab 3)</span></div>
+              <div className="stat"><b className="num">30/30</b><span>Security Rules tests</span></div>
+              <div className="stat"><b className="num">303</b><span>Flutter app tests</span></div>
+              <div className="stat"><b className="num">14 + 5</b><span>web admin + core tests</span></div>
+              <div className="stat"><b className="num">14/15</b><span>ARTEMIS Final runs, real phone</span></div>
             </div>
           </div>
           <table className="grow">
@@ -929,12 +930,12 @@ export default function FinalDeck() {
               </tr>
             </thead>
             <tbody>
-              <tr><td><b>Rules</b></td><td>Emulator, allowed + denied per role per collection</td><td><span className="pill ok">28 / 28</span></td></tr>
+              <tr><td><b>Rules</b></td><td>Emulator, allowed + denied per role per collection (BR-02…BR-05)</td><td><span className="pill ok">30 / 30</span></td></tr>
               <tr><td><b>Unit / widget</b></td><td>ViewModels, repositories, screens at 360 dp</td><td><span className="pill ok">all pass</span></td></tr>
               <tr><td><b>Cross-role</b></td><td>3 runs on the deployed system, timed</td><td><span className="pill ok">3 / 3</span></td></tr>
-              <tr><td><b>Web checklist</b></td><td>13 screenshots: actions, rejection, empty, loading</td><td><span className="pill ok">done</span></td></tr>
-              <tr><td><b>Real device</b></td><td>Onboarding, Nốt AI, PDF, AI off on Galaxy A70</td><td><span className="pill ok">pass</span></td></tr>
-              <tr><td><b>E2E (ARTEMIS)</b></td><td>Lab 3 flows 3× each; Final flows written, not run yet</td><td><span className="pill warn">partial</span></td></tr>
+              <tr><td><b>Web checklist</b></td><td>Actions, rejection, empty, loading, error, live role change</td><td><span className="pill ok">16 / 16</span></td></tr>
+              <tr><td><b>Real device</b></td><td>Onboarding, Nốt AI, PDF, AI off, journal draft, role rejection on Galaxy A70</td><td><span className="pill ok">pass</span></td></tr>
+              <tr><td><b>E2E (ARTEMIS)</b></td><td>Lab 3: 41/42 · Final T14, T17–T20 on Galaxy A70: 14/15 · T15/T16 not run</td><td><span className="pill warn">14 / 15</span></td></tr>
             </tbody>
           </table>
         </S>
@@ -954,13 +955,14 @@ export default function FinalDeck() {
               </tr>
             </thead>
             <tbody>
-              <tr><td>Web admin: 4 screens + announcement form, deployed</td><td>Dashboard, catalog, review, announcements, users</td><td><code>evidence/web-admin/</code> (13 shots)</td></tr>
-              <tr><td>Role-based rules, deny by default, tested</td><td>user / staff / admin, R-01…R-28</td><td><code>evidence/firestore/rules-tests.txt</code></td></tr>
+              <tr><td>Web admin: 4 screens + announcement form, deployed</td><td>Dashboard, catalog, review, announcements, users</td><td><code>evidence/web-admin/</code> (16 items)</td></tr>
+              <tr><td>Role-based rules, deny by default, tested</td><td>user / staff / admin, R-01…R-30</td><td><code>evidence/firestore/rules-tests.txt</code></td></tr>
               <tr><td>Cross-role flow, real time, documented</td><td>Share card → approve → app + inbox</td><td><code>docs/cross-role-flow.md</code>, <code>evidence/cross-role/</code></td></tr>
-              <tr><td>AI level 2 with RC, App Check, fallback</td><td>Kể tự do on Gemini, <code>ai_*</code> flags, enforced App Check</td><td><code>docs/ai-feature.md</code>, <code>evidence/mobile-final/</code></td></tr>
-              <tr><td>App Check on Firestore and AI Logic</td><td>Web: reCAPTCHA Enterprise; Android: Play Integrity + debug</td><td><code>evidence/app-check/</code> (43 verified)</td></tr>
+              <tr><td>AI level 2 with RC, App Check, fallback</td><td>Kể tự do on Gemini, <code>ai_*</code> flags incl. prompts, enforced App Check</td><td><code>docs/ai-feature.md</code>, ARTEMIS T18/T19</td></tr>
+              <tr><td>App Check on Firestore and AI Logic</td><td><b>Enforced</b> on both · Web: reCAPTCHA Enterprise; Android: Play Integrity</td><td><code>evidence/app-check/</code></td></tr>
               <tr><td>Lab 3 PDF saved & shared on device</td><td>pdf + share_plus, metadata in Firestore</td><td>15.4 KB file pulled from the phone</td></tr>
               <tr><td>Mobile data on Firestore with inbox</td><td>Announcements + personal inbox, real time</td><td>web checklist #11</td></tr>
+              <tr><td colSpan={3} style={{ color: "#b3261e" }}><b>Not met:</b> ARTEMIS T15/T16 (email sign-in) not run → slide 23</td></tr>
             </tbody>
           </table>
         </S>
@@ -981,47 +983,18 @@ export default function FinalDeck() {
               </tr>
             </thead>
             <tbody>
-              <tr><td>ARTEMIS not run for the Final flows</td><td>Onboarding, Nốt AI, cross-role mobile steps lack 3× E2E evidence</td><td><span className="pill bad">High</span></td><td>Run on the Galaxy A70, 3× each</td></tr>
-              <tr><td>App Check on Firestore only monitored</td><td>Unverified clients can still reach Firestore (rules still apply)</td><td><span className="pill warn">Medium</span></td><td>Enforce once almost all traffic is verified</td></tr>
-              <tr><td>Lab 2 flows A3 (practice chat) and P4 (resume draft) not built</td><td>Two designed flows missing</td><td><span className="pill warn">Medium</span></td><td>Build A3 on the same AiService</td></tr>
+              <tr><td>ARTEMIS T15/T16 (email sign-in) not run</td><td>Sign-out / sign-in by email has widget tests only, no E2E on a device</td><td><span className="pill warn">Medium</span></td><td>Create a test-only account, run 3× each</td></tr>
+              <tr><td>Names can reach Gemini (CR-F2)</td><td>Email and phone are scrubbed, but a friend's name is sent as typed</td><td><span className="pill warn">Medium</span></td><td>Consent sheet says so; add on-device name masking</td></tr>
+              <tr><td>Exploratory session X01: 10 UI issues not rechecked</td><td>Possible small layout bugs on rarely used screens</td><td><span className="pill">Low</span></td><td>Re-run X01 on the Final build, fix or close each</td></tr>
               <tr><td>D-1 took 22 s on an idle phone</td><td>Real time not guaranteed after long idle</td><td><span className="pill">Low</span></td><td>Measure more runs; re-listen on resume</td></tr>
-              <tr><td>Release builds sideloaded fail Play Integrity</td><td>AI blocked outside Play / debug builds</td><td><span className="pill">Low</span></td><td>Demo on debug build; Play internal track</td></tr>
+              <tr><td>Lab 2 flow A3 (practice chat) dropped</td><td>Overlaps the Discord rooms; one designed flow not built</td><td><span className="pill">Low</span></td><td>Reason in docs/gap-review.md §1.1</td></tr>
             </tbody>
           </table>
         </S>
 
-        {/* 24 · Lessons */}
+        {/* 24 · Conclusion */}
         <S
-          part="P4 · Proof · 24 Lessons learned"
-          title="Running the system for real found bugs the tests did not"
-          sub="Three bugs surfaced only against the real project; all three are fixed, the first two with regression tests."
-          notes="The lesson: test on the deployed system with real accounts and real devices, not only the Emulator."
-        >
-          <div className="cards grow" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
-            <Card head="Approve timed out" tone="bad">
-              <p>Riverpod paused the unwatched catalog provider; approval waited 10 s and failed. Found while timing D-1. Fixed: read the repository once (PR #70).</p>
-            </Card>
-            <Card head="Dashboard spun offline" tone="bad">
-              <p><code>count()</code> waits for the server forever. Found while shooting the error state. Fixed: 15 s timeout → error state (PR #71).</p>
-            </Card>
-            <Card head="Gemini model retired" tone="bad">
-              <p><code>gemini-2.5-flash</code> returned 404 for new projects. Fixed: default <code>gemini-flash-lite-latest</code>, model stays in Remote Config.</p>
-            </Card>
-            <Card head="Rules are the backend">
-              <p>Without a server, every business rule is a rules condition, so rules need their own test suite.</p>
-            </Card>
-            <Card head="Read the brief twice">
-              <p>We removed the PDF for "no Cloud Storage", then re-read: the brief wanted it on the device. Restored.</p>
-            </Card>
-            <Card head="AI needs a plan B">
-              <p>App Check, quota and model changes all broke AI at some point; the hand-written path kept the flow alive.</p>
-            </Card>
-          </div>
-        </S>
-
-        {/* 25 · Conclusion */}
-        <S
-          part="P4 · Proof · 25 Conclusion"
+          part="P4 · Proof · 24 Conclusion"
           title="Nốt is now a working multi-role system, and we can show every claim"
           notes="Three messages, then leave this slide up for Q&A."
           foot="Demo: prm393-not-lab3.web.app · Web admin: prm393-not-lab3.web.app/admin/ · Repo: github.com/FU-PRM-Projects/Lab-03"
@@ -1034,7 +1007,7 @@ export default function FinalDeck() {
               <p>WF-01, WF-02, WF-03 run live on Android and the deployed web admin, on the free plan.</p>
             </Card>
             <Card head="3 · Verified" tone="accent">
-              <p>28/28 rules tests, 300+ code tests in CI, 3 timed cross-role runs, real-device AI and PDF evidence.</p>
+              <p>30/30 rules tests, 300+ code tests in CI, 14/15 ARTEMIS runs on a real phone, 3 timed cross-role runs, App Check enforced.</p>
             </Card>
           </div>
         </S>
@@ -1065,12 +1038,41 @@ export default function FinalDeck() {
         {/* A2 · App Check */}
         <S
           part="Appendix · A2 · App Check"
-          title="Both apps are registered; Firestore shows verified traffic from the web admin"
-          notes="Backup slide. Outdated-client requests are the Android app before the App Check build; Enforce waits until they are verified."
-          foot="Web: reCAPTCHA Enterprise (Fraud Defense) · Android: Play Integrity + debug tokens · Firebase AI Logic: enforced."
+          title="Both apps are registered, and Firestore and AI Logic are enforced"
+          notes="Backup slide. Before enforcing we checked that the release build passes Play Integrity (Gemini works with AI Logic enforced). After enforcing, the web admin and the phone still read Firestore."
+          foot="Web: reCAPTCHA Enterprise (Fraud Defense) · Android: Play Integrity (debug builds need a registered debug token) · enforced 12/11/2026 · evidence/app-check/."
         >
-          <Shot src="apps-registered.webp" alt="App Check apps registered" h={300} cap="Apps registered" />
-          <Shot src="firestore-metrics.webp" alt="Firestore App Check metrics" h={300} cap="Firestore: 43 verified, 0 invalid" />
+          <Shot src="ac-apps-registered.png" alt="App Check apps registered" w={560} cap="Apps: lab03 (android) Play Integrity · lab03 (web) Fraud Defense" />
+          <Shot src="ac-firestore-enforced.png" alt="Firestore enforced" w={560} cap="Cloud Firestore: Enforced · AI Logic: Enforced" />
+        </S>
+
+        {/* A3 · Lessons (appendix) */}
+        <S
+          part="Appendix · A3 · Lessons learned"
+          title="Running the system for real found bugs the tests did not"
+          sub="Five bugs surfaced only against the real project or a real device; all are fixed, with regression tests."
+          notes="The lesson: test on the deployed system with real accounts and real devices, not only the Emulator."
+        >
+          <div className="cards grow" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
+            <Card head="Approve timed out" tone="bad">
+              <p>Riverpod paused the unwatched catalog provider; approval waited 10 s and failed. Found while timing D-1. Fixed: read the repository once (PR #70).</p>
+            </Card>
+            <Card head="Dashboard spun offline" tone="bad">
+              <p><code>count()</code> waits for the server forever. Found while shooting the error state. Fixed: 15 s timeout → error state (PR #71).</p>
+            </Card>
+            <Card head="Error states 3 min late" tone="bad">
+              <p>Riverpod 3 retried failed providers 10× while showing loading. Found on the deployed web admin. Fixed: <code>retry: noRetry</code> in both apps (PR #77).</p>
+            </Card>
+            <Card head="Role read only once" tone="bad">
+              <p>A demoted staff kept the admin UI until reload (CR-F1). Fixed: the session follows the user's role document live (PR #75).</p>
+            </Card>
+            <Card head="Gemini model retired" tone="bad">
+              <p><code>gemini-2.5-flash</code> returned 404 for new projects. Fixed: default <code>gemini-flash-lite-latest</code>, model stays in Remote Config.</p>
+            </Card>
+            <Card head="AI needs a plan B">
+              <p>App Check, quota and model changes all broke AI at some point; the hand-written path kept the flow alive.</p>
+            </Card>
+          </div>
         </S>
       </Deck>
     </div>

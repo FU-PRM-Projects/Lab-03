@@ -46,6 +46,7 @@ Unknown origin vẫn là 0.
 
 | Ảnh | Cho thấy |
 |---|---|
+| [`final-apps-registered.png`](final-apps-registered.png) | App Check → Apps: `lab03 (android)` Play Integrity và `lab03 (web)` Fraud Defense, cả hai **Registered** |
 | [`final-firestore-enforced.png`](final-firestore-enforced.png) | App Check → APIs: **Cloud Firestore Enforced**, Firebase AI Logic Enforced (Basic), Authentication Monitoring |
 | [`final-web-admin-after-enforce.png`](final-web-admin-after-enforce.png) | Sau khi Enforce, tải lại web admin: vẫn đọc được vai trò từ Firestore (màn từ chối cho tài khoản `user`, không phải lỗi "Chưa kiểm tra được tài khoản"). Đã che email |
 | [`final-mobile-after-enforce.png`](final-mobile-after-enforce.png) | Bản release trên Galaxy A70, mở lại sau khi Enforce: màn Hôm nay đọc được Tường nốt và chuỗi ngày |

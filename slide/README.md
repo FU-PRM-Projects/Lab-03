@@ -114,7 +114,7 @@ import { Slide, Stack, Fragment, Code } from '@revealjs/react';
 
 ## Bộ slide Final Assignment (`final.html`)
 
-Bộ slide riêng cho Final (tiếng Anh, theo *Software Project Presentation Guideline*: Problem → Design → Demo → Proof, 28 slide gồm bìa và 2 phụ lục). Mã ở `src/final/`, ảnh minh chứng chép từ `evidence/` vào `public/final/`.
+Bộ slide riêng cho Final (tiếng Anh, theo *Software Project Presentation Guideline V11* của giảng viên: Problem 01–06 → Design 07–16 → Demo 17–20, mỗi workflow một slide cùng bố cục → Proof 21–24; 28 trang gồm bìa và 3 phụ lục A1 ví dụ Gemini, A2 App Check, A3 bài học). Workflow đặt tên theo mẫu động từ + đối tượng, điểm rẽ ghi mã BR-01…BR-05. Mã ở `src/final/`, ảnh minh chứng chép từ `evidence/` vào `public/final/`.
 
 ```sh
 cd slide
