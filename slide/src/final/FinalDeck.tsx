@@ -409,33 +409,59 @@ export default function FinalDeck() {
         <S
           part="P1 · Problem · 01 Overview"
           title="Nốt is a daily-wins app with a staff web admin, running on one Firebase project"
-          sub="The Lab 3 app became a two-client, three-role system: users log small wins on Android, staff curate the content they see."
           notes="30 seconds. Product: Nốt. Users: final-year students (persona Minh). Value: notice small wins instead of unfinished tasks; a curated, growing challenge catalog. Platform: Android plus a Flutter Web admin, both live."
           foot="Live: prm393-not-lab3.web.app (app) · prm393-not-lab3.web.app/admin/ (web admin) · repo FU-PRM-Projects/Lab-03"
         >
           <div className="col grow">
-            <div className="cards" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
-              <Card head="Users" tone="accent">
-                <p>Final-year students who feel behind; staff and admins who run the content</p>
-              </Card>
-              <Card head="Value" tone="accent">
-                <p>Log a mood and one small win in under 30 s; get new challenge cards and news without updating the app</p>
-              </Card>
-              <Card head="Platform" tone="accent">
-                <p>Flutter Android app · Flutter Web admin on Hosting · Firestore, Rules, App Check, Gemini</p>
-              </Card>
+            <div className="grid" style={{ gridTemplateColumns: '1fr 1fr 1fr', flex: 'none', gridAutoRows: 'auto' }}>
+              {[
+                [Users, 'Users', 'Students · staff · admins'],
+                [Smartphone, 'Platform', 'Flutter Android + Web'],
+                [Flame, 'Backend', 'Firebase, no server'],
+              ].map(([Icon, head, text]) => {
+                const I = Icon as typeof Users;
+                return (
+                  <div key={head as string} className="tile" style={{ alignItems: 'center', padding: '12px 14px', gap: 12 }}>
+                    <span className="ic"><I size={22} /></span>
+                    <div>
+                      <span className="k">{head as string}</span>
+                      <p style={{ color: '#1b1d2a', fontWeight: 600, fontSize: 15 }}>{text as string}</p>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-            <Card head="What the Final added on top of Lab 3">
-              <ul className="tight">
-                <li>Roles <code>user</code> / <code>staff</code> / <code>admin</code> and a web admin with 5 screens</li>
-                <li>Cross-role flow: a user shares a card, staff approve it, the app updates in real time</li>
-                <li>Nốt AI (Gemini via Firebase AI Logic): tell the day, get sorted notes to confirm</li>
-                <li>Inbox for announcements, first-run onboarding, weekly card PDF saved on the device</li>
-              </ul>
-            </Card>
+            <div className="value">
+              <span className="k">Value</span>
+              <p>Log one small win in <b>under 30 s</b>, get fresh challenge cards and news <b>without updating the app</b>.</p>
+            </div>
+            <span className="k" style={{ marginTop: 4 }}>What the Final added on top of Lab 3</span>
+            <div className="grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+              {[
+                [UserCog, 'Roles + web admin', 'user / staff / admin · 5 screens'],
+                [ClipboardCheck, 'Cross-role flow', 'share → approve → live update'],
+                [Sparkles, 'Nốt AI', 'one paragraph → sorted notes'],
+                [Bell, 'Inbox · onboarding · PDF', 'news live · starter plan · weekly card'],
+              ].map(([Icon, head, text]) => {
+                const I = Icon as typeof Users;
+                return (
+                  <div key={head as string} className="tile" style={{ alignItems: 'center', padding: '10px 14px' }}>
+                    <span className="ic"><I size={22} /></span>
+                    <div>
+                      <h4 style={{ fontSize: 17 }}>{head as string}</h4>
+                      <p style={{ fontSize: 15 }}>{text as string}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-          <div className="phones">
-            <Shot src="05-ai-free-tell-result.png" alt="Nốt AI suggestions" h={430} cap="App · Nốt AI" />
+          <div className="collage">
+            <img className="c-web" src={img('wa-03-dashboard-crop.png')} alt="Web admin dashboard" />
+            <img className="c-phone c-a" src={img('m-today.png')} alt="Today screen" />
+            <img className="c-phone c-b" src={img('05-ai-free-tell-result.png')} alt="Nốt AI" />
+            <span className="c-tag c-tag-web">Web admin · staff</span>
+            <span className="c-tag c-tag-app">Android app · user</span>
           </div>
         </S>
 
