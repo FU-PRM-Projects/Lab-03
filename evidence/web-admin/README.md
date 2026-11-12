@@ -51,4 +51,6 @@ Riverpod 3 mặc định **tự thử lại provider lỗi tới 10 lần**
 (`ProviderContainer.defaultRetry`, chờ 0,2 → 6,4 giây) và giữ trạng thái
 `AsyncLoading` trong lúc thử lại; `TimeoutException` không phải `Error` nên
 cũng bị thử lại. Vì vậy bản sửa "chờ tối đa 15 giây" ở trên chưa có tác dụng
-trên bản deploy. Chưa có ảnh trạng thái lỗi.
+trên bản deploy. Đã sửa: cả hai app dùng `ProviderScope(retry: noRetry)`, test
+`web_admin/test/dashboard_error_test.dart`. Ảnh trạng thái lỗi chụp sau khi
+bản này được deploy.

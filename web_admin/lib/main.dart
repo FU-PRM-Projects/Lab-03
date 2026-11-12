@@ -25,6 +25,7 @@ Future<void> main() async {
 
   runApp(
     ProviderScope(
+      retry: noRetry,
       overrides: [
         adminAuthProvider.overrideWithValue(FirebaseAdminAuth()),
         adminAnalyticsProvider.overrideWithValue(FirebaseAdminAnalytics()),

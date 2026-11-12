@@ -12,7 +12,8 @@ import 'package:not_core/not_core.dart'
     show
         FirestoreAnnouncementRepository,
         FirestoreInboxRepository,
-        FirestoreSubmissionRepository;
+        FirestoreSubmissionRepository,
+        noRetry;
 
 import 'app.dart';
 import 'firebase/crash_handlers.dart';
@@ -100,6 +101,7 @@ Future<void> main() async {
 
   runApp(
     ProviderScope(
+      retry: noRetry,
       overrides: [
         authServiceProvider.overrideWithValue(auth),
         messagingServiceProvider.overrideWithValue(messaging),
