@@ -424,19 +424,19 @@ export default function FinalDeck() {
         {/* 01 · Overview */}
         <S
           part="P1 · Problem · 01 Overview"
-          title="Students end the day counting what they did not finish; Nốt makes one small win visible"
-          notes="30 seconds. Problem first: Minh, a final-year student, ends each evening looking at unfinished tasks; Lab 3 helped one person alone, with fixed content and no way to reach users. Our answer: Nốt, log one win in 30 s, staff keep the challenge catalog fresh, Gemini cuts the typing. Product is live: Android app + web admin on one Firebase project. Details of each pain point on slide 03."
+          title="After a long day, many of us feel we got nothing done; Nốt helps us notice the small wins"
+          notes="30 seconds. Start with a feeling everyone knows: at the end of a long day we think we got nothing done, because we remember unfinished tasks, not the small things that went well. Writing those down takes effort when tired, and small goals that never change lose their pull. Our answer: Nốt. One small win in 30 s, fresh challenge cards curated by staff, Gemini to cut the typing. Live on Android + web admin. Next slide: who exactly (persona) and how it works today."
           foot="Live: prm393-not-lab3.web.app (app) · prm393-not-lab3.web.app/admin/ (web admin) · repo FU-PRM-Projects/Lab-03"
         >
           <div className="col grow">
             <div className="problem">
               <span className="k">Problem</span>
-              <p className="quote">“I end every evening looking at what I didn’t finish.”<span> — Minh, 22, final-year student (persona)</span></p>
+              <p className="quote">“I didn’t get anything done today.”<span>A thought most of us have at the end of a long day</span></p>
               <ul className="pains">
                 {[
-                  [MoonStar, 'Logging a good moment takes effort at night'],
-                  [Boxes, 'Challenge cards never change; nobody curates them'],
-                  [Megaphone, 'No way to tell users about new cards or news'],
+                  [CheckCircle2, 'We remember unfinished tasks, not the small things that went well'],
+                  [MoonStar, 'When tired, writing the day down feels like one more task'],
+                  [Boxes, 'Small goals that never change stop motivating us'],
                 ].map(([Icon, text]) => {
                   const I = Icon as typeof Users;
                   return (
@@ -450,7 +450,7 @@ export default function FinalDeck() {
             </div>
             <div className="value">
               <span className="k">Our answer · Nốt</span>
-              <p>Log one small win in <b>under 30 s</b>; staff keep fresh challenge cards and news coming <b>without an app update</b>.</p>
+              <p>Log one small win in <b>under 30 s</b>, see them add up, and get <b>fresh small challenges</b> curated by staff.</p>
             </div>
             <div className="facts">
               {[
