@@ -667,32 +667,70 @@ export default function FinalDeck() {
         {/* 06 · Features */}
         <S
           part="P1 · Problem · 06 Main features · WHAT"
-          title="Three core workflows"
-          sub="Each workflow has an actor, a trigger and a business result, not a list of buttons."
-          notes="Three workflows, one story: the user logs the day, shares a card that staff approve, staff announce it. Other features listed underneath."
-          foot="Supporting features: onboarding & starter plan · weekly card PDF · streaks & journey · self-control & breathing · groups · Discord link · dashboard · roles."
+          title="Four feature groups, three demo workflows"
+          sub="Each group links an actor to the pain point it solves, and names the workflow we demo live."
+          notes="Four groups, left to right. Log the day is for the user and answers pains 1 and 2; WF-01 Nốt AI is the demo. Challenges joins user and staff and answers pain 3; WF-02 is the demo. News to users is staff talking to everyone; WF-03 is the demo. Admin and safety keeps the other three safe. Filled dots are the MVP, built and tested; hollow dots are extensions, either Lab 3 extras or next steps we did not build."
         >
-          {[
-            [Sparkles, 'WF-01', 'Log the day with Nốt AI', 'User', 'Evening, user taps Ghi nốt → Kể tự do', 'Notes saved after the user confirms', 'BR-01 · consent, Gemini JSON, edit, fallback', 'Slow evenings'],
-            [ClipboardCheck, 'WF-02', 'Publish a user card to the shared catalog', 'User + Staff', 'User shares an own card', 'Card in the catalog, app updates, inbox message', 'BR-02 submit · BR-03 approve / reject + reason', 'Static content'],
-            [Megaphone, 'WF-03', 'Announce news to every user', 'Staff', 'Staff has news for everyone', 'Announcement published; every inbox shows it', 'BR-04 title 1–80, body 1–1000, staff only', 'No channel'],
-          ].map(([Icon, id, name, actor, trigger, result, rule, pain]) => {
-            const I = Icon as typeof Sparkles;
-            return (
-              <div key={id as string} className="wf grow">
-                <span className="ic big" style={{ background: '#fff' }}><I size={30} /></span>
-                <span className="id">{id as string}</span>
-                <span className="name">{name as string}</span>
-                <dl>
-                  <dt>Actor</dt><dd>{actor as string}</dd>
-                  <dt>Trigger</dt><dd>{trigger as string}</dd>
-                  <dt>Result</dt><dd><b>{result as string}</b></dd>
-                  <dt>Rules</dt><dd>{rule as string}</dd>
-                  <dt>Solves</dt><dd>{pain as string}</dd>
-                </dl>
-              </div>
-            );
-          })}
+          <div className="col grow" style={{ minWidth: 0 }}>
+            <div className="fg4">
+              {[
+                {
+                  icon: Sparkles, name: 'Log the day', roles: [['u', 'User']], shot: '05-ai-free-tell-result.png',
+                  items: [['star', 'Nốt AI: tell the day once', 'WF-01'], ['mvp', 'Jar of small wins, 30 s note'], ['mvp', 'Streak and weekly card PDF'], ['ext', 'Self-control and breathing']],
+                  solves: 'Only seeing what is unfinished · writing is one more task',
+                },
+                {
+                  icon: ClipboardCheck, name: 'Challenges', roles: [['u', 'User'], ['s', 'Staff']], shot: 'cr-05-phone-approved-run3.png',
+                  items: [['star', 'Share a card, staff approve', 'WF-02'], ['mvp', 'Card catalog run on the web'], ['mvp', 'Onboarding + starter plan'], ['ext', 'Journey climb, groups']],
+                  solves: 'Goals that never change',
+                },
+                {
+                  icon: Megaphone, name: 'News to users', roles: [['s', 'Staff']], shot: 'wa-11-app-inbox-announcement.png',
+                  items: [['star', 'Announce to every inbox', 'WF-03'], ['mvp', 'Personal inbox messages'], ['mvp', 'Evening push reminder'], ['ext', 'Discord room links']],
+                  solves: 'Nobody tells us what is new',
+                },
+                {
+                  icon: ShieldCheck, name: 'Admin and safety', roles: [['a', 'Admin']], shot: 'wa-12-users-crop.png', web: true,
+                  items: [['mvp', 'Roles, changed by an admin only'], ['mvp', 'Dashboard'], ['mvp', 'App Check, AI on/off switch'], ['ext', 'next: "Hỏi Nốt" AI, iOS']],
+                  solves: 'Keeps the other three safe',
+                },
+              ].map((g) => {
+                const I = g.icon;
+                return (
+                  <div key={g.name} className="fg-col">
+                    <div className="fg-head">
+                      <span className="wf3-ic"><I size={20} /></span>
+                      <h4>{g.name}</h4>
+                    </div>
+                    <span className="wf3-roles">
+                      {g.roles.map(([t, r]) => (
+                        <span key={r} className={`role ${t}`}>{r}</span>
+                      ))}
+                    </span>
+                    <div className="fg-shot">
+                      <img src={img(g.shot)} alt="" className={g.web ? 'web' : 'phone'} />
+                    </div>
+                    {g.items.filter(([k]) => k === 'star').map(([, t, wf]) => (
+                      <p key={t} className="fg-demo"><span>Demo {wf}</span>{t}</p>
+                    ))}
+                    <div className="fg-sec">
+                      <span className="fg-k mvp">MVP</span>
+                      <ul>
+                        {g.items.filter(([k]) => k === 'mvp').map(([, t]) => <li key={t}>{t}</li>)}
+                      </ul>
+                    </div>
+                    <div className="fg-sec">
+                      <span className="fg-k ext">Extra</span>
+                      <ul className="ext">
+                        {g.items.filter(([k]) => k === 'ext').map(([, t]) => <li key={t}>{t}</li>)}
+                      </ul>
+                    </div>
+                    <p className="wf3-solves"><span>Solves</span>{g.solves}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </S>
 
         <Divider part={PARTS[1]} shots={['ev-firestore-console.png', 'g-mobile-final-03-onboarding-starter-plan.png', 'g-journey-climb-dung-cam.png']} />
