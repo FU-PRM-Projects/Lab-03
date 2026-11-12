@@ -69,52 +69,41 @@ Cho các ca T14–T16:
 
 ### Chạy các ca Android của Final
 
-Dùng máy Android đăng nhập tài khoản test riêng, đã hoàn thành Làm quen.
-Giữ server ARTEMIS chạy và để app ở tab Hôm nay trước ca đầu tiên.
+Bộ flow chuẩn duy nhất là `test_main_flows.py` của Thúy (PR #78):
+
+| Mã | Flow | Kỳ vọng |
+|---|---|---|
+| T17 | Trả lời 4 câu Làm quen, xem 3 thẻ khởi đầu, không bấm Bắt đầu | `PLAN_SHOWN` |
+| T18 | Kể tự do, xem gợi ý Gemini, không lưu nốt | `SUGGESTIONS` |
+| T19 | Tắt AI bằng Remote Config, mở Ghi tay, không lưu nốt | `AI_OFF_MANUAL MANUAL_OPENS` |
+| T20 | Gửi thẻ thử, kiểm tra chờ, rút/xoá thẻ thử; xem thẻ đã duyệt và tin có sẵn | `PENDING APPROVED INBOX` |
+
+Dùng Android đã đăng nhập tài khoản demo như mô tả trong báo cáo, có thẻ đã duyệt
+và tin hộp thư cho T20. Giữ server ARTEMIS chạy, app ở Hôm nay; bật AI trước T18.
+T17 tự khởi động lại app để tránh ghi đè khảo sát. T20 dọn thẻ thử do chính ca tạo.
+Luồng staff duyệt đúng thẻ mới trên web được đo riêng trong
+[báo cáo liên vai trò](../docs/cross-role-flow.md).
 
 ```powershell
 cd D:\Lab-03\e2e_test
 $env:ARTEMIS_DEVICE_SERIAL = 'emulator-5554'
-$env:E2E_FINAL_TEST_ACCOUNT = '1'
-$env:E2E_REVIEW_BATCH = 'final-demo-01'
-uv run pytest test_final_flows.py -k t17 --runs 3 -v --junitxml=../evidence/artemis/final-t17.xml
+uv run pytest test_main_flows.py -k 't17 or t18 or t20' --runs 3 -v --junitxml=../evidence/artemis/final-rerun-t17-t18-t20.xml
 ```
 
-Chọn mã đợt mới mỗi khi chạy lại T17. Staff duyệt trên Web Admin đúng ba
-thẻ `E2E-final-demo-01-1`, `E2E-final-demo-01-2` và `E2E-final-demo-01-3`,
-sau đó chạy T18 bằng cùng mã đợt:
+T19 chạy riêng: đặt `ai_enabled=false` trên Console, Publish và tải cấu hình mới
+trong app trước khi chạy. Sau khi test, bật lại `ai_enabled=true` và tải lại.
 
 ```powershell
-$env:E2E_REVIEW_OUTCOME = 'approved'
-uv run pytest test_final_flows.py -k t18 --runs 3 -v --junitxml=../evidence/artemis/final-t18.xml
+$env:E2E_AI_DISABLED = '1'
+uv run pytest test_main_flows.py -k t19 --runs 3 -v --junitxml=../evidence/artemis/final-rerun-t19.xml
+Remove-Item Env:E2E_AI_DISABLED
 ```
 
-Để test nhánh từ chối, dùng một đợt T17 mới. Trên web, từ chối cả ba thẻ
-với lý do `Trung voi the da co`, rồi chạy T18 với `E2E_REVIEW_OUTCOME=rejected`.
-T17/T18 xác minh phía Android. Ba lượt đo thời gian trên bản deploy được
-ghi riêng trong [báo cáo luồng liên vai trò](../docs/cross-role-flow.md).
+Log gốc của Thúy được giữ ở `evidence/artemis/final-t14-t17-t18-t20.txt` và
+`final-t19.txt`; dùng tên `final-rerun-*` cho đợt mới để tránh ghi đè.
+Bộ bổ sung trước đây chuyển sang `archived_final_scenarios.py.txt`, chỉ để tham khảo,
+không được pytest thu thập. Không dùng mã T17–T27 trong file lưu trữ để ghi slide.
 
-Các ca AI chạy theo từng cấu hình. Mỗi lần chuẩn bị Remote Config trên
-môi trường test và tải lại trong app trước khi chạy. T21 cần cấu hình
-AI vẫn bật nhưng phát sinh lỗi có kiểm soát (ví dụ model thử không tồn tại).
-Khôi phục cấu hình sau khi test. Bộ pytest chỉ đọc biến để chọn ca chạy.
-
-```powershell
-$env:E2E_AI_MODE = 'on'
-uv run pytest test_final_flows.py -k t19 --runs 3 -v --junitxml=../evidence/artemis/final-t19.xml
-# Sau khi tắt ai_enabled và tải lại trên app
-$env:E2E_AI_MODE = 'off'
-uv run pytest test_final_flows.py -k t20 --runs 3 -v --junitxml=../evidence/artemis/final-t20.xml
-# Sau khi chuẩn bị lỗi AI có kiểm soát
-$env:E2E_AI_MODE = 'error'
-uv run pytest test_final_flows.py -k t21 --runs 3 -v --junitxml=../evidence/artemis/final-t21.xml
-```
-
-T22–T24 lần lượt kiểm tra Thống kê/Lịch, viết nhật ký và khảo sát Làm quen.
-T25 kiểm tra ghi vận động khi dừng sớm. T26 cần ba nốt test được tạo sẵn
-trên cùng tài khoản, có tiêu đề `E2E edit <mã đợt> 1`, `E2E edit <mã đợt> 2`
-và `E2E edit <mã đợt> 3`. Đặt `E2E_EDIT_BATCH` bằng mã đợt đó rồi chạy T26.
-T27 ghi một lần tự chủ.
 T02 dùng gợi ý nhanh “Dọn phòng” để kiểm tra thao tác lưu. T03 chỉ dọn nốt
 có dấu hiệu riêng `E2E test note`, nên các nốt thử từ gợi ý cần dọn riêng
 trên tài khoản test nếu cần.
