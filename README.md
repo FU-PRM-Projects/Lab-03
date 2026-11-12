@@ -74,7 +74,7 @@ Giảng viên cần vào web admin thì đăng nhập Google một lần (web t�
 | 3 | Firebase và đăng nhập | Xong (chạy trên project thật `prm393-not-lab3`, Google Sign-In trên máy thật) | `lib/services/`, `lib/firebase/`, S01, đăng xuất ở S12 |
 | 4 | Tính năng | Xong: đủ 12 màn, 3 flow F1–F3 và các flow phụ, PDF Thẻ tuần (Final: lưu trên máy, chia sẻ, metadata Firestore); Final thêm Làm quen, Nốt AI, hộp thư, gửi thẻ lên kho chung, nháp nhật ký (P4) | Đủ 12 màn với mọi trạng thái, lưu và chia sẻ PDF |
 | 5 | Analytics, Crashlytics, Remote Config, FCM | Xong ([`evidence/analytics/`](evidence/analytics/), [`evidence/crashlytics/`](evidence/crashlytics/), [`evidence/remote-config/`](evidence/remote-config/), [`evidence/fcm/`](evidence/fcm/)) | [`docs/analytics-plan.md`](docs/analytics-plan.md) |
-| 6 | Test plan và ARTEMIS | Lab 3 xong (41/42); Final: T14, T17, T18, T20 đạt 11/12 lần trên máy thật, T19/T15/T16 chưa chạy | `docs/test-plan.md`, `e2e_test/`, [`docs/test-report.md`](docs/test-report.md) |
+| 6 | Test plan và ARTEMIS | Lab 3 xong (41/42); Final: T14, T17–T20 đạt 14/15 lần trên máy thật, T15/T16 chưa chạy | `docs/test-plan.md`, `e2e_test/`, [`docs/test-report.md`](docs/test-report.md) |
 | 7 | AI code review | Lab 3 xong; Final: 5 góp ý có quyết định | `docs/code-review.md`, [`docs/test-report.md`](docs/test-report.md) mục 6 |
 | 8 | Báo cáo, slide, video | Slide Final có bản đầu (`slides/Final_SE190992_slides.pdf`); report Final và video chưa làm | `report/`, `slides/` |
 
