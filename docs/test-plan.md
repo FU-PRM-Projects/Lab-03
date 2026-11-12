@@ -117,7 +117,7 @@ mong muốn, không phải để che lỗi của app.
   nhận chuỗi rỗng. Thêm vòng thử lại (5 lần, cách 2 giây) rồi chạy lại T13 đủ 3 lần: 3/3. Lần
   chạy đầu (2/3 cho T13) vẫn giữ trong `junit-t13-t14.xml`.
 - **T14 (Lab 3):** chưa có Storage bucket nên kết quả đúng là câu báo lỗi kèm "Thử lại" (3/3).
-  Ở Final, PDF lưu trên máy nên T14 đòi lưu và mở hộp chia sẻ thành công; cần chạy lại 3 lần.
+  Ở Final, PDF lưu trên máy nên T14 đòi lưu và mở hộp chia sẻ thành công; chạy lại 12/11: 3/3.
 
 ### Phiên khám phá X01
 
@@ -162,7 +162,7 @@ cấm đăng xuất, xoá tài khoản và gửi ra ngoài app. Sau khi chạy, 
 
 - **T15 và T16 chưa chạy**: cần một tài khoản email chỉ dùng cho test.
   Đặt `E2E_EMAIL`, `E2E_PASSWORD` rồi chạy `uv run pytest -k "t15 or t16"`.
-- T14 (bản Final: lưu PDF trên máy) chưa chạy lại trên ARTEMIS.
+- T14 bản Final đã chạy lại 12/11/2026 trên máy thật: 3/3 (xem `test-report.md` mục 2.2, cùng T17, T18, T20).
 - Agent là mô hình ngôn ngữ nên kết quả có thể thay đổi giữa các lần; 3 lần mỗi ca chỉ cho
   ước lượng thô về độ ổn định.
 - Chỉ có một model (DeepSeek) và một thiết bị ảo; chưa thử điện thoại thật.

@@ -74,7 +74,7 @@ Giảng viên cần vào web admin thì đăng nhập Google một lần (web t�
 | 3 | Firebase và đăng nhập | Xong (chạy trên project thật `prm393-not-lab3`, Google Sign-In trên máy thật) | `lib/services/`, `lib/firebase/`, S01, đăng xuất ở S12 |
 | 4 | Tính năng | Xong: đủ 12 màn, 3 flow F1–F3 và các flow phụ, PDF Thẻ tuần (Final: lưu trên máy, chia sẻ, metadata Firestore); Final thêm Làm quen, Nốt AI, hộp thư, gửi thẻ lên kho chung, nháp nhật ký (P4) | Đủ 12 màn với mọi trạng thái, lưu và chia sẻ PDF |
 | 5 | Analytics, Crashlytics, Remote Config, FCM | Xong ([`evidence/analytics/`](evidence/analytics/), [`evidence/crashlytics/`](evidence/crashlytics/), [`evidence/remote-config/`](evidence/remote-config/), [`evidence/fcm/`](evidence/fcm/)) | [`docs/analytics-plan.md`](docs/analytics-plan.md) |
-| 6 | Test plan và ARTEMIS | Lab 3 xong (41/42); ca ARTEMIS cho luồng Final chưa chạy | `docs/test-plan.md`, `e2e_test/`, [`docs/test-report.md`](docs/test-report.md) |
+| 6 | Test plan và ARTEMIS | Lab 3 xong (41/42); Final: T14, T17–T20 đạt 14/15 lần trên máy thật, T15/T16 chưa chạy | `docs/test-plan.md`, `e2e_test/`, [`docs/test-report.md`](docs/test-report.md) |
 | 7 | AI code review | Lab 3 xong; Final: 5 góp ý có quyết định | `docs/code-review.md`, [`docs/test-report.md`](docs/test-report.md) mục 6 |
 | 8 | Báo cáo, slide, video | Slide Final có bản đầu (`slides/Final_SE190992_slides.pdf`); report Final và video chưa làm | `report/`, `slides/` |
 
@@ -254,7 +254,7 @@ lib/
 |---|---|
 | Claude (Claude Code) | Đọc đề Lab 3 và tài liệu Lab 2, viết `design-traceability.md` và `architecture.md`, dựng theme, thư viện widget, khung route và test (Stage 1–2); tầng service Firebase, đăng nhập, redirect và test (Stage 3). Final: đối chiếu đề với repo, viết `docs/test-report.md` và AI code review cho code Final (mục 6), chặn tài khoản staff / admin trên app, nháp nhật ký (P4), vai trò web admin theo thời gian thực, prompt AI trong Remote Config, test rules R-29 / R-30, cập nhật gap review, data model, README |
 | CodeRabbit | AI code review cho Lab 3 ([`docs/code-review.md`](docs/code-review.md)) và nhận xét trên các PR của Final |
-| DeepSeek (qua Google ARTEMIS) | Agent chạy test E2E trên máy ảo Android ([`docs/test-plan.md`](docs/test-plan.md)) |
+| DeepSeek (qua Google ARTEMIS) | Agent chạy test E2E trên máy ảo Android (Lab 3) và Galaxy A70 thật (Final) ([`docs/test-plan.md`](docs/test-plan.md)) |
 | Gemini (Firebase AI Logic) | Tính năng trong app (Nốt AI), không phải công cụ viết code ([`docs/ai-feature.md`](docs/ai-feature.md)) |
 
 Thành viên dùng thêm công cụ AI nào thì bổ sung vào bảng này trước khi nộp.

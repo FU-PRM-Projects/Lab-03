@@ -1,0 +1,18 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.5, pytest-9.2.0, pluggy-1.7.0 -- D:\Semester 8_FA26\PRM393\Code_Lab3\Lab-03\e2e_test\.venv\Scripts\python.exe
+rootdir: D:\Semester 8_FA26\PRM393\Code_Lab3\Lab-03\e2e_test
+configfile: pyproject.toml
+plugins: asyncio-1.4.1.post1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=session, asyncio_default_test_loop_scope=session
+collecting ... collected 60 items / 57 deselected / 3 selected
+
+test_main_flows.py::test_t19_ai_disabled_by_remote_config[run1] PASSED   [ 33%]
+test_main_flows.py::test_t19_ai_disabled_by_remote_config[run2] PASSED   [ 66%]
+test_main_flows.py::test_t19_ai_disabled_by_remote_config[run3] PASSED   [100%]
+
+=================================== PASSES ====================================
+=========================== short test summary info ===========================
+PASSED test_main_flows.py::test_t19_ai_disabled_by_remote_config[run1]
+PASSED test_main_flows.py::test_t19_ai_disabled_by_remote_config[run2]
+PASSED test_main_flows.py::test_t19_ai_disabled_by_remote_config[run3]
+================ 3 passed, 57 deselected in 369.16s (0:06:09) =================

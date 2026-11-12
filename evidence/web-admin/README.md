@@ -22,6 +22,7 @@ admin "Thị Kim Thúy Đoàn".
 | 13 | Tổng quan | **Trạng thái đang tải**: "Đang đếm số liệu…", nút Làm mới mờ | Đạt | [`13-dashboard-loading.png`](13-dashboard-loading.png) |
 | 14 | Đổi vai trò khi đang mở | Tab đang ở màn từ chối; đổi `role` của tài khoản đó thành `staff` trên Console → tab **tự vào Tổng quan**, nhãn "Staff", không tải lại trang | Đạt | [`14-live-role-user-to-staff.png`](14-live-role-user-to-staff.png) |
 | 15 | Đổi vai trò khi đang mở | Đổi lại `role = user` → tab đang ở Tổng quan **tự về màn từ chối** (góp ý CR-F1). Đã che email | Đạt | [`15-live-role-staff-to-user.png`](15-live-role-staff-to-user.png) |
+| 16 | Tổng quan | **Trạng thái lỗi** (bản deploy sau PR #77): chặn request `count()` trong tab rồi bấm Làm mới → sau ~15 giây hiện "Chưa tải được dữ liệu · Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại." và nút Thử lại; gỡ chặn, bấm Thử lại thì số liệu hiện lại | Đạt | [`16-dashboard-error.png`](16-dashboard-error.png) |
 
 ## Trạng thái lỗi
 
@@ -30,8 +31,8 @@ dùng chung `MessageView.error` khi tải lỗi (Tụi Nốt "lạc" + câu báo
 lại); màn đăng nhập có nhánh lỗi riêng "Chưa kiểm tra được tài khoản". Lỗi
 thật gặp trên bản deploy khi chạy luồng liên vai trò: bấm Duyệt hiện *"Có lỗi
 xảy ra. Thử lại sau ít phút."* và giữ thẻ ở hàng chờ (đã sửa ở PR #70, xem
-[`docs/cross-role-flow.md`](../../docs/cross-role-flow.md)). Chưa có ảnh chụp
-trạng thái lỗi.
+[`docs/cross-role-flow.md`](../../docs/cross-role-flow.md)). Ảnh trạng thái
+lỗi của Tổng quan: ảnh 16.
 
 ## Phát hiện khi chụp trạng thái lỗi
 
@@ -52,5 +53,5 @@ Riverpod 3 mặc định **tự thử lại provider lỗi tới 10 lần**
 `AsyncLoading` trong lúc thử lại; `TimeoutException` không phải `Error` nên
 cũng bị thử lại. Vì vậy bản sửa "chờ tối đa 15 giây" ở trên chưa có tác dụng
 trên bản deploy. Đã sửa: cả hai app dùng `ProviderScope(retry: noRetry)`, test
-`web_admin/test/dashboard_error_test.dart`. Ảnh trạng thái lỗi chụp sau khi
-bản này được deploy.
+`web_admin/test/dashboard_error_test.dart`. Đã kiểm tra lại trên bản
+deploy sau PR #77: lỗi hiện sau ~15 giây (ảnh 16).
