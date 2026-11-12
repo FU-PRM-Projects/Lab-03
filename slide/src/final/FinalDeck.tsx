@@ -2,12 +2,10 @@ import type { ReactNode } from 'react';
 import { Deck, Slide } from '@revealjs/react';
 import RevealNotes from 'reveal.js/plugin/notes';
 import {
-  Activity, Bell, BellRing, Bot, Boxes, Bug, ChartColumn, CheckCircle2, ClipboardCheck, Container,
-  Database, FileText, Flame, GitBranch, HardDrive, Image as ImageIcon, KeyRound, Link2, Megaphone,
-  Monitor, MoonStar, PenLine, Rocket, ScrollText, ShieldCheck, SlidersHorizontal, Smartphone,
-  Sparkles, UserCog, Users, Workflow,
+  Bell, Bot, Boxes, CheckCircle2, ClipboardCheck, FileText, Flame, Link2, Megaphone, MoonStar, PenLine, ShieldCheck, Smartphone, Sparkles, UserCog, Users,
 } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+
+import ServerlessMap from './ServerlessMap';
 
 import 'reveal.js/reveal.css';
 import '../slides.css';
@@ -350,122 +348,6 @@ function Erd() {
   );
 }
 
-/** Slide 10: AWS-style technology map, grouped as FE · BE/AI · DB · DevOps · Ops. */
-const T = {
-  fe: '#ED7100',
-  be: '#DD344C',
-  ai: '#01A88D',
-  db: '#3B48CC',
-  dev: '#7B42BC',
-  ops: '#E7157B',
-};
-
-function Svc({
-  x,
-  y,
-  w,
-  icon: I,
-  color,
-  t,
-  s,
-  dashed,
-}: {
-  x: number;
-  y: number;
-  w: number;
-  icon: LucideIcon;
-  color: string;
-  t: string;
-  s: string;
-  dashed?: boolean;
-}) {
-  return (
-    <g>
-      <rect x={x} y={y} width={w} height={64} rx={8} fill="#fff" stroke={dashed ? '#9aa1b3' : '#d9dce6'} strokeDasharray={dashed ? '5 4' : undefined} />
-      <rect x={x + 9} y={y + 9} width={46} height={46} rx={7} fill={color} />
-      <I x={x + 19} y={y + 19} width={26} height={26} color="#fff" strokeWidth={2} />
-      <text x={x + 65} y={y + 28} fontSize={14} fontWeight={700} fill={C.ink}>
-        {t}
-      </text>
-      <text x={x + 65} y={y + 47} fontSize={11.5} fill={C.muted}>
-        {s}
-      </text>
-    </g>
-  );
-}
-
-function Group({ x, y, w, h, t, color }: { x: number; y: number; w: number; h: number; t: string; color: string }) {
-  return (
-    <g>
-      <rect x={x} y={y} width={w} height={h} rx={10} fill="#fafbfd" stroke={color} strokeWidth={1.6} />
-      <rect x={x} y={y} width={w} height={26} rx={10} fill={color} />
-      <rect x={x} y={y + 14} width={w} height={12} fill={color} />
-      <text x={x + 12} y={y + 18} fontSize={12.5} fontWeight={800} fill="#fff" letterSpacing="0.06em">
-        {t}
-      </text>
-    </g>
-  );
-}
-
-function TechMap() {
-  return (
-    <svg className="diagram" viewBox="0 -18 1168 496">
-      <Defs />
-      {/* FE */}
-      <Group x={0} y={0} w={262} h={300} t="FE · MOBILE & WEB" color={T.fe} />
-      <Svc x={10} y={40} w={242} icon={Users} color={T.fe} t="User · Staff · Admin" s="Android phone · browser" />
-      <Svc x={10} y={124} w={242} icon={Smartphone} color={T.fe} t="Android app" s="Flutter · Riverpod 3 · go_router" />
-      <Svc x={10} y={208} w={242} icon={Monitor} color={T.fe} t="Web admin" s="Flutter Web · same MVVM" />
-      <Arrow d="M131 104 V122" />
-
-      {/* Firebase boundary */}
-      <rect x={280} y={0} width={888} height={300} rx={12} fill="none" stroke="#f5a623" strokeWidth={1.6} strokeDasharray="7 5" />
-      <text x={292} y={-6} fontSize={12} fontWeight={700} fill="#a84f00">
-        GOOGLE CLOUD · FIREBASE (Spark, no custom server)
-      </text>
-
-      {/* BE + AI */}
-      <Group x={294} y={14} w={548} h={274} t="BE · AI  (serverless)" color={T.be} />
-      <Svc x={304} y={50} w={260} icon={KeyRound} color={T.be} t="Firebase Auth" s="Google + email sign-in" />
-      <Svc x={572} y={50} w={260} icon={ShieldCheck} color={T.be} t="App Check" s="Play Integrity · reCAPTCHA Ent." />
-      <Svc x={304} y={126} w={260} icon={ScrollText} color={T.be} t="Security Rules" s="roles + business rules BR-02…05" />
-      <Svc x={572} y={126} w={260} icon={SlidersHorizontal} color={T.be} t="Remote Config" s="feature flags · ai_* · prompts" />
-      <Svc x={304} y={202} w={260} icon={BellRing} color={T.be} t="Cloud Messaging" s="push reminders (FCM)" />
-      <Svc x={572} y={202} w={260} icon={Sparkles} color={T.ai} t="Firebase AI Logic" s="Gemini API · JSON schema" />
-
-      {/* DB + storage */}
-      <Group x={856} y={14} w={300} h={274} t="DB · STORAGE" color={T.db} />
-      <Svc x={866} y={50} w={280} icon={Database} color={T.db} t="Cloud Firestore" s="realtime NoSQL · asia-southeast1" />
-      <Svc x={866} y={126} w={280} icon={HardDrive} color={T.db} t="On-device storage" s="weekly PDF · drafts (prefs)" dashed />
-      <Svc x={866} y={202} w={280} icon={ImageIcon} color={T.db} t="Cloudinary" s="note photos (external)" dashed />
-
-      {/* data flow */}
-      <Arrow d="M252 156 H302" color={T.fe} />
-      <Arrow d="M252 240 C276 240 280 170 302 160" color={T.fe} />
-      <Label x={276} y={146} t="HTTPS" color={T.fe} />
-      <Arrow d="M832 158 C848 158 848 82 864 82" color={T.be} />
-
-      {/* DevOps */}
-      <Group x={0} y={322} w={700} h={150} t="DEVOPS" color={T.dev} />
-      <Svc x={10} y={360} w={166} icon={GitBranch} color={T.dev} t="GitHub" s="PRs · CodeRabbit" />
-      <Svc x={184} y={360} w={166} icon={Workflow} color={T.dev} t="Actions" s="CI · tests · build" />
-      <Svc x={358} y={360} w={166} icon={Rocket} color={T.dev} t="Hosting" s="app + /admin/" />
-      <Svc x={532} y={360} w={160} icon={Container} color={T.dev} t="Docker" s="Discord bot" />
-      <Arrow d="M176 392 H182" color={T.dev} />
-      <Arrow d="M350 392 H356" color={T.dev} />
-      <Arrow d="M440 358 C440 330 140 330 131 274" color={T.dev} dash />
-      <Label x={350} y={448} t="GitHub Actions: merge to main → test → deploy Hosting, Firestore rules" color={T.dev} />
-
-      {/* Ops */}
-      <Group x={716} y={322} w={452} h={150} t="OPS · MONITORING" color={T.ops} />
-      <Svc x={726} y={360} w={140} icon={Bug} color={T.ops} t="Crashlytics" s="crashes" />
-      <Svc x={872} y={360} w={140} icon={ChartColumn} color={T.ops} t="Analytics" s="events" />
-      <Svc x={1018} y={360} w={142} icon={Activity} color={T.ops} t="App Check" s="traffic" />
-      <Label x={942} y={448} t="Firebase Console dashboards (managed, no Grafana)" color={T.ops} />
-    </svg>
-  );
-}
-
 /* ---------------------------------------------------------------- deck */
 
 export default function FinalDeck() {
@@ -787,10 +669,10 @@ export default function FinalDeck() {
         {/* 10 · Tech stack */}
         <S
           part="P2 · Design · 10 Technology stack"
-          title="Flutter in front, Firebase behind, GitHub to ship: every service has one job"
+          title="Serverless on Firebase: Security Rules are the backend"
           notes="Read it like an AWS diagram: FE (two Flutter clients) talks over HTTPS to serverless Firebase (BE + AI), which stores data in Firestore. Below: DevOps ships it, Ops watches it. Only services we really use (pubspec, workflows, compose file); no Grafana, monitoring is the Firebase Console."
         >
-          <TechMap />
+          <ServerlessMap />
         </S>
 
         {/* 11 · UI/UX */}
