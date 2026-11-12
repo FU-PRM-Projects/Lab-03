@@ -40,7 +40,8 @@ function S({
 }) {
   const [code, ...rest] = part.split(' · ');
   const tone = code.startsWith('P') ? code.toLowerCase() : 'px';
-  const chip = code.startsWith('P') ? `${code} ${rest.shift() ?? ''}` : code;
+  if (code.startsWith('P')) rest.shift(); // part name is shown by the colour and the divider slide
+  const chip = code;
   const qtag = ['WHY', 'WHAT', 'WHY + WHAT'].includes(rest[rest.length - 1] ?? '') ? rest.pop() : undefined;
   return (
     <Slide className={`fd ${tone}${wide ? ' wide' : ''}`} notes={notes}>
@@ -425,7 +426,7 @@ export default function FinalDeck() {
 
         {/* 01 · Overview */}
         <S
-          part="P1 · Problem · 01 Overview · WHY + WHAT"
+          part="P1 · Problem · 01 Overview"
           title="After a long day, many of us feel we got nothing done; Nốt helps us notice the small wins"
           notes="30 seconds. Start with a feeling everyone knows: at the end of a long day we think we got nothing done, because we remember unfinished tasks, not the small things that went well. Writing those down takes effort when tired, and small goals that never change lose their pull. Our answer: Nốt. One small win in 30 s, fresh challenge cards curated by staff, Gemini to cut the typing. Live on Android + web admin. Next slide: who exactly (persona) and how it works today."
           foot="Android app (users) + Flutter web admin (staff, admins) on one Firebase project · live: prm393-not-lab3.web.app · repo FU-PRM-Projects/Lab-03"
