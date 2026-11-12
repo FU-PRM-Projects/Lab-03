@@ -31,7 +31,35 @@ Với **Authentication**, 14 request "unknown origin" là đăng nhập từ cli
 không gửi kèm thông tin App Check (app Android và bản web app ở `/`, cùng các
 lần làm mới phiên). Số này sẽ chuyển sang Verified khi mobile có App Check.
 
-## Chưa Enforce
+## Enforce cho Firestore (12/11/2026)
+
+Bật Enforce cho **Cloud Firestore** sau khi:
+
+- `lab03 (android)` đã đăng ký Play Integrity và `lab03 (web)` Fraud Defense
+  (tab Apps: cả hai **Registered**);
+- bản release cài tay trên Galaxy A70 gọi được Gemini qua Firebase AI Logic (đã
+  Enforced từ trước), tức là token Play Integrity hợp lệ.
+
+Hộp xác nhận báo 45% request trong 7 ngày đến từ bản cũ chưa có App Check (và
+bản debug dùng để chạy ARTEMIS hôm đó): các request này giờ bị chặn, đúng mục đích.
+Unknown origin vẫn là 0.
+
+| Ảnh | Cho thấy |
+|---|---|
+| [`final-firestore-enforced.png`](final-firestore-enforced.png) | App Check → APIs: **Cloud Firestore Enforced**, Firebase AI Logic Enforced (Basic), Authentication Monitoring |
+| [`final-web-admin-after-enforce.png`](final-web-admin-after-enforce.png) | Sau khi Enforce, tải lại web admin: vẫn đọc được vai trò từ Firestore (màn từ chối cho tài khoản `user`, không phải lỗi "Chưa kiểm tra được tài khoản"). Đã che email |
+| [`final-mobile-after-enforce.png`](final-mobile-after-enforce.png) | Bản release trên Galaxy A70, mở lại sau khi Enforce: màn Hôm nay đọc được Tường nốt và chuỗi ngày |
+| [`final-mobile-jar-after-enforce.png`](final-mobile-jar-after-enforce.png) | 5 phút sau khi Enforce: tab Hũ (19 nốt tháng 11) và Thử thách tải được; logcat không có `PERMISSION_DENIED` hay lỗi App Check |
+
+Tải lại web admin lúc 16 phút sau khi Enforce (đủ thời gian có hiệu lực): vẫn đọc
+được vai trò như trên.
+
+Bản **debug** chỉ đọc được Firestore nếu debug token của máy đã đăng ký ở App
+Check → Apps → `lab03 (android)` → Manage debug tokens. Chạy lại ARTEMIS bằng bản
+debug cần kiểm tra điều này trước.
+
+## Trước khi Enforce (lịch sử)
+
 
 Firestore đang ở chế độ **Monitoring**: App Check ghi nhận nhưng chưa chặn.
 Enforce lúc này sẽ chặn 94% request (app Android), nên chỉ bật khi:

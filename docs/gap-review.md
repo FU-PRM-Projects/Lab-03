@@ -111,8 +111,8 @@ là kiểm thử và sản phẩm nộp:
 
 1. ARTEMIS T15, T16 (cần tài khoản test); T14, T17–T20 đã chạy 12/11 (14/15)
    ([`test-report.md`](test-report.md) mục 2.2).
-2. Bật Enforce App Check cho Cloud Firestore (đang Monitoring) và chụp minh chứng.
-3. Ảnh trạng thái lỗi của web admin; chụp lại ảnh `mobile-final/08` và
-   `web-admin/11` đủ màn hình.
+2. ~~Bật Enforce App Check cho Cloud Firestore~~: đã bật 12/11/2026, minh chứng ở [`evidence/app-check/`](../evidence/app-check/README.md).
+3. ~~Ảnh trạng thái lỗi của web admin; chụp lại `mobile-final/08`, `web-admin/11`~~:
+   xong 11–12/11 (`web-admin/16`, PR #77).
 4. Slide, report Final (`report/Final_SE190992.pdf`), video.
 5. S11 Hỏi Nốt (bonus, AI mức 3): chỉ làm nếu còn thời gian.
