@@ -1,0 +1,12 @@
+00:00 +0: loading D:/Lab-03/web_admin/test/app_check_test.dart
+00:00 +0: D:/Lab-03/web_admin/test/app_check_test.dart: không có site key lẫn debug token: không bật App Check
+00:00 +1: D:/Lab-03/web_admin/test/app_check_test.dart: có site key: dùng reCAPTCHA Enterprise
+00:00 +2: D:/Lab-03/web_admin/test/app_check_test.dart: debug token được ưu tiên hơn reCAPTCHA
+00:00 +3: D:/Lab-03/web_admin/test/session_test.dart: chưa đăng nhập thì ở màn đăng nhập
+00:00 +4: D:/Lab-03/web_admin/test/session_test.dart: tài khoản người dùng app bị từ chối, có hồ sơ role = user
+00:00 +5: D:/Lab-03/web_admin/test/session_test.dart: staff và admin vào được; chỉ admin là isAdmin
+00:00 +6: D:/Lab-03/web_admin/test/session_test.dart: duyệt được khi chưa mở màn Kho thẻ (kho thẻ chưa ai lắng nghe)
+00:00 +7: D:/Lab-03/web_admin/test/session_test.dart: hết giờ chờ máy chủ báo như lỗi mạng, không phải lỗi chung
+00:00 +8: D:/Lab-03/web_admin/test/session_test.dart: thẻ mới xếp cuối cấp của đúng chủ đề
+00:00 +9: D:/Lab-03/web_admin/test/session_test.dart: bộ lọc kho thẻ: ẩn thẻ lưu trữ, tìm theo tên
+00:00 +10: All tests passed!

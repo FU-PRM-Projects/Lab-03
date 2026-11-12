@@ -1,0 +1,640 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="3" time="747.614" timestamp="2026-11-10T13:09:59.401007+07:00" hostname="DuyPhan"><testcase classname="test_main_flows" name="test_t02_f1_save_a_note[run1]" time="322.693"><failure message="artemis_client.errors.NetworkError: Could not reach Artemis host at http://127.0.0.1:8000/api/sessions/6ea39c0a-3e3b-40b5-adb3-dc72906e3c35: [WinError 10061] No connection could be made because the target machine actively refused it">self = &lt;urllib.request.HTTPHandler object at 0x000001CAD4959A30&gt;
+http_class = &lt;class 'http.client.HTTPConnection'&gt;
+req = &lt;urllib.request.Request object at 0x000001CAD495B950&gt;, http_conn_args = {}
+
+    def do_open(self, http_class, req, **http_conn_args):
+        """Return an HTTPResponse object for the request, using http_class.
+    
+        http_class must implement the HTTPConnection API from http.client.
+        """
+        host = req.host
+        if not host:
+            raise URLError('no host given')
+    
+        # will parse host:port
+        h = http_class(host, timeout=req.timeout, **http_conn_args)
+        h.set_debuglevel(self._debuglevel)
+    
+        headers = dict(req.unredirected_hdrs)
+        headers.update({k: v for k, v in req.headers.items()
+                        if k not in headers})
+    
+        # TODO(jhylton): Should this be redesigned to handle
+        # persistent connections?
+    
+        # We want to make an HTTP/1.1 request, but the addinfourl
+        # class isn't prepared to deal with a persistent connection.
+        # It will try to read all remaining data from the socket,
+        # which will block while the server waits for the next request.
+        # So make sure the connection gets closed after the (only)
+        # request.
+        headers["Connection"] = "close"
+        headers = {name.title(): val for name, val in headers.items()}
+    
+        if req._tunnel_host:
+            tunnel_headers = {}
+            proxy_auth_hdr = "Proxy-Authorization"
+            if proxy_auth_hdr in headers:
+                tunnel_headers[proxy_auth_hdr] = headers[proxy_auth_hdr]
+                # Proxy-Authorization should not be sent to origin
+                # server.
+                del headers[proxy_auth_hdr]
+            h.set_tunnel(req._tunnel_host, headers=tunnel_headers)
+    
+        try:
+            try:
+&gt;               h.request(req.get_method(), req.selector, req.data, headers,
+                          encode_chunked=req.has_header('Transfer-encoding'))
+
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\urllib\request.py:1357: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\http\client.py:1386: in request
+    self._send_request(method, url, body, headers, encode_chunked)
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\http\client.py:1432: in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\http\client.py:1381: in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\http\client.py:1141: in _send_output
+    self.send(msg)
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\http\client.py:1085: in send
+    self.connect()
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\http\client.py:1051: in connect
+    self.sock = self._create_connection(
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\socket.py:865: in create_connection
+    raise exceptions[0]
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+address = ('127.0.0.1', 8000), timeout = 60.0, source_address = None
+all_errors = False
+
+    def create_connection(address, timeout=_GLOBAL_DEFAULT_TIMEOUT,
+                          source_address=None, *, all_errors=False):
+        """Connect to *address* and return the socket object.
+    
+        Convenience function.  Connect to *address* (a 2-tuple ``(host,
+        port)``) and return the socket object.  Passing the optional
+        *timeout* parameter will set the timeout on the socket instance
+        before attempting to connect.  If no *timeout* is supplied, the
+        global default timeout setting returned by :func:`getdefaulttimeout`
+        is used.  If *source_address* is set it must be a tuple of (host, port)
+        for the socket to bind as a source address before making the connection.
+        A host of '' or port 0 tells the OS to use the default. When a connection
+        cannot be created, raises the last error if *all_errors* is False,
+        and an ExceptionGroup of all errors if *all_errors* is True.
+        """
+    
+        host, port = address
+        exceptions = []
+        for res in getaddrinfo(host, port, 0, SOCK_STREAM):
+            af, socktype, proto, canonname, sa = res
+            sock = None
+            try:
+                sock = socket(af, socktype, proto)
+                if timeout is not _GLOBAL_DEFAULT_TIMEOUT:
+                    sock.settimeout(timeout)
+                if source_address:
+                    sock.bind(source_address)
+&gt;               sock.connect(sa)
+E               ConnectionRefusedError: [WinError 10061] No connection could be made because the target machine actively refused it
+
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\socket.py:850: ConnectionRefusedError
+
+During handling of the above exception, another exception occurred:
+
+self = &lt;artemis_client.transport.JsonTransport object at 0x000001CAD4932090&gt;
+method = 'GET', path = '/api/sessions/6ea39c0a-3e3b-40b5-adb3-dc72906e3c35'
+json_body = None
+
+    def request(
+        self,
+        method: str,
+        path: str,
+        *,
+        json_body: Mapping[str, Any] | None = None,
+    ) -&gt; Any:
+        if not path.startswith("/"):
+            path = f"/{path}"
+        url = f"{self.base_url}{path}"
+        body = None
+        headers = dict(self.headers)
+        if json_body is not None:
+            body = json.dumps(json_body, separators=(",", ":")).encode("utf-8")
+            headers["Content-Type"] = "application/json"
+    
+        request = urllib.request.Request(
+            url,
+            data=body,
+            headers=headers,
+            method=method.upper(),
+        )
+        try:
+&gt;           with urllib.request.urlopen(
+                request,
+                timeout=self.timeout,
+                context=self.ssl_context,
+            ) as response:
+
+.venv\Lib\site-packages\artemis_client\transport.py:87: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\urllib\request.py:215: in urlopen
+    return opener.open(url, data, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\urllib\request.py:515: in open
+    response = self._open(req, data)
+               ^^^^^^^^^^^^^^^^^^^^^
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\urllib\request.py:532: in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\urllib\request.py:492: in _call_chain
+    result = func(*args)
+             ^^^^^^^^^^^
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\urllib\request.py:1386: in http_open
+    return self.do_open(http.client.HTTPConnection, req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;urllib.request.HTTPHandler object at 0x000001CAD4959A30&gt;
+http_class = &lt;class 'http.client.HTTPConnection'&gt;
+req = &lt;urllib.request.Request object at 0x000001CAD495B950&gt;, http_conn_args = {}
+
+    def do_open(self, http_class, req, **http_conn_args):
+        """Return an HTTPResponse object for the request, using http_class.
+    
+        http_class must implement the HTTPConnection API from http.client.
+        """
+        host = req.host
+        if not host:
+            raise URLError('no host given')
+    
+        # will parse host:port
+        h = http_class(host, timeout=req.timeout, **http_conn_args)
+        h.set_debuglevel(self._debuglevel)
+    
+        headers = dict(req.unredirected_hdrs)
+        headers.update({k: v for k, v in req.headers.items()
+                        if k not in headers})
+    
+        # TODO(jhylton): Should this be redesigned to handle
+        # persistent connections?
+    
+        # We want to make an HTTP/1.1 request, but the addinfourl
+        # class isn't prepared to deal with a persistent connection.
+        # It will try to read all remaining data from the socket,
+        # which will block while the server waits for the next request.
+        # So make sure the connection gets closed after the (only)
+        # request.
+        headers["Connection"] = "close"
+        headers = {name.title(): val for name, val in headers.items()}
+    
+        if req._tunnel_host:
+            tunnel_headers = {}
+            proxy_auth_hdr = "Proxy-Authorization"
+            if proxy_auth_hdr in headers:
+                tunnel_headers[proxy_auth_hdr] = headers[proxy_auth_hdr]
+                # Proxy-Authorization should not be sent to origin
+                # server.
+                del headers[proxy_auth_hdr]
+            h.set_tunnel(req._tunnel_host, headers=tunnel_headers)
+    
+        try:
+            try:
+                h.request(req.get_method(), req.selector, req.data, headers,
+                          encode_chunked=req.has_header('Transfer-encoding'))
+            except OSError as err: # timeout error
+&gt;               raise URLError(err)
+E               urllib.error.URLError: &lt;urlopen error [WinError 10061] No connection could be made because the target machine actively refused it&gt;
+
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\urllib\request.py:1360: URLError
+
+The above exception was the direct cause of the following exception:
+
+ask = &lt;function ask.&lt;locals&gt;.run at 0x000001CAD492F240&gt;
+
+    async def test_t02_f1_save_a_note(ask) -&gt; None:
+        """F1 nhánh chính: Today → Ghi nốt → viết → lưu → màn xác nhận."""
+&gt;       answer, result = await ask(
+            "Ở màn Hôm nay, bấm 'Ghi nốt'. Chọn ghi một điều làm được (không phải nhật ký), "
+            f"chọn một tâm trạng bất kỳ, gõ đúng chữ '{NOTE_TEXT}' vào ô nội dung, bỏ qua "
+            "phần kể thêm ('Bỏ qua phần kể thêm') rồi bấm lưu. Khi màn hình xác nhận đã lưu "
+            "hiện ra, trả lời SAVED nếu thấy, ngược lại FAILED." + RULES,
+            "SAVED hoặc FAILED",
+        )
+
+test_main_flows.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+conftest.py:139: in run
+    result = await client.run(
+.venv\Lib\site-packages\artemis_client\client.py:328: in run
+    return await self.wait_for_task(
+.venv\Lib\site-packages\artemis_client\client.py:287: in wait_for_task
+    result = await self.get_task(task_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\artemis_client\client.py:256: in get_task
+    payload = await self._request("GET", f"/api/sessions/{task_id}")
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\artemis_client\client.py:367: in _request
+    return await asyncio.to_thread(
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\asyncio\threads.py:25: in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\concurrent\futures\thread.py:59: in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;artemis_client.transport.JsonTransport object at 0x000001CAD4932090&gt;
+method = 'GET', path = '/api/sessions/6ea39c0a-3e3b-40b5-adb3-dc72906e3c35'
+json_body = None
+
+    def request(
+        self,
+        method: str,
+        path: str,
+        *,
+        json_body: Mapping[str, Any] | None = None,
+    ) -&gt; Any:
+        if not path.startswith("/"):
+            path = f"/{path}"
+        url = f"{self.base_url}{path}"
+        body = None
+        headers = dict(self.headers)
+        if json_body is not None:
+            body = json.dumps(json_body, separators=(",", ":")).encode("utf-8")
+            headers["Content-Type"] = "application/json"
+    
+        request = urllib.request.Request(
+            url,
+            data=body,
+            headers=headers,
+            method=method.upper(),
+        )
+        try:
+            with urllib.request.urlopen(
+                request,
+                timeout=self.timeout,
+                context=self.ssl_context,
+            ) as response:
+                data = response.read()
+                if not data:
+                    return None
+                try:
+                    return json.loads(data.decode("utf-8"))
+                except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+                    raise ProtocolError(f"Artemis host returned invalid JSON from {path}") from exc
+        except urllib.error.HTTPError as exc:
+            payload = self._decode_error_payload(exc)
+            detail = self._error_detail(payload, exc.reason)
+            error_type = {
+                401: AuthenticationError,
+                403: AuthenticationError,
+                404: NotFoundError,
+                409: ConflictError,
+            }.get(exc.code, ApiError)
+            raise error_type(exc.code, detail, payload=payload) from exc
+        except (urllib.error.URLError, TimeoutError, OSError) as exc:
+            reason = getattr(exc, "reason", exc)
+&gt;           raise NetworkError(f"Could not reach Artemis host at {url}: {reason}") from exc
+E           artemis_client.errors.NetworkError: Could not reach Artemis host at http://127.0.0.1:8000/api/sessions/6ea39c0a-3e3b-40b5-adb3-dc72906e3c35: [WinError 10061] No connection could be made because the target machine actively refused it
+
+.venv\Lib\site-packages\artemis_client\transport.py:111: NetworkError</failure></testcase><testcase classname="test_main_flows" name="test_t02_f1_save_a_note[run2]" time="2.032"><failure message="artemis_client.errors.NetworkError: Could not reach Artemis host at http://127.0.0.1:8000/api/run: [WinError 10061] No connection could be made because the target machine actively refused it">self = &lt;urllib.request.HTTPHandler object at 0x000001CAD4959A30&gt;
+http_class = &lt;class 'http.client.HTTPConnection'&gt;
+req = &lt;urllib.request.Request object at 0x000001CAD49CD580&gt;, http_conn_args = {}
+
+    def do_open(self, http_class, req, **http_conn_args):
+        """Return an HTTPResponse object for the request, using http_class.
+    
+        http_class must implement the HTTPConnection API from http.client.
+        """
+        host = req.host
+        if not host:
+            raise URLError('no host given')
+    
+        # will parse host:port
+        h = http_class(host, timeout=req.timeout, **http_conn_args)
+        h.set_debuglevel(self._debuglevel)
+    
+        headers = dict(req.unredirected_hdrs)
+        headers.update({k: v for k, v in req.headers.items()
+                        if k not in headers})
+    
+        # TODO(jhylton): Should this be redesigned to handle
+        # persistent connections?
+    
+        # We want to make an HTTP/1.1 request, but the addinfourl
+        # class isn't prepared to deal with a persistent connection.
+        # It will try to read all remaining data from the socket,
+        # which will block while the server waits for the next request.
+        # So make sure the connection gets closed after the (only)
+        # request.
+        headers["Connection"] = "close"
+        headers = {name.title(): val for name, val in headers.items()}
+    
+        if req._tunnel_host:
+            tunnel_headers = {}
+            proxy_auth_hdr = "Proxy-Authorization"
+            if proxy_auth_hdr in headers:
+                tunnel_headers[proxy_auth_hdr] = headers[proxy_auth_hdr]
+                # Proxy-Authorization should not be sent to origin
+                # server.
+                del headers[proxy_auth_hdr]
+            h.set_tunnel(req._tunnel_host, headers=tunnel_headers)
+    
+        try:
+            try:
+&gt;               h.request(req.get_method(), req.selector, req.data, headers,
+                          encode_chunked=req.has_header('Transfer-encoding'))
+
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\urllib\request.py:1357: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\http\client.py:1386: in request
+    self._send_request(method, url, body, headers, encode_chunked)
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\http\client.py:1432: in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\http\client.py:1381: in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\http\client.py:1141: in _send_output
+    self.send(msg)
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\http\client.py:1085: in send
+    self.connect()
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\http\client.py:1051: in connect
+    self.sock = self._create_connection(
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\socket.py:865: in create_connection
+    raise exceptions[0]
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+address = ('127.0.0.1', 8000), timeout = 60.0, source_address = None
+all_errors = False
+
+    def create_connection(address, timeout=_GLOBAL_DEFAULT_TIMEOUT,
+                          source_address=None, *, all_errors=False):
+        """Connect to *address* and return the socket object.
+    
+        Convenience function.  Connect to *address* (a 2-tuple ``(host,
+        port)``) and return the socket object.  Passing the optional
+        *timeout* parameter will set the timeout on the socket instance
+        before attempting to connect.  If no *timeout* is supplied, the
+        global default timeout setting returned by :func:`getdefaulttimeout`
+        is used.  If *source_address* is set it must be a tuple of (host, port)
+        for the socket to bind as a source address before making the connection.
+        A host of '' or port 0 tells the OS to use the default. When a connection
+        cannot be created, raises the last error if *all_errors* is False,
+        and an ExceptionGroup of all errors if *all_errors* is True.
+        """
+    
+        host, port = address
+        exceptions = []
+        for res in getaddrinfo(host, port, 0, SOCK_STREAM):
+            af, socktype, proto, canonname, sa = res
+            sock = None
+            try:
+                sock = socket(af, socktype, proto)
+                if timeout is not _GLOBAL_DEFAULT_TIMEOUT:
+                    sock.settimeout(timeout)
+                if source_address:
+                    sock.bind(source_address)
+&gt;               sock.connect(sa)
+E               ConnectionRefusedError: [WinError 10061] No connection could be made because the target machine actively refused it
+
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\socket.py:850: ConnectionRefusedError
+
+During handling of the above exception, another exception occurred:
+
+self = &lt;artemis_client.transport.JsonTransport object at 0x000001CAD4932090&gt;
+method = 'POST', path = '/api/run'
+json_body = {'goal': "Ở màn Hôm nay, bấm 'Ghi nốt'. Chọn ghi một điều làm được (không phải nhật ký), chọn một tâm trạng bất kỳ, gõ...chữ nào khác.", 'profile': 'flash', 'session_id': 'c97e4f6c-80db-4c84-8af6-dc610e38db89', 'ingress': 'python_sdk', ...}
+
+    def request(
+        self,
+        method: str,
+        path: str,
+        *,
+        json_body: Mapping[str, Any] | None = None,
+    ) -&gt; Any:
+        if not path.startswith("/"):
+            path = f"/{path}"
+        url = f"{self.base_url}{path}"
+        body = None
+        headers = dict(self.headers)
+        if json_body is not None:
+            body = json.dumps(json_body, separators=(",", ":")).encode("utf-8")
+            headers["Content-Type"] = "application/json"
+    
+        request = urllib.request.Request(
+            url,
+            data=body,
+            headers=headers,
+            method=method.upper(),
+        )
+        try:
+&gt;           with urllib.request.urlopen(
+                request,
+                timeout=self.timeout,
+                context=self.ssl_context,
+            ) as response:
+
+.venv\Lib\site-packages\artemis_client\transport.py:87: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\urllib\request.py:215: in urlopen
+    return opener.open(url, data, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\urllib\request.py:515: in open
+    response = self._open(req, data)
+               ^^^^^^^^^^^^^^^^^^^^^
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\urllib\request.py:532: in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\urllib\request.py:492: in _call_chain
+    result = func(*args)
+             ^^^^^^^^^^^
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\urllib\request.py:1386: in http_open
+    return self.do_open(http.client.HTTPConnection, req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;urllib.request.HTTPHandler object at 0x000001CAD4959A30&gt;
+http_class = &lt;class 'http.client.HTTPConnection'&gt;
+req = &lt;urllib.request.Request object at 0x000001CAD49CD580&gt;, http_conn_args = {}
+
+    def do_open(self, http_class, req, **http_conn_args):
+        """Return an HTTPResponse object for the request, using http_class.
+    
+        http_class must implement the HTTPConnection API from http.client.
+        """
+        host = req.host
+        if not host:
+            raise URLError('no host given')
+    
+        # will parse host:port
+        h = http_class(host, timeout=req.timeout, **http_conn_args)
+        h.set_debuglevel(self._debuglevel)
+    
+        headers = dict(req.unredirected_hdrs)
+        headers.update({k: v for k, v in req.headers.items()
+                        if k not in headers})
+    
+        # TODO(jhylton): Should this be redesigned to handle
+        # persistent connections?
+    
+        # We want to make an HTTP/1.1 request, but the addinfourl
+        # class isn't prepared to deal with a persistent connection.
+        # It will try to read all remaining data from the socket,
+        # which will block while the server waits for the next request.
+        # So make sure the connection gets closed after the (only)
+        # request.
+        headers["Connection"] = "close"
+        headers = {name.title(): val for name, val in headers.items()}
+    
+        if req._tunnel_host:
+            tunnel_headers = {}
+            proxy_auth_hdr = "Proxy-Authorization"
+            if proxy_auth_hdr in headers:
+                tunnel_headers[proxy_auth_hdr] = headers[proxy_auth_hdr]
+                # Proxy-Authorization should not be sent to origin
+                # server.
+                del headers[proxy_auth_hdr]
+            h.set_tunnel(req._tunnel_host, headers=tunnel_headers)
+    
+        try:
+            try:
+                h.request(req.get_method(), req.selector, req.data, headers,
+                          encode_chunked=req.has_header('Transfer-encoding'))
+            except OSError as err: # timeout error
+&gt;               raise URLError(err)
+E               urllib.error.URLError: &lt;urlopen error [WinError 10061] No connection could be made because the target machine actively refused it&gt;
+
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\urllib\request.py:1360: URLError
+
+The above exception was the direct cause of the following exception:
+
+ask = &lt;function ask.&lt;locals&gt;.run at 0x000001CAD4976A20&gt;
+
+    async def test_t02_f1_save_a_note(ask) -&gt; None:
+        """F1 nhánh chính: Today → Ghi nốt → viết → lưu → màn xác nhận."""
+&gt;       answer, result = await ask(
+            "Ở màn Hôm nay, bấm 'Ghi nốt'. Chọn ghi một điều làm được (không phải nhật ký), "
+            f"chọn một tâm trạng bất kỳ, gõ đúng chữ '{NOTE_TEXT}' vào ô nội dung, bỏ qua "
+            "phần kể thêm ('Bỏ qua phần kể thêm') rồi bấm lưu. Khi màn hình xác nhận đã lưu "
+            "hiện ra, trả lời SAVED nếu thấy, ngược lại FAILED." + RULES,
+            "SAVED hoặc FAILED",
+        )
+
+test_main_flows.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+conftest.py:139: in run
+    result = await client.run(
+.venv\Lib\site-packages\artemis_client\client.py:314: in run
+    handle = await self.submit(
+.venv\Lib\site-packages\artemis_client\client.py:237: in submit
+    await self._request("POST", "/api/run", json_body=payload),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\artemis_client\client.py:367: in _request
+    return await asyncio.to_thread(
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\asyncio\threads.py:25: in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\.dart_tool\artemis-python\cpython-3.12-windows-x86_64-none\Lib\concurrent\futures\thread.py:59: in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;artemis_client.transport.JsonTransport object at 0x000001CAD4932090&gt;
+method = 'POST', path = '/api/run'
+json_body = {'goal': "Ở màn Hôm nay, bấm 'Ghi nốt'. Chọn ghi một điều làm được (không phải nhật ký), chọn một tâm trạng bất kỳ, gõ...chữ nào khác.", 'profile': 'flash', 'session_id': 'c97e4f6c-80db-4c84-8af6-dc610e38db89', 'ingress': 'python_sdk', ...}
+
+    def request(
+        self,
+        method: str,
+        path: str,
+        *,
+        json_body: Mapping[str, Any] | None = None,
+    ) -&gt; Any:
+        if not path.startswith("/"):
+            path = f"/{path}"
+        url = f"{self.base_url}{path}"
+        body = None
+        headers = dict(self.headers)
+        if json_body is not None:
+            body = json.dumps(json_body, separators=(",", ":")).encode("utf-8")
+            headers["Content-Type"] = "application/json"
+    
+        request = urllib.request.Request(
+            url,
+            data=body,
+            headers=headers,
+            method=method.upper(),
+        )
+        try:
+            with urllib.request.urlopen(
+                request,
+                timeout=self.timeout,
+                context=self.ssl_context,
+            ) as response:
+                data = response.read()
+                if not data:
+                    return None
+                try:
+                    return json.loads(data.decode("utf-8"))
+                except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+                    raise ProtocolError(f"Artemis host returned invalid JSON from {path}") from exc
+        except urllib.error.HTTPError as exc:
+            payload = self._decode_error_payload(exc)
+            detail = self._error_detail(payload, exc.reason)
+            error_type = {
+                401: AuthenticationError,
+                403: AuthenticationError,
+                404: NotFoundError,
+                409: ConflictError,
+            }.get(exc.code, ApiError)
+            raise error_type(exc.code, detail, payload=payload) from exc
+        except (urllib.error.URLError, TimeoutError, OSError) as exc:
+            reason = getattr(exc, "reason", exc)
+&gt;           raise NetworkError(f"Could not reach Artemis host at {url}: {reason}") from exc
+E           artemis_client.errors.NetworkError: Could not reach Artemis host at http://127.0.0.1:8000/api/run: [WinError 10061] No connection could be made because the target machine actively refused it
+
+.venv\Lib\site-packages\artemis_client\transport.py:111: NetworkError</failure></testcase><testcase classname="test_main_flows" name="test_t02_f1_save_a_note[run3]" time="422.459"><failure message="artemis_client.errors.TaskTimeoutError: Task 8425e581-4bfc-45ee-ac21-be21387b8f11 did not finish within 420 seconds">ask = &lt;function ask.&lt;locals&gt;.run at 0x000001CAD4977560&gt;
+
+    async def test_t02_f1_save_a_note(ask) -&gt; None:
+        """F1 nhánh chính: Today → Ghi nốt → viết → lưu → màn xác nhận."""
+&gt;       answer, result = await ask(
+            "Ở màn Hôm nay, bấm 'Ghi nốt'. Chọn ghi một điều làm được (không phải nhật ký), "
+            f"chọn một tâm trạng bất kỳ, gõ đúng chữ '{NOTE_TEXT}' vào ô nội dung, bỏ qua "
+            "phần kể thêm ('Bỏ qua phần kể thêm') rồi bấm lưu. Khi màn hình xác nhận đã lưu "
+            "hiện ra, trả lời SAVED nếu thấy, ngược lại FAILED." + RULES,
+            "SAVED hoặc FAILED",
+        )
+
+test_main_flows.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+conftest.py:139: in run
+    result = await client.run(
+.venv\Lib\site-packages\artemis_client\client.py:328: in run
+    return await self.wait_for_task(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;artemis_client.client.ArtemisClient object at 0x000001CAD4931610&gt;
+task_id = '8425e581-4bfc-45ee-ac21-be21387b8f11', timeout = 420
+poll_interval = None
+
+    async def wait_for_task(
+        self,
+        task_id: str,
+        *,
+        timeout: float = 1800.0,
+        poll_interval: float | None = None,
+    ) -&gt; TaskResult:
+        """Wait until a task reaches a terminal state."""
+        if timeout &lt;= 0:
+            raise ValueError("timeout must be greater than zero")
+        interval = self.poll_interval if poll_interval is None else float(poll_interval)
+        if interval &lt;= 0:
+            raise ValueError("poll_interval must be greater than zero")
+    
+        started = time.monotonic()
+        while True:
+            result = await self.get_task(task_id)
+            if result.done:
+                return result
+            elapsed = time.monotonic() - started
+            if elapsed &gt;= timeout:
+&gt;               raise TaskTimeoutError(task_id, timeout)
+E               artemis_client.errors.TaskTimeoutError: Task 8425e581-4bfc-45ee-ac21-be21387b8f11 did not finish within 420 seconds
+
+.venv\Lib\site-packages\artemis_client\client.py:292: TaskTimeoutError</failure></testcase></testsuite></testsuites>

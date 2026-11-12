@@ -67,6 +67,60 @@ Cho các ca T14–T16:
 
 ## Viết ca mới
 
+### Chạy các ca Android của Final
+
+Dùng máy Android đăng nhập tài khoản test riêng, đã hoàn thành Làm quen.
+Giữ server ARTEMIS chạy và để app ở tab Hôm nay trước ca đầu tiên.
+
+```powershell
+cd D:\Lab-03\e2e_test
+$env:ARTEMIS_DEVICE_SERIAL = 'emulator-5554'
+$env:E2E_FINAL_TEST_ACCOUNT = '1'
+$env:E2E_REVIEW_BATCH = 'final-demo-01'
+uv run pytest test_final_flows.py -k t17 --runs 3 -v --junitxml=../evidence/artemis/final-t17.xml
+```
+
+Chọn mã đợt mới mỗi khi chạy lại T17. Staff duyệt trên Web Admin đúng ba
+thẻ `E2E-final-demo-01-1`, `E2E-final-demo-01-2` và `E2E-final-demo-01-3`,
+sau đó chạy T18 bằng cùng mã đợt:
+
+```powershell
+$env:E2E_REVIEW_OUTCOME = 'approved'
+uv run pytest test_final_flows.py -k t18 --runs 3 -v --junitxml=../evidence/artemis/final-t18.xml
+```
+
+Để test nhánh từ chối, dùng một đợt T17 mới. Trên web, từ chối cả ba thẻ
+với lý do `Trung voi the da co`, rồi chạy T18 với `E2E_REVIEW_OUTCOME=rejected`.
+T17/T18 xác minh phía Android. Ba lượt đo thời gian trên bản deploy được
+ghi riêng trong [báo cáo luồng liên vai trò](../docs/cross-role-flow.md).
+
+Các ca AI chạy theo từng cấu hình. Mỗi lần chuẩn bị Remote Config trên
+môi trường test và tải lại trong app trước khi chạy. T21 cần cấu hình
+AI vẫn bật nhưng phát sinh lỗi có kiểm soát (ví dụ model thử không tồn tại).
+Khôi phục cấu hình sau khi test. Bộ pytest chỉ đọc biến để chọn ca chạy.
+
+```powershell
+$env:E2E_AI_MODE = 'on'
+uv run pytest test_final_flows.py -k t19 --runs 3 -v --junitxml=../evidence/artemis/final-t19.xml
+# Sau khi tắt ai_enabled và tải lại trên app
+$env:E2E_AI_MODE = 'off'
+uv run pytest test_final_flows.py -k t20 --runs 3 -v --junitxml=../evidence/artemis/final-t20.xml
+# Sau khi chuẩn bị lỗi AI có kiểm soát
+$env:E2E_AI_MODE = 'error'
+uv run pytest test_final_flows.py -k t21 --runs 3 -v --junitxml=../evidence/artemis/final-t21.xml
+```
+
+T22–T24 lần lượt kiểm tra Thống kê/Lịch, viết nhật ký và khảo sát Làm quen.
+T25 kiểm tra ghi vận động khi dừng sớm. T26 cần ba nốt test được tạo sẵn
+trên cùng tài khoản, có tiêu đề `E2E edit <mã đợt> 1`, `E2E edit <mã đợt> 2`
+và `E2E edit <mã đợt> 3`. Đặt `E2E_EDIT_BATCH` bằng mã đợt đó rồi chạy T26.
+T27 ghi một lần tự chủ.
+T02 dùng gợi ý nhanh “Dọn phòng” để kiểm tra thao tác lưu. T03 chỉ dọn nốt
+có dấu hiệu riêng `E2E test note`, nên các nốt thử từ gợi ý cần dọn riêng
+trên tài khoản test nếu cần.
+
+### Nguyên tắc viết ca
+
 - Nhận `client`, `app_id` và `attempt` để được chạy lặp và khoá vào app Nốt.
 - Khẳng định trên `result.output` (giá trị ARTEMIS báo), không chỉ
   `result.succeeded`.

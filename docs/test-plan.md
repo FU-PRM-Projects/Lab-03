@@ -47,9 +47,9 @@ Ca ghi dữ liệu dùng nốt `E2E test note`; ca T03 xoá mọi nốt đó sau
 | ID | Luồng | Các bước chính | Kỳ vọng (giá trị agent báo) |
 |---|---|---|---|
 | T01 | Khởi động | Mở app, nhìn màn đầu, không bấm gì | `WELCOME` hoặc `TODAY` |
-| T02 | F1 nhánh chính | Ghi nốt → điều làm được → tâm trạng → gõ nội dung → bỏ qua phần kể thêm → lưu | `SAVED` (màn xác nhận) |
+| T02 | F1 nhánh chính | Ghi nốt → Chiến thắng nhỏ → bỏ qua ảnh → chọn “Dọn phòng” → bỏ qua phần kể thêm | `SAVED` (màn xác nhận đúng nốt) |
 | T03 | Hũ: mở và xoá | Tab Hũ → mở nốt `E2E test note` → xoá → kiểm tra danh sách | `DELETED` (hoặc `NOT_FOUND`) |
-| T04 | F1 lỗi: trống | Ghi nốt, chọn tâm trạng, để trống nội dung | `DISABLED` (không đi tiếp) |
+| T04 | F1 lỗi: trống | Ghi nốt → Chiến thắng nhỏ → bỏ qua ảnh → để trống nội dung | `DISABLED` (không đi tiếp hoặc lưu) |
 | T05 | F1 lỗi: thoát giữa chừng | Gõ vài chữ rồi bấm Back | `DIALOG` (hỏi giữ nháp) |
 | T06 | F1 lỗi: mất mạng | Bật chế độ máy bay bằng `adb`, ghi nốt | `OFFLINE_BANNER` ("đã lưu trên máy") |
 | T07 | F2 | Lối tắt "Dừng lại, ghi 1 lần tự chủ", không ghi gì | `SELF_CONTROL` |
@@ -62,7 +62,24 @@ Ca ghi dữ liệu dùng nốt `E2E test note`; ca T03 xoá mọi nốt đó sau
 | T14 | Thẻ tuần PDF | Tab Hành trình → Thống kê → Mục tiêu tuần → 'Lưu thẻ tuần (PDF)' → đóng hộp chia sẻ | `SAVED_SHARED` ('Đã lưu thẻ tuần vào máy.' + tên `weekly-….pdf`, hộp chia sẻ đã mở). Final: lưu trên máy, không dùng Cloud Storage |
 | T15 | Đăng xuất, đăng nhập | Cài đặt → Đăng xuất → 'Đăng nhập bằng email' với tài khoản test | `OUT_WELCOME IN_TODAY` |
 | T16 | Đăng nhập lỗi | Đăng xuất → email đúng, mật khẩu sai → rồi mật khẩu đúng | `ERROR_SHOWN IN_TODAY` |
+| T17 | Liên vai trò · Android gửi | Tạo thẻ test → gửi → xác nhận thẻ đang chờ | `PENDING` |
+| T18 | Liên vai trò · Android nhận | Staff xử lý trên web trước → Android kiểm tra trạng thái và tin đúng thẻ | `APPROVED_WITH_INBOX` hoặc `REJECTED_WITH_INBOX` |
+| T19 | A1 · AI bật | Kể tự do → AI trả đề xuất → sửa tiêu đề → lưu → kiểm tra Hũ | `AI_SAVED` |
+| T20 | A1 · AI tắt | Xác nhận AI nghỉ → Ghi tay → lưu nốt | `MANUAL_SAVED` |
+| T21 | A1 · AI lỗi | Gọi AI trong cấu hình lỗi có kiểm soát → đoạn kể còn nguyên → mở Ghi tay | `ERROR_FALLBACK` |
+| T22 | P6/T3 · Hành trình | Mở Thống kê và Lịch năng lượng | `STATS_AND_CALENDAR` |
+| T23 | P4 · Viết nhật ký | Gợi ý → chọn câu làm tiêu đề → lưu vào Hũ | `JOURNAL_SAVED` |
+| T24 | A2 · Làm quen | Làm lại khảo sát → xem hồ sơ khởi đầu → về Hôm nay | `ONBOARDING_DONE` |
+| T25 | P3 · Vận động | Nhận thẻ Vận động → chọn Dừng sớm → lưu nốt | `MOVEMENT_SAVED` |
+| T26 | P5 · Sửa nốt | Mở nốt test → sửa tiêu đề → lưu → mở lại từ Hũ | `EDIT_PERSISTED` |
+| T27 | F2 · Ghi tự chủ | Dừng lại → Ghi lại vừa rồi → Mình đã dừng được | `SELF_CONTROL_SAVED` |
 | X01 | Khám phá | Profile Pro, khoảng 20 phút, agent tự đi khắp app | Danh sách `BUG: màn \| bước \| thấy gì` hoặc `NO_BUGS` |
+
+T17–T27 chưa có kết quả chạy. Đối chiếu với [danh sách luồng Lab 2](design-traceability.md#2-flow--màn-hình--kiểm-thử),
+bộ này còn thiếu ca chuyên biệt cho P1/P2 (đăng ký và quên mật khẩu),
+P7 (mở đích từ thông báo), trạng thái Hũ rỗng T1,
+các nhánh nhóm G1 và Discord D1/D2. A3 còn được ghi là Planned trong
+tài liệu thiết kế. T4 có widget test riêng.
 
 T13 chạy trước T03 vì T03 xoá nốt `E2E test note`. T15 và T16 đổi phiên đăng nhập nên
 đặt cuối file và cần `E2E_EMAIL`, `E2E_PASSWORD` (bỏ qua nếu thiếu). Mật khẩu đi qua model
@@ -178,3 +195,13 @@ uv run pytest --runs 1 -k t02                        # một ca, một lần
 ```
 
 Chi tiết cài đặt: [`e2e_test/README.md`](../e2e_test/README.md).
+
+
+## 8. Cập nhật Final ngày 12/11/2026
+
+T02 được chạy lại thật trên Android emulator sau khi cập nhật kịch bản theo luồng ảnh trước, chọn gợi ý Dọn phòng và lưu ngay bằng Bỏ qua phần kể thêm. **Ba lượt pass, 0 fail (100%)**, thời gian từng lượt 62,359 / 61,612 / 48,258 giây; tổng pytest 172,32 giây. Chỉ T02 được xác nhận lại trong đợt này. T17–T27 và các ca còn thiếu vẫn cần chạy thực tế.
+
+- [Log pytest](../evidence/artemis/final-t02-2026-11-12.txt)
+- [JUnit](../evidence/artemis/final-t02-2026-11-12.xml)
+- [Ảnh Workspace và ba phiên Completed](../evidence/artemis/final-t02-workspace-2026-11-12.jpg)
+- [Báo cáo tổng hợp và ba phát hiện AI review đã sửa](test-report.md)

@@ -18,7 +18,7 @@ from collections.abc import Awaitable, Callable
 from typing import Any, Literal, cast
 
 import pytest
-from artemis_client import ArtemisClient
+from artemis_client import ArtemisClient, TaskTimeoutError
 
 #: Package của app Nốt; ARTEMIS bị khoá vào app này để không thao tác ngoài app.
 APP_ID = "com.quanphungg.lab03"
@@ -136,12 +136,21 @@ def ask(client: ArtemisClient, app_id: str, attempt: int, reported):
     """
 
     async def run(goal: str, expected: str, *, locked: bool = True, timeout: int = 420):
-        result = await client.run(
-            goal,
-            locked_app_package=app_id if locked else None,
-            expected_output=expected,
-            timeout=timeout,
-        )
+        try:
+            result = await client.run(
+                goal,
+                locked_app_package=app_id if locked else None,
+                expected_output=expected,
+                timeout=timeout,
+            )
+        except TaskTimeoutError as error:
+            if not await client.stop(error.task_id):
+                pytest.exit(
+                    f"Không xác nhận được dừng phiên quá giờ {error.task_id}. "
+                    "Dừng bộ test để tránh thao tác chồng lên nhau.",
+                    returncode=2,
+                )
+            raise
         assert result.succeeded, f"[run{attempt}] {result.error or result.status}"
         answer = (await reported(result)).strip().upper()
         return answer, result

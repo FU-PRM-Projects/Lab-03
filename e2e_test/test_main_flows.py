@@ -1,7 +1,8 @@
 """Các luồng chính của Nốt (F1 ghi nốt, F2 tự chủ, F3 thử thách, tab, cài đặt).
 
 Mỗi ca nói bằng ngôn ngữ tự nhiên và khẳng định trên giá trị ARTEMIS báo về.
-Ca ghi dữ liệu dùng nốt có chữ `E2E test note` và được dọn ở T03 (chạy sau các ca ghi).
+T02 lưu từ gợi ý nhanh trên tài khoản test. T03 chỉ dọn nốt có nội dung
+`E2E test note` do những ca dùng chuỗi này tạo ra.
 Kế hoạch và bảng kết quả: docs/test-plan.md.
 """
 
@@ -39,20 +40,26 @@ RULES = (
 async def test_t02_f1_save_a_note(ask) -> None:
     """F1 nhánh chính: Today → Ghi nốt → viết → lưu → màn xác nhận."""
     answer, result = await ask(
-        "Ở màn Hôm nay, bấm 'Ghi nốt'. Chọn ghi một điều làm được (không phải nhật ký), "
-        f"chọn một tâm trạng bất kỳ, gõ đúng chữ '{NOTE_TEXT}' vào ô nội dung, bỏ qua "
-        "phần kể thêm ('Bỏ qua phần kể thêm') rồi bấm lưu. Khi màn hình xác nhận đã lưu "
-        "hiện ra, trả lời SAVED nếu thấy, ngược lại FAILED." + RULES,
+        "Nếu đang ở màn xác nhận nốt đã lưu, bấm 'Về Hôm nay' (hoặc 'Để sau' ở màn mốc). "
+        "Về tab 'Hôm nay', cuộn xuống nếu cần rồi bấm 'Ghi nốt' và chọn 'Chiến thắng nhỏ'. "
+        "Ở bước ảnh 1/3, bấm 'Bỏ qua'. Ở bước nội dung 2/3, chạm gợi ý 'Dọn phòng' "
+        "và kiểm tra ô nội dung hiện đúng 'Dọn phòng'. Không mở bàn phím hoặc tìm mục tâm trạng. "
+        "Bấm 'Bỏ qua phần kể thêm' một lần để lưu ngay. "
+        "Trả lời SAVED nếu màn xác nhận đã lưu hiện ra cùng nốt 'Dọn phòng'. "
+        "Nếu thiếu một bước hoặc không thấy đúng kết quả, trả lời FAILED và dừng, "
+        "không tạo lại hay xoá nốt." + RULES,
         "SAVED hoặc FAILED",
+        timeout=240,
     )
-    assert "SAVED" in answer, f"{answer!r} (trace {result.trace_id})"
+    assert answer == "SAVED", f"{answer!r} (trace {result.trace_id})"
 
 
 async def test_t04_f1_empty_note_cannot_be_saved(ask) -> None:
     """F1 nhánh lỗi: không có nội dung thì không lưu được."""
     answer, result = await ask(
-        "Ở màn Hôm nay, bấm 'Ghi nốt', chọn ghi một điều làm được và chọn một tâm trạng "
-        "nhưng KHÔNG gõ gì vào ô nội dung. Nhìn nút lưu/tiếp tục: trả lời DISABLED nếu "
+        "Ở màn Hôm nay, bấm 'Ghi nốt', chọn 'Chiến thắng nhỏ' và bấm 'Bỏ qua' ở bước ảnh. "
+        "Ở bước nội dung 2/3, KHÔNG nhập hay chọn gợi ý. Kiểm tra nút 'Tiếp' và "
+        "'Bỏ qua phần kể thêm': trả lời DISABLED nếu cả hai bị vô hiệu hóa, hoặc ENABLED nếu "
         "nút bị mờ hoặc bấm vào không đi tiếp, ENABLED nếu bấm được và đi tiếp. Sau đó "
         "thoát về màn Hôm nay, chọn bỏ nháp nếu app hỏi." + RULES,
         "DISABLED hoặc ENABLED",
@@ -63,8 +70,9 @@ async def test_t04_f1_empty_note_cannot_be_saved(ask) -> None:
 async def test_t05_f1_leaving_asks_to_keep_draft(ask) -> None:
     """F1 nhánh lỗi: thoát giữa chừng phải hỏi có giữ nháp không."""
     answer, result = await ask(
-        "Ở màn Hôm nay, bấm 'Ghi nốt', chọn ghi một điều làm được, gõ vài chữ vào ô nội "
-        "dung rồi bấm nút Back của Android. Nếu hiện hộp thoại hỏi giữ nháp thì trả lời "
+        "Ở màn Hôm nay, bấm 'Ghi nốt', chọn 'Chiến thắng nhỏ', bỏ qua ảnh ở bước 1/3, "
+        "chạm gợi ý 'Dọn phòng' ở bước 2/3 rồi bấm nút Back của Android. "
+        "Nếu hiện hộp thoại hỏi giữ nháp thì trả lời "
         "DIALOG (và chọn bỏ nháp), nếu thoát luôn không hỏi thì trả lời NO_DIALOG." + RULES,
         "DIALOG hoặc NO_DIALOG",
     )
@@ -78,8 +86,9 @@ async def test_t06_f1_offline_note_is_kept_on_device(ask) -> None:
     subprocess.run([ADB, "shell", "cmd", "connectivity", "airplane-mode", "enable"], check=False)
     try:
         answer, result = await ask(
-            "Máy đang mất mạng. Ở màn Hôm nay, bấm 'Ghi nốt', chọn ghi một điều làm được, "
-            f"tâm trạng bất kỳ, gõ '{NOTE_TEXT}' rồi lưu. Trả lời OFFLINE_BANNER nếu app "
+            "Máy đang mất mạng. Ở màn Hôm nay, bấm 'Ghi nốt', chọn 'Chiến thắng nhỏ' "
+            f"và bỏ qua ảnh. Ở bước 2/3, nhập đúng '{NOTE_TEXT}' rồi bấm 'Bỏ qua phần kể thêm' "
+            "để lưu ngay. Trả lời OFFLINE_BANNER nếu app "
             "báo nốt được lưu trên máy / đang chờ mạng (banner hoặc thông báo), SAVED nếu "
             "lưu như bình thường không nhắc gì đến mạng, FAILED nếu không lưu được." + RULES,
             "OFFLINE_BANNER, SAVED hoặc FAILED",
@@ -102,9 +111,9 @@ async def test_t13_analytics_note_saved_is_logged(ask) -> None:
         adb("shell", "setprop", f"log.tag.{tag}", "VERBOSE")
     adb("logcat", "-c")
     answer, result = await ask(
-        "Ở màn Hôm nay, bấm 'Ghi nốt'. Chọn ghi một điều làm được (không phải nhật ký), "
-        f"chọn một tâm trạng bất kỳ, gõ đúng chữ '{NOTE_TEXT}' vào ô nội dung, bỏ qua "
-        "phần kể thêm rồi bấm lưu. Trả lời SAVED nếu màn xác nhận đã lưu hiện ra, ngược "
+        "Ở màn Hôm nay, bấm 'Ghi nốt', chọn 'Chiến thắng nhỏ' và bỏ qua ảnh. "
+        f"Ở bước 2/3, nhập đúng '{NOTE_TEXT}' rồi bấm 'Bỏ qua phần kể thêm' để lưu ngay. "
+        "Trả lời SAVED nếu màn xác nhận đã lưu hiện ra, ngược "
         "lại FAILED." + RULES,
         "SAVED hoặc FAILED",
     )

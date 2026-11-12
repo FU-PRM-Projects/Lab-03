@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="12.436" timestamp="2026-11-10T11:34:47.204431+07:00" hostname="DuyPhan"><testcase classname="test_smoke" name="test_app_opens_to_a_known_screen[run1]" time="12.248"><failure message="AssertionError: [run1] failed&#10;assert False&#10;[+1 more line; full report in element text]">client = &lt;artemis_client.client.ArtemisClient object at 0x000001DF2C82A360&gt;
+app_id = 'com.quanphungg.lab03', attempt = 1
+reported = &lt;function reported.&lt;locals&gt;.read at 0x000001DF2C8239C0&gt;
+
+    async def test_app_opens_to_a_known_screen(
+        client: ArtemisClient, app_id: str, attempt: int, reported
+    ) -&gt; None:
+        result = await client.run(
+            GOAL,
+            locked_app_package=app_id,
+            expected_output="WELCOME, TODAY hoặc ONBOARDING",
+            timeout=300,
+        )
+    
+&gt;       assert result.succeeded, f"[run{attempt}] {result.error or result.status}"
+E       AssertionError: [run1] failed
+E       assert False
+E        +  where False = TaskResult(task_id='9d93c3aa-79d3-4ed9-9abc-cf00dd97a1ea', status='failed', goal="Mở app Nốt (com.quanphungg.lab03). Nhìn màn hình đầu tiên và trả lời đúng một từ: WELCOME nếu là màn hình đăng nhập có nút 'Tiếp tục với Google', TODAY nếu là màn hình có tiêu đề 'Hôm nay bạn làm được gì?', hoặc ONBOARDING nếu thấy tiêu đề 'Làm quen' và số bước (ví dụ 1/4). Không bấm nút nào.", profile=None, device_serial='emulator-5554', output=None, error=None, turns=None).succeeded
+
+test_smoke.py:30: AssertionError</failure></testcase></testsuite></testsuites>

@@ -1,0 +1,15 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.16, pytest-9.2.0, pluggy-1.7.0 -- D:\Lab-03\e2e_test\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: D:\Lab-03\e2e_test
+configfile: pyproject.toml
+plugins: asyncio-1.4.1.post1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=session, asyncio_default_test_loop_scope=session
+collecting ... collected 48 items / 45 deselected / 3 selected
+
+test_main_flows.py::test_t02_f1_save_a_note[run1] PASSED                 [ 33%]
+test_main_flows.py::test_t02_f1_save_a_note[run2] PASSED                 [ 66%]
+test_main_flows.py::test_t02_f1_save_a_note[run3] PASSED                 [100%]
+
+--- generated xml file: D:\Lab-03\evidence\artemis\final-t02-2026-11-12.xml ---
+================ 3 passed, 45 deselected in 172.32s (0:02:52) =================
