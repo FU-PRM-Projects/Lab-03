@@ -114,13 +114,13 @@ import { Slide, Stack, Fragment, Code } from '@revealjs/react';
 
 ## Bộ slide Final Assignment (`final.html`)
 
-Bộ slide riêng cho Final (tiếng Anh, theo *Software Project Presentation Guideline*: Problem → Design → Demo → Proof, 28 slide gồm bìa và 2 phụ lục). Mã ở `src/final/`, ảnh minh chứng chép từ `evidence/` vào `public/final/`.
+Bộ slide riêng cho Final (tiếng Anh, theo *Software Project Presentation Guideline V11* của giảng viên: Problem 01–06 → Design 07–16 → Demo 17–20, mỗi workflow một slide cùng bố cục → Proof 21–24; 38 trang: bìa, agenda, 4 slide mở đầu từng phần, 24 slide nội dung theo guideline, thêm 11b bản đồ màn hình, 18b/19b/20b storyboard từng workflow, 21b tường minh chứng, và 3 phụ lục A1 ví dụ Gemini, A2 App Check, A3 bài học). Workflow đặt tên theo mẫu động từ + đối tượng, điểm rẽ ghi mã BR-01…BR-05. Mã ở `src/final/`, ảnh minh chứng chép từ `evidence/` vào `public/final/`.
 
 ```sh
 cd slide
 npm run dev                         # mở http://localhost:5173/final.html
 npx vite build && npx vite preview  # bản build ở http://localhost:4173/final.html
-node scripts/export-pdf.mjs http://localhost:4173/final.html 28 ../slides/Final_SE190992_slides.pdf
+node scripts/export-pdf.mjs http://localhost:4173/final.html 38 ../slides/Final_SE190992_slides.pdf
 ```
 
 Phím `S` mở Speaker View (mỗi slide có ghi chú thuyết trình).
