@@ -69,7 +69,7 @@ trong Spec không dùng tới.
 |---|---|---|
 | Firebase Auth, Firestore, FCM, Analytics, Crashlytics, Remote Config | Xong | Đã đóng |
 | Tạo file PDF (Thẻ tuần) | Gỡ nhầm ở PR #57 rồi làm lại ở PR #65: tạo PDF trên máy (font đóng gói, chạy offline), lưu vào thư mục của app, mở hộp chia sẻ, metadata `users/{uid}/reports/{isoWeek}` (rules R-28); chạy trên máy thật ([`evidence/mobile-final/`](../evidence/mobile-final/README.md) 07–10) | Đã đóng. Đề Final mục 4: *"The Lab 3 PDF report is saved and shared on the device, with its metadata in Firestore"*; Cloud Storage ngoài phạm vi |
-| ARTEMIS E2E ≥ 10 ca, 3 lần chạy | Xong ở Lab 3 (`docs/test-plan.md`); T14 đổi sang lưu và chia sẻ PDF trên máy (PR #65), chưa chạy lại | Chạy lại cho Final kèm các luồng mới; tổng hợp kiểm thử và AI code review cho Final ở [`test-report.md`](test-report.md) |
+| ARTEMIS E2E ≥ 10 ca, 3 lần chạy | Xong ở Lab 3 (`docs/test-plan.md`); T14 đổi sang lưu và chia sẻ PDF trên máy (PR #65). Final 12/11 trên máy thật: T14, T17, T18, T20 đạt 11/12 lần; T19, T15, T16 chưa chạy | Chạy lại cho Final kèm các luồng mới; tổng hợp kiểm thử và AI code review cho Final ở [`test-report.md`](test-report.md) |
 | AI code review ≥ 5 góp ý, sửa ≥ 3 | Xong ([`code-review.md`](code-review.md)) | Đã đóng; Final làm thêm review cho code mới |
 | Không dữ liệu mock | Xong (kho thẻ trên Firestore, seed script) | Đã đóng |
 | Mỗi client từ chối tài khoản sai vai trò (đề Final mục 6) | Web admin từ chối `user`; app mobile từ chối `staff` / `admin` bằng màn "Tài khoản này dành cho web admin" (`WrongRoleScreen`), có test | Đã đóng: xem [`data-model.md`](data-model.md) mục "Mỗi client từ chối tài khoản sai vai trò" |
@@ -109,7 +109,7 @@ Mọi luồng Lab 2 và yêu cầu Lab 3 ở mục 1–3 đã có quyết địn
 **Bỏ (có lý do)** (A3; phần gợi ý AI của G1; golden test của T4). Việc còn lại
 là kiểm thử và sản phẩm nộp:
 
-1. ARTEMIS cho luồng Final (T17–T20), chạy lại T14, T15, T16; mỗi ca 3 lần
+1. ARTEMIS T19 (cần tắt `ai_enabled` trên Remote Config) và T15, T16 (cần tài khoản test); T14, T17, T18, T20 đã chạy 12/11 (11/12)
    ([`test-report.md`](test-report.md) mục 2.2).
 2. Bật Enforce App Check cho Cloud Firestore (đang Monitoring) và chụp minh chứng.
 3. Ảnh trạng thái lỗi của web admin; chụp lại ảnh `mobile-final/08` và

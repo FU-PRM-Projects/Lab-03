@@ -6,7 +6,7 @@ vai trò chạy 3 lần trên hệ thống đã deploy; AI code review cho code 
 góp ý kèm quyết định). File này gom kết quả và trỏ tới minh chứng trong
 `evidence/`.
 
-Cập nhật 11/11/2026, trên `main` commit `eb04447`.
+Cập nhật 12/11/2026, trên `main` commit `d137a98` (sau PR #77).
 
 ## Tổng hợp
 
@@ -15,7 +15,7 @@ Cập nhật 11/11/2026, trên `main` commit `eb04447`.
 | Security Rules (Emulator) | R-01…R-30, mọi collection trừ Discord | **30/30 đạt** (chạy lại 11/11) | [`evidence/firestore/rules-tests.txt`](../evidence/firestore/rules-tests.txt) |
 | Unit + widget test (Flutter) | App, `packages/core`, `web_admin` | **303 / 5 / 14 đạt** (app thêm 7 test vai trò, 6 test nháp nhật ký P4; web thêm 1 test vai trò theo thời gian thực và 3 test màn lỗi Tổng quan), `flutter analyze` không lỗi | [`evidence/flutter/analyze-and-test.txt`](../evidence/flutter/analyze-and-test.txt) |
 | Mobile E2E (ARTEMIS) | T01–T14 (luồng Lab 2 / Lab 3) | **41/42 lần đạt (98%)** | [`test-plan.md`](test-plan.md) mục 5, `evidence/artemis/` |
-| Mobile E2E (ARTEMIS) | Luồng mới của Final | **Chưa chạy** (xem mục 2.2) | — |
+| Mobile E2E (ARTEMIS) | Luồng mới của Final: T14 bản Final, T17, T18, T20 (máy thật) | **11/12 lần đạt** (T18 2/3: một lần agent quá giờ); T19, T15, T16 chưa chạy (mục 2.2) | `evidence/artemis/final-t14-t17-t18-t20.log` |
 | Mobile trên máy thật | Onboarding, Nốt AI, Thẻ tuần PDF, tắt AI bằng Remote Config | Chạy tay, đạt | [`evidence/mobile-final/`](../evidence/mobile-final/README.md) |
 | Web admin (checklist) | 5 màn + form thông báo, từ chối sai vai trò, trống, đang tải | 16/16 mục đạt (thêm đổi vai trò khi đang mở hai chiều, trạng thái lỗi Tổng quan) | [`evidence/web-admin/`](../evidence/web-admin/README.md) |
 | Luồng liên vai trò | Gửi thẻ trên app → duyệt trên web → app cập nhật + hộp thư | **3/3 lần đạt trên bản deploy** (D-1…D-3) | [`cross-role-flow.md`](cross-role-flow.md), `evidence/cross-role/` |
@@ -77,24 +77,44 @@ T06 lần 3 quá 420 giây, agent không báo kết quả; chưa tìm được n
 Phiên khám phá X01 (25 phút) báo 10 lỗi giao diện, nhóm chưa kiểm tra lại từng lỗi
 ([`test-plan.md`](test-plan.md) mục "Phiên khám phá X01").
 
-### 2.2 Luồng mới của Final (chưa chạy)
+### 2.2 Luồng mới của Final
 
-Đề yêu cầu ARTEMIS cho phần mobile của luồng liên vai trò và tính năng AI, mỗi
-ca 3 lần. Các luồng dưới đây **đã chạy tay trên máy thật** (minh chứng ở cột
-cuối) nhưng **chưa có ca ARTEMIS**:
+Chạy ngày 12/11/2026 trên **Galaxy A70 thật** (adb không dây), bản debug build từ
+`main` sau PR #77, tài khoản "Thị Kim Thúy Đoàn" (`user`), ARTEMIS profile Flash
+(model như mục 2.1), mỗi ca 3 lần. Tổng thời gian 47 phút. Log:
+[`evidence/artemis/final-t14-t17-t18-t20.log`](../evidence/artemis/final-t14-t17-t18-t20.log).
+Ca nằm trong `e2e_test/test_main_flows.py`.
 
-| Ca cần thêm | Luồng | Trạng thái ARTEMIS | Đã kiểm tra tay |
-|---|---|---|---|
-| T17 | A2 Làm quen: 4 câu → thẻ khởi đầu | Chưa có ca | [`mobile-final/01–03`](../evidence/mobile-final/README.md) |
-| T18 | A1 Nốt AI · Kể tự do: đoạn kể → 3 nốt sửa được → lưu | Chưa có ca | [`mobile-final/04–06`](../evidence/mobile-final/README.md) |
-| T19 | Nốt AI tắt bằng Remote Config → vẫn ghi tay | Chưa có ca | [`mobile-final/11`](../evidence/mobile-final/README.md) |
-| T20 | Liên vai trò, phần mobile: gửi thẻ → thấy `pending` → thấy "Đã vào kho chung" + tin trong hộp thư | Chưa có ca | [`cross-role/`](../evidence/cross-role/) |
-| T14 | Thẻ tuần PDF bản Final: lưu trên máy, mở hộp chia sẻ | Ca đã sửa ở `e2e_test/`, chưa chạy lại | [`mobile-final/07–10`](../evidence/mobile-final/README.md) |
-| T15, T16 | Đăng xuất / đăng nhập, đăng nhập sai mật khẩu | Có ca, chưa chạy (cần tài khoản test) | — |
+Các ca chạy trên tài khoản demo nên **không để lại dữ liệu**: T17 dừng ở màn "Hồ sơ
+khởi đầu" rồi test tự tắt và mở lại app (bấm "Bắt đầu" sẽ ghi đè cấp thử thách và
+giờ nhắc); T18 không lưu nốt; T20 rút lại và xoá thẻ thử ngay. Sau khi chạy đã
+kiểm tra trên Console: `challengeSubmissions` không có thẻ `pending`, không còn thẻ
+"E2E thẻ thử".
 
-Lưu ý khi viết T18: agent không đọc được chữ của Gemini một cách ổn định giữa các
-lần chạy, nên khẳng định nên dựa vào nhãn cố định "Gợi ý từ Nốt AI" và câu "Đã lưu
-… nốt vào hũ", không dựa vào nội dung AI trả về.
+| ID | Luồng | Khẳng định | Lần 1 | Lần 2 | Lần 3 | Đạt |
+|---|---|---|---|---|---|---|
+| T14 | Thẻ tuần PDF bản Final: lưu trên máy, mở hộp chia sẻ | `SAVED_SHARED` | đạt | đạt | đạt | 3/3 |
+| T17 | A2 Làm quen: 4 câu → "Hồ sơ khởi đầu" có "3 thẻ để bắt đầu" | `PLAN_SHOWN` | đạt | đạt | đạt | 3/3 |
+| T18 | A1 Kể tự do → Gemini tách thành nốt gợi ý có nhãn "Gợi ý từ Nốt AI" | `SUGGESTIONS` | đạt | **quá giờ** | đạt | 2/3 |
+| T20 | Liên vai trò, phần mobile: gửi thẻ → "Đang chờ duyệt"; thẻ đã duyệt hiện "Đã vào kho chung"; hộp thư có tin duyệt | `PENDING APPROVED INBOX` | đạt | đạt | đạt | 3/3 |
+| **Tổng** | | | | | | **11/12 (92%)** |
+
+**T18 lần 2:** agent không gõ được chữ bằng lệnh `input_text` (chữ không vào ô),
+chuyển sang bấm từng phím trên bàn phím ảo, nên quá giới hạn 480 giây. Ở bước
+cuối agent vẫn thấy danh sách gợi ý có dòng "Gợi ý từ Nốt AI" và 3 nốt, rồi về
+màn Hôm nay không lưu, tức là app chạy đúng; lỗi nằm ở cách agent nhập chữ. Tính
+là không đạt theo quy tắc của bộ test.
+
+**T20** chỉ kiểm phần mobile. Bước staff duyệt trên web đã chạy 3 lần trên bản
+deploy (mục 5). Ca dùng thẻ cũ đã được duyệt để kiểm "Đã vào kho chung" và tin
+trong hộp thư, nên không cần staff duyệt thẻ thử.
+
+**Chưa chạy:**
+
+| Ca | Lý do | Cách chạy |
+|---|---|---|
+| T19 | Cần đặt `ai_enabled = false` trên Remote Config thật (ảnh hưởng mọi người dùng trong lúc chạy) | Tắt cờ, Publish, chạy `E2E_AI_DISABLED=1 uv run pytest -k t19`, bật lại. Đã kiểm tay: [`mobile-final/11`](../evidence/mobile-final/README.md) |
+| T15, T16 | Cần tài khoản email chỉ dùng cho test | Đặt `E2E_EMAIL`, `E2E_PASSWORD` rồi `uv run pytest -k "t15 or t16"` |
 
 ## 3. Mobile trên máy thật
 
@@ -186,7 +206,7 @@ Review của Lab 3 (CodeRabbit, các góp ý đã sửa và chưa sửa) ở
 
 ## 7. Việc còn lại
 
-1. Viết và chạy 3 lần các ca ARTEMIS T17–T20, chạy lại T14 (bản Final) và T15–T16.
+1. Chạy ARTEMIS T19 (cần tắt `ai_enabled` trên Remote Config) và T15–T16 (cần tài khoản test).
 2. (Tuỳ chọn) Ảnh trạng thái lỗi cho các màn web admin dùng listener thời gian thực.
 
 ## Cách chạy lại
