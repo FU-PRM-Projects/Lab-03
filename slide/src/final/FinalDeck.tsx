@@ -2,10 +2,12 @@ import type { ReactNode } from 'react';
 import { Deck, Slide } from '@revealjs/react';
 import RevealNotes from 'reveal.js/plugin/notes';
 import {
-  Bell, Bot, Boxes, CheckCircle2, ClipboardCheck, FileText, Flame, Link2, Megaphone, MoonStar, PenLine, ShieldCheck, Smartphone, Sparkles, UserCog, Users,
+  Beaker, Compass, Layers, PlayCircle, Bell, Bot, Boxes, CheckCircle2, ClipboardCheck, FileText, Flame, Link2, Megaphone, MoonStar, PenLine, ShieldCheck, Smartphone, Sparkles, UserCog, Users,
 } from 'lucide-react';
 
 import ServerlessMap from './ServerlessMap';
+import { Agenda, Divider, EvidenceWall, ScreenRow, Storyboard } from './Visuals';
+import type { Part } from './Visuals';
 
 import 'reveal.js/reveal.css';
 import '../slides.css';
@@ -364,6 +366,17 @@ function Erd() {
   );
 }
 
+const PARTS: Part[] = [
+  { code: 'p1', num: '01', name: 'Problem', question: 'Why build it, and what is it?', minutes: '≈ 3.5 min', icon: Compass,
+    slides: ['01 Overview', '02 Context', '03 Problem', '04 Solution', '05 Actors', '06 Features'] },
+  { code: 'p2', num: '02', name: 'Design', question: 'How is the whole system built?', minutes: '≈ 6 min', icon: Layers,
+    slides: ['07 Business flow', '08 State machine', '09 Architecture', '10 Stack', '11 UI/UX', '12 Sequence', '13 Classes', '14–15 Database', '16 Traceability'] },
+  { code: 'p3', num: '03', name: 'Demo', question: 'How do the workflows run for real?', minutes: '≈ 6.5 min', icon: PlayCircle,
+    slides: ['17 Demo plan', '18 WF-01 Nốt AI', '19 WF-02 Publish a card', '20 WF-03 Announce'] },
+  { code: 'p4', num: '04', name: 'Proof', question: 'What can we prove?', minutes: '≈ 2.5 min', icon: Beaker,
+    slides: ['21 Testing', '22 Achievements', '23 Limitations', '24 Conclusion'] },
+];
+
 /* ---------------------------------------------------------------- deck */
 
 export default function FinalDeck() {
@@ -404,6 +417,9 @@ export default function FinalDeck() {
             <Shot src="06-ai-notes-saved.png" alt="Nốt app on a Galaxy A70" h={340} />
           </div>
         </Slide>
+
+        <Agenda parts={PARTS} />
+        <Divider part={PARTS[0]} shots={['wa-03-dashboard-crop.png', 'm-today.png', '05-ai-free-tell-result.png']} />
 
         {/* 01 · Overview */}
         <S
@@ -689,6 +705,8 @@ export default function FinalDeck() {
           })}
         </S>
 
+        <Divider part={PARTS[1]} shots={['ev-firestore-console.png', 'g-mobile-final-03-onboarding-starter-plan.png', 'g-journey-climb-dung-cam.png']} />
+
         {/* 07 · Business flow */}
         <S
           part="P2 · Design · 07 Business flow"
@@ -752,6 +770,42 @@ export default function FinalDeck() {
             <Shot src="wa-08-review-approved-crop.png" alt="Approved list" h={200} cap="Success · approved cards" />
           </div>
           <Shot src="11-ai-off-remote-config.png" alt="Nốt AI off" h={440} cap="App · AI off state" />
+        </S>
+
+        {/* 11b · Screen map */}
+        <S
+          part="P2 · Design · 11b Screen map"
+          title="Twelve screens carry the three workflows, on two clients"
+          sub="Real screenshots from the Galaxy A70 and the deployed web admin; codes match docs/design-traceability.md."
+          notes="Top row: the Android app a user sees every evening. Bottom row: the five web admin screens staff use. WF-01 lives on S02 and S03b, WF-02 crosses S07 and the review queue, WF-03 goes from Announcements to the inbox."
+        >
+          <div className="screens">
+            <ScreenRow
+              label="Android · user"
+              h={200}
+              screens={[
+                { src: 'm-today.png', code: 'S02', name: 'Today' },
+                { src: '05-ai-free-tell-result.png', code: 'S03b', name: 'Nốt AI' },
+                { src: 'g-app-check-final-mobile-jar-after-enforce.png', code: 'S05', name: 'Jar' },
+                { src: 'cr-02-phone-pending.png', code: 'S07', name: 'Challenges' },
+                { src: 'g-journey-climb-dung-cam.png', code: 'S11', name: 'Journey' },
+                { src: '07-weekly-card.png', code: 'S11b', name: 'Weekly PDF' },
+                { src: 'g-mobile-final-03-onboarding-starter-plan.png', code: 'S13', name: 'Onboarding' },
+                { src: 'g-breathing-s10-inhale.png', code: 'S10', name: 'Breathing' },
+              ]}
+            />
+            <ScreenRow
+              label="Web · staff"
+              h={120}
+              screens={[
+                { src: 'wa-03-dashboard-crop.png', code: 'W1', name: 'Dashboard', web: true },
+                { src: 'wa-04-catalog-search-crop.png', code: 'W2', name: 'Catalog', web: true },
+                { src: 'wa-08-review-approved-crop.png', code: 'W3', name: 'Review queue', web: true },
+                { src: 'wa-10-announcement-sent-crop.png', code: 'W4', name: 'Announcements', web: true },
+                { src: 'wa-12-users-crop.png', code: 'W5', name: 'Users & roles', web: true },
+              ]}
+            />
+          </div>
         </S>
 
         {/* 12 · Sequence */}
@@ -866,6 +920,8 @@ export default function FinalDeck() {
           </table>
         </S>
 
+        <Divider part={PARTS[2]} shots={['wa-08-review-approved-crop.png', 'cr-02-phone-pending.png', 'cr-06-phone-inbox-3-messages.png']} />
+
         {/* 17 · Demo plan */}
         <S
           part="P3 · Demo · 17 Demo plan"
@@ -937,6 +993,23 @@ export default function FinalDeck() {
           <Shot src="11-ai-off-remote-config.png" alt="AI off" h={440} cap="ai_enabled = false" />
         </S>
 
+        {/* 18b · WF-01 storyboard */}
+        <S
+          part="P3 · Demo · 18b WF-01 storyboard"
+          title="WF-01 in four screens: from an empty evening to three saved notes"
+          notes="Walk the frames left to right while doing it live. Frame 4 is what the user sees after saving."
+          foot="Exception shown live: ai_enabled = false → frame 2 says 'Nốt AI đang nghỉ' and only 'Ghi tay' is left."
+        >
+          <Storyboard
+            steps={[
+              { src: 'm-today.png', title: 'Ghi nốt', text: 'evening, from Today' },
+              { src: '04-ai-consent.png', title: 'Consent', text: 'what is sent to Gemini' },
+              { src: '05-ai-free-tell-result.png', title: 'Suggestions', text: '3 notes + mood, editable' },
+              { src: '06-ai-notes-saved.png', title: 'Saved', text: 'jar 11 → 14, streak starts' },
+            ]}
+          />
+        </S>
+
         {/* 19 · WF-02 */}
         <S
           part="P3 · Demo · 19 WF-02 · User + Staff"
@@ -963,6 +1036,25 @@ export default function FinalDeck() {
           </div>
         </S>
 
+        {/* 19b · WF-02 storyboard */}
+        <S
+          part="P3 · Demo · 19b WF-02 storyboard"
+          title="WF-02 in five screens: a private card becomes everyone's card"
+          notes="Phone and web side by side. Frames 1–2 on the phone, 3 on the web admin, 4–5 back on the phone within seconds."
+          foot="Exception shown live: Từ chối without a reason is blocked (BR-03); the card stays pending."
+        >
+          <Storyboard
+            h={300}
+            steps={[
+              { src: 'cr-01-phone-send-dialog.png', title: 'Share', text: 'user sends own card' },
+              { src: 'cr-02-phone-pending.png', title: 'Pending', text: '"Đang chờ duyệt"' },
+              { src: 'wa-08-review-approved-crop.png', title: 'Approve', text: 'staff, web admin', web: true },
+              { src: 'cr-05-phone-approved-run3.png', title: 'In catalog', text: '"Đã vào kho chung ✓"' },
+              { src: 'cr-06-phone-inbox-3-messages.png', title: 'Inbox', text: 'message for the author' },
+            ]}
+          />
+        </S>
+
         {/* 20 · WF-03 */}
         <S
           part="P3 · Demo · 20 WF-03 · Staff"
@@ -982,6 +1074,25 @@ export default function FinalDeck() {
             <Card head="Exception" tone="bad"><p>Empty or too long → form error, nothing saved · user account → rejected at sign-in, rules deny (R-25)</p></Card>
           </div>
         </S>
+
+        {/* 20b · WF-03 storyboard */}
+        <S
+          part="P3 · Demo · 20b WF-03 storyboard"
+          title="WF-03 in three screens: one form, every inbox"
+          notes="Compose on the web, send, then show the phone inbox at the same minute."
+          foot="Exception shown live: empty body or > 1000 characters → form error, nothing saved (BR-04)."
+        >
+          <Storyboard
+            h={330}
+            steps={[
+              { src: 'wa-09-announcement-form-crop.png', title: 'Compose', text: 'staff, web admin', web: true },
+              { src: 'wa-10-announcement-sent-crop.png', title: 'Sent', text: '10:56, form cleared', web: true },
+              { src: 'wa-11-app-inbox-announcement.png', title: 'Every inbox', text: 'phone, 10:56' },
+            ]}
+          />
+        </S>
+
+        <Divider part={PARTS[3]} shots={['ac-firestore-enforced.png', 'm-wrong-role.png', 'm-journal-draft.png']} />
 
         {/* 21 · Testing */}
         <S
@@ -1021,6 +1132,27 @@ export default function FinalDeck() {
             <Shot src="ev-deploy-run.png" alt="GitHub Actions deploy" h={112} cap="GitHub Actions: deploy on main" />
           </div>
           </div>
+        </S>
+
+        {/* 21b · Evidence wall */}
+        <S
+          part="P4 · Proof · 21b Evidence wall"
+          title="Every number on the testing slide has a screenshot or a log behind it"
+          notes="Point at two or three tiles; all files are in evidence/ in the repo."
+          foot="All files: evidence/ in the repo · details: docs/test-report.md"
+        >
+          <EvidenceWall
+            items={[
+              { term: ['✔ R-25 staff post announcements', '✔ R-26 only an admin changes roles', '✔ R-27 onboarding answers private', '✔ R-28 weekly PDF metadata', '✔ R-29 staff/admin cannot read private data', '✔ R-30 streak card once', 'ℹ tests 30', 'ℹ pass 30', 'ℹ fail 0'], label: 'Security Rules · Emulator', result: '30/30' },
+              { src: 'ev-artemis.jpg', label: 'ARTEMIS on a real phone', result: '14/15' },
+              { src: 'ev-deploy-run.png', label: 'GitHub Actions deploy', result: 'green' },
+              { src: 'ac-firestore-enforced.png', label: 'App Check', result: 'enforced' },
+              { src: 'wa-16-dashboard-error-crop.png', label: 'Web checklist · error state', result: '16/16' },
+              { src: 'cr-05-phone-approved-run3.png', label: 'Cross-role, deployed', result: '3/3' },
+              { src: 'g-crashlytics-nonfatal-list.png', label: 'Crashlytics', result: 'live' },
+              { src: 'g-analytics-debugview-events.png', label: 'Analytics events', result: 'live' },
+            ]}
+          />
         </S>
 
         {/* 22 · Achievements */}
