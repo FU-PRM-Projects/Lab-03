@@ -15,7 +15,7 @@ Cập nhật 12/11/2026, trên `main` commit `d137a98` (sau PR #77).
 | Security Rules (Emulator) | R-01…R-30, mọi collection trừ Discord | **30/30 đạt** (chạy lại 11/11) | [`evidence/firestore/rules-tests.txt`](../evidence/firestore/rules-tests.txt) |
 | Unit + widget test (Flutter) | App, `packages/core`, `web_admin` | **303 / 5 / 14 đạt** (app thêm 7 test vai trò, 6 test nháp nhật ký P4; web thêm 1 test vai trò theo thời gian thực và 3 test màn lỗi Tổng quan), `flutter analyze` không lỗi | [`evidence/flutter/analyze-and-test.txt`](../evidence/flutter/analyze-and-test.txt) |
 | Mobile E2E (ARTEMIS) | T01–T14 (luồng Lab 2 / Lab 3) | **41/42 lần đạt (98%)** | [`test-plan.md`](test-plan.md) mục 5, `evidence/artemis/` |
-| Mobile E2E (ARTEMIS) | Luồng mới của Final: T14 bản Final, T17, T18, T20 (máy thật) | **11/12 lần đạt** (T18 2/3: một lần agent quá giờ); T19, T15, T16 chưa chạy (mục 2.2) | `evidence/artemis/final-t14-t17-t18-t20.log` |
+| Mobile E2E (ARTEMIS) | Luồng mới của Final: T14 bản Final, T17, T18, T20 (máy thật) | **11/12 lần đạt** (T18 2/3: một lần agent quá giờ); T19, T15, T16 chưa chạy (mục 2.2) | `evidence/artemis/final-t14-t17-t18-t20.txt` |
 | Mobile trên máy thật | Onboarding, Nốt AI, Thẻ tuần PDF, tắt AI bằng Remote Config | Chạy tay, đạt | [`evidence/mobile-final/`](../evidence/mobile-final/README.md) |
 | Web admin (checklist) | 5 màn + form thông báo, từ chối sai vai trò, trống, đang tải | 16/16 mục đạt (thêm đổi vai trò khi đang mở hai chiều, trạng thái lỗi Tổng quan) | [`evidence/web-admin/`](../evidence/web-admin/README.md) |
 | Luồng liên vai trò | Gửi thẻ trên app → duyệt trên web → app cập nhật + hộp thư | **3/3 lần đạt trên bản deploy** (D-1…D-3) | [`cross-role-flow.md`](cross-role-flow.md), `evidence/cross-role/` |
@@ -82,7 +82,7 @@ Phiên khám phá X01 (25 phút) báo 10 lỗi giao diện, nhóm chưa kiểm t
 Chạy ngày 12/11/2026 trên **Galaxy A70 thật** (adb không dây), bản debug build từ
 `main` sau PR #77, tài khoản "Thị Kim Thúy Đoàn" (`user`), ARTEMIS profile Flash
 (model như mục 2.1), mỗi ca 3 lần. Tổng thời gian 47 phút. Log:
-[`evidence/artemis/final-t14-t17-t18-t20.log`](../evidence/artemis/final-t14-t17-t18-t20.log).
+[`evidence/artemis/final-t14-t17-t18-t20.txt`](../evidence/artemis/final-t14-t17-t18-t20.txt).
 Ca nằm trong `e2e_test/test_main_flows.py`.
 
 Các ca chạy trên tài khoản demo nên **không để lại dữ liệu**: T17 dừng ở màn "Hồ sơ
