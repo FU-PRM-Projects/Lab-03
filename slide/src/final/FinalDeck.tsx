@@ -1,6 +1,11 @@
 import { createContext, useContext, type ReactNode } from 'react';
 import { Deck, Slide } from '@revealjs/react';
 import RevealNotes from 'reveal.js/plugin/notes';
+import { ArrowRight, Beaker, Layers, PlayCircle, BedDouble, Bot, CheckCircle2, ClipboardCheck, Compass, Flame, ListTodo, Megaphone, Monitor, NotebookPen, PenLine, Repeat, ShieldCheck, Smartphone, Sparkles, Sunset, UserCog, Users, Wrench, Link2, Timer, WifiOff, BookOpen, LifeBuoy } from 'lucide-react';
+import ServerlessMap from './ServerlessMap';
+import { Card, Code, Shot as LShot, S, Steps, Thumb } from './Legacy';
+import { ActorMap, Divider, EvidenceWall, Storyboard, FlowDiagram, IllJournal, IllRepeat, IllTodo, MiniAvatar } from './Visuals';
+import type { Part } from './Visuals';
 
 import 'reveal.js/reveal.css';
 import '../slides.css';
@@ -13,6 +18,9 @@ const img = (name: string) => `${base}final/${name}`;
 function OrgLogo({ cover }: { cover?: boolean }) {
   return <img className={cover ? 'org-logo cover' : 'org-logo'} src={`${base}assets/fpt-logo.webp`} alt="FPT University" />;
 }
+
+/** Colour stripe on the left edge, one colour per part (same as the part dividers). */
+const PART_STRIPE: Record<string, string> = { PROBLEM: 'stripe-p1', DESIGN: 'stripe-p2', DEMO: 'stripe-p3', PROOF: 'stripe-p4', APPENDIX: 'stripe-px' };
 
 /** One page, same shape as the Lab 3 deck: short title, one line, a body; detail goes in the notes. */
 function Page({
@@ -33,7 +41,7 @@ function Page({
   children: ReactNode;
 }) {
   return (
-    <Slide className={dense ? 'fx dense' : 'fx'} notes={notes}>
+    <Slide className={[dense ? 'fx dense' : 'fx', PART_STRIPE[part.split(' ')[0]] ?? ''].join(' ').trim()} notes={notes}>
       <OrgLogo />
       <p className="tech-step">{part}</p>
       <h2>{title}</h2>
@@ -53,17 +61,113 @@ function Shot({ src, alt, h, w, cap }: { src: string; alt: string; h?: number; w
   );
 }
 
-/** A small red label over a plain block of text, no box around it. */
-function Block({ head, tone, children }: { head: string; tone?: 'bad' | 'ok'; children: ReactNode }) {
+/* ---------------------------------------------------------------- diagrams */
+
+/** Shows one region of a screenshot, scaled down (never up) so it stays sharp. */
+function Crop({ src, w, cx, cy, rw, bw, bh }: { src: string; w: number; cx: number; cy: number; rw: number; bw: number; bh: number }) {
+  const k = bw / rw;
   return (
-    <div className={tone ? `fx-block ${tone}` : 'fx-block'}>
-      <h3>{head}</h3>
-      {children}
-    </div>
+    <div
+      className="ux-crop"
+      style={{
+        width: bw,
+        height: bh,
+        backgroundImage: `url(${img(src)})`,
+        backgroundSize: `${w * k}px auto`,
+        backgroundPosition: `${-(cx * k - bw / 2)}px ${-(cy * k - bh / 2)}px`,
+      }}
+    />
   );
 }
 
-/* ---------------------------------------------------------------- diagrams */
+/** Low-fi wireframe of S02 Today, drawn to match the final layout (grey boxes, no colour). */
+function WireToday() {
+  const g = '#e3e5ea';
+  const d = '#9aa0ab';
+  const t = { fontSize: 15, fill: '#6b7280', fontFamily: 'Inter, sans-serif' } as const;
+  return (
+    <svg viewBox="0 0 360 800" className="ux-wire" aria-label="Wireframe S02 Today">
+      <rect x="0.5" y="0.5" width="359" height="799" rx="14" fill="#fff" stroke="#d1d5db" />
+      <rect x="18" y="16" width="70" height="10" rx="5" fill={g} />
+      <rect x="18" y="80" width="190" height="26" rx="6" fill={g} />
+      <text x="24" y="99" {...t} fontSize={13}>Ngày hôm nay</text>
+      <circle cx="266" cy="94" r="22" fill="none" stroke={d} strokeWidth="1.5" />
+      <text x="266" y="98" textAnchor="middle" {...t} fontSize={10}>chuông</text>
+      <circle cx="322" cy="94" r="22" fill="none" stroke={d} strokeWidth="1.5" />
+      <text x="322" y="98" textAnchor="middle" {...t} fontSize={10}>avatar</text>
+      <circle cx="180" cy="266" r="112" fill="none" stroke={d} strokeWidth="1.5" />
+      <path d="M100 186 L260 346 M260 186 L100 346" stroke={g} strokeWidth="2" />
+      <rect x="112" y="250" width="136" height="32" rx="6" fill="#fff" />
+      <text x="180" y="271" textAnchor="middle" {...t} fontSize={14}>hũ + mascot</text>
+      <rect x="40" y="408" width="280" height="18" rx="6" fill={g} />
+      <text x="180" y="422" textAnchor="middle" {...t} fontSize={12}>câu hỏi: hôm nay làm được gì?</text>
+      <rect x="16" y="448" width="328" height="48" rx="10" fill="#4b5563" />
+      <text x="180" y="478" textAnchor="middle" fontSize={16} fontWeight={700} fill="#fff" fontFamily="Inter, sans-serif">+ Ghi nốt</text>
+      {[64, 180, 296].map((x, i) => (
+        <g key={x}>
+          <circle cx={x} cy="578" r="28" fill="none" stroke={d} strokeWidth="1.5" />
+          <text x={x} y="630" textAnchor="middle" {...t} fontSize={13}>{['Dừng lại', 'Thở 90 giây', 'Thử thách'][i]}</text>
+        </g>
+      ))}
+      <rect x="16" y="718" width="328" height="56" rx="28" fill="none" stroke={d} strokeWidth="1.5" />
+      <rect x="24" y="726" width="128" height="40" rx="20" fill={g} />
+      <text x="88" y="751" textAnchor="middle" {...t} fontSize={13}>Hôm nay</text>
+      {[200, 258, 316].map((x) => (
+        <rect key={x} x={x - 11} y="735" width="22" height="22" rx="5" fill="none" stroke={d} strokeWidth="1.5" />
+      ))}
+    </svg>
+  );
+}
+
+/** Sitemap of both clients with screen codes (S = Android app, W = web admin). */
+function SiteMap() {
+  const w = 112;
+  const h = 40;
+  const col = (n: number) => 6 + n * 134;
+  return (
+    <Svg id="sitemap" viewBox="0 0 620 470">
+      <text x={6} y={14} fontSize={12} fontWeight={800} fill={C.primary}>ANDROID APP · user</text>
+      <Box x={col(0)} y={24} w={w} h={h} t="S01 Sign in" />
+      <Box x={col(1)} y={24} w={w} h={h} t="S13 Onboarding" s="first run" />
+      <Arrow d={`M${col(0) + w} 44 H${col(1) - 4}`} />
+      <Arrow d={`M${col(0) + w / 2} 64 V96`} />
+      <text x={col(0) + w / 2 + 8} y={84} fontSize={11} fill={C.muted}>4 tabs</text>
+      <rect x={2} y={92} width={522} height={50} rx={8} fill="none" stroke={C.primary} strokeDasharray="5 4" />
+      <Box x={col(0)} y={97} w={w} h={h} t="S02 Today" bold stroke={C.primary} />
+      <Box x={col(1)} y={97} w={w} h={h} t="S05 Jar" bold stroke={C.primary} />
+      <Box x={col(2)} y={97} w={w} h={h} t="S07 Challenges" bold stroke={C.primary} />
+      <Box x={col(3)} y={97} w={w} h={h} t="S11 Journey" bold stroke={C.primary} />
+      <Box x={col(0)} y={168} w={w} h={h} t="S03 Ghi nốt" s="S03b Nốt AI" />
+      <Box x={col(1)} y={168} w={w} h={h} t="S06 Note" />
+      <Box x={col(2)} y={168} w={w} h={h} t="S08 Challenge" />
+      <Box x={col(3)} y={168} w={w} h={h} t="S12 Settings" s="avatar, any tab" />
+      <Box x={col(0)} y={234} w={w} h={h} t="S04 Saved" />
+      <Box x={col(1)} y={234} w={w} h={h} t="S09 · S10" s="stop · breathe" />
+      <Box x={col(2)} y={234} w={w} h={h} t="Inbox" s="bell, any tab" />
+      <Box x={col(3)} y={234} w={w} h={h} t="S14 Rooms" s="Discord" />
+      {[0, 1, 2, 3].map((n) => (
+        <Arrow key={n} d={`M${col(n) + w / 2} 142 V164`} />
+      ))}
+      <Arrow d={`M${col(0) + w / 2} 208 V230`} />
+      <Arrow d={`M${col(0) + w} 117 H${col(0) + w + 7} Q${col(0) + w + 11} 117 ${col(0) + w + 11} 121 V250 Q${col(0) + w + 11} 254 ${col(0) + w + 15} 254 H${col(1) - 2}`} />
+      <Arrow d={`M${col(3) + w / 2} 208 V230`} />
+
+      <line x1={0} y1={300} x2={620} y2={300} stroke={C.line} />
+      <text x={6} y={326} fontSize={12} fontWeight={800} fill={C.primary}>WEB ADMIN · staff, admin</text>
+      <Box x={col(0)} y={338} w={w} h={h} t="W0 Sign in" s="role check" />
+      <rect x={2} y={404} width={616} height={52} rx={8} fill="none" stroke={C.primary} strokeDasharray="5 4" />
+      <text x={col(1)} y={398} fontSize={11} fill={C.muted}>sidebar</text>
+      <Box x={6} y={410} w={112} h={h} t="W1 Dashboard" bold stroke={C.primary} />
+      <Box x={128} y={410} w={112} h={h} t="W2 Catalog" bold stroke={C.primary} />
+      <Box x={250} y={410} w={112} h={h} t="W3 Review" bold stroke={C.primary} />
+      <Box x={372} y={410} w={118} h={h} t="W4 Announce" bold stroke={C.primary} />
+      <Box x={500} y={410} w={114} h={h} t="W5 Users" s="admin only" bold stroke={C.primary} />
+      <Arrow d={`M${col(0) + w / 2} 378 V406`} />
+    </Svg>
+  );
+}
+
+
 
 const C = {
   ink: '#111',
@@ -404,6 +508,17 @@ function Erd() {
 
 /* ---------------------------------------------------------------- deck */
 
+const PARTS: Part[] = [
+  { code: 'p1', num: '01', name: 'Problem', question: 'Why build it, and what is it?', minutes: '≈ 3.5 min', icon: Compass,
+    slides: ['§Why build it?', '01 Overview', '02 Context', '03 Problem', '§What is it?', '04 Solution', '05 Actors', '06 Features'] },
+  { code: 'p2', num: '02', name: 'Design', question: 'How is the whole system built?', minutes: '≈ 6 min', icon: Layers,
+    slides: ['07 Business flow', '08 State machine', '09 Architecture', '10 Stack', '11 UI/UX', '12 Sequence', '13 Classes', '14–15 Database', '16 Traceability'] },
+  { code: 'p3', num: '03', name: 'Demo', question: 'How do the workflows run for real?', minutes: '≈ 6.5 min', icon: PlayCircle,
+    slides: ['17 Demo plan', '18 WF-01 Nốt AI', '18b WF-01 storyboard', '19 WF-02 Publish a card', '19b WF-02 storyboard', '20 WF-03 Announce', '20b WF-03 storyboard'] },
+  { code: 'p4', num: '04', name: 'Proof', question: 'What can we prove?', minutes: '≈ 2.5 min', icon: Beaker,
+    slides: ['21 Testing', '21A Test cases', '21B Defects', '21C Evidence wall', '22 Achievements', '23 Limitations', '24 Lessons learned', '25 Conclusion'] },
+];
+
 export default function FinalDeck() {
   return (
     <div className="stage">
@@ -442,38 +557,142 @@ export default function FinalDeck() {
           </div>
         </Slide>
 
+        {/* Agenda */}
+        <Page
+          dense
+          part="AGENDA · FOUR PARTS"
+          title="Problem → Design → Demo → Proof"
+          notes="Four parts, the lecturer's order. Time budget, for us only: Problem about 3.5 min, Design about 6 min, Demo about 6.5 min, Proof about 2.5 min; 18 to 20 minutes in total, the demo about a third."
+        >
+          <div className="p1-body">
+            <div className="agenda-row">
+              {[
+                { c: 'p1', num: '01', name: 'Problem', q: 'Why build it, and what is it?', icon: Compass,
+                  items: ['§Why build it?', '01 Overview', '02 Context', '03 Problem', '§What is it?', '04 Solution', '05 Actors', '06 Features'] },
+                { c: 'p2', num: '02', name: 'Design', q: 'How is the whole system built?', icon: Layers,
+                  items: ['07 Business flow', '08 State machine', '09 Architecture', '10 Stack', '11 UI/UX', '12 Sequence', '13 Classes', '14–15 Database', '16 Traceability'] },
+                { c: 'p3', num: '03', name: 'Demo', q: 'How do the workflows run for real?', icon: PlayCircle,
+                  items: ['17 Demo plan', '18 WF-01 Nốt AI', '18b WF-01 storyboard', '19 WF-02 Publish a card', '19b WF-02 storyboard', '20 WF-03 Announce', '20b WF-03 storyboard'] },
+                { c: 'p4', num: '04', name: 'Proof', q: 'What can we prove?', icon: Beaker,
+                  items: ['21 Testing', '21A Test cases', '21B Defects', '21C Evidence wall', '22 Achievements', '23 Limitations', '24 Lessons learned', '25 Conclusion'] },
+              ].map((p) => {
+                const I = p.icon;
+                return (
+                  <div key={p.c} className={`ag ${p.c}`}>
+                    <span className="ag-num">{p.num}</span>
+                    <span className="ag-ic"><I size={34} /></span>
+                    <span className="ag-name">{p.name}</span>
+                    <span className="ag-q">{p.q}</span>
+                    <ul>
+                      {p.items.map((t) => (t.startsWith('§') ? <li key={t} className="grp">{t.slice(1)}</li> : <li key={t}>{t}</li>))}
+                    </ul>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </Page>
+
+        <Divider part={PARTS[0]} shots={['wa-03-dashboard-crop.png', 'm-today.png', '05-ai-free-tell-result.png']} />
+
         {/* 01 · Overview */}
         <Page
+          dense
           part="PROBLEM · 01"
           title="Overview"
-          foot="prm393-not-lab3.web.app · /admin/ · github.com/FU-PRM-Projects/Lab-03"
-          notes="30 seconds. Product: Nốt. Users: final-year students (persona Minh). Value: notice small wins instead of unfinished tasks; a curated, growing challenge catalog. Platform: Android plus a Flutter Web admin, both live at prm393-not-lab3.web.app and /admin/; repo FU-PRM-Projects/Lab-03. Added on top of Lab 3: roles user / staff / admin and a web admin with 5 screens; the cross-role flow where a user shares a card, staff approve it and the app updates in real time; Nốt AI (Gemini via Firebase AI Logic); inbox for announcements, first-run onboarding, weekly card PDF saved on the device."
+          notes="30 seconds. Name and type: Nốt, an Android app for logging small wins plus a Flutter web admin for staff. One sentence: for students who end the day feeling behind, Nốt makes one small win visible in under 30 s and keeps fresh challenges coming. Users, value, platform. It is live: point at the screenshots."
         >
-          <div className="fx-split">
-            <ul className="fx-list">
-              <li>Users log a win on Android</li>
-              <li>Staff curate the cards on the web</li>
-              <li>Gemini sorts the day into notes</li>
-              <li>One Firestore, rules per role</li>
-            </ul>
-            <Shot src="05-ai-free-tell-result.png" alt="Nốt AI suggestions" h={380} />
+          <div className="p1-body">
+          <div className="ov">
+            <div className="ov-head">
+              <span className="ov-k">Project</span>
+              <h3 className="ov-name">Nốt</h3>
+              <p className="ov-type">Small-wins journal · Android app + web admin · one Firebase project</p>
+            </div>
+            <p className="ov-desc">
+              For <b>students and young workers</b> who end a long day feeling they got nothing done: Nốt makes{' '}
+              <b>one small win visible in under 30 seconds</b> and keeps <b>fresh small challenges</b> coming.
+            </p>
+            <div className="ov-sec">
+              <span className="ov-k">Users</span>
+              <div className="ov-roles">
+                <div>
+                  <span className="ov-ic r1"><Smartphone size={22} /></span>
+                  <p><b>user</b>logs the day on the Android app</p>
+                </div>
+                <div>
+                  <span className="ov-ic r2"><ClipboardCheck size={22} /></span>
+                  <p><b>staff</b>reviews and creates cards, posts news on the web admin</p>
+                </div>
+                <div>
+                  <span className="ov-ic r3"><UserCog size={22} /></span>
+                  <p><b>admin</b>everything staff can, plus changes roles</p>
+                </div>
+              </div>
+            </div>
+            <div className="ov-sec">
+              <span className="ov-k">Core value</span>
+              <div className="ov-vals">
+                <p><CheckCircle2 size={20} />One win in 30 s, typed or sorted by Gemini</p>
+                <p><CheckCircle2 size={20} />New challenge cards without an app update</p>
+                <p><CheckCircle2 size={20} />Staff news in every inbox in the same minute</p>
+              </div>
+            </div>
+          </div>
+          <div className="collage">
+            <img className="c-web" src={img('wa-03-dashboard-crop.png')} alt="Web admin dashboard" />
+            <img className="c-phone c-a" src={img('m-today.png')} alt="Today screen" />
+            <img className="c-phone c-b" src={img('05-ai-free-tell-result.png')} alt="Nốt AI" />
+            <span className="c-tag c-tag-web">Web admin · staff</span>
+            <span className="c-tag c-tag-app">Android app · user</span>
+          </div>
           </div>
         </Page>
 
         {/* 02 · Context */}
         <Page
+          dense
           part="PROBLEM · 02"
           title="Context"
-          foot="Source: Lab 2 persona and success criterion (docs/design-traceability.md)"
-          notes="Context, not problem yet. Persona Minh, 22, final year, worn out. Lab 2 success criterion: log a mood and one small win in under 30 seconds after tapping the evening reminder. After Lab 3: one user, own data only (notes, habits, groups); challenge cards were a fixed seed list in Firestore; own cards stayed private. Now also involved: staff who write and curate cards, an admin who decides who is staff, and Gemini to cut typing in the evening."
+          line="Final-year students and young workers reach the evening with little energy left."
+          notes="Context, no problem yet. Who: final-year students and young workers with a full day of classes, internships or work. The persona from Lab 2 is Minh, 22. What they use today: a to-do app, phone notes, sometimes a paper diary, and self-help tips seen on social media. Walk the evening: the day ends, Minh opens the to-do list and sees what is left, tries to write a diary and gives up, looks at the same goals as last week, and goes to bed feeling nothing got done. Nobody curates small, fresh challenges for them."
         >
-          <div className="fx-split">
-            <ul className="fx-list">
-              <li>Goal: a mood and one win in under 30 seconds</li>
-              <li>Lab 3: one user, a fixed list of cards</li>
-              <li>Missing: staff, an admin, a way to reach users</li>
-            </ul>
-            <Shot src="07-weekly-card.png" alt="Weekly card" h={380} cap="Weekly card, kept from Lab 3" />
+          <div className="p1-body">
+          <div className="col grow" style={{ gap: 30, justifyContent: 'center' }}>
+            <div className="ctx3">
+              <div className="ctx-col c1">
+                <span className="ctx-h"><span className="ctx-ic"><Compass size={20} /></span><span className="ctx-k">Environment</span></span>
+                <p>University life and first jobs</p>
+                <small>long days of classes, internships, part-time work; the evening is the only free time</small>
+              </div>
+              <div className="ctx-col c2">
+                <span className="ctx-h"><span className="ctx-ic"><Users size={20} /></span><span className="ctx-k">Who is involved</span></span>
+                <div className="ctx-people">
+                  <MiniAvatar size={52} />
+                  <p><b>Minh, 22</b> · final-year student, tired, wants to feel the day counted</p>
+                </div>
+                <small>Nobody curates small, fresh challenges for people like Minh</small>
+              </div>
+              <div className="ctx-col c3">
+                <span className="ctx-h"><span className="ctx-ic"><Wrench size={20} /></span><span className="ctx-k">Current tools</span></span>
+                <p>To-do app, phone notes, paper diary</p>
+                <small>plus self-help tips scattered across social media</small>
+              </div>
+            </div>
+            <span className="ctx-proc">Current process</span>
+            <FlowDiagram
+              steps={[
+                { icon: Sunset, title: 'Day ends', note: 'home late, low energy' },
+                { icon: ListTodo, title: 'Checks to-do', note: 'sees only what is left', warn: true },
+                { icon: NotebookPen, title: 'Tries a diary', note: 'blank page, gives up', warn: true },
+                { icon: Repeat, title: 'Same goals', note: 'last week\'s list again', warn: true },
+                { icon: BedDouble, title: 'Goes to bed', note: '"nothing done today"', warn: true },
+              ]}
+            />
+            <p className="ctx-need">
+              <b>So people need:</b> a way to see one small win in seconds, and fresh small challenges that someone keeps up for them.
+            </p>
+          </div>
           </div>
         </Page>
 
@@ -482,40 +701,56 @@ export default function FinalDeck() {
           dense
           part="PROBLEM · 03"
           title="Problem"
-          foot="Evidence: docs/gap-review.md. No user survey; impacts observed in the Lab 3 build."
-          notes="Pain points with cause and impact. Evidence is our own Lab 3 state (docs/gap-review.md), not a survey; we say that openly."
+          line="Most of us think it after a long day, even on days when we did plenty of small things."
+          notes="Three pain points, each with a concrete cause and the impact we see. 1: to-do lists only track what is left, so the small things we did are never written anywhere. 2: diary apps ask for a long entry at the moment we are most tired. 3: goals and challenges stay the same, and nobody refreshes them or tells us what is new. Hit hardest: final-year students and young workers. Evidence: the Lab 2 persona and our own evenings as final-year students; we did not run a formal survey and we say so."
         >
-          <table className="fx-table">
-            <thead>
-              <tr>
-                <th style={{ width: '26%' }}>Pain point</th>
-                <th style={{ width: '38%' }}>Cause</th>
-                <th>Impact</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><b>Static challenge content</b></td>
-                <td>Cards were a seed list; changing one needed a developer</td>
-                <td>Users run out of fresh cards</td>
-              </tr>
-              <tr>
-                <td><b>No way to reach users</b></td>
-                <td>No staff role, no announcements</td>
-                <td>Nobody can tell users about news in the app</td>
-              </tr>
-              <tr>
-                <td><b>Logging takes effort at night</b></td>
-                <td>Each note is typed and classified by hand</td>
-                <td>The 30 s goal slips on a busy day</td>
-              </tr>
-              <tr>
-                <td><b>Lab 3 flow unfinished</b></td>
-                <td>Weekly PDF went to Cloud Storage (paid plan)</td>
-                <td>Export never worked on the real project</td>
-              </tr>
-            </tbody>
-          </table>
+          <div className="p1-body">
+          <div className="pcx">
+            <div className="pcx-head">
+              <span className="h-pain">Pain point</span>
+              <span />
+              <span className="h-cause">Cause</span>
+              <span />
+              <span className="h-impact">Impact</span>
+            </div>
+            {[
+              {
+                head: 'At night we only see what is unfinished', Ill: IllTodo,
+                cause: <>To-do lists track <b>what is left</b>; the small things we did are never written down</>,
+                impact: <>We feel the day was wasted; motivation drops and <b>burnout</b> builds up</>,
+              },
+              {
+                head: 'Writing the day down is one more task', Ill: IllJournal,
+                cause: <>Diary apps ask for a <b>long entry</b>, at the moment we are most tired</>,
+                impact: <>We skip it, then <b>stop after a few days</b>; the good moments are lost</>,
+              },
+              {
+                head: 'Goals that never change stop motivating', Ill: IllRepeat,
+                cause: <><b>Nobody refreshes</b> the challenges or tells us what is new</>,
+                impact: <>The same list every week gets boring; good habits <b>break off</b></>,
+              },
+            ].map((x) => (
+              <div key={x.head} className="pcx-row">
+                <div className="pcx-pain">
+                  <div className="pcx-thumb ill-box">
+                    <x.Ill />
+                  </div>
+                  <b>{x.head}</b>
+                </div>
+                <ArrowRight className="pcx-arrow" size={22} />
+                <p className="pcx-cause">{x.cause}</p>
+                <ArrowRight className="pcx-arrow" size={22} />
+                <p className="pcx-impact">{x.impact}</p>
+              </div>
+            ))}
+            <p className="pcx-who">
+              <span>Hit hardest</span>final-year students and young workers, whose evening is the only free time and the most tired one.
+            </p>
+            <p className="pcx-ev">
+              <span>Evidence</span>Lab 2 persona (Minh, 22) and our own evenings as final-year students. No formal survey was run.
+            </p>
+          </div>
+          </div>
         </Page>
 
         {/* 04 · Proposed solution */}
@@ -523,40 +758,63 @@ export default function FinalDeck() {
           dense
           part="PROBLEM · 04"
           title="Proposed solution"
-          foot="Out of scope: Cloud Functions, Cloud Storage, AI level 3 “Hỏi Nốt”, iOS"
-          notes="Pain point to solution to value. Scope. In scope (MVP): WF-01 Log the day with Nốt AI; WF-02 Publish a user card to the catalog; WF-03 Announce to all users; onboarding, weekly PDF, roles, App Check. Out of scope on purpose: Cloud Functions and Cloud Storage (the brief and the paid plan), AI level 3 'Hỏi Nốt' (bonus, not built), iOS build."
+          line="An Android app for the evening, a staff web admin for content, and Gemini that sorts the day."
+          notes="Each pain point from slide 03 gets one answer, and each answer is live: point at the screenshot. 1: the jar shows what you did; one mood and one small win in under 30 s. 2: Nốt AI, tell the day once and Gemini splits it into sorted notes you confirm. 3: staff keep the catalog fresh from the web admin, approve cards users share, and announce news to every inbox. Then scope: in scope are the three workflows plus onboarding, weekly PDF, roles and App Check; out of scope are Cloud Functions and Cloud Storage (paid plan), the bonus 'Hỏi Nốt' AI, and iOS."
         >
-          <table className="fx-table">
-            <thead>
-              <tr>
-                <th>Pain point</th>
-                <th>Solution</th>
-                <th>Value</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><b>Static content</b></td>
-                <td>Web admin catalog; users share cards, staff approve</td>
-                <td>Catalog grows without a release</td>
-              </tr>
-              <tr>
-                <td><b>No channel</b></td>
-                <td>Announcements and a personal inbox</td>
-                <td>News lands in the same minute</td>
-              </tr>
-              <tr>
-                <td><b>Slow evenings</b></td>
-                <td>Nốt AI: tell the day once, confirm the notes</td>
-                <td>Several notes from one paragraph</td>
-              </tr>
-              <tr>
-                <td><b>Broken PDF</b></td>
-                <td>Build and save it on the device</td>
-                <td>Works on the free plan, offline</td>
-              </tr>
-            </tbody>
-          </table>
+          <div className="p1-body">
+          <div className="pcx">
+            <div className="pcx-head sol">
+              <span className="h-pain">Pain point</span>
+              <span />
+              <span className="h-sol">Solution in Nốt</span>
+              <span />
+              <span className="h-impact">Value</span>
+            </div>
+            {[
+              {
+                pain: 'At night we only see what is unfinished',
+                shots: ['m-today.png'],
+                sol: <><b>The jar of small wins</b>: one mood + one win, saved in under 30 s</>,
+                value: <>The evening ends on <b>what we did</b>, not on what is left</>,
+              },
+              {
+                pain: 'Writing the day down is one more task',
+                shots: ['05-ai-free-tell-result.png'],
+                sol: <><b>Nốt AI</b>: tell the day in one paragraph; Gemini splits it into sorted notes to confirm</>,
+                value: <><b>3 notes</b> from one paragraph, no form to fill</>,
+              },
+              {
+                pain: 'Goals that never change stop motivating',
+                shots: ['wa-04-catalog-search-crop.png'],
+                web: true,
+                sol: <><b>Staff web admin</b>: keep the card catalog fresh, approve cards users share, announce news</>,
+                value: <>New cards and news reach users <b>without an app update</b></>,
+              },
+            ].map((x) => (
+              <div key={x.pain} className="pcx-row sol">
+                <p className="sol-pain">{x.pain}</p>
+                <ArrowRight className="pcx-arrow" size={22} />
+                <div className="sol-mid">
+                  <div className="sol-shots">
+                    {x.shots.map((src) => (
+                      <img key={src} src={img(src)} alt="" className={x.web ? 'web' : 'phone'} />
+                    ))}
+                  </div>
+                  <p>{x.sol}</p>
+                </div>
+                <ArrowRight className="pcx-arrow" size={22} />
+                <p className="pcx-impact">{x.value}</p>
+              </div>
+            ))}
+            <p className="pcx-who">
+              <span className="in">In scope</span>WF-01 Log the day with Nốt AI · WF-02 Publish a user card · WF-03 Announce news · onboarding, weekly
+              PDF, roles, App Check
+            </p>
+            <p className="pcx-ev">
+              <span className="out">Out of scope</span>Cloud Functions and Cloud Storage (paid plan) · "Hỏi Nốt" AI (bonus) · iOS build
+            </p>
+          </div>
+          </div>
         </Page>
 
         {/* 05 · Actors */}
@@ -564,78 +822,114 @@ export default function FinalDeck() {
           dense
           part="PROBLEM · 05"
           title="Main actors"
-          foot="Role lives in users/{uid}.role; only an admin changes it, never their own."
-          notes="Actors match the real permission model in firestore.rules and the web admin's role check. First admin: set in the Firebase Console (Thị Kim Thúy Đoàn). Rules tests R-19…R-30 cover every role and collection."
+          line="The role lives in users/{uid}.role; only an admin changes it, and never their own."
+          notes="Read the map left to right. User on the Android app, staff and admin on the web admin; an admin can do everything staff can, plus change other users' roles, never their own. Every request lands on Firebase, where Security Rules decide every read and write; there is no custom server. Gemini only receives the scrubbed paragraph through Firebase AI Logic and returns JSON. The first admin was set in the Firebase Console. Rules tests R-01 to R-30 cover every role and collection; BR-05 is R-26."
         >
-          <table className="fx-table">
-            <thead>
-              <tr>
-                <th style={{ width: '14%' }}>Actor</th>
-                <th style={{ width: '14%' }}>Client</th>
-                <th>Main permissions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><b>User</b></td>
-                <td>Android app</td>
-                <td>Own notes; share own cards (pending only); read catalog, announcements, own inbox</td>
-              </tr>
-              <tr>
-                <td><b>Staff</b></td>
-                <td>Web admin</td>
-                <td>Create, edit, archive cards; approve or reject with a reason; post announcements</td>
-              </tr>
-              <tr>
-                <td><b>Admin</b></td>
-                <td>Web admin</td>
-                <td>Everything staff can do, plus change other users' roles</td>
-              </tr>
-              <tr>
-                <td><b>Gemini</b></td>
-                <td>External</td>
-                <td>Receives the scrubbed paragraph only; returns JSON suggestions</td>
-              </tr>
-              <tr>
-                <td><b>Firebase</b></td>
-                <td>Platform</td>
-                <td>Rules decide every read and write; no custom server</td>
-              </tr>
-            </tbody>
-          </table>
+          <div className="p1-body">
+          <ActorMap
+            rows={[
+              {
+                icon: Users, name: 'User', who: 'logs every evening', tone: 'u',
+                perms: ['own notes and data', 'share own cards (pending only)', 'read catalog, news, own inbox'],
+                client: { icon: Smartphone, label: 'Android app', shot: 'm-today.png', phone: true },
+              },
+              {
+                icon: PenLine, name: 'Staff', who: 'content curator', tone: 's',
+                perms: ['create, edit, archive cards', 'approve / reject with a reason', 'post announcements'],
+                client: { icon: Monitor, label: 'Web admin', shot: 'wa-08-review-approved-crop.png' },
+              },
+              {
+                icon: UserCog, name: 'Admin', who: 'team lead', tone: 'a', badge: 'all staff rights',
+                perms: ['everything staff can do', "change other users' roles", 'never their own role'],
+                client: { icon: Monitor, label: 'Web admin', shot: 'wa-12-users-crop.png' },
+              },
+            ]}
+            hub={{ icon: Flame, name: 'Firebase', lines: ['Auth · Firestore', 'App Check · Remote Config · FCM'], rule: 'Security Rules decide every read and write' }}
+            ext={{ icon: Bot, name: 'Gemini', lines: ['via Firebase AI Logic', 'gets the scrubbed paragraph only', 'returns JSON suggestions'] }}
+          />
+          </div>
         </Page>
 
         {/* 06 · Features */}
         <Page
+          dense
           part="PROBLEM · 06"
           title="Main features"
-          foot="Also: onboarding · weekly PDF · streaks · self-control · groups · Discord link · dashboard"
-          notes="Three workflows, one story: the user logs the day, shares a card that staff approve, staff announce it. Each has an actor, a trigger and a business result, not a list of buttons. Other features: onboarding & starter plan, weekly card PDF, streaks & journey, self-control & breathing, groups, Discord link, dashboard, roles."
+          line="Each group links an actor to the pain point it solves, and names the workflow we demo live."
+          notes="Four groups, left to right. Log the day is for the user and answers pains 1 and 2; WF-01 Nốt AI is the demo. Challenges joins user and staff and answers pain 3; WF-02 is the demo. News to users is staff talking to everyone; WF-03 is the demo. Admin and safety keeps the other three safe. Filled dots are the MVP, built and tested; hollow dots are extensions, either Lab 3 extras or next steps we did not build."
         >
-          <div className="fx-cols">
-            {[
-              ['WF-01', 'Log the day with Nốt AI', 'User', 'Taps Ghi nốt → Kể tự do', 'Notes saved after confirming'],
-              ['WF-02', 'Publish a card to the catalog', 'User + Staff', 'Shares an own card', 'Card in catalog, inbox message'],
-              ['WF-03', 'Announce to all users', 'Staff', 'Has news for everyone', 'Shown in every user inbox'],
-            ].map(([id, name, actor, trigger, result]) => (
-              <div key={id} className="fx-wf">
-                <h3>{id}</h3>
-                <b>{name}</b>
-                <p>{actor}</p>
-                <p>{trigger}</p>
-                <p>→ {result}</p>
-              </div>
-            ))}
+          <div className="p1-body">
+          <div className="col grow" style={{ minWidth: 0 }}>
+            <div className="fg4">
+              {[
+                {
+                  icon: Sparkles, name: 'Log the day', roles: [['u', 'User']], shot: '05-ai-free-tell-result.png',
+                  items: [['star', 'Nốt AI: tell the day once', 'WF-01'], ['mvp', 'Jar of small wins, 30 s note'], ['mvp', 'Streak and weekly card PDF'], ['ext', 'Self-control and breathing']],
+                  solves: 'Only seeing what is unfinished · writing is one more task',
+                },
+                {
+                  icon: ClipboardCheck, name: 'Challenges', roles: [['u', 'User'], ['s', 'Staff']], shot: 'cr-05-phone-approved-run3.png',
+                  items: [['star', 'Share a card, staff approve', 'WF-02'], ['mvp', 'Card catalog run on the web'], ['mvp', 'Onboarding + starter plan'], ['ext', 'Journey climb, groups']],
+                  solves: 'Goals that never change',
+                },
+                {
+                  icon: Megaphone, name: 'News to users', roles: [['s', 'Staff']], shot: 'wa-11-app-inbox-announcement.png',
+                  items: [['star', 'Announce to every inbox', 'WF-03'], ['mvp', 'Personal inbox messages'], ['mvp', 'Evening push reminder'], ['ext', 'Discord room links']],
+                  solves: 'Nobody tells us what is new',
+                },
+                {
+                  icon: ShieldCheck, name: 'Admin and safety', roles: [['a', 'Admin']], shot: 'wa-12-users-crop.png', web: true,
+                  items: [['mvp', 'Roles, changed by an admin only'], ['mvp', 'Dashboard'], ['mvp', 'App Check, AI on/off switch'], ['ext', 'next: "Hỏi Nốt" AI, iOS']],
+                  solves: 'Keeps the other three safe',
+                },
+              ].map((g) => {
+                const I = g.icon;
+                return (
+                  <div key={g.name} className="fg-col">
+                    <div className="fg-head">
+                      <span className="wf3-ic"><I size={20} /></span>
+                      <h4>{g.name}</h4>
+                    </div>
+                    <span className="wf3-roles">
+                      {g.roles.map(([t, r]) => (
+                        <span key={r} className={`role ${t}`}>{r}</span>
+                      ))}
+                    </span>
+                    <div className="fg-shot">
+                      <img src={img(g.shot)} alt="" className={g.web ? 'web' : 'phone'} />
+                    </div>
+                    {g.items.filter(([k]) => k === 'star').map(([, t, wf]) => (
+                      <p key={t} className="fg-demo"><span>Demo {wf}</span>{t}</p>
+                    ))}
+                    <div className="fg-sec">
+                      <span className="fg-k mvp">MVP</span>
+                      <ul>
+                        {g.items.filter(([k]) => k === 'mvp').map(([, t]) => <li key={t}>{t}</li>)}
+                      </ul>
+                    </div>
+                    <div className="fg-sec">
+                      <span className="fg-k ext">Extra</span>
+                      <ul className="ext">
+                        {g.items.filter(([k]) => k === 'ext').map(([, t]) => <li key={t}>{t}</li>)}
+                      </ul>
+                    </div>
+                    <p className="wf3-solves"><span>Solves</span>{g.solves}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
           </div>
         </Page>
+
+        <Divider part={PARTS[1]} shots={['ev-firestore-console.png', 'g-mobile-final-03-onboarding-starter-plan.png', 'g-journey-climb-dung-cam.png']} />
 
         {/* 07 · Business flow */}
         <Page
           dense
           part="DESIGN · 07"
           title="Business flow"
-          foot="BR-AI1: AI only when enabled, consented, App Check · BR-02: pending only · BR-03: reject needs a reason"
-          notes="Walk the lanes left to right: WF-01 stays in the user's own data; WF-02 crosses from user to staff and back; WF-03 goes from staff to everyone. The three workflows share one Firestore; rules are the decision points. BR-AI1: AI only when enabled, consented and App Check passes. BR-02: user creates pending only. BR-03: reject needs a reason."
+          notes="Walk the lanes left to right: WF-01 stays in the user's own data; WF-02 crosses from user to staff and back; WF-03 goes from staff to everyone. The three workflows share one Firestore; rules are the decision points. BR-AI1: AI only when enabled, consented and App Check passes. BR-02: user creates pending only. BR-03: reject needs a reason. On-screen footnote moved here: BR-AI1: AI only when enabled, consented, App Check · BR-02: pending only · BR-03: reject needs a reason"
         >
           <BusinessFlow />
         </Page>
@@ -645,8 +939,7 @@ export default function FinalDeck() {
           dense
           part="DESIGN · 08"
           title="State machine"
-          foot="Tests R-20…R-24 · 30/30 rules tests pass"
-          notes="Entity: challengeSubmissions/{id}. Event, guard, action. Every transition and every forbidden one has a rules test in the Emulator: R-20 create pending only, R-21 read own or staff, R-22 staff review with a reason on reject, R-23 withdraw while pending, R-24 inbox. 30/30 rules tests pass (R-01…R-30)."
+          notes="Entity: challengeSubmissions/{id}. Event, guard, action. Every transition and every forbidden one has a rules test in the Emulator: R-20 create pending only, R-21 read own or staff, R-22 staff review with a reason on reject, R-23 withdraw while pending, R-24 inbox. 30/30 rules tests pass (R-01…R-30). On-screen footnote moved here: Tests R-20…R-24 · 30/30 rules tests pass"
         >
           <StateMachine />
         </Page>
@@ -656,61 +949,104 @@ export default function FinalDeck() {
           dense
           part="DESIGN · 09"
           title="System architecture"
-          foot="GitHub Actions deploys Hosting (/ and /admin/) and rules on merge to main"
-          notes="Decision: no custom server. Security Rules + App Check are the backend's access layer. Trade-off: no server means rules carry the business rules (validation, transitions). Benefit: free plan, real time, less to run. Cost: complex rules, so we test them. Deploy: GitHub Actions builds both clients, deploys Hosting and Firestore rules + indexes on merge to main."
+          notes="Decision: no custom server. Security Rules + App Check are the backend's access layer. Trade-off: no server means rules carry the business rules (validation, transitions). Benefit: free plan, real time, less to run. Cost: complex rules, so we test them. Deploy: GitHub Actions builds both clients, deploys Hosting and Firestore rules + indexes on merge to main. On-screen footnote moved here: GitHub Actions deploys Hosting (/ and /admin/) and rules on merge to main"
         >
           <Architecture />
         </Page>
 
-        {/* 10 · Tech stack */}
+        {/* 10 · Tech stack map */}
         <Page
           dense
           part="DESIGN · 10"
           title="Technology stack"
-          foot="Source: app and web admin pubspec, discord_bot/Cargo.toml, GitHub workflows"
-          notes="Only what is in pubspec / package.json / Cargo.toml / workflows. The Discord bot is the one non-Dart part: a Rust service (Poise on Serenity) that runs on a VPS with Docker through Dokploy. It chats with a linked user over DM, calls an OpenRouter model (default deepseek) through rig-core with tools that only touch that user's notes, and reads and writes Firestore through the REST API with a service account. Photos go to Cloudinary. A guard model checks abuse and there is a per-user cooldown. It is an extra, not part of the three core workflows."
+          notes="Read it like an AWS diagram: FE (two Flutter clients) talks over HTTPS to serverless Firebase (BE + AI), which stores data in Firestore. Below: DevOps ships it, Ops watches it. Only services we really use (pubspec, workflows, compose file); no Grafana, monitoring is the Firebase Console. Details if asked: Only what is in pubspec / package.json / Cargo.toml / workflows. The Discord bot is the one non-Dart part: a Rust service (Poise on Serenity) that runs on a VPS with Docker through Dokploy. It chats with a linked user over DM, calls an OpenRouter model (default deepseek) through rig-core with tools that only touch that user's notes, and reads and writes Firestore through the REST API with a service account. Photos go to Cloudinary. A guard model checks abuse and there is a per-user cooldown. It is an extra, not part of the three core workflows."
         >
-          <table className="fx-table fx-small">
-            <thead>
-              <tr>
-                <th style={{ width: '11%' }}>Group</th>
-                <th style={{ width: '43%' }}>Technology</th>
-                <th>Used for</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td><b>Mobile</b></td><td>Flutter (Dart) · Riverpod · charts · PDF · sharing and camera</td><td>Android app in MVVM; charts; weekly card PDF saved and shared on the device</td></tr>
-              <tr><td><b>Web</b></td><td>Flutter Web (Dart) · Riverpod · Firebase Hosting</td><td>Web admin for staff and admin, served from Firebase Hosting at /admin/</td></tr>
-              <tr><td><b>Shared</b></td><td>Shared Dart package</td><td>Models, repositories and design tokens used by both clients</td></tr>
-              <tr><td><b>Backend</b></td><td>Firebase: Firestore · Rules · Auth · Remote Config · Messaging · Analytics · Crashlytics</td><td>Data, role permissions, flags, push, usage and crash reports; no custom server</td></tr>
-              <tr><td><b>AI</b></td><td>Firebase AI Logic · Google Gemini</td><td>Nốt AI: sort one paragraph into notes with a JSON schema, model name kept in Remote Config</td></tr>
-              <tr><td><b>Security</b></td><td>Firebase App Check · Google Play Integrity · reCAPTCHA Enterprise</td><td>Only our own apps reach Firestore and Gemini</td></tr>
-              <tr><td><b>Discord bot</b></td><td><b>Rust</b> · Discord API · async runtime · HTTP client</td><td>Assistant in Discord DM: the connect command links a Nốt account with a 6-character code, then the user manages notes by chatting</td></tr>
-              <tr><td><b>Bot AI</b></td><td>LLM agent framework · OpenRouter · DeepSeek</td><td>Agent with tools bound to the linked user's own notes; a guard model and a cooldown limit abuse</td></tr>
-              <tr><td><b>Bot data</b></td><td>Firestore REST API · Google service account · Cloudinary</td><td>Reads and writes notes and account links; uploads photos sent in the chat</td></tr>
-              <tr><td><b>Media</b></td><td>Cloudinary</td><td>Note photos, because Cloud Storage needs the paid plan</td></tr>
-              <tr><td><b>Quality</b></td><td>Flutter tests · Firebase Emulator · ARTEMIS · CodeRabbit</td><td>Unit and widget tests, rules tests, E2E on a real phone, AI code review on PRs</td></tr>
-              <tr><td><b>DevOps</b></td><td>GitHub Actions · Firebase Hosting previews · Docker · Dokploy</td><td>CI, PR previews, deploy on merge; the bot ships as a Docker image on a VPS</td></tr>
-            </tbody>
-          </table>
+          <div className="p1-body map-full">
+            <ServerlessMap />
+          </div>
         </Page>
 
-        {/* 11 · UI/UX */}
+        {/* 11 · UI/UX: sitemap and design path */}
         <Page
           dense
           part="DESIGN · 11"
           title="UI/UX design"
-          foot="States: empty · loading · error (5 screens) · success"
-          notes="Lab 2 tokens live in packages/core; the web admin reuses them in a wide layout. Same indigo, Be Vietnam Pro, mascot for empty and error. Show loading, empty, error, success on the web admin. Error uses the shared MessageView.error on 5 screens."
+          line="Sitemap of both clients, and how the Today screen went from wireframe to final Figma to the app."
+          notes="Left: the sitemap with our screen codes (S for the Android app, W for the web admin); the same codes are used in docs/design-traceability.md and on every slide. Four tabs on the phone, everything else is nested; the web admin is one sidebar with five screens, Users only for admins. Right: the design path of the Today screen, from the Figma file PRM393-LAB2. The low-fi wireframe shows only the layout: date, bell and avatar, one big picture, the question, one main button, three shortcuts and the tab bar. The Lab 2 wireframes on page 02 date from the study-planner version, so this one is redrawn for Nốt from the same rules (one big picture, one main action). The final Figma on page 03 adds colour, the jar and the mascot with Auto Layout and components; the Flutter app implements it, with deviations logged as D-01 to D-37."
         >
-          <div className="fx-row">
-            <div className="fx-grid2">
-              <Shot src="wa-07-review-empty.png" alt="Empty review queue" w={400} cap="Empty: review queue" />
-              <Shot src="wa-13-dashboard-loading.png" alt="Dashboard loading" w={400} cap="Loading: dashboard" />
-              <Shot src="wa-08-review-approved.png" alt="Approved list" w={400} cap="Success: approved cards" />
-              <Shot src="wa-16-dashboard-error.png" alt="Dashboard error" w={400} cap="Error: dashboard, server unreachable" />
+          <div className="p1-body ux-body">
+            <div className="ux-map">
+              <SiteMap />
             </div>
-            <Shot src="11-ai-off-remote-config.png" alt="Nốt AI off" h={440} cap="App: AI off" />
+            <div className="ux-path">
+              {[
+                ['wire', 'Wireframe', 'S02 Today, low-fi'],
+                ['ux-figma-s02.png', 'Final Figma', 'page 03 Final UI'],
+                ['m-today.png', 'Built app', 'Flutter, Galaxy A70'],
+              ].map(([src, t, sub], i) => (
+                <div key={src} className="ux-step">
+                  {i > 0 && <span className="ux-arrow">→</span>}
+                  <figure>
+                    {src === 'wire' ? <WireToday /> : <img src={img(src)} alt={t} />}
+                    <figcaption><b>{t}</b>{sub}</figcaption>
+                  </figure>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Page>
+
+        {/* 11b · UI/UX: states and feedback */}
+        <Page
+          dense
+          part="DESIGN · 11"
+          title="UI states and feedback"
+          line="Every screen has empty, loading, error and success; three rounds of feedback changed the design."
+          notes="Left: the four states on the web admin; the error uses the shared MessageView.error on five screens, and the phone has the same set plus 'Nốt AI đang nghỉ' when ai_enabled is false. Right: feedback that changed the design. One, the lecturer on 24/10 in Lab 2: a deadline planner is not a real pain, Minh already has Calendar and Notion, so we pivoted to a positive-notes app and kept the colours, font and mascot. Two, the lecturer again: too much text, cluttered, so every screen got one big picture and one main action, and the Jar became a grid of note sheets instead of a card list. Three, running the Final on the real project: the web admin kept retrying for about three minutes before showing an error, so retries are off and the error with 'Thử lại' shows at once."
+        >
+          <div className="p1-body ux-body">
+            <div className="ux-states">
+              {([
+                ['wa-07-review-empty.png', 1280, 715, 362, 290, 'Empty', 'review queue'],
+                ['wa-13-dashboard-loading.png', 1280, 716, 342, 250, 'Loading', 'dashboard'],
+                ['wa-16-dashboard-error-crop.png', 960, 484, 432, 400, 'Error', 'server unreachable'],
+                ['wa-08-review-approved.png', 1280, 600, 240, 560, 'Success', 'card approved'],
+              ] as const).map(([src, w, cx, cy, rw, t, sub]) => (
+                <figure key={src}>
+                  <Crop src={src} w={w} cx={cx} cy={cy} rw={rw} bw={250} bh={166} />
+                  <figcaption><b>{t}</b> · {sub}</figcaption>
+                </figure>
+              ))}
+            </div>
+            <div className="ux-fb">
+              <h3>Feedback → change</h3>
+              {[
+                { who: 'Lecturer · Lab 2', said: '"A deadline planner is not a real pain."', change: 'Pivot to a positive-notes app; colours, font, mascot kept', before: 'ux-fb1-before.png', after: 'ux-figma-s02.png' },
+                { who: 'Lecturer · Lab 2', said: '"Too much text, it feels cluttered."', change: 'One big picture + one action per screen; the Jar is a grid of notes', before: 'ux-fb2-before.png', after: 'ux-figma-s05.png' },
+                { who: 'Real project · Final', said: 'Errors showed only after ~3 min of retries', change: 'Retries off: the error and "Thử lại" show at once', before: 'wa-13-dashboard-loading-crop.png', after: 'wa-16-dashboard-error-crop.png', web: true },
+              ].map((f) => (
+                <div key={f.said} className="ux-fb-item">
+                  <div className="ux-fb-text">
+                    <span>{f.who}</span>
+                    <p className="said">{f.said}</p>
+                    <p className="change">→ {f.change}</p>
+                  </div>
+                  {f.web ? (
+                    <div className="ux-ba web">
+                      <Crop src="wa-13-dashboard-loading.png" w={1280} cx={716} cy={342} rw={260} bw={104} bh={104} />
+                      <i>→</i>
+                      <Crop src="wa-16-dashboard-error-crop.png" w={960} cx={484} cy={432} rw={300} bw={104} bh={104} />
+                    </div>
+                  ) : (
+                    <div className="ux-ba">
+                      <img src={img(f.before)} alt="before" />
+                      <i>→</i>
+                      <img src={img(f.after)} alt="after" />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </Page>
 
@@ -729,8 +1065,7 @@ export default function FinalDeck() {
           dense
           part="DESIGN · 13"
           title="Class design"
-          foot="Tests swap in fakes · 305 app · 14 web admin · 5 core"
-          notes="Business rules sit in the repository + Security Rules, not in widgets. Screen → Notifier/actions → service interface → Firestore implementation in packages/core. main.dart wires each provider to its Firebase implementation; fakes replace the interfaces in tests (305 app, 14 web admin, 5 core tests)."
+          notes="Business rules sit in the repository + Security Rules, not in widgets. Screen → Notifier/actions → service interface → Firestore implementation in packages/core. main.dart wires each provider to its Firebase implementation; fakes replace the interfaces in tests (305 app, 14 web admin, 5 core tests). On-screen footnote moved here: Tests swap in fakes · 290 app · 10 web admin · 5 core"
         >
           <table className="fx-table">
             <thead>
@@ -756,8 +1091,7 @@ export default function FinalDeck() {
           dense
           part="DESIGN · 14"
           title="Database design: conceptual"
-          foot="Final additions only; Lab 3 data (notes, groups, habits, …) is not drawn · attributes: next slide"
-          notes="Business-level model, drawn in crow's foot (IE) notation, so it has no attributes, keys or collection names; those are on the physical slide. Read each line with its verb: a user owns custom cards, sends submissions, receives inbox messages, saves weekly reports, answers the onboarding questions and reads announcements. A submission is shared from at most one custom card, and becomes at most one challenge card. A staff member (a user with role staff or admin) reviews submissions, which results in one inbox message, maintains challenge cards and posts announcements. Only the Final additions are drawn: the challenge catalog existed in Lab 3 as a seed list, and the Final added staff writing to it and the link to submissions. Lab 3 data (notes, groups, habits, progress, streaks) stays private to its owner and is not drawn. Notation and sources: docs/erd-notation.md."
+          notes="Business-level model, drawn in crow's foot (IE) notation, so it has no attributes, keys or collection names; those are on the physical slide. Read each line with its verb: a user owns custom cards, sends submissions, receives inbox messages, saves weekly reports, answers the onboarding questions and reads announcements. A submission is shared from at most one custom card, and becomes at most one challenge card. A staff member (a user with role staff or admin) reviews submissions, which results in one inbox message, maintains challenge cards and posts announcements. Only the Final additions are drawn: the challenge catalog existed in Lab 3 as a seed list, and the Final added staff writing to it and the link to submissions. Lab 3 data (notes, groups, habits, progress, streaks) stays private to its owner and is not drawn. Notation and sources: docs/erd-notation.md. On-screen footnote moved here: Final additions only; Lab 3 data (notes, groups, habits, …) is not drawn · attributes: next slide"
         >
           <Erd />
         </Page>
@@ -767,8 +1101,7 @@ export default function FinalDeck() {
           dense
           part="DESIGN · 15"
           title="Database design: physical"
-          foot="Types, limits and rules per field: docs/erd.svg · docs/data-model.md"
-          notes="No schema in Firestore, so the shape, sizes and transitions are enforced by rules and covered by tests. Indexes: submissions (uid, createdAt↓), (status, createdAt↓); notes (groupId, createdAt↓). Full table: docs/data-model.md. The diagram shows every collection with its fields; the full version with types and limits is docs/erd.svg. Rules per collection: users: only an admin changes a role, never their own; challenges: staff only, archive instead of delete; challengeSubmissions: create as pending, staff review, reason on reject; inbox: staff create, the owner may only flip read; announcements: staff create, every signed-in user reads; reports: owner only, id = ISO week; onboarding: owner only, enums checked."
+          notes="No schema in Firestore, so the shape, sizes and transitions are enforced by rules and covered by tests. Indexes: submissions (uid, createdAt↓), (status, createdAt↓); notes (groupId, createdAt↓). Full table: docs/data-model.md. The diagram shows every collection with its fields; the full version with types and limits is docs/erd.svg. Rules per collection: users: only an admin changes a role, never their own; challenges: staff only, archive instead of delete; challengeSubmissions: create as pending, staff review, reason on reject; inbox: staff create, the owner may only flip read; announcements: staff create, every signed-in user reads; reports: owner only, id = ISO week; onboarding: owner only, enums checked. On-screen footnote moved here: Types, limits and rules per field: docs/erd.svg · docs/data-model.md"
         >
           <img className="fx-erd" src={img('erd-slide.svg')} alt="Firestore data model: collections, fields, keys and relationships" />
         </Page>
@@ -778,153 +1111,254 @@ export default function FinalDeck() {
           dense
           part="DESIGN · 16"
           title="Traceability"
-          foot="Full matrix: docs/design-traceability.md"
-          notes="Feature → screen → class → collection → tests. ARTEMIS Final evidence is grouped by device; T15/T16 remain not run. Rules: firebase/tests/firestore.rules.test.js. E2E: e2e_test/."
+          line="Each feature traces from actor and screen to class, data, business rule and test."
+          notes="Read one row left to right: who uses it, which screen (the S and W codes from the sitemap), which ViewModel or action class, which Firestore collection, which business rule, and which tests prove it. R-xx are the rules tests in firebase/tests/firestore.rules.test.js, T-xx are ARTEMIS runs on the Galaxy A70, the rest are Flutter tests. If asked what the matrix found: S11 Hỏi Nốt is designed but still Planned (bonus), S08b and S08c were dropped on purpose (D-37), MascotAnim is not built, and ARTEMIS T15 and T16 are written but not run because they need a test-only account. Full matrix: docs/design-traceability.md."
         >
-          <table className="fx-table">
-            <thead>
-              <tr>
-                <th>Workflow</th>
-                <th>Screen</th>
-                <th>Class</th>
-                <th>Collection</th>
-                <th>Tests</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td><b>WF-01</b> Nốt AI</td><td>Kể tự do</td><td>FreeTellViewModel</td><td>notes</td><td>free_tell_flow_test · real device</td></tr>
-              <tr><td><b>WF-02</b> Share</td><td>Review queue</td><td>ReviewActions</td><td>challengeSubmissions</td><td>R-20…R-24 · D-1…D-3</td></tr>
-              <tr><td><b>WF-03</b> Announce</td><td>Announcements</td><td>AnnouncementActions</td><td>announcements</td><td>R-25 · inbox test</td></tr>
-              <tr><td>Weekly PDF</td><td>Thẻ tuần</td><td>WeeklyReportViewModel</td><td>reports</td><td>R-28 · real device</td></tr>
-              <tr><td>Onboarding</td><td>S13a–g</td><td>OnboardingViewModel</td><td>private/onboarding</td><td>R-27 · flow test</td></tr>
-              <tr><td>Roles</td><td>Sign-in · Users</td><td>sessionProvider</td><td>users</td><td>R-01, R-26</td></tr>
-            </tbody>
-          </table>
+          <div className="p1-body" style={{ flexDirection: 'column', gap: 14 }}>
+            <table className="fx-table tr-table">
+              <thead>
+                <tr>
+                  <th>Feature</th>
+                  <th>Actor</th>
+                  <th>Screen</th>
+                  <th>Class / service</th>
+                  <th>Entity</th>
+                  <th>Rule</th>
+                  <th>Tests</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><b>WF-01</b> Log the day with Nốt AI</td><td>User</td><td>S03b</td><td>FreeTellViewModel</td><td>notes</td><td>BR-AI1</td><td>free_tell_flow_test · T18, T19</td></tr>
+                <tr><td><b>WF-02</b> Publish a user card</td><td>User + Staff</td><td>S07 → W3</td><td>ReviewActions</td><td>challengeSubmissions</td><td>BR-02, BR-03</td><td>R-20…R-24 · cross-role 3/3 · T20</td></tr>
+                <tr><td><b>WF-03</b> Announce to every user</td><td>Staff</td><td>W4 → Inbox</td><td>AnnouncementActions</td><td>announcements</td><td>BR-04</td><td>R-25 · notification_inbox_test</td></tr>
+                <tr><td><b>SF-1</b> Weekly card PDF</td><td>User</td><td>S11b</td><td>WeeklyReportViewModel</td><td>reports</td><td>—</td><td>R-28 · T14</td></tr>
+                <tr><td><b>SF-2</b> Onboarding</td><td>User</td><td>S13a–g</td><td>OnboardingViewModel</td><td>private/onboarding</td><td>—</td><td>R-27 · T17</td></tr>
+                <tr><td><b>SF-3</b> Roles</td><td>Admin</td><td>W0, W5</td><td>sessionProvider</td><td>users</td><td>BR-05</td><td>R-01, R-26, R-29</td></tr>
+              </tbody>
+            </table>
+          </div>
         </Page>
+
+        <Divider part={PARTS[2]} shots={['wa-08-review-approved-crop.png', 'cr-02-phone-pending.png', 'cr-06-phone-inbox-3-messages.png']} />
 
         {/* 17 · Demo plan */}
-        <Page
-          part="DEMO · 17"
-          title="Demo plan"
-          foot="Ready: admin account · Galaxy A70 with debug token · ai_enabled toggle · backup video"
-          notes="The result of each workflow is the input of the next. Order: WF-01 on the phone, WF-02 phone + web side by side, WF-03 on the web then the phone. Accounts ready, App Check debug token registered on the demo phone. Results: jar 11 → 14 notes and a streak starts; card 'Người dùng đề xuất' in the catalog plus an inbox message; announcement in the app inbox at 10:56, same minute. Exception paths shown live: Remote Config ai_enabled = false gives 'Nốt AI đang nghỉ' and the user writes by hand; reject without a reason is blocked; a non-staff account is rejected at sign-in."
+        <S
+          part="P3 · Demo · 17 Demo plan"
+          title="Demo plan: one evening"
+          sub="Minh logs his day and shares a card; staff publish it and announce. Each result feeds the next workflow."
+          notes="Order: WF-01 on the phone, WF-02 phone + web side by side, WF-03 on the web then the phone. One account per actor, prepared before the session; the backup video is the fallback if the network fails. On-screen footnote moved here: Prepared: user account on a Galaxy A70 (release build, Play Integrity) · staff/admin account on the web admin · ai_enabled ready to toggle in Remote Config · empty review queue · backup video."
         >
-          <div className="fx-cols">
-            {[
-              ['01 · User', 'Kể tự do', 'One paragraph becomes 3 saved notes'],
-              ['02 · User → Staff', 'Share and approve', '“Đi bộ 10 phút” shows up in the app'],
-              ['03 · Staff → Users', 'Announce', '“Bạn đã vận động chưa?” in every user inbox'],
-            ].map(([who, name, result]) => (
-              <div key={who} className="fx-wf">
-                <h3>{who}</h3>
-                <b>{name}</b>
-                <p>{result}</p>
-              </div>
-            ))}
+          <div className="col grow">
+            <Steps
+              items={[
+                ['01 · User', 'Kể tự do: one paragraph → 3 notes saved'],
+                ['02 · User → Staff', 'Share "Đi bộ 10 phút" → staff approves → app shows it'],
+                ['03 · Staff → Users', '"Bạn đã vận động chưa?" → every inbox'],
+              ]}
+            />
+            <div className="cards" style={{ gridTemplateColumns: '1fr 1fr 1fr', marginTop: 12 }}>
+              <Card head="Result WF-01" tone="ok">
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                  <Thumb src="06-ai-notes-saved.png" h={150} />
+                  <p>Jar 11 → 14 notes, streak starts</p>
+                </div>
+              </Card>
+              <Card head="Result WF-02" tone="ok">
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                  <Thumb src="cr-05-phone-approved-run3.png" h={150} />
+                  <p>Card "Người dùng đề xuất" in catalog; inbox message</p>
+                </div>
+              </Card>
+              <Card head="Result WF-03" tone="ok">
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                  <Thumb src="wa-11-app-inbox-announcement.png" h={150} />
+                  <p>Announcement in app inbox at 10:56, same minute</p>
+                </div>
+              </Card>
+            </div>
+            <Card head="Exception paths shown live">
+              <ul className="tight">
+                <li>Remote Config <code>ai_enabled = false</code> → "Nốt AI đang nghỉ", user writes by hand</li>
+                <li>Reject without reason → blocked (BR-03) · user account on the web, staff account on the phone → rejected (BR-05)</li>
+              </ul>
+            </Card>
           </div>
-          <p className="fx-bar bad">Shown live: AI off, so the user writes by hand · reject without a reason is blocked</p>
-        </Page>
+        </S>
 
         {/* 18 · WF-01 */}
-        <Page
-          dense
-          part="DEMO · 18"
-          title="WF-01 · Nốt AI"
-          foot="Galaxy A70 · real Gemini (~2 s) · gemini-flash-lite-latest"
-          notes="Trigger: evening, user taps Ghi nốt → Kể tự do. Steps: first use shows a consent sheet (what is and is not sent); the paragraph is scrubbed (email, phone) and capped at 500 chars; Gemini returns notes and a mood as JSON; suggestions are labelled 'Gợi ý từ Nốt AI', editable and untickable. Exception: AI off, quota, network or App Check gives a message and 'Ghi tay'; the paragraph is kept. Evidence: run 10/11/2026 on Galaxy A70 against the real project; AI level 2, JSON schema to AiSortResult, confirmed by the user."
+        <S
+          part="P3 · Demo · 18 WF-01 · User"
+          title="WF-01 Log the day with Nốt AI"
+          sub="One paragraph becomes three editable notes."
+          notes="Trigger: evening. Steps: consent sheet, Gemini, labelled suggestions, edit, save. Exception: AI off via Remote Config. Evidence: Galaxy A70, real Gemini. On-screen footnote moved here: Evidence: Galaxy A70, real Gemini (~2 s) · ARTEMIS T18 2/3, T19 (AI off) 3/3 · AI level 2: JSON schema → AiSortResult."
         >
-          <div className="fx-split">
-            <div className="fx-text">
-              <Block head="Trigger">
-                <p>Evening: Ghi nốt → Kể tự do</p>
-              </Block>
-              <Block head="Result">
-                <p>Gemini returns labelled notes; the user edits and saves</p>
-              </Block>
-              <Block head="Exception" tone="bad">
-                <p>AI off or error: message and “Ghi tay”, text kept</p>
-              </Block>
-            </div>
-            <div className="fx-row">
-              <Shot src="04-ai-consent.png" alt="Kể tự do input screen" h={430} cap="Input (consent sheet on first use)" />
-              <Shot src="05-ai-free-tell-result.png" alt="Suggestions" h={430} cap="Suggestions" />
-              <Shot src="11-ai-off-remote-config.png" alt="AI off" h={430} cap="ai_enabled = false" />
-            </div>
+          <div className="col" style={{ width: 360 }}>
+            <Card head="Trigger · precondition"><p>Evening, Ghi nốt → Kể tự do · role <code>user</code>, AI on (BR-01)</p></Card>
+            <Card head="Steps → result">
+              <ul className="tight">
+                <li>Consent sheet on first use</li>
+                <li>Scrubbed paragraph → Gemini → JSON notes + mood</li>
+                <li>Labelled "Gợi ý từ Nốt AI", editable</li>
+                <li><b>Result:</b> chosen notes saved, jar and streak update</li>
+              </ul>
+            </Card>
+            <Card head="Exception" tone="bad">
+              <p>BR-01 fails (AI off, App Check, network) → "Ghi tay", paragraph kept</p>
+            </Card>
           </div>
-        </Page>
+          <LShot src="04-ai-consent.png" alt="Consent sheet" h={440} cap="Consent" />
+          <LShot src="05-ai-free-tell-result.png" alt="Suggestions" h={440} cap="Suggestions" />
+          <LShot src="11-ai-off-remote-config.png" alt="AI off" h={440} cap="ai_enabled = false" />
+        </S>
+
+        {/* 18b · WF-01 storyboard */}
+        <S
+          part="P3 · Demo · 18b WF-01 storyboard"
+          title="WF-01 in four screens"
+          sub="From an empty evening to three saved notes."
+          notes="Walk the frames left to right while doing it live. Frame 4 is what the user sees after saving. On-screen footnote moved here: Exception shown live: ai_enabled = false → frame 2 says 'Nốt AI đang nghỉ' and only 'Ghi tay' is left."
+        >
+          <Storyboard
+            steps={[
+              { src: 'm-today.png', title: 'Ghi nốt', text: 'evening, from Today' },
+              { src: '04-ai-consent.png', title: 'Consent', text: 'what is sent to Gemini' },
+              { src: '05-ai-free-tell-result.png', title: 'Suggestions', text: '3 notes + mood, editable' },
+              { src: '06-ai-notes-saved.png', title: 'Saved', text: 'jar 11 → 14, streak starts' },
+            ]}
+          />
+        </S>
 
         {/* 19 · WF-02 */}
-        <Page
-          dense
-          part="DEMO · 19"
-          title="WF-02 · Share a card"
-          foot="Server write 1.4 s after Duyệt · phone ≤ 3.4 s (D-2), ≤ 2.3 s (D-3), 22 s (D-1, idle phone)"
-          notes="Cross-role, measured three times on the deployed system (docs/cross-role-flow.md). D-1 slow (22 s, listener idle); D-2 and D-3 within 2–4 s. State: pending → approved, or rejected with a reason. Steps: user taps Gửi cho mọi người; staff opens Hàng chờ duyệt and picks Duyệt with a level; a batch writes the catalog card, the status and an inbox message; the app shows 'Đã vào kho chung ✓' and a bell badge. Exception: reject needs a reason (rules + UI); a user cannot approve (R-22). Also mention the approve bug found here and fixed."
+        <S
+          part="P3 · Demo · 19 WF-02 · User + Staff"
+          title="WF-02 Publish a card"
+          sub="Staff approve on the web; the phone updates within seconds."
+          notes="Cross-role. Measured three times on the deployed system. D-1 slow (listener idle); D-2, D-3 2–4 s. Also mention the approve bug found here and fixed. On-screen footnote moved here: Evidence: write 1.4 s after Duyệt · phone ≤ 3.4 s (D-2, D-3), 22 s when idle (D-1) · ARTEMIS T20 3/3 · docs/cross-role-flow.md"
         >
-          <div className="fx-row">
-            <Shot src="cr-02-phone-pending.png" alt="Pending" h={440} cap="1 · Đang chờ duyệt" />
-            <Shot src="wa-08-review-approved.png" alt="Approved on web" h={200} cap="2 · Web: approved" />
-            <Shot src="cr-06-phone-inbox-3-messages.png" alt="Inbox" h={440} cap="3 · App: inbox" />
+          <div className="col" style={{ width: 300 }}>
+            <Card head="Trigger · state"><p>User shares own card · <b>pending → approved</b> / rejected</p></Card>
+            <Card head="Steps">
+              <ul className="tight">
+                <li>User shares → pending</li>
+                <li>Staff: Duyệt on the web</li>
+                <li>Batch: card + status + inbox</li>
+                <li>App: "Đã vào kho chung ✓"</li>
+              </ul>
+            </Card>
+            <Card head="Exception" tone="bad"><p>BR-03 reason required · BR-02 user cannot approve</p></Card>
           </div>
-        </Page>
+          <LShot src="cr-02-phone-pending.png" alt="Pending" h={440} cap="Đang chờ duyệt" />
+          <div className="col grow" style={{ alignItems: 'flex-start' }}>
+            <LShot src="wa-08-review-approved-crop.png" alt="Approved on web" w={520} cap="Web: approved" />
+            <LShot src="cr-06-phone-inbox-3-messages.png" alt="Inbox" h={160} cap="App: inbox" />
+          </div>
+        </S>
+
+        {/* 19b · WF-02 storyboard */}
+        <S
+          part="P3 · Demo · 19b WF-02 storyboard"
+          title="WF-02 in five screens"
+          sub="A private card becomes everyone's card."
+          notes="Phone and web side by side. Frames 1–2 on the phone, 3 on the web admin, 4–5 back on the phone within seconds. On-screen footnote moved here: Exception shown live: Từ chối without a reason is blocked (BR-03); the card stays pending."
+        >
+          <Storyboard
+            h={300}
+            steps={[
+              { src: 'cr-01-phone-send-dialog.png', title: 'Share', text: 'user sends own card' },
+              { src: 'cr-02-phone-pending.png', title: 'Pending', text: '"Đang chờ duyệt"' },
+              { src: 'wa-08-review-approved-crop.png', title: 'Approve', text: 'staff, web admin', web: true },
+              { src: 'cr-05-phone-approved-run3.png', title: 'In catalog', text: '"Đã vào kho chung ✓"' },
+              { src: 'cr-06-phone-inbox-3-messages.png', title: 'Inbox', text: 'message for the author' },
+            ]}
+          />
+        </S>
 
         {/* 20 · WF-03 */}
-        <Page
-          dense
-          part="DEMO · 20"
-          title="WF-03 · Announce"
-          foot="Rules R-25: staff only · authorUid = self · title ≤ 80 · body 1–1000"
-          notes="Form validation (title ≤ 80, body ≤ 1000), staff only. Exception: empty body or non-staff, rules deny (R-25). Shows in the app inbox at the same minute. Web checklist #9–11."
+        <S
+          part="P3 · Demo · 20 WF-03 · Staff"
+          title="WF-03 Announce news to every user"
+          sub="Staff post once; every inbox shows it in the same minute."
+          notes="Trigger: staff has news. Precondition: staff or admin session. BR-04 is checked twice: in the form and in the rules. Result: the announcement exists and every user sees it in the inbox in real time. Exception: empty body, too long, or a user account → blocked. On-screen footnote moved here: Evidence: sent at 10:56, in the app inbox at 10:56 · rules R-25 (staff only, authorUid = self, title 1–80, body 1–1000) · web checklist #9–11."
         >
-          <div className="fx-row">
-            <div className="fx-stack">
-              <Shot src="wa-09-announcement-form.png" alt="Announcement form" w={380} cap="1 · Compose" />
-              <Shot src="wa-10-announcement-sent.png" alt="Announcement sent" w={380} cap="2 · Sent at 10:56" />
-            </div>
-            <Shot src="wa-11-app-inbox-announcement.png" alt="App inbox" h={440} cap="3 · App inbox, 10:56" />
+          <div className="col">
+            <LShot src="wa-09-announcement-form-crop.png" alt="Announcement form" w={400} cap="1 · Compose (list still empty)" />
+            <LShot src="wa-10-announcement-sent-crop.png" alt="Announcement sent" w={400} cap="2 · Sent at 10:56, form cleared" />
           </div>
-        </Page>
+          <LShot src="wa-11-app-inbox-announcement.png" alt="App inbox" h={470} cap="3 · App inbox, 10:56" />
+          <div className="col grow">
+            <Card head="Trigger · precondition"><p>Staff has news for every user · signed in as staff or admin</p></Card>
+            <Card head="Decision (BR-04)"><p>Title 1–80 · body 1–1000 · authorUid = self, in the form and in the rules</p></Card>
+            <Card head="Result" tone="ok"><p>Announcement published; every user's inbox shows it in real time</p></Card>
+            <Card head="Exception" tone="bad"><p>Empty or too long → form error, nothing saved · user account → rejected at sign-in, rules deny (R-25)</p></Card>
+          </div>
+        </S>
+
+        {/* 20b · WF-03 storyboard */}
+        <S
+          part="P3 · Demo · 20b WF-03 storyboard"
+          title="WF-03 in three screens"
+          sub="One form, every inbox."
+          notes="Compose on the web, send, then show the phone inbox at the same minute. On-screen footnote moved here: Exception shown live: empty body or > 1000 characters → form error, nothing saved (BR-04)."
+        >
+          <Storyboard
+            h={330}
+            steps={[
+              { src: 'wa-09-announcement-form-crop.png', title: 'Compose', text: 'staff, web admin', web: true },
+              { src: 'wa-10-announcement-sent-crop.png', title: 'Sent', text: '10:56, form cleared', web: true },
+              { src: 'wa-11-app-inbox-announcement.png', title: 'Every inbox', text: 'phone, 10:56' },
+            ]}
+          />
+        </S>
+
+        <Divider part={PARTS[3]} shots={['ac-firestore-enforced.png', 'm-wrong-role.png', 'm-journal-draft.png']} />
 
         {/* 21 · Testing */}
-        <Page
-          dense
-          part="PROOF · 21"
-          title="Testing"
-          foot="CI on every PR: format, analyze, all suites, rules in the Emulator, builds, Hosting preview"
-          notes="Unit/widget tests checked locally on 12 November: 305 app, 14 web admin, 5 core. Rules 30/30 is the recorded earlier Emulator run. ARTEMIS results belong to separate batches: Lab 3 41/42, Final on Galaxy A70 14/15, latest emulator T17/T18/T20 7/9. Do not combine their denominators. Full case steps and defects are linked in docs/test-cases.md and docs/defect-report.md."
+        <S
+          part="P4 · Proof · 21 Testing"
+          title="Testing at three levels"
+          sub="Rules, code and the deployed system are each tested, with evidence in the repo."
+          notes="Numbers from the latest runs on main (12/11/2026). Say what is not run: T15/T16 need a test-only email account. The one ARTEMIS failure was the agent typing key by key and timing out; the app showed the right screen. On-screen footnote moved here: CI on every PR: format, analyze, all test suites, rules in the Emulator, web build, Android build, Hosting preview · details: docs/test-report.md."
         >
-          <div className="fx-stats">
-            <p><b>30/30</b><span>rules tests</span></p>
-            <p><b>305</b><span>app tests</span></p>
-            <p><b>14 + 5</b><span>web + core tests</span></p>
-            <p><b>41/42</b><span>ARTEMIS runs (Lab 3)</span></p>
+          <div className="col" style={{ width: 360 }}>
+            <div className="stats" style={{ gridTemplateColumns: '1fr 1fr' }}>
+              <div className="stat"><b className="num">30/30</b><span>Security Rules tests</span></div>
+              <div className="stat"><b className="num">305</b><span>Flutter app tests</span></div>
+              <div className="stat"><b className="num">14 + 5</b><span>web admin + core tests</span></div>
+              <div className="stat"><b className="num">14/15</b><span>ARTEMIS Final runs, real phone</span></div>
+            </div>
           </div>
-          <table className="fx-table">
+          <div className="col grow">
+          <table style={{ fontSize: 15.5 }}>
             <thead>
               <tr>
-                <th style={{ width: '20%' }}>Level</th>
+                <th>Level</th>
                 <th>Evidence</th>
-                <th style={{ width: '14%' }}>Result</th>
+                <th>Result</th>
               </tr>
             </thead>
             <tbody>
-              <tr><td><b>Rules</b></td><td>Emulator: allowed and denied per role per collection</td><td className="ok">30 / 30</td></tr>
-              <tr><td><b>Unit / widget</b></td><td>ViewModels, repositories, screens at 360 dp</td><td className="ok">all pass</td></tr>
-              <tr><td><b>Cross-role</b></td><td>3 timed runs on the deployed system</td><td className="ok">3 / 3</td></tr>
-              <tr><td><b>Web checklist</b></td><td>16 checks: actions, roles, empty, loading, dashboard error</td><td className="ok">recorded</td></tr>
-              <tr><td><b>Real device</b></td><td>Onboarding, Nốt AI, PDF, AI off on Galaxy A70</td><td className="ok">pass</td></tr>
-              <tr><td><b>E2E (ARTEMIS)</b></td><td>Final phone: 14/15; emulator T17/T18/T20: 7/9</td><td className="warn">see batches</td></tr>
+              <tr><td><b>Rules</b></td><td>Emulator, allowed + denied per role per collection (BR-02…BR-05)</td><td><span className="pill ok">30 / 30</span></td></tr>
+              <tr><td><b>Unit / widget</b></td><td>ViewModels, repositories, screens at 360 dp</td><td><span className="pill ok">all pass</span></td></tr>
+              <tr><td><b>Cross-role</b></td><td>3 runs on the deployed system, timed</td><td><span className="pill ok">3 / 3</span></td></tr>
+              <tr><td><b>Web checklist</b></td><td>Actions, rejection, empty, loading, error, live role change</td><td><span className="pill ok">16 / 16</span></td></tr>
+              <tr><td><b>Real device</b></td><td>Onboarding, Nốt AI, PDF, AI off, journal draft, role rejection on Galaxy A70</td><td><span className="pill ok">pass</span></td></tr>
+              <tr><td><b>E2E (ARTEMIS)</b></td><td>Lab 3: 41/42 · Final on Galaxy A70: 14/15 · emulator T17/T18/T20: 7/9 · T15/T16 not run</td><td><span className="pill warn">see batches</span></td></tr>
             </tbody>
           </table>
-        </Page>
+          <div style={{ display: 'flex', gap: 14 }}>
+            <LShot src="ev-artemis.jpg" alt="ARTEMIS run" h={112} cap="ARTEMIS: agent reports SAVED" />
+            <LShot src="ev-deploy-run.png" alt="GitHub Actions deploy" h={112} cap="GitHub Actions: deploy on main" />
+          </div>
+          </div>
+        </S>
 
+        {/* 21A · Test cases (Duy) */}
         <Page
           dense
           part="PROOF · 21A"
           title="Test Cases & Results"
           line="20 defined cases. Results stay attached to their device and test batch."
-          foot="docs/test-cases.md · outputs/final-testing/Test-Cases-and-Defects.xlsx · evidence/artemis/"
-          notes="The full case file contains preconditions, steps, expected result, three run outcomes, environment, actual result and evidence. T01–T14 is the historical Lab 3 baseline, 41/42 after documented reruns. Thuy's Final phone batch covers T14 and T17–T20, 14/15. Duy's latest emulator batch covers T17, T18, T20, 7/9; T17 is now 3/3 after the ADB path fix. T15 and T16 have definitions but no ARTEMIS execution evidence. T20 checks submission then withdraws the test card; it checks approval and inbox on previously approved data, while fresh end-to-end approval is evidenced separately by D-1…D-3. T14 Final validates local PDF saving/sharing, unlike the historical Storage error-path test."
+          notes="The full case file contains preconditions, steps, expected result, three run outcomes, environment, actual result and evidence. T01–T14 is the historical Lab 3 baseline, 41/42 after documented reruns. Thuy's Final phone batch covers T14 and T17–T20, 14/15. Duy's latest emulator batch covers T17, T18, T20, 7/9; T17 is now 3/3 after the ADB path fix. T15 and T16 have definitions but no ARTEMIS execution evidence. T20 checks submission then withdraws the test card; it checks approval and inbox on previously approved data, while fresh end-to-end approval is evidenced separately by D-1…D-3. T14 Final validates local PDF saving/sharing, unlike the historical Storage error-path test. Sources: docs/test-cases.md · outputs/final-testing/Test-Cases-and-Defects.xlsx · evidence/artemis/"
         >
           <table className="fx-table">
             <thead><tr><th>Batch / device</th><th>Cases and expected result</th><th>Result</th></tr></thead>
@@ -939,13 +1373,13 @@ export default function FinalDeck() {
           <p style={{ fontSize: 21, marginTop: 22 }}>Each case records preconditions, steps, expected and actual results, run outcomes and proof. A pass in an earlier batch does not replace a later failure.</p>
         </Page>
 
+        {/* 21B · Defects (Duy) */}
         <Page
           dense
           part="PROOF · 21B"
           title="Defects & Retest"
           line="Separate application defects, automation failures and unverified reports."
-          foot="docs/defect-report.md · evidence/artemis/emulator-final-2026-11-12-7of9.txt"
-          notes="The defect register has 17 records: three confirmed application defects, one test-harness defect, three automation/environment incidents, and ten unverified exploratory candidates. ADB path failure is verified fixed by the latest T17 3/3 run. T18 run 3 exceeded the 480-second task deadline; the root cause remains open. T20 run 3 failed because the ARTEMIS controller model call timed out after 180 seconds, not because Gemini in the app necessarily failed. An earlier key-limit incident is kept as environment history, not claimed as the cause of these new timeouts. Dashboard error handling, approval timeout and live role changes have recorded fixes/tests. The X01 candidate list is not counted as ten confirmed app bugs."
+          notes="The defect register has 17 records: three confirmed application defects, one test-harness defect, three automation/environment incidents, and ten unverified exploratory candidates. ADB path failure is verified fixed by the latest T17 3/3 run. T18 run 3 exceeded the 480-second task deadline; the root cause remains open. T20 run 3 failed because the ARTEMIS controller model call timed out after 180 seconds, not because Gemini in the app necessarily failed. An earlier key-limit incident is kept as environment history, not claimed as the cause of these new timeouts. Dashboard error handling, approval timeout and live role changes have recorded fixes/tests. The X01 candidate list is not counted as ten confirmed app bugs. Sources: docs/defect-report.md · evidence/artemis/emulator-final-2026-11-12-7of9.txt"
         >
           <table className="fx-table">
             <thead><tr><th>Record / category</th><th>Observed issue</th><th>Decision / retest</th></tr></thead>
@@ -960,14 +1394,35 @@ export default function FinalDeck() {
           <p style={{ fontSize: 21, marginTop: 22 }}>A failed test is evidence to investigate. It does not by itself prove an application defect.</p>
         </Page>
 
-        {/* 22 · Achievements */}
-        <Page
-          dense
-          part="PROOF · 22"
-          title="Achievements"
-          notes="Objective → implemented → validated. Point to the evidence folders."
+        {/* 21C · Evidence wall */}
+        <S
+          part="P4 · Proof · 21C Evidence wall"
+          title="Evidence wall"
+          sub="Every number on the testing slide has a screenshot or a log behind it."
+          notes="Point at two or three tiles; all files are in evidence/ in the repo. On-screen footnote moved here: All files: evidence/ in the repo · details: docs/test-report.md"
         >
-          <table className="fx-table">
+          <EvidenceWall
+            items={[
+              { term: ['✔ R-25 staff post announcements', '✔ R-26 only an admin changes roles', '✔ R-27 onboarding answers private', '✔ R-28 weekly PDF metadata', '✔ R-29 staff/admin cannot read private data', '✔ R-30 streak card once', 'ℹ tests 30', 'ℹ pass 30', 'ℹ fail 0'], label: 'Security Rules · Emulator', result: '30/30' },
+              { src: 'ev-artemis.jpg', label: 'ARTEMIS on a real phone', result: '14/15' },
+              { src: 'ev-deploy-run.png', label: 'GitHub Actions deploy', result: 'green' },
+              { src: 'ac-firestore-enforced.png', label: 'App Check', result: 'enforced' },
+              { src: 'wa-16-dashboard-error-crop.png', label: 'Web checklist · error state', result: '16/16' },
+              { src: 'cr-05-phone-approved-run3.png', label: 'Cross-role, deployed', result: '3/3' },
+              { src: 'g-crashlytics-nonfatal-list.png', label: 'Crashlytics', result: 'live' },
+              { src: 'g-analytics-debugview-events.png', label: 'Analytics events', result: 'live' },
+            ]}
+          />
+        </S>
+
+        {/* 22 · Achievements */}
+        <S
+          part="P4 · Proof · 22 Achievements"
+          title="Achievements"
+          sub="Every brief requirement maps to a live feature and a piece of evidence."
+          notes="Objective → implemented → validated. Point to evidence folders."
+        >
+          <table style={{ fontSize: 15.5 }}>
             <thead>
               <tr>
                 <th>Brief requirement</th>
@@ -976,91 +1431,134 @@ export default function FinalDeck() {
               </tr>
             </thead>
             <tbody>
-              <tr><td>Web admin, deployed</td><td>Dashboard, catalog, review, announcements, users</td><td><code>evidence/web-admin/</code></td></tr>
-              <tr><td>Role-based rules, tested</td><td>user / staff / admin, R-01…R-30</td><td><code>evidence/firestore/</code></td></tr>
-              <tr><td>Cross-role flow, real time</td><td>Share card → approve → app + inbox</td><td><code>docs/cross-role-flow.md</code></td></tr>
-              <tr><td>AI level 2 with fallback</td><td>Kể tự do on Gemini, Remote Config flags</td><td><code>docs/ai-feature.md</code></td></tr>
-              <tr><td>App Check</td><td>reCAPTCHA Enterprise · Play Integrity</td><td><code>evidence/app-check/</code></td></tr>
-              <tr><td>Lab 3 PDF on device</td><td>pdf + share_plus, metadata in Firestore</td><td>15.4 KB file from the phone</td></tr>
-              <tr><td>Mobile data with inbox</td><td>Announcements + personal inbox</td><td>web checklist #11</td></tr>
+              <tr><td>Web admin: 4 screens + announcement form, deployed</td><td>Dashboard, catalog, review, announcements, users</td><td><code>evidence/web-admin/</code> (16 items)</td></tr>
+              <tr><td>Role-based rules, deny by default, tested</td><td>user / staff / admin, R-01…R-30</td><td><code>evidence/firestore/rules-tests.txt</code></td></tr>
+              <tr><td>Cross-role flow, real time, documented</td><td>Share card → approve → app + inbox</td><td><code>docs/cross-role-flow.md</code>, <code>evidence/cross-role/</code></td></tr>
+              <tr><td>AI level 2 with RC, App Check, fallback</td><td>Kể tự do on Gemini, <code>ai_*</code> flags incl. prompts, enforced App Check</td><td><code>docs/ai-feature.md</code>, ARTEMIS T18/T19</td></tr>
+              <tr><td>App Check on Firestore and AI Logic</td><td><b>Enforced</b> on both · Web: reCAPTCHA Enterprise; Android: Play Integrity</td><td><code>evidence/app-check/</code></td></tr>
+              <tr><td>Lab 3 PDF saved & shared on device</td><td>pdf + share_plus, metadata in Firestore</td><td>15.4 KB file pulled from the phone</td></tr>
+              <tr><td>Mobile data on Firestore with inbox</td><td>Announcements + personal inbox, real time</td><td>web checklist #11</td></tr>
+              <tr><td colSpan={3} style={{ color: "#b3261e" }}><b>Not met:</b> ARTEMIS T15/T16 (email sign-in) not run → slide 23</td></tr>
             </tbody>
           </table>
-        </Page>
+        </S>
 
         {/* 23 · Limitations */}
-        <Page
-          dense
-          part="PROOF · 23"
-          title="Limitations & next steps"
+        <S
+          part="P4 · Proof · 23 Limitations & next steps"
+          title="Limitations and next steps"
+          sub="What is not done yet, and what it costs."
           notes="Honest list, each with impact and a next step."
         >
-          <table className="fx-table">
+          <table>
             <thead>
               <tr>
                 <th>Limitation</th>
                 <th>Impact</th>
-                <th style={{ width: '11%' }}>Priority</th>
+                <th>Priority</th>
                 <th>Next step</th>
               </tr>
             </thead>
             <tbody>
-              <tr><td>E2E coverage and stability remain partial</td><td>T15/T16 not run; latest emulator T18/T20 2/3 each</td><td className="bad">High</td><td>Complete missing cases and investigate timeouts</td></tr>
-              <tr><td>App Check on Authentication only monitored</td><td>26% of sign-in requests are unverified</td><td className="warn">Medium</td><td>Enforce once all traffic is verified</td></tr>
-              <tr><td>A3 omitted by scope decision</td><td>No roleplay chat before challenges; journal drafts P4 are implemented</td><td className="warn">Medium</td><td>Keep rationale in gap-review.md</td></tr>
-              <tr><td>D-1 took 22 s on an idle phone</td><td>Real time not guaranteed after idle</td><td>Low</td><td>Re-listen on resume</td></tr>
-              <tr><td>Sideloaded release builds fail Play Integrity</td><td>AI blocked outside Play / debug</td><td>Low</td><td>Demo on debug; Play internal track</td></tr>
+              <tr><td>ARTEMIS T15/T16 (email sign-in) not run</td><td>Sign-out / sign-in by email has widget tests only; latest emulator T18/T20 were 2/3 each</td><td><span className="pill warn">Medium</span></td><td>Create a test-only account, run 3× each; investigate the timeouts</td></tr>
+              <tr><td>Names can reach Gemini (CR-F2)</td><td>Email and phone are scrubbed, but a friend's name is sent as typed</td><td><span className="pill warn">Medium</span></td><td>Consent sheet says so; add on-device name masking</td></tr>
+              <tr><td>Exploratory session X01: 10 UI issues not rechecked</td><td>Possible small layout bugs on rarely used screens</td><td><span className="pill">Low</span></td><td>Re-run X01 on the Final build, fix or close each</td></tr>
+              <tr><td>D-1 took 22 s on an idle phone</td><td>Real time not guaranteed after long idle</td><td><span className="pill">Low</span></td><td>Measure more runs; re-listen on resume</td></tr>
+              <tr><td>App Check on Authentication only monitored</td><td>26% of sign-in requests are unverified; Firestore and AI Logic are enforced</td><td><span className="pill warn">Medium</span></td><td>Enforce once all traffic is verified</td></tr>
             </tbody>
           </table>
-        </Page>
+        </S>
 
         {/* 24 · Lessons */}
         <Page
           dense
           part="PROOF · 24"
           title="Lessons learned"
-          notes="Three bugs surfaced only against the real project; all three are fixed, the first two with regression tests. The lesson: test on the deployed system with real accounts and real devices, not only the Emulator."
+          line="Three bugs appeared only on the real project; three habits we keep."
+          notes="Left: three bugs surfaced only against the real project or a real phone; all three are fixed, the first two with regression tests. Right: what we take away. The lesson: test on the deployed system with real accounts and real devices, not only the Emulator."
         >
-          <div className="fx-lessons">
-            <p className="fx-bar bad"><b>Approve timed out</b>Riverpod paused the unwatched provider. Fixed: read once (PR #70).</p>
-            <p className="fx-bar bad"><b>Dashboard spun offline</b><code>count()</code> waits forever. Fixed: 15 s timeout (PR #71).</p>
-            <p className="fx-bar bad"><b>Gemini model retired</b>404 for new projects. Fixed: model name in Remote Config.</p>
-            <p className="fx-bar"><b>Rules are the backend</b>Every business rule is a rules condition, so rules need tests.</p>
-            <p className="fx-bar"><b>Read the brief twice</b>We removed the PDF, then re-read: the brief wanted it on the device.</p>
-            <p className="fx-bar"><b>AI needs a plan B</b>App Check, quota and model changes broke AI; hand-writing kept the flow alive.</p>
+          <div className="p1-body ls-body">
+            <div className="ls-col">
+              <h3 className="ls-h bad">Found on the real system, then fixed</h3>
+              {[
+                { I: Timer, t: 'Approve timed out', problem: 'Riverpod paused the provider nobody watched', fix: 'read it once · PR #70' },
+                { I: WifiOff, t: 'Dashboard spun offline', problem: 'count() waited forever without a network', fix: '15 s timeout and an error state · PR #71' },
+                { I: Bot, t: 'Gemini model retired', problem: 'new projects got a 404 from the old model name', fix: 'model name moved to Remote Config' },
+              ].map(({ I, t, problem, fix }) => (
+                <div key={t} className="ls-item">
+                  <span className="ls-ic bad"><I size={22} /></span>
+                  <div>
+                    <b>{t}</b>
+                    <p>{problem}</p>
+                    <p className="fix">✓ Fixed: {fix}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="ls-col">
+              <h3 className="ls-h">What we keep doing</h3>
+              {[
+                { I: ShieldCheck, t: 'Rules are the backend', text: 'Every business rule is a rules condition, so the rules get their own tests (30/30).' },
+                { I: BookOpen, t: 'Read the brief twice', text: 'We removed the PDF, re-read the brief, and put it back: saved on the device.' },
+                { I: LifeBuoy, t: 'AI needs a plan B', text: 'App Check, quota and model changes broke AI once; writing by hand kept the flow alive.' },
+              ].map(({ I, t, text }) => (
+                <div key={t} className="ls-item">
+                  <span className="ls-ic"><I size={22} /></span>
+                  <div>
+                    <b>{t}</b>
+                    <p>{text}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </Page>
 
         {/* 25 · Conclusion */}
-        <Page
-          part="PROOF · 25"
+        <S
+          part="P4 · Proof · 25 Conclusion"
           title="Conclusion"
-          foot="prm393-not-lab3.web.app · /admin/ · github.com/FU-PRM-Projects/Lab-03"
-          notes="Three messages, then leave this slide up for Q&A. Problem solved: content is curated by staff and grows from users' own cards; news reaches every user in the same minute. Working product: WF-01, WF-02, WF-03 run live on Android and the deployed web admin, on the free plan. Verified: 30/30 rules tests, 300+ code tests in CI, 3 timed cross-role runs, real-device AI and PDF evidence."
+          sub="Nốt is now a working multi-role system, and we can show every claim."
+          notes="Three messages: the problem is solved, the product works, and every claim is verified. Then move to the thank-you slide for questions."
         >
-          <div className="fx-cols">
+          <div className="col grow cc-left">
             {[
-              ['1', 'Problem solved', 'Staff curate the cards; news reaches every user in the same minute'],
-              ['2', 'Working product', 'Three workflows run live on Android and the web admin'],
-              ['3', 'Verified', '30/30 rules tests, 3 timed runs, real-device evidence'],
-            ].map(([n, head, text]) => (
-              <div key={n} className="fx-wf">
-                <h3>{n}</h3>
-                <b>{head}</b>
-                <p>{text}</p>
+              { I: CheckCircle2, head: 'Problem solved', text: 'One small win in 30 s, Gemini sorts the day, and staff keep the challenges fresh and reach every inbox.' },
+              { I: Smartphone, head: 'Working product', text: 'WF-01, WF-02, WF-03 run live on Android and the deployed web admin, on the free plan.' },
+              { I: ShieldCheck, head: 'Verified', text: '30/30 rules tests · 300+ code tests in CI · 14/15 ARTEMIS runs on a real phone · 3 timed cross-role runs · App Check enforced.' },
+            ].map(({ I, head, text }, i) => (
+              <div key={head} className="cc-item">
+                <span className="cc-ic"><I size={26} /></span>
+                <div>
+                  <b><span>{i + 1}</span>{head}</b>
+                  <p>{text}</p>
+                </div>
               </div>
             ))}
+            <div className="chips cc-chips">
+              <span><Link2 size={15} /> prm393-not-lab3.web.app</span>
+              <span><Link2 size={15} /> /admin/</span>
+              <span><Link2 size={15} /> github.com/FU-PRM-Projects/Lab-03</span>
+            </div>
           </div>
-        </Page>
+          <div className="collage">
+            <img className="c-web" src={img('wa-05-catalog-edit-crop.png')} alt="Staff edit a card in the catalog" />
+            <img className="c-phone c-a" src={img('g-streak-streak-today.png')} alt="Streak today" />
+            <img className="c-phone c-b" src={img('07-weekly-card.png')} alt="Weekly card" />
+            <span className="c-tag c-tag-web">Staff keep cards fresh</span>
+            <span className="c-tag c-tag-app">A week of small wins</span>
+          </div>
+        </S>
 
         {/* A1 · Appendix */}
-        <Page
-          dense
-          part="APPENDIX · A1"
+        <S
+          part="Appendix · A1 · AI examples"
           title="AI examples"
-          foot="Inputs are scrubbed (email, phone) and capped at 500 characters"
-          notes="Backup slide for AI questions. From docs/ai-feature.md. Inputs are scrubbed (email, phone) and capped at 500 characters; no names, emails or photos are sent."
+          sub="Three real Gemini inputs and outputs, and one handled failure."
+          notes="Backup slide for AI questions. From docs/ai-feature.md. On-screen footnote moved here: Inputs are scrubbed (email, phone) and capped at 500 characters; no names, emails or photos are sent."
         >
-          <table className="fx-table">
+          <div className="col grow">
+          <table style={{ fontSize: 15 }}>
             <thead>
               <tr>
                 <th style={{ width: '40%' }}>Input (Kể tự do)</th>
@@ -1068,27 +1566,45 @@ export default function FinalDeck() {
               </tr>
             </thead>
             <tbody>
-              <tr><td>Ran 2 km, ate a snack I meant to skip, calmed down without blaming myself</td><td>chien_thang “Chạy bộ 2km quanh hồ” · nhat_ky · tu_chu · mood binh_thuong</td></tr>
-              <tr><td>Asked a stranger in the library where to charge my phone; wrote a few lines about the rainy afternoon</td><td>chien_thang “Lấy hết can đảm hỏi mượn chỗ sạc pin” · nhat_ky · mood vui</td></tr>
-              <tr><td>Tired for days, only tidied my desk today</td><td>chien_thang “Mình đã dọn dẹp được cái bàn học” · 2× nhat_ky · mood met</td></tr>
-              <tr><td><b>Handled failure</b></td><td>404 or 401 → <code>ai_error</code> logged, text kept, “Ghi tay” offered</td></tr>
+              <tr><td>Ran 2 km, ate a snack I meant to skip, calmed down without blaming myself</td><td>chien_thang "Chạy bộ 2km quanh hồ" · nhat_ky "Lỡ ăn thêm gói snack…" · tu_chu "Không tự trách và bình tĩnh lại" · mood binh_thuong</td></tr>
+              <tr><td>Asked a stranger in the library where to charge my phone; wrote a few lines about the rainy afternoon</td><td>chien_thang "Lấy hết can đảm hỏi mượn chỗ sạc pin" · nhat_ky "Ghi lại vài dòng cảm xúc buổi chiều mưa" · mood vui</td></tr>
+              <tr><td>Tired for days, only tidied my desk today</td><td>chien_thang "Mình đã dọn dẹp được cái bàn học" · 2× nhat_ky · mood met · needs_support false</td></tr>
+              <tr><td><b>Handled failure</b></td><td>404 model retired / 401 missing App Check → <code>ai_error</code> logged, paragraph kept, "Ghi tay" offered; fixed by Remote Config model name</td></tr>
             </tbody>
           </table>
-        </Page>
+          </div>
+          <div className="col" style={{ width: 340 }}>
+            <Code name="f-ai-model" w={340} cap="JSON schema forces the answer shape" />
+            <LShot src="ev-rc-params.png" alt="Remote Config parameters" w={340} cap="Remote Config: model, prompts, on/off" />
+          </div>
+        </S>
 
         {/* A2 · App Check */}
-        <Page
-          dense
-          part="APPENDIX · A2"
-          title="App Check"
-          foot="Web: reCAPTCHA Enterprise · Android: Play Integrity + debug token · evidence/app-check/ (12/11/2026)"
-          notes="Backup slide. After both apps were registered (web with reCAPTCHA Enterprise, Android with Play Integrity), App Check was enforced for Cloud Firestore on 12/11/2026 and for Firebase AI Logic earlier; Authentication is still Monitoring. The console shows 55% verified and 45% unverified requests over 7 days: the unverified ones are the old app builds without App Check, now blocked on purpose. After enforcing, the web admin still reads the user role and the release build on the Galaxy A70 still loads the jar and the challenges, with no PERMISSION_DENIED in logcat. A debug build only reads Firestore if its debug token is registered under App Check, Apps, lab03 (android), so register it before running ARTEMIS on a debug build."
+        <S
+          part="Appendix · A2 · App Check"
+          title="App Check: registered and enforced"
+          sub="Both apps are registered; Firestore and AI Logic are enforced."
+          notes="Backup slide. Before enforcing we checked that the release build passes Play Integrity (Gemini works with AI Logic enforced). After enforcing, the web admin and the phone still read Firestore. On-screen footnote moved here: Web: reCAPTCHA Enterprise (Fraud Defense) · Android: Play Integrity (debug builds need a registered debug token) · enforced 12/11/2026 · evidence/app-check/."
         >
-          <div className="fx-row">
-            <Shot src="ac-firestore-enforced.png" alt="App Check APIs: Cloud Firestore enforced" h={330} cap="Cloud Firestore and AI Logic: Enforced" />
-            <Shot src="ac-mobile-after-enforce.png" alt="Jar tab after enforcing" h={400} cap="Galaxy A70, 5 min after enforcing: Hũ loads" />
+          <LShot src="ac-apps-registered.png" alt="App Check apps registered" w={560} cap="Apps: lab03 (android) Play Integrity · lab03 (web) Fraud Defense" />
+          <LShot src="ac-firestore-enforced.png" alt="Firestore enforced" w={560} cap="Cloud Firestore: Enforced · AI Logic: Enforced" />
+        </S>
+
+        {/* Thank you · last slide */}
+        <Slide className="fd p1 closing" notes="Thank the panel and open the floor for questions. The appendix (AI examples, App Check) sits just before this slide if a question needs it.">
+          <img className="org-logo" src={`${base}assets/fpt-logo.webp`} alt="FPT University" />
+          <div className="cl-left">
+            <p className="cl-kicker">Nốt · PRM393 Final Assignment</p>
+            <h1>Thank you</h1>
+            <p className="cl-q">Questions?</p>
+            <p className="cl-links">prm393-not-lab3.web.app · /admin/ · github.com/FU-PRM-Projects/Lab-03</p>
           </div>
-        </Page>
+          <div className="cl-art">
+            <img className="cl-confetti" src={`${base}assets/illustrations/confetti.svg`} alt="" />
+            <img className="cl-jar" src={`${base}assets/illustrations/jar.svg`} alt="" />
+            <img className="cl-mascot" src={`${base}assets/mascot/mascot-not-xong.svg`} alt="" />
+          </div>
+        </Slide>
       </Deck>
     </div>
   );

@@ -3,6 +3,7 @@ import type { LucideIcon } from 'lucide-react';
 import {
   Activity,
   BellRing,
+  Container,
   Bug,
   Database,
   FileText,
@@ -10,6 +11,7 @@ import {
   Laptop,
   Radio,
   Rocket,
+  Server,
   ScrollText,
   ShieldCheck,
   SlidersHorizontal,
@@ -71,28 +73,24 @@ function Fire({ x, y, I, color = FIRE }: { x: number; y: number; I: LucideIcon; 
   );
 }
 
-function Plain({ x, y, I, color }: { x: number; y: number; I: LucideIcon; color: string }) {
+function Plain({ x, y, I, color, size = S }: { x: number; y: number; I: LucideIcon; color: string; size?: number }) {
+  const g = size * 0.56;
   return (
     <g>
-      <rect x={x} y={y} width={S} height={S} rx={9} fill={color} />
-      <I x={x + (S - G) / 2} y={y + (S - G) / 2} width={G} height={G} color="#fff" strokeWidth={2} />
+      <rect x={x} y={y} width={size} height={size} rx={9} fill={color} />
+      <I x={x + (size - g) / 2} y={y + (size - g) / 2} width={g} height={g} color="#fff" strokeWidth={2} />
     </g>
   );
 }
 
 /** Icon at (cx - S/2, y) with a two-line caption under it. */
-function Node({ cx, y, icon, t, s }: { cx: number; y: number; icon: (x: number, y: number) => ReactNode; t: string; s?: string }) {
+function Node({ cx, y, icon, t, size = S }: { cx: number; y: number; icon: (x: number, y: number) => ReactNode; t: string; s?: string; size?: number }) {
   return (
     <g>
-      {icon(cx - S / 2, y)}
-      <text x={cx} y={y + S + 17} textAnchor="middle" fontSize={13.5} fontWeight={700} fill={INK}>
+      {icon(cx - size / 2, y)}
+      <text x={cx} y={y + size + 17} textAnchor="middle" fontSize={13.5} fontWeight={700} fill={INK}>
         {t}
       </text>
-      {s && (
-        <text x={cx} y={y + S + 32} textAnchor="middle" fontSize={11.5} fill={MUTED}>
-          {s}
-        </text>
-      )}
     </g>
   );
 }
@@ -118,14 +116,6 @@ function A({ d, async }: { d: string; async?: boolean }) {
       strokeDasharray={async ? '8 3 2 3' : undefined}
       markerEnd="url(#sa)"
     />
-  );
-}
-
-function Note({ x, y, t }: { x: number; y: number; t: string }) {
-  return (
-    <text x={x} y={y} textAnchor="middle" fontSize={11.5} fill={MUTED} fontStyle="italic">
-      {t}
-    </text>
   );
 }
 
@@ -183,8 +173,8 @@ export default function ServerlessMap() {
       <Node cx={246} y={150} t="App Check" s="every call" icon={(x, y) => <Fire x={x} y={y} I={ShieldCheck} />} />
       <A d="M172 175 H219" />
       <Block x={200} y={262} w={136} h={108} t="Website Hosting" color="#16a34a" />
-      <Node cx={268} y={286} t="Hosting" s="app + /admin/" icon={(x, y) => <Fire x={x} y={y} I={Rocket} />} />
-      <A d="M172 311 H241" async />
+      <Node cx={268} y={294} t="Hosting" s="app + /admin/" icon={(x, y) => <Fire x={x} y={y} I={Rocket} />} />
+      <A d="M172 319 H241" async />
 
       {/* ---- Users & Authentication */}
       <Block x={352} y={58} w={292} h={146} t="Users & Authentication" color="#f0b429" />
@@ -203,7 +193,6 @@ export default function ServerlessMap() {
       <Node cx={588} y={246} t="Remote Config" s="flags · prompts" icon={(x, y) => <Fire x={x} y={y} I={SlidersHorizontal} />} />
       <A d="M427 271 H467" />
       <A d="M271 188 C312 222 330 268 375 271" />
-      <Note x={498} y={358} t="no custom server: rules hold the business logic" />
 
       <Big x={652} y={131} />
       <Big x={652} y={294} />
@@ -213,13 +202,11 @@ export default function ServerlessMap() {
       <Node cx={752} y={86} t="AI Logic" s="Firebase SDK" icon={(x, y) => <Fire x={x} y={y} I={Sparkles} color="#01A88D" />} />
       <Node cx={892} y={86} t="Gemini" s="flash-lite · JSON" icon={(x, y) => <Brand x={x} y={y} icon={siGooglegemini} />} />
       <A d="M777 111 H865" />
-      <Note x={822} y={102} t="scrubbed text" />
 
       {/* ---- Files & Media */}
       <Block x={694} y={218} w={256} h={152} t="Files & Media" color="#a16207" />
       <Node cx={752} y={246} t="Weekly PDF" s="on the device" icon={(x, y) => <Plain x={x} y={y} I={FileText} color="#a16207" />} />
       <Node cx={892} y={246} t="Cloudinary" s="note photos" icon={(x, y) => <Brand x={x} y={y} icon={siCloudinary} />} />
-      <Note x={822} y={358} t="no Cloud Storage (paid plan)" />
 
       <Big x={958} y={131} />
       <Big x={958} y={294} />
@@ -230,13 +217,16 @@ export default function ServerlessMap() {
       <Node cx={1164} y={86} t="FCM" s="push" icon={(x, y) => <Fire x={x} y={y} I={BellRing} />} />
       <A d="M1071 111 H1137" async />
 
-      {/* ---- Async extra: Discord */}
-      <Block x={998} y={218} w={214} h={152} t="Async extra · Discord" color="#8b5cf6" />
-      <Node cx={1036} y={246} t="Rust bot" s="commands" icon={(x, y) => <Brand x={x} y={y} icon={siRust} />} />
-      <Node cx={1105} y={246} t="Docker" s="Dokploy" icon={(x, y) => <Brand x={x} y={y} icon={siDocker} />} />
-      <Node cx={1174} y={246} t="Discord" s="rooms" icon={(x, y) => <Brand x={x} y={y} icon={siDiscord} />} />
-      <A d="M1061 271 H1078" async />
-      <A d="M1130 271 H1147" async />
+      {/* ---- Async extra: Discord bot, hosted with Dokploy on Oracle Cloud Compute */}
+      <Block x={998} y={218} w={214} h={152} t="Async extra · Discord bot" color="#8b5cf6" />
+      <Node cx={1046} y={246} size={38} t="Rust bot" icon={(x, y) => <Brand x={x} y={y} icon={siRust} size={38} />} />
+      <Node cx={1164} y={246} size={38} t="Discord" icon={(x, y) => <Brand x={x} y={y} icon={siDiscord} size={38} />} />
+      <A d="M1067 265 H1143" async />
+      <Node cx={1030} y={308} size={38} t="Docker" icon={(x, y) => <Brand x={x} y={y} icon={siDocker} size={38} />} />
+      <Node cx={1102} y={308} size={38} t="Dokploy" icon={(x, y) => <Plain x={x} y={y} I={Container} color="#1b1d2a" size={38} />} />
+      <Node cx={1174} y={308} size={38} t="Oracle VM" icon={(x, y) => <Plain x={x} y={y} I={Server} color="#C74634" size={38} />} />
+      <A d="M1051 327 H1081" />
+      <A d="M1123 327 H1153" />
 
       {/* ---- outside the project: security, monitoring, DevOps */}
       <Block x={186} y={392} w={292} h={132} t="Security" color="#ef4444" />
