@@ -1,6 +1,11 @@
 import type { ReactNode } from 'react';
 import { Deck, Slide } from '@revealjs/react';
 import RevealNotes from 'reveal.js/plugin/notes';
+import {
+  Bell, Bot, Boxes, CheckCircle2, ClipboardCheck, Code2, Database, FileText, Flame,
+  Layers, Link2, Megaphone, MoonStar, PenLine, Rocket, ShieldCheck, Smartphone, Sparkles,
+  TestTube2, UserCog, Users,
+} from 'lucide-react';
 
 import 'reveal.js/reveal.css';
 import '../slides.css';
@@ -29,10 +34,16 @@ function S({
   notes: string;
   children: ReactNode;
 }) {
+  const [code, ...rest] = part.split(' · ');
+  const tone = code.startsWith('P') ? code.toLowerCase() : 'px';
+  const chip = code.startsWith('P') ? `${code} ${rest.shift() ?? ''}` : code;
   return (
-    <Slide className="fd" notes={notes}>
+    <Slide className={`fd ${tone}`} notes={notes}>
       <Logo />
-      <p className="kicker">{part}</p>
+      <p className="kicker">
+        <span className="chip">{chip}</span>
+        {rest.join(' · ')}
+      </p>
       <h2>{title}</h2>
       {sub && <p className="sub">{sub}</p>}
       <div className="body">{children}</div>
@@ -373,7 +384,7 @@ export default function FinalDeck() {
             Phan Hữu Phước · SE161951
           </p>
           <div style={{ position: 'absolute', right: 56, bottom: 80, display: 'flex', gap: 16, alignItems: 'flex-end' }}>
-            <Shot src="wa-03-dashboard.png" alt="Web admin dashboard" w={480} />
+            <Shot src="wa-03-dashboard-crop.png" alt="Web admin dashboard" w={560} />
             <Shot src="06-ai-notes-saved.png" alt="Nốt app on a Galaxy A70" h={340} />
           </div>
         </Slide>
@@ -458,37 +469,26 @@ export default function FinalDeck() {
           notes="Pain points with cause and impact. Evidence is our own Lab 3 state (gap review), not a survey; we say that openly."
           foot="Evidence: docs/gap-review.md (Lab 2 / Lab 3 gaps before the Final). No user survey was run; impacts are observed in the Lab 3 build."
         >
-          <table>
-            <thead>
-              <tr>
-                <th style={{ width: '24%' }}>Pain point</th>
-                <th style={{ width: '38%' }}>Cause</th>
-                <th>Impact</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><b>Static challenge content</b></td>
-                <td>Cards were a seed list; changing one needed a developer and a script</td>
-                <td>Users run out of fresh cards; good ideas from users stay private</td>
-              </tr>
-              <tr>
-                <td><b>No way to reach users</b></td>
-                <td>No staff role, no announcements, push only from the Console</td>
-                <td>Nobody can tell users about new cards or events inside the app</td>
-              </tr>
-              <tr>
-                <td><b>Logging takes effort at night</b></td>
-                <td>Each note is typed and classified by hand (win, self-control, journal)</td>
-                <td>The 30 s goal can slip when the day had several moments to record</td>
-              </tr>
-              <tr>
-                <td><b>Lab 3 flow left unfinished</b></td>
-                <td>Weekly card PDF went to Cloud Storage, which needs the paid plan</td>
-                <td>Export never worked on the real project</td>
-              </tr>
-            </tbody>
-          </table>
+          <div className="grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+            {[
+              [Boxes, 'Static challenge content', 'Cards were a seed list; changing one needed a developer and a script', 'Users run out of fresh cards; good ideas from users stay private'],
+              [Megaphone, 'No way to reach users', 'No staff role, no announcements, push only from the Console', 'Nobody can tell users about new cards or events inside the app'],
+              [MoonStar, 'Logging takes effort at night', 'Each note is typed and classified by hand (win, self-control, journal)', 'The 30 s goal slips when the day had several moments to record'],
+              [FileText, 'Lab 3 flow left unfinished', 'The weekly card PDF went to Cloud Storage, which needs the paid plan', 'Export never worked on the real project'],
+            ].map(([Icon, head, cause, impact]) => {
+              const I = Icon as typeof Boxes;
+              return (
+                <div key={head as string} className="tile">
+                  <span className="ic big"><I size={30} /></span>
+                  <div>
+                    <h4>{head as string}</h4>
+                    <p><span className="k">Cause</span><br />{cause as string}</p>
+                    <p style={{ marginTop: 8 }}><span className="k">Impact</span><br /><b>{impact as string}</b></p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </S>
 
         {/* 04 · Proposed solution */}
@@ -561,7 +561,7 @@ export default function FinalDeck() {
           <table>
             <thead>
               <tr>
-                <th style={{ width: '16%' }}>Actor</th>
+                <th style={{ width: '19%' }}>Actor</th>
                 <th style={{ width: '12%' }}>Client</th>
                 <th style={{ width: '32%' }}>Who</th>
                 <th>Main permissions</th>
@@ -569,31 +569,31 @@ export default function FinalDeck() {
             </thead>
             <tbody>
               <tr>
-                <td><b>User</b></td>
+                <td><span className="ic" style={{ marginRight: 10, verticalAlign: 'middle' }}><Users size={22} /></span><b>User</b></td>
                 <td>Android app</td>
                 <td>Student using Nốt every evening</td>
                 <td>Own notes and data; share own cards (pending only); read catalog, announcements, own inbox</td>
               </tr>
               <tr>
-                <td><b>Staff</b></td>
+                <td><span className="ic" style={{ marginRight: 10, verticalAlign: 'middle' }}><PenLine size={22} /></span><b>Staff</b></td>
                 <td>Web admin</td>
                 <td>Content curator</td>
                 <td>Create, edit, archive catalog cards; approve / reject with reason; post announcements</td>
               </tr>
               <tr>
-                <td><b>Admin</b></td>
+                <td><span className="ic" style={{ marginRight: 10, verticalAlign: 'middle' }}><UserCog size={22} /></span><b>Admin</b></td>
                 <td>Web admin</td>
                 <td>Team lead</td>
                 <td>Everything staff can do + change other users' roles</td>
               </tr>
               <tr>
-                <td><b>Gemini</b></td>
+                <td><span className="ic" style={{ marginRight: 10, verticalAlign: 'middle' }}><Bot size={22} /></span><b>Gemini</b></td>
                 <td>External</td>
                 <td>Firebase AI Logic, Gemini Developer API</td>
                 <td>Receives the scrubbed paragraph only; returns JSON suggestions</td>
               </tr>
               <tr>
-                <td><b>Firebase</b></td>
+                <td><span className="ic" style={{ marginRight: 10, verticalAlign: 'middle' }}><Flame size={22} /></span><b>Firebase</b></td>
                 <td>Platform</td>
                 <td>Auth, Firestore, App Check, RC, FCM…</td>
                 <td>Rules decide every read and write; no custom server</td>
@@ -608,22 +608,29 @@ export default function FinalDeck() {
           title="Three core workflows carry the demo; everything else supports them"
           sub="Each workflow has an actor, a trigger and a business result, not a list of buttons."
           notes="Three workflows, one story: the user logs the day, shares a card that staff approve, staff announce it. Other features listed underneath."
-          foot="Other features: onboarding & starter plan · weekly card PDF · streaks & journey · self-control & breathing · groups · Discord link · dashboard · roles."
+          foot="Supporting features: onboarding & starter plan · weekly card PDF · streaks & journey · self-control & breathing · groups · Discord link · dashboard · roles."
         >
           {[
-            ['WF-01', 'Log the day with Nốt AI', 'User', 'Evening, user taps Ghi nốt → Kể tự do', 'Notes saved after the user confirms', 'Consent · BR-01 · Gemini JSON · edit · fallback'],
-            ['WF-02', 'Publish a user card to the shared catalog', 'User + Staff', 'User shares an own card', 'Card in catalog, app updates, inbox message', 'BR-02 submit · review · BR-03 approve / reject + reason'],
-            ['WF-03', 'Announce news to every user', 'Staff', 'Staff has news for everyone', 'Announcement published; every user inbox shows it', 'Form · BR-04 validation · real-time inbox'],
-          ].map(([id, name, actor, trigger, result, feat]) => (
-            <div key={id} className="card accent grow" style={{ fontSize: 15 }}>
-              <h4>{id}</h4>
-              <p style={{ fontSize: 19, fontWeight: 700, marginBottom: 10 }}>{name}</p>
-              <p><b>Actor:</b> {actor}</p>
-              <p><b>Trigger:</b> {trigger}</p>
-              <p><b>Result:</b> {result}</p>
-              <p style={{ marginTop: 8, color: '#555b6e' }}>{feat}</p>
-            </div>
-          ))}
+            [Sparkles, 'WF-01', 'Log the day with Nốt AI', 'User', 'Evening, user taps Ghi nốt → Kể tự do', 'Notes saved after the user confirms', 'BR-01 · consent, Gemini JSON, edit, fallback', 'Slow evenings'],
+            [ClipboardCheck, 'WF-02', 'Publish a user card to the shared catalog', 'User + Staff', 'User shares an own card', 'Card in the catalog, app updates, inbox message', 'BR-02 submit · BR-03 approve / reject + reason', 'Static content'],
+            [Megaphone, 'WF-03', 'Announce news to every user', 'Staff', 'Staff has news for everyone', 'Announcement published; every inbox shows it', 'BR-04 title 1–80, body 1–1000, staff only', 'No channel'],
+          ].map(([Icon, id, name, actor, trigger, result, rule, pain]) => {
+            const I = Icon as typeof Sparkles;
+            return (
+              <div key={id as string} className="wf grow">
+                <span className="ic big" style={{ background: '#fff' }}><I size={30} /></span>
+                <span className="id">{id as string}</span>
+                <span className="name">{name as string}</span>
+                <dl>
+                  <dt>Actor</dt><dd>{actor as string}</dd>
+                  <dt>Trigger</dt><dd>{trigger as string}</dd>
+                  <dt>Result</dt><dd><b>{result as string}</b></dd>
+                  <dt>Rules</dt><dd>{rule as string}</dd>
+                  <dt>Solves</dt><dd>{pain as string}</dd>
+                </dl>
+              </div>
+            );
+          })}
         </S>
 
         {/* 07 · Business flow */}
@@ -665,25 +672,28 @@ export default function FinalDeck() {
           title="Every technology in the stack has one job"
           notes="Only what is in pubspec / package.json / workflows."
         >
-          <table>
-            <thead>
-              <tr>
-                <th style={{ width: '14%' }}>Group</th>
-                <th style={{ width: '46%' }}>Technology</th>
-                <th>Used for</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td><b>Mobile</b></td><td>Flutter · Riverpod 3 · go_router · fl_chart · pdf · share_plus</td><td>Android app, MVVM, charts, weekly PDF on device</td></tr>
-              <tr><td><b>Web</b></td><td>Flutter Web · same Riverpod/MVVM · google_fonts</td><td>Web admin on Firebase Hosting</td></tr>
-              <tr><td><b>Shared</b></td><td><code>packages/core</code> (Dart)</td><td>Models, Firestore repositories, design tokens</td></tr>
-              <tr><td><b>Backend</b></td><td>Firestore · Security Rules · Auth · Remote Config · FCM</td><td>Data, permissions, flags, push</td></tr>
-              <tr><td><b>AI</b></td><td>Firebase AI Logic (<code>firebase_ai</code>) · Gemini Developer API</td><td>Nốt AI: sort a paragraph into notes (JSON schema)</td></tr>
-              <tr><td><b>Security</b></td><td>App Check: Play Integrity / debug · reCAPTCHA Enterprise</td><td>Only our apps reach Firestore and Gemini</td></tr>
-              <tr><td><b>Quality</b></td><td>flutter_test · Firebase Emulator + rules-unit-testing · ARTEMIS · CodeRabbit</td><td>Unit/widget, rules, E2E on device, AI review</td></tr>
-              <tr><td><b>DevOps</b></td><td>GitHub Actions · Firebase Hosting preview channels</td><td>CI, PR previews, deploy on merge</td></tr>
-            </tbody>
-          </table>
+          <div className="grid" style={{ gridTemplateColumns: '1fr 1fr 1fr 1fr' }}>
+            {[
+              [Smartphone, 'Mobile', 'Flutter · Riverpod 3 · go_router · fl_chart · pdf · share_plus', 'Android app, MVVM, charts, weekly PDF on device'],
+              [Layers, 'Web', 'Flutter Web · same Riverpod / MVVM · google_fonts', 'Web admin on Firebase Hosting'],
+              [Code2, 'Shared', 'packages/core (Dart)', 'Models, Firestore repositories, design tokens'],
+              [Database, 'Backend', 'Firestore · Security Rules · Auth · Remote Config · FCM', 'Data, permissions, flags, push'],
+              [Bot, 'AI', 'Firebase AI Logic · Gemini Developer API', 'Sort a paragraph into notes (JSON schema)'],
+              [ShieldCheck, 'Security', 'App Check: Play Integrity · reCAPTCHA Enterprise', 'Only our apps reach Firestore and Gemini'],
+              [TestTube2, 'Quality', 'flutter_test · Firebase Emulator · ARTEMIS · CodeRabbit', 'Unit / widget, rules, E2E on device, AI review'],
+              [Rocket, 'DevOps', 'GitHub Actions · Hosting preview channels', 'CI, PR previews, deploy on merge'],
+            ].map(([Icon, group, tech, use]) => {
+              const I = Icon as typeof Smartphone;
+              return (
+                <div key={group as string} className="tile" style={{ flexDirection: 'column', gap: 8 }}>
+                  <span className="ic"><I size={24} /></span>
+                  <h4>{group as string}</h4>
+                  <p><b>{tech as string}</b></p>
+                  <p>{use as string}</p>
+                </div>
+              );
+            })}
+          </div>
         </S>
 
         {/* 11 · UI/UX */}
@@ -695,10 +705,10 @@ export default function FinalDeck() {
           foot="States: empty · loading · error (within 15 s, Thử lại) · success · wrong role rejected on web and mobile."
         >
           <div className="grow" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-            <Shot src="wa-07-review-empty.png" alt="Empty review queue" w={410} cap="Web · empty: Hàng chờ duyệt" />
-            <Shot src="wa-13-dashboard-loading.png" alt="Dashboard loading" w={410} cap="Web · loading: Tổng quan" />
-            <Shot src="wa-16-dashboard-error.png" alt="Dashboard error" w={410} cap="Web · error: server unreachable, Thử lại" />
-            <Shot src="wa-08-review-approved.png" alt="Approved list" w={410} cap="Web · success: approved cards" />
+            <Shot src="wa-07-review-empty-crop.png" alt="Empty review queue" h={200} cap="Empty · Hàng chờ duyệt" />
+            <Shot src="wa-13-dashboard-loading-crop.png" alt="Dashboard loading" h={200} cap="Loading · Tổng quan" />
+            <Shot src="wa-16-dashboard-error-crop.png" alt="Dashboard error" h={200} cap="Error · server unreachable, Thử lại" />
+            <Shot src="wa-08-review-approved-crop.png" alt="Approved list" h={200} cap="Success · approved cards" />
           </div>
           <Shot src="11-ai-off-remote-config.png" alt="Nốt AI off" h={440} cap="App · AI off state" />
         </S>
@@ -756,7 +766,7 @@ export default function FinalDeck() {
           notes="No schema in Firestore, so the shape, sizes and transitions are enforced by rules and covered by tests."
           foot="Indexes: submissions (uid, createdAt↓), (status, createdAt↓) · notes (groupId, createdAt↓) · full table: docs/data-model.md"
         >
-          <table>
+          <table style={{ fontSize: 15.5 }}>
             <thead>
               <tr>
                 <th style={{ width: '26%' }}>Collection</th>
@@ -871,18 +881,18 @@ export default function FinalDeck() {
             <Card head="Trigger · state"><p>User shares own card · <b>pending → approved</b> / rejected</p></Card>
             <Card head="Steps">
               <ul className="tight">
-                <li>User: Gửi cho mọi người → pending</li>
-                <li>Staff: Hàng chờ duyệt → Duyệt</li>
+                <li>User shares → pending</li>
+                <li>Staff: Duyệt on the web</li>
                 <li>Batch: card + status + inbox</li>
                 <li>App: "Đã vào kho chung ✓"</li>
               </ul>
             </Card>
-            <Card head="Exception" tone="bad"><p>BR-03 reject needs a reason · BR-02 user cannot approve (R-22)</p></Card>
+            <Card head="Exception" tone="bad"><p>BR-03 reason required · BR-02 user cannot approve</p></Card>
           </div>
           <Shot src="cr-02-phone-pending.png" alt="Pending" h={430} cap="Đang chờ duyệt" />
           <div className="col">
-            <Shot src="wa-08-review-approved.png" alt="Approved on web" h={190} cap="Web: approved" />
-            <Shot src="cr-06-phone-inbox-3-messages.png" alt="Inbox" h={230} cap="App: inbox" />
+            <Shot src="wa-08-review-approved-crop.png" alt="Approved on web" w={420} cap="Web: approved" />
+            <Shot src="cr-06-phone-inbox-3-messages.png" alt="Inbox" h={190} cap="App: inbox" />
           </div>
         </S>
 
@@ -894,8 +904,8 @@ export default function FinalDeck() {
           foot="Evidence: sent at 10:56, in the app inbox at 10:56 · rules R-25 (staff only, authorUid = self, title 1–80, body 1–1000) · web checklist #9–11."
         >
           <div className="col">
-            <Shot src="wa-09-announcement-form.png" alt="Announcement form" w={420} cap="1 · Compose (list still empty)" />
-            <Shot src="wa-10-announcement-sent.png" alt="Announcement sent" w={420} cap="2 · Sent at 10:56, form cleared" />
+            <Shot src="wa-09-announcement-form-crop.png" alt="Announcement form" w={400} cap="1 · Compose (list still empty)" />
+            <Shot src="wa-10-announcement-sent-crop.png" alt="Announcement sent" w={400} cap="2 · Sent at 10:56, form cleared" />
           </div>
           <Shot src="wa-11-app-inbox-announcement.png" alt="App inbox" h={470} cap="3 · App inbox, 10:56" />
           <div className="col grow">
@@ -946,7 +956,7 @@ export default function FinalDeck() {
           title="Every brief requirement maps to a live feature and a piece of evidence"
           notes="Objective → implemented → validated. Point to evidence folders."
         >
-          <table>
+          <table style={{ fontSize: 15.5 }}>
             <thead>
               <tr>
                 <th>Brief requirement</th>
@@ -997,18 +1007,30 @@ export default function FinalDeck() {
           part="P4 · Proof · 24 Conclusion"
           title="Nốt is now a working multi-role system, and we can show every claim"
           notes="Three messages, then leave this slide up for Q&A."
-          foot="Demo: prm393-not-lab3.web.app · Web admin: prm393-not-lab3.web.app/admin/ · Repo: github.com/FU-PRM-Projects/Lab-03"
         >
-          <div className="cards grow" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
-            <Card head="1 · Problem solved" tone="accent">
-              <p>Content is curated by staff and grows from users' own cards; news reaches every user in the same minute.</p>
-            </Card>
-            <Card head="2 · Working product" tone="accent">
-              <p>WF-01, WF-02, WF-03 run live on Android and the deployed web admin, on the free plan.</p>
-            </Card>
-            <Card head="3 · Verified" tone="accent">
-              <p>30/30 rules tests, 300+ code tests in CI, 14/15 ARTEMIS runs on a real phone, 3 timed cross-role runs, App Check enforced.</p>
-            </Card>
+          <div className="col grow">
+            <div className="grid" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
+              {[
+                [CheckCircle2, '1 · Problem solved', "Content is curated by staff and grows from users' own cards; news reaches every user in the same minute."],
+                [Smartphone, '2 · Working product', 'WF-01, WF-02, WF-03 run live on Android and the deployed web admin, on the free plan.'],
+                [ShieldCheck, '3 · Verified', '30/30 rules tests, 300+ code tests in CI, 14/15 ARTEMIS runs on a real phone, 3 timed cross-role runs, App Check enforced.'],
+              ].map(([Icon, head, text]) => {
+                const I = Icon as typeof CheckCircle2;
+                return (
+                  <div key={head as string} className="wf">
+                    <span className="ic big" style={{ background: '#fff' }}><I size={30} /></span>
+                    <span className="name">{head as string}</span>
+                    <p style={{ margin: 0, fontSize: 22, lineHeight: 1.45 }}>{text as string}</p>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="chips" style={{ marginTop: 6 }}>
+              <span><Link2 size={15} /> prm393-not-lab3.web.app</span>
+              <span><Link2 size={15} /> prm393-not-lab3.web.app/admin/</span>
+              <span><Link2 size={15} /> github.com/FU-PRM-Projects/Lab-03</span>
+              <span><Bell size={15} /> Thank you · Questions?</span>
+            </div>
           </div>
         </S>
 
