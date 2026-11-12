@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="9" time="3345.865" timestamp="2026-11-12T17:07:11.411464+07:00" hostname="DuyPhan"><testcase classname="test_main_flows" name="test_t17_onboarding_starter_plan[run1]" time="54.414" /><testcase classname="test_main_flows" name="test_t17_onboarding_starter_plan[run2]" time="244.313" /><testcase classname="test_main_flows" name="test_t17_onboarding_starter_plan[run3]" time="52.914" /><testcase classname="test_main_flows" name="test_t18_free_tell_ai_suggestions[run1]" time="173.250" /><testcase classname="test_main_flows" name="test_t18_free_tell_ai_suggestions[run2]" time="464.579" /><testcase classname="test_main_flows" name="test_t18_free_tell_ai_suggestions[run3]" time="1577.604"><failure message="artemis_client.errors.TaskTimeoutError: Task 30d74a56-7023-47ca-8b3c-d492dfa41cb7 did not finish within 480 seconds">ask = &lt;function ask.&lt;locals&gt;.run at 0x00000156CD829620&gt;
+
+    async def test_t18_free_tell_ai_suggestions(ask) -&gt; None:
+        """A1 / S03b: Kể tự do → Gemini tách thành nốt gợi ý có nhãn, sửa được.
+    
+        Nội dung Gemini trả về đổi giữa các lần, nên chỉ khẳng định trên nhãn cố
+        định "Gợi ý từ Nốt AI". Không lưu để khỏi để lại nốt trong hũ.
+        """
+&gt;       answer, result = await ask(
+            "Ở màn Hôm nay, bấm 'Ghi nốt', chọn 'Kể tự do · Nốt AI'. Gõ vào ô: 'Sang nay "
+            "minh day som chay bo 2km, chieu hoi thay mot cau, toi met nen ngu som'. Bấm "
+            "'Nhờ Tụi Nốt sắp xếp' (nếu hiện bảng hỏi đồng ý gửi cho Gemini thì đồng ý). Chờ "
+            "tối đa 30 giây. Trả lời SUGGESTIONS nếu hiện danh sách nốt gợi ý có dòng 'Gợi ý "
+            "từ Nốt AI', FALLBACK nếu hiện câu báo Nốt AI đang nghỉ hoặc lỗi, kèm lối ghi "
+            "tay. KHÔNG bấm lưu: sau khi xem xong, bấm Back / Đóng cho tới khi về màn Hôm "
+            "nay, chọn bỏ nếu app hỏi." + RULES,
+            "SUGGESTIONS hoặc FALLBACK",
+            timeout=480,
+        )
+
+test_main_flows.py:307: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+conftest.py:140: in run
+    result = await client.run(
+.venv\Lib\site-packages\artemis_client\client.py:328: in run
+    return await self.wait_for_task(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;artemis_client.client.ArtemisClient object at 0x00000156CD7D5AF0&gt;
+task_id = '30d74a56-7023-47ca-8b3c-d492dfa41cb7', timeout = 480, poll_interval = None
+
+    async def wait_for_task(
+        self,
+        task_id: str,
+        *,
+        timeout: float = 1800.0,
+        poll_interval: float | None = None,
+    ) -&gt; TaskResult:
+        """Wait until a task reaches a terminal state."""
+        if timeout &lt;= 0:
+            raise ValueError("timeout must be greater than zero")
+        interval = self.poll_interval if poll_interval is None else float(poll_interval)
+        if interval &lt;= 0:
+            raise ValueError("poll_interval must be greater than zero")
+    
+        started = time.monotonic()
+        while True:
+            result = await self.get_task(task_id)
+            if result.done:
+                return result
+            elapsed = time.monotonic() - started
+            if elapsed &gt;= timeout:
+&gt;               raise TaskTimeoutError(task_id, timeout)
+E               artemis_client.errors.TaskTimeoutError: Task 30d74a56-7023-47ca-8b3c-d492dfa41cb7 did not finish within 480 seconds
+
+.venv\Lib\site-packages\artemis_client\client.py:292: TaskTimeoutError</failure></testcase><testcase classname="test_main_flows" name="test_t20_cross_role_mobile_part[run1]" time="351.008" /><testcase classname="test_main_flows" name="test_t20_cross_role_mobile_part[run2]" time="132.630" /><testcase classname="test_main_flows" name="test_t20_cross_role_mobile_part[run3]" time="293.604"><failure message="AssertionError: [run3] failed&#10;assert False&#10;[+1 more line; full report in element text]">ask = &lt;function ask.&lt;locals&gt;.run at 0x00000156CD82AE80&gt;
+
+    async def test_t20_cross_role_mobile_part(ask) -&gt; None:
+        """Liên vai trò, phần mobile: gửi thẻ → "Đang chờ duyệt"; thẻ đã duyệt hiện
+        "Đã vào kho chung"; hộp thư có tin duyệt. Bước duyệt trên web xem
+        docs/cross-role-flow.md (D-1…D-3). Thẻ thử được rút lại và xoá để hàng chờ
+        của staff vẫn trống."""
+&gt;       answer, result = await ask(
+            "Mở tab 'Thử thách', bấm 'Thêm điều tốt của bạn', tạo thẻ tên "
+            f"'{CARD_NAME}' (điền các ô bắt buộc tối thiểu) rồi lưu. Mở thẻ đó, bấm 'Gửi "
+            "cho mọi người' rồi 'Gửi'. Ghi PENDING nếu thẻ hiện 'Đang chờ duyệt'. Sau đó "
+            "bấm 'Rút lại', rồi 'Xoá thẻ này' và xác nhận xoá. Tiếp theo tìm trong tab Thử "
+            "thách một thẻ có dòng 'Đã vào kho chung' (thẻ đã gửi trước đây, có thể phải "
+            "vuốt): ghi APPROVED nếu thấy. Cuối cùng về màn Hôm nay, bấm 'Hộp thư': ghi "
+            "INBOX nếu có tin 'Thẻ của bạn đã vào kho chung', rồi đóng hộp thư. Trả lời các "
+            "từ khoá đã ghi, cách nhau dấu cách, ví dụ 'PENDING APPROVED INBOX'." + RULES,
+            "PENDING, APPROVED, INBOX (những từ thấy được)",
+            timeout=600,
+        )
+
+test_main_flows.py:349: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+goal = "Mở tab 'Thử thách', bấm 'Thêm điều tốt của bạn', tạo thẻ tên 'E2E thẻ thử' (điền các ô bắt buộc tối thiểu) rồi lưu. M...OX'. Không đăng xuất và không đổi cài đặt nào. Cuối cùng trả lời đúng định dạng được yêu cầu, không thêm chữ nào khác."
+expected = 'PENDING, APPROVED, INBOX (những từ thấy được)', locked = True, timeout = 600
+
+    async def run(goal: str, expected: str, *, locked: bool = True, timeout: int = 420):
+        try:
+            result = await client.run(
+                goal,
+                locked_app_package=app_id if locked else None,
+                expected_output=expected,
+                timeout=timeout,
+            )
+        except TaskTimeoutError as error:
+            if not await client.stop(error.task_id):
+                pytest.exit(
+                    f"Không xác nhận được dừng phiên quá giờ {error.task_id}. "
+                    "Dừng bộ test để tránh thao tác chồng lên nhau.",
+                    returncode=2,
+                )
+            raise
+&gt;       assert result.succeeded, f"[run{attempt}] {result.error or result.status}"
+E       AssertionError: [run3] failed
+E       assert False
+E        +  where False = TaskResult(task_id='0e08a9da-1e78-4d21-aef8-423a83a19064', status='failed', goal="Mở tab 'Thử thách', bấm 'Thêm điều tốt của bạn', tạo thẻ tên 'E2E thẻ thử' (điền các ô bắt buộc tối thiểu) rồi lưu. Mở thẻ đó, bấm 'Gửi cho mọi người' rồi 'Gửi'. Ghi PENDING nếu thẻ hiện 'Đang chờ duyệt'. Sau đó bấm 'Rút lại', rồi 'Xoá thẻ này' và xác nhận xoá. Tiếp theo tìm trong tab Thử thách một thẻ có dòng 'Đã vào kho chung' (thẻ đã gửi trước đây, có thể phải vuốt): ghi APPROVED nếu thấy. Cuối cùng về màn Hôm nay, bấm 'Hộp thư': ghi INBOX nếu có tin 'Thẻ của bạn đã vào kho chung', rồi đóng hộp thư. Trả lời các từ khoá đã ghi, cách nhau dấu cách, ví dụ 'PENDING APPROVED INBOX'. Không đăng xuất và không đổi cài đặt nào. Cuối cùng trả lời đúng định dạng được yêu cầu, không thêm chữ nào khác.", profile=None, device_serial='emulator-5554', output=None, error=None, turns=None).succeeded
+
+conftest.py:154: AssertionError</failure></testcase></testsuite></testsuites>

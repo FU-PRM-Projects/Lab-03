@@ -8,6 +8,18 @@ góp ý kèm quyết định). File này gom kết quả và trỏ tới minh ch
 
 Cập nhật 12/11/2026. Mã ca và flow chuẩn theo `e2e_test/test_main_flows.py` của Thúy (PR #78). Minh chứng T02 chạy lại và review Codex được giữ riêng bên dưới.
 
+## Test Case và Defect Report
+
+- [Test Cases T01–T20](test-cases.md): điều kiện, bước thao tác, kết quả mong đợi/thực tế, ba lượt và nguồn minh chứng.
+- [Defect Report](defect-report.md): phân biệt lỗi app, lỗi công cụ/môi trường và ứng viên chưa xác nhận.
+- [Excel hai sheet](../outputs/final-testing/Test-Cases-and-Defects.xlsx).
+
+### Đợt emulator mới nhất ngày 12/11/2026
+
+T17/T18/T20 chạy 3 lượt mỗi ca: **7/9 pass**. T17 đạt 3/3 sau sửa đường dẫn ADB; T18 2/3 (lượt 3 quá 480 giây); T20 2/3 (lượt 3 model điều khiển ARTEMIS timeout 180 giây). Hai timeout chưa xác nhận là defect app. T19 không nằm trong đợt này. [Log](../evidence/artemis/emulator-final-2026-11-12-7of9.txt) · [JUnit](../evidence/artemis/emulator-final-2026-11-12-7of9.xml) · [Chẩn đoán trích từ server](../evidence/artemis/diagnostics-2026-11-12.txt).
+
+Số liệu **14/15** của Galaxy A70 bên dưới thuộc đợt máy thật riêng. Không ghi đè bằng số liệu emulator và không cộng hai đợt thành một bộ kết quả.
+
 ## Tổng hợp
 
 | Loại kiểm thử | Phạm vi | Kết quả | Minh chứng |

@@ -729,8 +729,8 @@ export default function FinalDeck() {
           dense
           part="DESIGN · 13"
           title="Class design"
-          foot="Tests swap in fakes · 290 app · 10 web admin · 5 core"
-          notes="Business rules sit in the repository + Security Rules, not in widgets. Screen → Notifier/actions → service interface → Firestore implementation in packages/core. main.dart wires each provider to its Firebase implementation; fakes replace the interfaces in tests (290 app, 10 web admin, 5 core tests)."
+          foot="Tests swap in fakes · 305 app · 14 web admin · 5 core"
+          notes="Business rules sit in the repository + Security Rules, not in widgets. Screen → Notifier/actions → service interface → Firestore implementation in packages/core. main.dart wires each provider to its Firebase implementation; fakes replace the interfaces in tests (305 app, 14 web admin, 5 core tests)."
         >
           <table className="fx-table">
             <thead>
@@ -779,7 +779,7 @@ export default function FinalDeck() {
           part="DESIGN · 16"
           title="Traceability"
           foot="Full matrix: docs/design-traceability.md"
-          notes="Feature → screen → class → collection → tests. Also shows where tests are still missing (ARTEMIS for new flows). Rules: firebase/tests/firestore.rules.test.js. E2E: e2e_test/."
+          notes="Feature → screen → class → collection → tests. ARTEMIS Final evidence is grouped by device; T15/T16 remain not run. Rules: firebase/tests/firestore.rules.test.js. E2E: e2e_test/."
         >
           <table className="fx-table">
             <thead>
@@ -891,12 +891,12 @@ export default function FinalDeck() {
           part="PROOF · 21"
           title="Testing"
           foot="CI on every PR: format, analyze, all suites, rules in the Emulator, builds, Hosting preview"
-          notes="Numbers from the latest runs on main. Be honest about what is not run yet: ARTEMIS for the Final flows. CI on every PR: format, analyze, all test suites, rules in the Emulator, web build, Android build, Hosting preview."
+          notes="Unit/widget tests checked locally on 12 November: 305 app, 14 web admin, 5 core. Rules 30/30 is the recorded earlier Emulator run. ARTEMIS results belong to separate batches: Lab 3 41/42, Final on Galaxy A70 14/15, latest emulator T17/T18/T20 7/9. Do not combine their denominators. Full case steps and defects are linked in docs/test-cases.md and docs/defect-report.md."
         >
           <div className="fx-stats">
             <p><b>30/30</b><span>rules tests</span></p>
-            <p><b>290</b><span>app tests</span></p>
-            <p><b>10 + 5</b><span>web + core tests</span></p>
+            <p><b>305</b><span>app tests</span></p>
+            <p><b>14 + 5</b><span>web + core tests</span></p>
             <p><b>41/42</b><span>ARTEMIS runs (Lab 3)</span></p>
           </div>
           <table className="fx-table">
@@ -911,11 +911,53 @@ export default function FinalDeck() {
               <tr><td><b>Rules</b></td><td>Emulator: allowed and denied per role per collection</td><td className="ok">30 / 30</td></tr>
               <tr><td><b>Unit / widget</b></td><td>ViewModels, repositories, screens at 360 dp</td><td className="ok">all pass</td></tr>
               <tr><td><b>Cross-role</b></td><td>3 timed runs on the deployed system</td><td className="ok">3 / 3</td></tr>
-              <tr><td><b>Web checklist</b></td><td>13 screenshots: actions, rejection, empty, loading</td><td className="ok">done</td></tr>
+              <tr><td><b>Web checklist</b></td><td>16 checks: actions, roles, empty, loading, dashboard error</td><td className="ok">recorded</td></tr>
               <tr><td><b>Real device</b></td><td>Onboarding, Nốt AI, PDF, AI off on Galaxy A70</td><td className="ok">pass</td></tr>
-              <tr><td><b>E2E (ARTEMIS)</b></td><td>Lab 3 flows 3× each; Final flows written, not run</td><td className="warn">partial</td></tr>
+              <tr><td><b>E2E (ARTEMIS)</b></td><td>Final phone: 14/15; emulator T17/T18/T20: 7/9</td><td className="warn">see batches</td></tr>
             </tbody>
           </table>
+        </Page>
+
+        <Page
+          dense
+          part="PROOF · 21A"
+          title="Test Cases & Results"
+          line="20 defined cases. Results stay attached to their device and test batch."
+          foot="docs/test-cases.md · outputs/final-testing/Test-Cases-and-Defects.xlsx · evidence/artemis/"
+          notes="The full case file contains preconditions, steps, expected result, three run outcomes, environment, actual result and evidence. T01–T14 is the historical Lab 3 baseline, 41/42 after documented reruns. Thuy's Final phone batch covers T14 and T17–T20, 14/15. Duy's latest emulator batch covers T17, T18, T20, 7/9; T17 is now 3/3 after the ADB path fix. T15 and T16 have definitions but no ARTEMIS execution evidence. T20 checks submission then withdraws the test card; it checks approval and inbox on previously approved data, while fresh end-to-end approval is evidenced separately by D-1…D-3. T14 Final validates local PDF saving/sharing, unlike the historical Storage error-path test."
+        >
+          <table className="fx-table">
+            <thead><tr><th>Batch / device</th><th>Cases and expected result</th><th>Result</th></tr></thead>
+            <tbody>
+              <tr><td>Lab 3 · emulator</td><td>T01–T14, historical baseline with documented reruns</td><td>41/42</td></tr>
+              <tr><td>Final · Galaxy A70</td><td>T14 PDF · T17 onboarding · T18 AI · T19 AI off · T20 mobile review</td><td>14/15</td></tr>
+              <tr><td>Final · emulator</td><td>T17: PLAN_SHOWN, including app restart</td><td className="ok">3/3</td></tr>
+              <tr><td>Same emulator batch</td><td>T18: SUGGESTIONS · T20: PENDING APPROVED INBOX</td><td className="warn">2/3 each</td></tr>
+              <tr><td>Not run</td><td>T15 email sign-in · T16 wrong password and recovery</td><td className="warn">Not Run</td></tr>
+            </tbody>
+          </table>
+          <p style={{ fontSize: 21, marginTop: 22 }}>Each case records preconditions, steps, expected and actual results, run outcomes and proof. A pass in an earlier batch does not replace a later failure.</p>
+        </Page>
+
+        <Page
+          dense
+          part="PROOF · 21B"
+          title="Defects & Retest"
+          line="Separate application defects, automation failures and unverified reports."
+          foot="docs/defect-report.md · evidence/artemis/emulator-final-2026-11-12-7of9.txt"
+          notes="The defect register has 17 records: three confirmed application defects, one test-harness defect, three automation/environment incidents, and ten unverified exploratory candidates. ADB path failure is verified fixed by the latest T17 3/3 run. T18 run 3 exceeded the 480-second task deadline; the root cause remains open. T20 run 3 failed because the ARTEMIS controller model call timed out after 180 seconds, not because Gemini in the app necessarily failed. An earlier key-limit incident is kept as environment history, not claimed as the cause of these new timeouts. Dashboard error handling, approval timeout and live role changes have recorded fixes/tests. The X01 candidate list is not counted as ten confirmed app bugs."
+        >
+          <table className="fx-table">
+            <thead><tr><th>Record / category</th><th>Observed issue</th><th>Decision / retest</th></tr></thead>
+            <tbody>
+              <tr><td>D-01 · test harness</td><td>T17 cleanup could not find adb.exe</td><td className="ok">SDK lookup fixed; T17 3/3</td></tr>
+              <tr><td>D-02 · automation</td><td>T18 run 3 exceeded 480 s</td><td className="warn">Open; inspect replay and rerun</td></tr>
+              <tr><td>D-03 · provider</td><td>T20 controller model call exceeded 180 s</td><td className="warn">Open; rerun after provider check</td></tr>
+              <tr><td>APP-01…03 · application</td><td>Approval timeout, dashboard loading, stale role UI</td><td className="ok">Fixed; tests and deploy evidence</td></tr>
+              <tr><td>X-01…10 · exploratory</td><td>Agent-reported UI issues from the Lab 3 build</td><td className="warn">Unverified; reproduce first</td></tr>
+            </tbody>
+          </table>
+          <p style={{ fontSize: 21, marginTop: 22 }}>A failed test is evidence to investigate. It does not by itself prove an application defect.</p>
         </Page>
 
         {/* 22 · Achievements */}
@@ -962,9 +1004,9 @@ export default function FinalDeck() {
               </tr>
             </thead>
             <tbody>
-              <tr><td>ARTEMIS not run for Final flows</td><td>No 3× E2E evidence for them</td><td className="bad">High</td><td>Run on the Galaxy A70, 3× each</td></tr>
+              <tr><td>E2E coverage and stability remain partial</td><td>T15/T16 not run; latest emulator T18/T20 2/3 each</td><td className="bad">High</td><td>Complete missing cases and investigate timeouts</td></tr>
               <tr><td>App Check on Authentication only monitored</td><td>26% of sign-in requests are unverified</td><td className="warn">Medium</td><td>Enforce once all traffic is verified</td></tr>
-              <tr><td>Lab 2 flows A3 and P4 not built</td><td>Two designed flows missing</td><td className="warn">Medium</td><td>Build A3 on the same AiService</td></tr>
+              <tr><td>A3 omitted by scope decision</td><td>No roleplay chat before challenges; journal drafts P4 are implemented</td><td className="warn">Medium</td><td>Keep rationale in gap-review.md</td></tr>
               <tr><td>D-1 took 22 s on an idle phone</td><td>Real time not guaranteed after idle</td><td>Low</td><td>Re-listen on resume</td></tr>
               <tr><td>Sideloaded release builds fail Play Integrity</td><td>AI blocked outside Play / debug</td><td>Low</td><td>Demo on debug; Play internal track</td></tr>
             </tbody>

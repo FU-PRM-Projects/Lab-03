@@ -1,0 +1,155 @@
+Windows PowerShell 5.1
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+PS C:\Users\duypd> cd D:\Lab-03\e2e_test
+PS D:\Lab-03\e2e_test> $env:ARTEMIS_DEVICE_SERIAL = 'emulator-5554'
+PS D:\Lab-03\e2e_test> uv run pytest test_main_flows.py -k "t17 or t18 or t20" --runs 3 -v --junitxml=../evidence/artemis/final-rerun-t17-t18-t20.xml
+================================================= test session starts =================================================
+platform win32 -- Python 3.12.16, pytest-9.2.0, pluggy-1.7.0 -- D:\Lab-03\e2e_test\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: D:\Lab-03\e2e_test
+configfile: pyproject.toml
+plugins: asyncio-1.4.1.post1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=session, asyncio_default_test_loop_scope=session
+collected 60 items / 51 deselected / 9 selected
+
+test_main_flows.py::test_t17_onboarding_starter_plan[run1]
+
+--------------------- generated xml file: D:\Lab-03\evidence\artemis\final-rerun-t17-t18-t20.xml ----------------------
+! _pytest.outcomes.Exit: Server ARTEMIS chạy nhưng không thấy thiết bị nào ở trạng thái 'device'. Bật emulator hoặc cắm điện thoại (USB debugging). !
+=============================================== 51 deselected in 0.50s ================================================
+PS D:\Lab-03\e2e_test> uv run pytest test_main_flows.py -k "t17 or t18 or t20" --runs 3 -v --junitxml=../evidence/artemis/final-rerun-t17-t18-t20.xml
+================================================= test session starts =================================================
+platform win32 -- Python 3.12.16, pytest-9.2.0, pluggy-1.7.0 -- D:\Lab-03\e2e_test\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: D:\Lab-03\e2e_test
+configfile: pyproject.toml
+plugins: asyncio-1.4.1.post1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=session, asyncio_default_test_loop_scope=session
+collected 60 items / 51 deselected / 9 selected
+
+test_main_flows.py::test_t17_onboarding_starter_plan[run1] PASSED                                                [ 11%]
+test_main_flows.py::test_t17_onboarding_starter_plan[run2] PASSED                                                [ 22%]
+test_main_flows.py::test_t17_onboarding_starter_plan[run3] PASSED                                                [ 33%]
+test_main_flows.py::test_t18_free_tell_ai_suggestions[run1] PASSED                                               [ 44%]
+test_main_flows.py::test_t18_free_tell_ai_suggestions[run2] PASSED                                               [ 55%]
+test_main_flows.py::test_t18_free_tell_ai_suggestions[run3] FAILED                                               [ 66%]
+test_main_flows.py::test_t20_cross_role_mobile_part[run1] PASSED                                                 [ 77%]
+test_main_flows.py::test_t20_cross_role_mobile_part[run2] PASSED                                                 [ 88%]
+test_main_flows.py::test_t20_cross_role_mobile_part[run3] FAILED                                                 [100%]
+
+====================================================== FAILURES =======================================================
+_______________________________________ test_t18_free_tell_ai_suggestions[run3] _______________________________________
+
+ask = <function ask.<locals>.run at 0x00000156CD829620>
+
+    async def test_t18_free_tell_ai_suggestions(ask) -> None:
+        """A1 / S03b: Kể tự do → Gemini tách thành nốt gợi ý có nhãn, sửa được.
+
+        Nội dung Gemini trả về đổi giữa các lần, nên chỉ khẳng định trên nhãn cố
+        định "Gợi ý từ Nốt AI". Không lưu để khỏi để lại nốt trong hũ.
+        """
+>       answer, result = await ask(
+            "Ở màn Hôm nay, bấm 'Ghi nốt', chọn 'Kể tự do · Nốt AI'. Gõ vào ô: 'Sang nay "
+            "minh day som chay bo 2km, chieu hoi thay mot cau, toi met nen ngu som'. Bấm "
+            "'Nhờ Tụi Nốt sắp xếp' (nếu hiện bảng hỏi đồng ý gửi cho Gemini thì đồng ý). Chờ "
+            "tối đa 30 giây. Trả lời SUGGESTIONS nếu hiện danh sách nốt gợi ý có dòng 'Gợi ý "
+            "từ Nốt AI', FALLBACK nếu hiện câu báo Nốt AI đang nghỉ hoặc lỗi, kèm lối ghi "
+            "tay. KHÔNG bấm lưu: sau khi xem xong, bấm Back / Đóng cho tới khi về màn Hôm "
+            "nay, chọn bỏ nếu app hỏi." + RULES,
+            "SUGGESTIONS hoặc FALLBACK",
+            timeout=480,
+        )
+
+test_main_flows.py:307:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+conftest.py:140: in run
+    result = await client.run(
+.venv\Lib\site-packages\artemis_client\client.py:328: in run
+    return await self.wait_for_task(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <artemis_client.client.ArtemisClient object at 0x00000156CD7D5AF0>
+task_id = '30d74a56-7023-47ca-8b3c-d492dfa41cb7', timeout = 480, poll_interval = None
+
+    async def wait_for_task(
+        self,
+        task_id: str,
+        *,
+        timeout: float = 1800.0,
+        poll_interval: float | None = None,
+    ) -> TaskResult:
+        """Wait until a task reaches a terminal state."""
+        if timeout <= 0:
+            raise ValueError("timeout must be greater than zero")
+        interval = self.poll_interval if poll_interval is None else float(poll_interval)
+        if interval <= 0:
+            raise ValueError("poll_interval must be greater than zero")
+
+        started = time.monotonic()
+        while True:
+            result = await self.get_task(task_id)
+            if result.done:
+                return result
+            elapsed = time.monotonic() - started
+            if elapsed >= timeout:
+>               raise TaskTimeoutError(task_id, timeout)
+E               artemis_client.errors.TaskTimeoutError: Task 30d74a56-7023-47ca-8b3c-d492dfa41cb7 did not finish within 480 seconds
+
+.venv\Lib\site-packages\artemis_client\client.py:292: TaskTimeoutError
+________________________________________ test_t20_cross_role_mobile_part[run3] ________________________________________
+
+ask = <function ask.<locals>.run at 0x00000156CD82AE80>
+
+    async def test_t20_cross_role_mobile_part(ask) -> None:
+        """Liên vai trò, phần mobile: gửi thẻ → "Đang chờ duyệt"; thẻ đã duyệt hiện
+        "Đã vào kho chung"; hộp thư có tin duyệt. Bước duyệt trên web xem
+        docs/cross-role-flow.md (D-1…D-3). Thẻ thử được rút lại và xoá để hàng chờ
+        của staff vẫn trống."""
+>       answer, result = await ask(
+            "Mở tab 'Thử thách', bấm 'Thêm điều tốt của bạn', tạo thẻ tên "
+            f"'{CARD_NAME}' (điền các ô bắt buộc tối thiểu) rồi lưu. Mở thẻ đó, bấm 'Gửi "
+            "cho mọi người' rồi 'Gửi'. Ghi PENDING nếu thẻ hiện 'Đang chờ duyệt'. Sau đó "
+            "bấm 'Rút lại', rồi 'Xoá thẻ này' và xác nhận xoá. Tiếp theo tìm trong tab Thử "
+            "thách một thẻ có dòng 'Đã vào kho chung' (thẻ đã gửi trước đây, có thể phải "
+            "vuốt): ghi APPROVED nếu thấy. Cuối cùng về màn Hôm nay, bấm 'Hộp thư': ghi "
+            "INBOX nếu có tin 'Thẻ của bạn đã vào kho chung', rồi đóng hộp thư. Trả lời các "
+            "từ khoá đã ghi, cách nhau dấu cách, ví dụ 'PENDING APPROVED INBOX'." + RULES,
+            "PENDING, APPROVED, INBOX (những từ thấy được)",
+            timeout=600,
+        )
+
+test_main_flows.py:349:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+goal = "Mở tab 'Thử thách', bấm 'Thêm điều tốt của bạn', tạo thẻ tên 'E2E thẻ thử' (điền các ô bắt buộc tối thiểu) rồi lưu. M...OX'. Không đăng xuất và không đổi cài đặt nào. Cuối cùng trả lời đúng định dạng được yêu cầu, không thêm chữ nào khác."
+expected = 'PENDING, APPROVED, INBOX (những từ thấy được)', locked = True, timeout = 600
+
+    async def run(goal: str, expected: str, *, locked: bool = True, timeout: int = 420):
+        try:
+            result = await client.run(
+                goal,
+                locked_app_package=app_id if locked else None,
+                expected_output=expected,
+                timeout=timeout,
+            )
+        except TaskTimeoutError as error:
+            if not await client.stop(error.task_id):
+                pytest.exit(
+                    f"Không xác nhận được dừng phiên quá giờ {error.task_id}. "
+                    "Dừng bộ test để tránh thao tác chồng lên nhau.",
+                    returncode=2,
+                )
+            raise
+>       assert result.succeeded, f"[run{attempt}] {result.error or result.status}"
+E       AssertionError: [run3] failed
+E       assert False
+E        +  where False = TaskResult(task_id='0e08a9da-1e78-4d21-aef8-423a83a19064', status='failed', goal="Mở tab 'Thử thách', bấm 'Thêm điều tốt của bạn', tạo thẻ tên 'E2E thẻ thử' (điền các ô bắt buộc tối thiểu) rồi lưu. Mở thẻ đó, bấm 'Gửi cho mọi người' rồi 'Gửi'. Ghi PENDING nếu thẻ hiện 'Đang chờ duyệt'. Sau đó bấm 'Rút lại', rồi 'Xoá thẻ này' và xác nhận xoá. Tiếp theo tìm trong tab Thử thách một thẻ có dòng 'Đã vào kho chung' (thẻ đã gửi trước đây, có thể phải vuốt): ghi APPROVED nếu thấy. Cuối cùng về màn Hôm nay, bấm 'Hộp thư': ghi INBOX nếu có tin 'Thẻ của bạn đã vào kho chung', rồi đóng hộp thư. Trả lời các từ khoá đã ghi, cách nhau dấu cách, ví dụ 'PENDING APPROVED INBOX'. Không đăng xuất và không đổi cài đặt nào. Cuối cùng trả lời đúng định dạng được yêu cầu, không thêm chữ nào khác.", profile=None, device_serial='emulator-5554', output=None, error=None, turns=None).succeeded
+
+conftest.py:154: AssertionError
+--------------------- generated xml file: D:\Lab-03\evidence\artemis\final-rerun-t17-t18-t20.xml ----------------------
+=============================================== short test summary info ===============================================
+FAILED test_main_flows.py::test_t18_free_tell_ai_suggestions[run3] - artemis_client.errors.TaskTimeoutError: Task 30d74a56-7023-47ca-8b3c-d492dfa41cb7 did not finish within 480 seconds
+FAILED test_main_flows.py::test_t20_cross_role_mobile_part[run3] - AssertionError: [run3] failed
+=============================== 2 failed, 7 passed, 51 deselected in 3345.97s (0:55:45) ===============================
+PS D:\Lab-03\e2e_test>

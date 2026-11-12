@@ -1,0 +1,13 @@
+Extracted ARTEMIS diagnostics — 12/11/2026
+This file extracts terminal error lines and the last stored action; it is not a new test run.
+
+Session: 30d74a56-7023-47ca-8b3c-d492dfa41cb7
+Last stored step/action: (5, '{"action": "input_text", "coordinates": [500, 358], "coordinate_space": "normalized", "args": {"target": 18, "text": "Sang nay minh day som chay bo 2km, chieu hoi thay mot cau, toi met nen ngu som"}, "normalized_coordinates": [500, 358], "target_text": "V\\u00ed d\\u1ee5: S\\u00e1ng d\\u1eady \\u0111\\u00fang gi\\u1edd, chi\\u1ec1u h\\u1ecfi \\u0111\\u01b0\\u1ee3c th\\u1ea7y m\\u1ed9t c\\u00e2u, t\\u1ed1i d\\u1eebng l\\u01b0\\u1edbt TikTok l\\u00fac 11 gi\\u1edd\\u2026", "target_bounds": [39, 258, 961, 459], "target_resource_id": "", "target_class": "android.widget.EditText"}')
+
+Session: 0e08a9da-1e78-4d21-aef8-423a83a19064
+TimeoutError: LLM call timed out after 180 seconds.
+Last stored step/action: (21, '{"action": "click", "coordinates": [500, 255], "coordinate_space": "normalized", "args": {"target": 12}, "normalized_coordinates": [500, 255], "target_text": "H\\u00f4m nay m\\u00ecnh s\\u1ebd\\u2026\\nV\\u00ed d\\u1ee5: Nh\\u1eafn l\\u1eddi c\\u1ea3m \\u01a1n m\\u1ed9t ng\\u01b0\\u1eddi b\\u1ea1n", "target_bounds": [39, 215, 961, 296], "target_resource_id": "", "target_class": "android.widget.EditText"}')
+
+Session: 78b4893f-d33b-4253-90ef-7df85aece5de
+403: Key limit exceeded (total limit). $2.00 of $2.00 used; does not reset. (Key management URL omitted.)
+Last stored step/action: None

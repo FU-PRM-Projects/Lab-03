@@ -120,7 +120,21 @@ Bộ slide riêng cho Final (tiếng Anh, theo *Software Project Presentation Gu
 cd slide
 npm run dev                         # mở http://localhost:5173/final.html
 npx vite build && npx vite preview  # bản build ở http://localhost:4173/final.html
-node scripts/export-pdf.mjs http://localhost:4173/final.html 38 ../slides/Final_SE190992_slides.pdf
+node scripts/export-pdf.mjs http://localhost:4173/final.html 30 ../slides/Final_SE190992_slides.pdf
 ```
 
 Phím `S` mở Speaker View (mỗi slide có ghi chú thuyết trình).
+
+
+### Test Cases và Defect Report (Final)
+
+Hai slide mới: **PROOF 21A — Test Cases & Results** và **PROOF 21B — Defects & Retest**.
+Bản PDF hiện có 30 trang; khi xuất lại dùng số lượng `30`:
+
+```sh
+node scripts/export-pdf.mjs http://localhost:4173/final.html 30 ../slides/Final_SE190992_slides.pdf
+```
+
+Chi tiết trong `docs/test-cases.md`, `docs/defect-report.md` và
+`outputs/final-testing/Test-Cases-and-Defects.xlsx`. Lab 3 41/42, Final máy thật
+14/15 và emulator mới 7/9 là ba phạm vi khác nhau, không cộng hoặc ghi đè nhau.
