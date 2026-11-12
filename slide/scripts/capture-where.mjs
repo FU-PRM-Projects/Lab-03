@@ -69,6 +69,15 @@ const all = [
   ['w-cb-inbox', 'lib/viewmodels/auth_view_model.dart', 123, 127],
   ['w-cb-payload', 'lib/firebase/firebase_messaging_service.dart', 101, 107],
   ['w-cb-rejected', 'lib/screens/challenges/create_challenge_sheet.dart', 97, 98],
+  // Final Assignment deck (src/final): business rules, approve batch, AI, roles
+  ['f-rules-review', 'firebase/firestore.rules', 110, 118],
+  ['f-rules-announce', 'firebase/firestore.rules', 128, 136],
+  ['f-approve-batch', 'packages/core/lib/firebase/firestore_repositories.dart', 157, 176],
+  ['f-ai-model', 'lib/firebase/firebase_ai_service.dart', 30, 38],
+  ['f-ai-sort', 'lib/firebase/firebase_ai_service.dart', 105, 112],
+  ['f-session-role', 'web_admin/lib/viewmodels/session_view_model.dart', 56, 69],
+  ['f-announce-post', 'web_admin/lib/viewmodels/admin_view_models.dart', 215, 222],
+  ['f-noretry', 'lib/main.dart', 102, 104],
 ];
 const only = process.argv.slice(2);
 const shots = only.length ? all.filter(([file]) => only.includes(file)) : all;
