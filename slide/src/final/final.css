@@ -1,348 +1,331 @@
-/* Final deck: white page, Nốt indigo accent, Be Vietnam Pro. */
+/* Final deck: same minimal black-on-white look as the Lab 3 deck (slides.css).
+   No cards, no pills, no tinted boxes: plain text, hairlines and a few left bars. */
 
-.fd {
-  --ink: #1b1d2a;
-  --muted: #555b6e;
-  --line: #e3e5ee;
-  --card: #f6f7fb;
-  --primary: #3d4fd6;
-  --primary-soft: #dce6ff;
-  --ok: #187a4d;
-  --ok-soft: #ddf5ea;
-  --bad: #b3261e;
-  --bad-soft: #fde1df;
-  --warn: #a84f00;
-  --warn-soft: #ffebd6;
-  font-family: 'Be Vietnam Pro', Inter, 'Segoe UI', sans-serif;
-  color: var(--ink);
+.reveal .slides section.fx h2 {
+  max-width: 940px;
 }
 
-.reveal .slides section.fd {
-  padding: 40px 56px 36px !important;
-  display: flex !important;
-  flex-direction: column;
+.reveal .slides section.fx .line {
+  max-width: 1000px;
 }
 
-.fd .kicker {
-  margin: 0 0 6px;
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--primary);
-}
-
-.reveal .slides section.fd h2 {
-  font-size: 36px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
-  max-width: 1020px;
-}
-
-.fd .sub {
-  margin: 8px 0 0;
-  font-size: 19px;
-  color: var(--muted);
-  max-width: 1040px;
-}
-
-.fd .body {
-  flex: 1;
-  min-height: 0;
-  margin-top: 22px;
-  display: flex;
-  gap: 24px;
-}
-
-.fd .col {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  min-width: 0;
-}
-
-.fd .grow {
-  flex: 1;
-}
-
-.fd .foot {
-  margin: 10px 0 0;
-  font-size: 14px;
-  color: var(--muted);
-}
-
-.fd .foot code,
-.fd code {
-  font-family: 'JetBrains Mono', Consolas, monospace;
-  font-size: 0.9em;
-  color: var(--primary);
-}
-
-/* Cards */
-.fd .card {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 14px 16px;
-  font-size: 16px;
-  line-height: 1.4;
-}
-
-.fd .card h4 {
-  margin: 0 0 6px;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.fd .card p {
-  margin: 0;
-}
-
-.fd .card.accent {
-  background: var(--primary-soft);
-  border-color: transparent;
-}
-
-.fd .card.ok {
-  background: var(--ok-soft);
-  border-color: transparent;
-}
-
-.fd .card.bad {
-  background: var(--bad-soft);
-  border-color: transparent;
-}
-
-.fd .card.warn {
-  background: var(--warn-soft);
-  border-color: transparent;
-}
-
-.fd .cards {
-  display: grid;
-  gap: 12px;
-}
-
-.fd ul.tight {
-  margin: 0;
-  padding-left: 18px;
-}
-
-.fd ul.tight li {
-  margin: 2px 0;
-}
-
-/* Tables */
-.fd table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 15px;
-  line-height: 1.35;
-}
-
-.fd th {
-  text-align: left;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted);
-  padding: 6px 10px;
-  border-bottom: 2px solid var(--line);
-}
-
-.fd td {
-  padding: 7px 10px;
-  border-bottom: 1px solid var(--line);
-  vertical-align: top;
-}
-
-.fd td b {
-  font-weight: 600;
-}
-
-/* Pills */
-.fd .pill {
-  display: inline-block;
-  padding: 2px 9px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 600;
-  background: var(--primary-soft);
-  color: var(--primary);
-  white-space: nowrap;
-}
-
-.fd .pill.ok {
-  background: var(--ok-soft);
-  color: var(--ok);
-}
-
-.fd .pill.bad {
-  background: var(--bad-soft);
-  color: var(--bad);
-}
-
-.fd .pill.warn {
-  background: var(--warn-soft);
-  color: var(--warn);
-}
-
-/* Screenshots */
-.fd .shot {
-  display: block;
-  margin: 0;
-  background: none;
-  flex: none;
-}
-
-.fd .shot img {
-  display: block;
-  margin: 0;
-  max-width: 100%;
-  border-radius: 10px;
-  border: 1px solid var(--line);
-  box-shadow: 0 6px 18px rgba(27, 29, 42, 0.12);
-}
-
-.fd .shot figcaption {
-  margin-top: 6px;
-  font-size: 13px;
-  color: var(--muted);
-}
-
-.fd .phones {
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-}
-
-/* Stats */
-.fd .stats {
-  display: grid;
-  gap: 12px;
-}
-
-.fd .stat {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 12px 14px;
-}
-
-.fd .stat b {
-  display: block;
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--primary);
-  line-height: 1.1;
-}
-
-.fd .stat span {
-  font-size: 14px;
-  color: var(--muted);
-}
-
-/* Step flow */
-.fd .steps {
-  display: flex;
-  align-items: stretch;
-  gap: 8px;
-}
-
-.fd .step {
-  flex: 1;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 10px 12px;
-  font-size: 14px;
-  line-height: 1.35;
-}
-
-.fd .step b {
-  display: block;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--primary);
-  margin-bottom: 4px;
-}
-
-.fd .arrow {
-  align-self: center;
-  color: var(--muted);
+.reveal .slides section.fx.dense .line {
   font-size: 20px;
 }
 
 /* Cover */
-.fd.cover {
-  background: radial-gradient(circle at 85% 20%, #e8ecff 0, #fff 55%);
+.reveal .slides section.fx-cover h1 {
+  margin-top: 40px;
 }
 
-.fd.cover h1 {
-  margin: 120px 0 0;
-  font-size: 96px;
-  font-weight: 700;
-  letter-spacing: -0.04em;
-  color: var(--ink);
+.reveal .slides section.fx-cover .line {
+  max-width: 560px;
+  font-size: 26px;
 }
 
-.fd.cover .tag {
-  margin: 10px 0 0;
+.fx-hero {
+  position: absolute;
+  right: 56px;
+  bottom: 70px;
+  display: flex;
+  gap: 24px;
+  align-items: flex-end;
+}
+
+/* Screenshots: plain, thin outline, no shadow */
+.fx-shot {
+  margin: 0;
+  flex: none;
+  text-align: center;
+}
+
+.fx-shot img {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.fx-shot figcaption {
+  margin-top: 8px;
+  font-size: 15px;
+  color: #777;
+}
+
+.fx-hero .fx-shot img {
+  border: 0;
+}
+
+.fx-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 28px;
+}
+
+.fx-split {
+  display: flex;
+  align-items: center;
+  gap: 48px;
+}
+
+.fx-split > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.fx-split > .fx-row {
+  flex: none;
+  gap: 20px;
+}
+
+.fx-grid2 {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 14px 22px;
+}
+
+.fx-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Text */
+.fx-list {
+  margin: 0;
+  padding-left: 1em;
   font-size: 30px;
-  color: var(--primary);
+  line-height: 1.3;
+}
+
+.fx-list li + li {
+  margin-top: 22px;
+}
+
+.fx-text {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.reveal .fx-block h3 {
+  margin: 0 0 6px;
+  color: #b71c25;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.fx-block p {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.3;
+}
+
+.fx-block.bad p {
+  padding-left: 14px;
+  border-left: 4px solid #e03131;
+}
+
+.reveal .slides section.fx code {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: #eef0fe;
+  color: #2c3aa8;
+  font-size: 0.86em;
+}
+
+/* Three plain columns: label, name, lines */
+.fx-cols {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 48px;
+}
+
+.reveal .fx-wf h3 {
+  margin: 0 0 8px;
+  color: #b71c25;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.fx-wf b {
+  display: block;
+  margin-bottom: 14px;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.fx-wf p {
+  margin: 0 0 8px;
+  font-size: 22px;
+  line-height: 1.35;
+  color: #444;
+}
+
+.fx-cols + .fx-bar {
+  margin-top: 36px;
+}
+
+/* Left bar, like the exception rows in the Lab 3 deck */
+.fx-bar {
+  margin: 0;
+  padding-left: 16px;
+  border-left: 4px solid #bbb;
+  font-size: 22px;
+  line-height: 1.35;
+}
+
+.fx-bar.bad {
+  border-color: #e03131;
+}
+
+.fx-bar b {
+  display: block;
+  font-size: 22px;
+}
+
+.fx-lessons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px 44px;
+}
+
+.fx-lessons .fx-bar {
+  font-size: 19px;
+}
+
+.fx-lessons .fx-bar b {
+  margin-bottom: 4px;
+  font-size: 23px;
+}
+
+/* Big numbers */
+.fx-stats {
+  display: flex;
+  gap: 56px;
+  margin: 0 0 26px;
+}
+
+.fx-stats p {
+  margin: 0;
+}
+
+.fx-stats b {
+  display: block;
+  font-size: 54px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.fx-stats span {
+  font-size: 18px;
+  color: #666;
+}
+
+/* Tables: hairlines only */
+.fx-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 19px;
+  line-height: 1.35;
+}
+
+.fx-table th {
+  padding: 6px 10px;
+  border-bottom: 2px solid #ccc;
+  font-size: 15px;
+  font-weight: 600;
+  color: #666;
+  text-align: left;
+}
+
+.fx-table td {
+  padding: 9px 10px;
+  border-bottom: 1px solid #e5e5e5;
+  vertical-align: top;
+}
+
+.fx-table td code {
+  font-size: 15px;
+}
+
+.fx-table .ok {
+  color: #1f9d55;
   font-weight: 600;
 }
 
-.fd.cover .meta {
-  margin: 28px 0 0;
-  font-size: 18px;
-  color: var(--muted);
-  line-height: 1.6;
+.fx-table .warn {
+  color: #b86e00;
+  font-weight: 600;
 }
 
-.fd .diagram {
-  width: 100%;
-  height: 100%;
+.fx-table .bad {
+  color: #c92a2a;
+  font-weight: 600;
 }
 
-.fd .diagram text {
-  font-family: 'Be Vietnam Pro', sans-serif;
-}
-
-.fd .num {
-  font-variant-numeric: tabular-nums;
-}
-
-/* --- layout fixes after the first review --- */
-.fd .body {
-  align-items: flex-start;
-}
-
-.fd .body > table {
+/* Diagrams fill the body, left aligned */
+.fx-diagram {
   flex: 1;
+  min-height: 0;
+  width: 100%;
+  font-family: Inter, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
-.reveal .slides section.fd .foot {
-  position: absolute;
-  left: 56px;
-  bottom: 30px;
-  max-width: 1040px;
+.reveal .slides section.fx .page-body {
+  justify-content: flex-start;
+}
+
+.reveal .slides section.fx:not(.dense) .page-body {
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.reveal .slides section.fx.dense .page-body {
+  margin-top: 18px;
+}
+
+/* Dense pages: keep the body above the footnote */
+.reveal .slides section.fx.dense .page-body {
+  height: 500px;
+  margin-top: 26px;
+}
+
+/* Smaller table for dense, detailed rows */
+.fx-table.fx-small {
+  font-size: 14.5px;
+  line-height: 1.3;
+}
+
+.fx-table.fx-small th {
+  padding: 3px 8px;
+  font-size: 12.5px;
+}
+
+.fx-table.fx-small td {
+  padding: 5px 8px;
+}
+
+.fx-table.fx-small td code {
+  font-size: 12.5px;
+}
+
+/* Compact ERD on the physical-design slide */
+.fx-erd {
+  display: block;
+  height: 520px;
+  width: auto;
+  max-width: 100%;
   margin: 0;
-  font-size: 14px;
-  color: var(--muted);
-}
-
-.reveal .slides section.fd .body {
-  margin-bottom: 30px;
-}
-
-.fd td code {
-  font-size: 0.95em;
+  border: 0;
+  box-shadow: none;
 }

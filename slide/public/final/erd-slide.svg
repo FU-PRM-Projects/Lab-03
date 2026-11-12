@@ -1,0 +1,336 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1168 565" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif">
+<title>Nốt: Firestore data model (compact ERD for the slide)</title>
+<style>
+  .ent{font-size:12.5px;font-weight:700;fill:#111}
+  .fld{font-size:10.5px;fill:#111;font-family:Consolas,'Cascadia Mono',monospace}
+  .fld.opt{fill:#444}
+  .typ{font-size:9.5px;fill:#6b7280}
+  .pk{font-size:8.5px;font-weight:700;fill:#b71c25}
+  .fk{font-size:8.5px;font-weight:700;fill:#3d4fd6}
+  .zone{font-size:10.5px;font-weight:700;letter-spacing:.06em;fill:#b71c25}
+  .rel{font-size:10px;fill:#374151}
+  .legend{font-size:10px;fill:#6b7280}
+</style>
+<rect x="479" y="0" width="681" height="562" rx="9" fill="none" stroke="#c4c8d4" stroke-dasharray="6 4"/>
+<text x="491" y="20" class="zone">PRIVATE TO THE OWNER · users/{uid}/… (1 user : many)</text>
+<g id="challenges">
+<rect x="0" y="0" width="190" height="221" rx="5" fill="#fff" stroke="#9ca3af"/>
+<path d="M0 22 V5 Q0 0 5 0 H185 Q190 0 190 5 V22 Z" fill="#f4f5fb" stroke="#9ca3af"/>
+<text x="8" y="15" class="ent">challenges</text>
+<text x="8" y="33" class="pk">PK</text>
+<text x="28" y="33" class="fld">id</text>
+<text x="28" y="47" class="fld">topic</text>
+<text x="28" y="61" class="fld">level</text>
+<text x="28" y="75" class="fld">order</text>
+<text x="28" y="89" class="fld">title</text>
+<text x="28" y="103" class="fld">minutes</text>
+<text x="28" y="117" class="fld opt">tip?</text>
+<text x="28" y="131" class="fld opt">script?</text>
+<text x="28" y="145" class="fld opt">discordRoom?</text>
+<text x="28" y="159" class="fld">status</text>
+<text x="28" y="173" class="fld opt">source?</text>
+<text x="8" y="187" class="fk">FK</text>
+<text x="28" y="187" class="fld opt">submissionId?</text>
+<text x="183" y="187" class="typ" text-anchor="end">→ submissions</text>
+<text x="8" y="201" class="fk">FK</text>
+<text x="28" y="201" class="fld">updatedBy</text>
+<text x="183" y="201" class="typ" text-anchor="end">→ users</text>
+<text x="28" y="215" class="fld">updatedAt</text>
+<line x1="0" y1="36" x2="190" y2="36" stroke="#9ca3af"/>
+</g>
+<g id="challengeSubmissions">
+<rect x="0" y="265" width="190" height="207" rx="5" fill="#fff" stroke="#9ca3af"/>
+<path d="M0 287 V270 Q0 265 5 265 H185 Q190 265 190 270 V287 Z" fill="#f4f5fb" stroke="#9ca3af"/>
+<text x="8" y="280" class="ent">challengeSubmissions</text>
+<text x="8" y="298" class="pk">PK</text>
+<text x="28" y="298" class="fld">id</text>
+<text x="8" y="312" class="fk">FK</text>
+<text x="28" y="312" class="fld">uid</text>
+<text x="183" y="312" class="typ" text-anchor="end">→ users</text>
+<text x="28" y="326" class="fld">topic</text>
+<text x="28" y="340" class="fld">title</text>
+<text x="28" y="354" class="fld">minutes</text>
+<text x="28" y="368" class="fld opt">tip?</text>
+<text x="8" y="382" class="fk">FK</text>
+<text x="28" y="382" class="fld opt">customId?</text>
+<text x="183" y="382" class="typ" text-anchor="end">→ custom cards</text>
+<text x="28" y="396" class="fld">status</text>
+<text x="28" y="410" class="fld opt">reason?</text>
+<text x="28" y="424" class="fld">createdAt</text>
+<text x="8" y="438" class="fk">FK</text>
+<text x="28" y="438" class="fld opt">reviewedBy?</text>
+<text x="183" y="438" class="typ" text-anchor="end">→ users</text>
+<text x="28" y="452" class="fld opt">reviewedAt?</text>
+<text x="8" y="466" class="fk">FK</text>
+<text x="28" y="466" class="fld opt">challengeId?</text>
+<text x="183" y="466" class="typ" text-anchor="end">→ challenges</text>
+<line x1="0" y1="301" x2="190" y2="301" stroke="#9ca3af"/>
+</g>
+<g id="announcements">
+<rect x="244" y="0" width="190" height="95" rx="5" fill="#fff" stroke="#9ca3af"/>
+<path d="M244 22 V5 Q244 0 249 0 H429 Q434 0 434 5 V22 Z" fill="#f4f5fb" stroke="#9ca3af"/>
+<text x="252" y="15" class="ent">announcements</text>
+<text x="252" y="33" class="pk">PK</text>
+<text x="272" y="33" class="fld">id</text>
+<text x="272" y="47" class="fld">title</text>
+<text x="272" y="61" class="fld">body</text>
+<text x="252" y="75" class="fk">FK</text>
+<text x="272" y="75" class="fld">authorUid</text>
+<text x="427" y="75" class="typ" text-anchor="end">→ users</text>
+<text x="272" y="89" class="fld">createdAt</text>
+<line x1="244" y1="36" x2="434" y2="36" stroke="#9ca3af"/>
+</g>
+<g id="users">
+<rect x="244" y="131" width="190" height="109" rx="5" fill="#fff" stroke="#9ca3af"/>
+<path d="M244 153 V136 Q244 131 249 131 H429 Q434 131 434 136 V153 Z" fill="#f4f5fb" stroke="#9ca3af"/>
+<text x="252" y="146" class="ent">users</text>
+<text x="252" y="164" class="pk">PK</text>
+<text x="272" y="164" class="fld">uid</text>
+<text x="272" y="178" class="fld">role</text>
+<text x="272" y="192" class="fld">displayName</text>
+<text x="272" y="206" class="fld opt">email?</text>
+<text x="272" y="220" class="fld opt">photo?</text>
+<text x="272" y="234" class="fld">createdAt</text>
+<line x1="244" y1="167" x2="434" y2="167" stroke="#9ca3af"/>
+</g>
+<g id="discordLinks">
+<rect x="244" y="276" width="190" height="81" rx="5" fill="#fff" stroke="#9ca3af"/>
+<path d="M244 298 V281 Q244 276 249 276 H429 Q434 276 434 281 V298 Z" fill="#f4f5fb" stroke="#9ca3af"/>
+<text x="252" y="291" class="ent">discordLinks</text>
+<text x="252" y="309" class="pk">PK</text>
+<text x="272" y="309" class="fld">discordId</text>
+<text x="252" y="323" class="fk">FK</text>
+<text x="272" y="323" class="fld">uid</text>
+<text x="427" y="323" class="typ" text-anchor="end">→ users</text>
+<text x="272" y="337" class="fld">discordUsername</text>
+<text x="272" y="351" class="fld">linkedAt</text>
+<line x1="244" y1="312" x2="434" y2="312" stroke="#9ca3af"/>
+</g>
+<g id="discordConnectCodes">
+<rect x="244" y="393" width="190" height="95" rx="5" fill="#fff" stroke="#9ca3af"/>
+<path d="M244 415 V398 Q244 393 249 393 H429 Q434 393 434 398 V415 Z" fill="#f4f5fb" stroke="#9ca3af"/>
+<text x="252" y="408" class="ent">discordConnectCodes</text>
+<text x="252" y="426" class="pk">PK</text>
+<text x="272" y="426" class="fld">code</text>
+<text x="272" y="440" class="fld">discordId</text>
+<text x="272" y="454" class="fld">discordUsername</text>
+<text x="272" y="468" class="fld">createdAt</text>
+<text x="272" y="482" class="fld">expiresAt</text>
+<line x1="244" y1="429" x2="434" y2="429" stroke="#9ca3af"/>
+</g>
+<g id="notes">
+<rect x="489" y="34" width="190" height="235" rx="5" fill="#fff" stroke="#9ca3af"/>
+<path d="M489 56 V39 Q489 34 494 34 H674 Q679 34 679 39 V56 Z" fill="#f4f5fb" stroke="#9ca3af"/>
+<text x="497" y="49" class="ent">notes</text>
+<text x="497" y="67" class="pk">PK</text>
+<text x="517" y="67" class="fld">id</text>
+<text x="517" y="81" class="fld">type</text>
+<text x="517" y="95" class="fld">title</text>
+<text x="517" y="109" class="fld opt">body?</text>
+<text x="517" y="123" class="fld opt">mood?</text>
+<text x="517" y="137" class="fld">createdAt</text>
+<text x="497" y="151" class="fk">FK</text>
+<text x="517" y="151" class="fld opt">challengeId?</text>
+<text x="672" y="151" class="typ" text-anchor="end">→ challenges</text>
+<text x="517" y="165" class="fld opt">subtype?</text>
+<text x="517" y="179" class="fld opt">outcome?</text>
+<text x="517" y="193" class="fld opt">anxietyBefore?</text>
+<text x="517" y="207" class="fld opt">anxietyAfter?</text>
+<text x="517" y="221" class="fld opt">minutes?</text>
+<text x="497" y="235" class="fk">FK</text>
+<text x="517" y="235" class="fld opt">groupId?</text>
+<text x="672" y="235" class="typ" text-anchor="end">→ groups</text>
+<text x="517" y="249" class="fld opt">isFirst?</text>
+<text x="517" y="263" class="fld opt">image?</text>
+<line x1="489" y1="70" x2="679" y2="70" stroke="#9ca3af"/>
+</g>
+<g id="groups">
+<rect x="489" y="309" width="190" height="179" rx="5" fill="#fff" stroke="#9ca3af"/>
+<path d="M489 331 V314 Q489 309 494 309 H674 Q679 309 679 314 V331 Z" fill="#f4f5fb" stroke="#9ca3af"/>
+<text x="497" y="324" class="ent">groups</text>
+<text x="497" y="342" class="pk">PK</text>
+<text x="517" y="342" class="fld">id</text>
+<text x="517" y="356" class="fld">name</text>
+<text x="517" y="370" class="fld">idea</text>
+<text x="517" y="384" class="fld">source</text>
+<text x="517" y="398" class="fld">noteCount</text>
+<text x="497" y="412" class="fk">FK</text>
+<text x="517" y="412" class="fld opt">firstNoteId?</text>
+<text x="672" y="412" class="typ" text-anchor="end">→ notes</text>
+<text x="517" y="426" class="fld opt">firstNoteTitle?</text>
+<text x="517" y="440" class="fld opt">firstAt?</text>
+<text x="517" y="454" class="fld opt">lastAt?</text>
+<text x="517" y="468" class="fld opt">createdAt?</text>
+<text x="517" y="482" class="fld opt">image?</text>
+<line x1="489" y1="345" x2="679" y2="345" stroke="#9ca3af"/>
+</g>
+<g id="habits">
+<rect x="489" y="500" width="190" height="53" rx="5" fill="#fff" stroke="#9ca3af"/>
+<path d="M489 522 V505 Q489 500 494 500 H674 Q679 500 679 505 V522 Z" fill="#f4f5fb" stroke="#9ca3af"/>
+<text x="497" y="515" class="ent">private/habits</text>
+<text x="517" y="533" class="fld">selected</text>
+<text x="517" y="547" class="fld">custom</text>
+</g>
+<g id="inbox">
+<rect x="719" y="34" width="190" height="123" rx="5" fill="#fff" stroke="#9ca3af"/>
+<path d="M719 56 V39 Q719 34 724 34 H904 Q909 34 909 39 V56 Z" fill="#f4f5fb" stroke="#9ca3af"/>
+<text x="727" y="49" class="ent">inbox</text>
+<text x="727" y="67" class="pk">PK</text>
+<text x="747" y="67" class="fld">id</text>
+<text x="747" y="81" class="fld">kind</text>
+<text x="747" y="95" class="fld">title</text>
+<text x="747" y="109" class="fld">body</text>
+<text x="727" y="123" class="fk">FK</text>
+<text x="747" y="123" class="fld opt">submissionId?</text>
+<text x="902" y="123" class="typ" text-anchor="end">→ submissions</text>
+<text x="747" y="137" class="fld">read</text>
+<text x="747" y="151" class="fld">createdAt</text>
+<line x1="719" y1="70" x2="909" y2="70" stroke="#9ca3af"/>
+</g>
+<g id="onboarding">
+<rect x="719" y="169" width="190" height="151" rx="5" fill="#fff" stroke="#9ca3af"/>
+<path d="M719 191 V174 Q719 169 724 169 H904 Q909 169 909 174 V191 Z" fill="#f4f5fb" stroke="#9ca3af"/>
+<text x="727" y="184" class="ent">private/onboarding</text>
+<text x="747" y="202" class="fld opt">strangerLevel?</text>
+<text x="747" y="216" class="fld opt">habits?</text>
+<text x="747" y="230" class="fld opt">move?</text>
+<text x="747" y="244" class="fld opt">freeSlot?</text>
+<text x="747" y="258" class="fld opt">goals?</text>
+<text x="747" y="272" class="fld opt">profileLabel?</text>
+<text x="747" y="286" class="fld opt">planSource?</text>
+<text x="747" y="300" class="fld">done</text>
+<text x="747" y="314" class="fld">completedAt</text>
+</g>
+<g id="settings">
+<rect x="719" y="332" width="190" height="109" rx="5" fill="#fff" stroke="#9ca3af"/>
+<path d="M719 354 V337 Q719 332 724 332 H904 Q909 332 909 337 V354 Z" fill="#f4f5fb" stroke="#9ca3af"/>
+<text x="727" y="347" class="ent">private/settings</text>
+<text x="747" y="365" class="fld">eveningReminder</text>
+<text x="747" y="379" class="fld">awakeEnabled</text>
+<text x="747" y="393" class="fld">awakeStart / awakeEnd</text>
+<text x="747" y="407" class="fld">lockSelfControl</text>
+<text x="747" y="421" class="fld">aiEnabled</text>
+<text x="747" y="435" class="fld">hideNotificationContent</text>
+</g>
+<g id="stickers">
+<rect x="719" y="453" width="190" height="53" rx="5" fill="#fff" stroke="#9ca3af"/>
+<path d="M719 475 V458 Q719 453 724 453 H904 Q909 453 909 458 V475 Z" fill="#f4f5fb" stroke="#9ca3af"/>
+<text x="727" y="468" class="ent">stickers</text>
+<text x="727" y="486" class="pk">PK</text>
+<text x="747" y="486" class="fld">month</text>
+<text x="747" y="500" class="fld">createdAt</text>
+<line x1="719" y1="489" x2="909" y2="489" stroke="#9ca3af"/>
+</g>
+<g id="reports">
+<rect x="949" y="34" width="190" height="109" rx="5" fill="#fff" stroke="#9ca3af"/>
+<path d="M949 56 V39 Q949 34 954 34 H1134 Q1139 34 1139 39 V56 Z" fill="#f4f5fb" stroke="#9ca3af"/>
+<text x="957" y="49" class="ent">reports</text>
+<text x="957" y="67" class="pk">PK</text>
+<text x="977" y="67" class="fld">isoWeek</text>
+<text x="977" y="81" class="fld">kind</text>
+<text x="977" y="95" class="fld">fileName</text>
+<text x="977" y="109" class="fld">sizeBytes</text>
+<text x="977" y="123" class="fld">noteCount</text>
+<text x="977" y="137" class="fld">savedAt</text>
+<line x1="949" y1="70" x2="1139" y2="70" stroke="#9ca3af"/>
+</g>
+<g id="sharedStreaks">
+<rect x="949" y="155" width="190" height="109" rx="5" fill="#fff" stroke="#9ca3af"/>
+<path d="M949 177 V160 Q949 155 954 155 H1134 Q1139 155 1139 160 V177 Z" fill="#f4f5fb" stroke="#9ca3af"/>
+<text x="957" y="170" class="ent">sharedStreaks</text>
+<text x="957" y="188" class="pk">PK</text>
+<text x="977" y="188" class="fld">id</text>
+<text x="977" y="202" class="fld">image</text>
+<text x="977" y="216" class="fld">streak</text>
+<text x="977" y="230" class="fld">record</text>
+<text x="977" y="244" class="fld">milestone</text>
+<text x="977" y="258" class="fld">createdAt</text>
+<line x1="949" y1="191" x2="1139" y2="191" stroke="#9ca3af"/>
+</g>
+<g id="customChallenges">
+<rect x="949" y="276" width="190" height="109" rx="5" fill="#fff" stroke="#9ca3af"/>
+<path d="M949 298 V281 Q949 276 954 276 H1134 Q1139 276 1139 281 V298 Z" fill="#f4f5fb" stroke="#9ca3af"/>
+<text x="957" y="291" class="ent">customChallenges</text>
+<text x="957" y="309" class="pk">PK</text>
+<text x="977" y="309" class="fld">id</text>
+<text x="977" y="323" class="fld">topic</text>
+<text x="977" y="337" class="fld">title</text>
+<text x="977" y="351" class="fld">minutes</text>
+<text x="977" y="365" class="fld opt">tip?</text>
+<text x="977" y="379" class="fld">createdAt</text>
+<line x1="949" y1="312" x2="1139" y2="312" stroke="#9ca3af"/>
+</g>
+<g id="challengeProgress">
+<rect x="949" y="397" width="190" height="67" rx="5" fill="#fff" stroke="#9ca3af"/>
+<path d="M949 419 V402 Q949 397 954 397 H1134 Q1139 397 1139 402 V419 Z" fill="#f4f5fb" stroke="#9ca3af"/>
+<text x="957" y="412" class="ent">challengeProgress</text>
+<text x="957" y="430" class="pk">PK</text>
+<text x="977" y="430" class="fld">topic</text>
+<text x="977" y="444" class="fld">level</text>
+<text x="977" y="458" class="fld">completed</text>
+<line x1="949" y1="433" x2="1139" y2="433" stroke="#9ca3af"/>
+</g>
+<g id="discord">
+<rect x="949" y="476" width="190" height="67" rx="5" fill="#fff" stroke="#9ca3af"/>
+<path d="M949 498 V481 Q949 476 954 476 H1134 Q1139 476 1139 481 V498 Z" fill="#f4f5fb" stroke="#9ca3af"/>
+<text x="957" y="491" class="ent">private/discord</text>
+<text x="977" y="509" class="fld">discordId</text>
+<text x="977" y="523" class="fld">discordUsername</text>
+<text x="977" y="537" class="fld">linkedAt</text>
+</g>
+<polyline points="95,221 95,265" fill="none" stroke="#111" stroke-width="1.2"/>
+<line x1="100" y1="228" x2="90" y2="228" stroke="#111" stroke-width="1.2"/>
+<circle cx="95" cy="234" r="3.5" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<line x1="90" y1="258" x2="100" y2="258" stroke="#111" stroke-width="1.2"/>
+<circle cx="95" cy="252" r="3.5" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="103" y="240" class="rel" text-anchor="start">challengeId</text>
+<text x="103" y="252" class="rel">submissionId</text>
+<polyline points="190,300 215,300 215,185 244,185" fill="none" stroke="#111" stroke-width="1.2"/>
+<line x1="201" y1="300" x2="190" y2="306" stroke="#111" stroke-width="1.2"/>
+<line x1="201" y1="300" x2="190" y2="294" stroke="#111" stroke-width="1.2"/>
+<line x1="201" y1="300" x2="190" y2="300" stroke="#111" stroke-width="1.2"/>
+<circle cx="206" cy="300" r="3.5" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<line x1="237" y1="190" x2="237" y2="180" stroke="#111" stroke-width="1.2"/>
+<line x1="233" y1="190" x2="233" y2="180" stroke="#111" stroke-width="1.2"/>
+<text x="221" y="250" class="rel" text-anchor="start">uid</text>
+<polyline points="339,95 339,131" fill="none" stroke="#111" stroke-width="1.2"/>
+<line x1="339" y1="106" x2="333" y2="95" stroke="#111" stroke-width="1.2"/>
+<line x1="339" y1="106" x2="345" y2="95" stroke="#111" stroke-width="1.2"/>
+<line x1="339" y1="106" x2="339" y2="95" stroke="#111" stroke-width="1.2"/>
+<circle cx="339" cy="111" r="3.5" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<line x1="334" y1="124" x2="344" y2="124" stroke="#111" stroke-width="1.2"/>
+<line x1="334" y1="120" x2="344" y2="120" stroke="#111" stroke-width="1.2"/>
+<text x="347" y="117" class="rel" text-anchor="start">authorUid (staff)</text>
+<polyline points="339,240 339,276" fill="none" stroke="#111" stroke-width="1.2"/>
+<line x1="344" y1="247" x2="334" y2="247" stroke="#111" stroke-width="1.2"/>
+<line x1="344" y1="251" x2="334" y2="251" stroke="#111" stroke-width="1.2"/>
+<line x1="334" y1="269" x2="344" y2="269" stroke="#111" stroke-width="1.2"/>
+<circle cx="339" cy="263" r="3.5" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="347" y="262" class="rel" text-anchor="start">uid (1 : 1)</text>
+<polyline points="339,393 339,357" fill="none" stroke="#111" stroke-width="1.2"/>
+<line x1="334" y1="386" x2="344" y2="386" stroke="#111" stroke-width="1.2"/>
+<circle cx="339" cy="380" r="3.5" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<line x1="344" y1="364" x2="334" y2="364" stroke="#111" stroke-width="1.2"/>
+<circle cx="339" cy="370" r="3.5" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="347" y="379" class="rel" text-anchor="start">discordId</text>
+<polyline points="434,185 479,185" fill="none" stroke="#111" stroke-width="1.2"/>
+<line x1="441" y1="180" x2="441" y2="190" stroke="#111" stroke-width="1.2"/>
+<line x1="445" y1="180" x2="445" y2="190" stroke="#111" stroke-width="1.2"/>
+<line x1="468" y1="185" x2="479" y2="179" stroke="#111" stroke-width="1.2"/>
+<line x1="468" y1="185" x2="479" y2="191" stroke="#111" stroke-width="1.2"/>
+<line x1="468" y1="185" x2="479" y2="185" stroke="#111" stroke-width="1.2"/>
+<circle cx="463" cy="185" r="3.5" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<polyline points="584,269 584,309" fill="none" stroke="#111" stroke-width="1.2"/>
+<line x1="584" y1="280" x2="578" y2="269" stroke="#111" stroke-width="1.2"/>
+<line x1="584" y1="280" x2="590" y2="269" stroke="#111" stroke-width="1.2"/>
+<line x1="584" y1="280" x2="584" y2="269" stroke="#111" stroke-width="1.2"/>
+<circle cx="584" cy="285" r="3.5" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<line x1="579" y1="302" x2="589" y2="302" stroke="#111" stroke-width="1.2"/>
+<circle cx="584" cy="296" r="3.5" fill="#fff" stroke="#111" stroke-width="1.2"/>
+<text x="592" y="293" class="rel" text-anchor="start">groupId</text>
+<g id="legend"><rect x="0" y="494" width="434" height="68" rx="5" fill="#fff" stroke="#9ca3af"/>
+<text x="8" y="508" class="pk">PK</text><text x="28" y="508" class="legend">document id</text>
+<text x="112" y="508" class="fk">FK</text><text x="132" y="508" class="legend">reference to another document</text>
+<text x="8" y="521" class="legend">Crow's foot (IE): two bars = one · circle+bar = zero or one · circle+crow's foot = zero or many</text>
+<text x="8" y="534" class="legend">name? = optional · types, limits and rules: docs/erd.svg, docs/data-model.md</text><text x="8" y="547" class="legend" font-weight="700">Indexes: notes(groupId, createdAt↓) · challengeSubmissions(uid, createdAt↓)</text><text x="8" y="559" class="legend" font-weight="700">· challengeSubmissions(status, createdAt↓)</text></g>
+</svg>
