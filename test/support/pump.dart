@@ -10,6 +10,7 @@ import 'package:lab03/services/clock.dart';
 import 'package:lab03/services/discord_service.dart';
 import 'package:lab03/services/draft_store.dart';
 import 'package:lab03/services/group_repository.dart';
+import 'package:lab03/services/journal_draft_store.dart';
 import 'package:lab03/services/note_repository.dart';
 import 'package:lab03/services/nudge_service.dart';
 import 'package:lab03/services/report_services.dart';
@@ -18,6 +19,7 @@ import 'package:lab03/services/user_repository.dart';
 import 'package:lab03/theme/app_theme.dart';
 import 'package:lab03/widgets/app_text_field.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:not_core/services/retry.dart';
 
 import 'fakes.dart';
 
@@ -43,6 +45,7 @@ class TestServices {
   final FakeNoteRepository notes = FakeNoteRepository();
   final FakeGroupRepository groups = FakeGroupRepository();
   final FakeDraftStore drafts = FakeDraftStore();
+  final FakeJournalDraftStore journalDrafts = FakeJournalDraftStore();
   final FixedClock clock = FixedClock();
   final FakeSelfControl selfControl = FakeSelfControl();
   final FakeLocalAuth localAuth = FakeLocalAuth();
@@ -60,6 +63,7 @@ class TestServices {
     noteRepositoryProvider.overrideWithValue(notes),
     groupRepositoryProvider.overrideWithValue(groups),
     draftStoreProvider.overrideWithValue(drafts),
+    journalDraftStoreProvider.overrideWithValue(journalDrafts),
     clockProvider.overrideWithValue(clock),
     habitRepositoryProvider.overrideWithValue(selfControl),
     settingsRepositoryProvider.overrideWithValue(selfControl.settingsView),
@@ -83,7 +87,11 @@ Future<TestServices> pumpApp(
   final s = services ?? TestServices();
   setScreenSize(tester, size);
   await tester.pumpWidget(
-    ProviderScope(overrides: s.overrides, child: const NotApp()),
+    ProviderScope(
+      retry: noRetry,
+      overrides: s.overrides,
+      child: const NotApp(),
+    ),
   );
   await tester.pumpAndSettle();
   return s;

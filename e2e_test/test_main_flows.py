@@ -239,6 +239,102 @@ async def test_t14_weekly_card_pdf(ask) -> None:
     assert "SAVED_SHARED" in answer, f"{answer!r} (trace {result.trace_id})"
 
 
+# --- Final: làm quen, Nốt AI, liên vai trò -----------------------------------
+#
+# Các ca dưới đây chạy trên tài khoản demo nên KHÔNG để lại dữ liệu: làm quen
+# không bấm "Bắt đầu" (sẽ ghi đè cấp thử thách và giờ nhắc), Kể tự do không lưu
+# nốt AI, thẻ gửi duyệt được rút lại ngay.
+
+CARD_NAME = "E2E thẻ thử"
+
+
+def restart_app(app_id: str) -> None:
+    """Tắt hẳn app rồi mở lại: thoát làm quen mà không lưu gì."""
+    adb("shell", "am", "force-stop", app_id)
+    adb("shell", "monkey", "-p", app_id, "-c", "android.intent.category.LAUNCHER", "1")
+
+
+async def test_t17_onboarding_starter_plan(ask, app_id: str) -> None:
+    """A2 / S13: trả lời 4 câu làm quen → màn "Hồ sơ khởi đầu" có 3 thẻ đầu tiên."""
+    try:
+        answer, result = await ask(
+            "Ở màn Hôm nay, bấm 'Cài đặt', bấm 'Làm lại khảo sát làm quen'. Trả lời lần "
+            "lượt 4 câu hỏi (chọn đáp án bất kỳ, câu nào cần chọn nhiều thì chọn 1–2 mục) "
+            "và bấm nút đi tiếp sau mỗi câu, KHÔNG bấm 'Bỏ qua câu này'. Khi màn 'Hồ sơ "
+            "khởi đầu' hiện ra thì DỪNG, KHÔNG bấm 'Bắt đầu' và không bấm Back. Trả lời "
+            "PLAN_SHOWN nếu màn đó có mục '3 thẻ để bắt đầu' và nút 'Bắt đầu', "
+            "NO_PLAN nếu không tới được màn đó." + RULES,
+            "PLAN_SHOWN hoặc NO_PLAN",
+        )
+    finally:
+        restart_app(app_id)
+    assert "PLAN_SHOWN" in answer, f"{answer!r} (trace {result.trace_id})"
+
+
+async def test_t18_free_tell_ai_suggestions(ask) -> None:
+    """A1 / S03b: Kể tự do → Gemini tách thành nốt gợi ý có nhãn, sửa được.
+
+    Nội dung Gemini trả về đổi giữa các lần, nên chỉ khẳng định trên nhãn cố
+    định "Gợi ý từ Nốt AI". Không lưu để khỏi để lại nốt trong hũ.
+    """
+    answer, result = await ask(
+        "Ở màn Hôm nay, bấm 'Ghi nốt', chọn 'Kể tự do · Nốt AI'. Gõ vào ô: 'Sang nay "
+        "minh day som chay bo 2km, chieu hoi thay mot cau, toi met nen ngu som'. Bấm "
+        "'Nhờ Tụi Nốt sắp xếp' (nếu hiện bảng hỏi đồng ý gửi cho Gemini thì đồng ý). Chờ "
+        "tối đa 30 giây. Trả lời SUGGESTIONS nếu hiện danh sách nốt gợi ý có dòng 'Gợi ý "
+        "từ Nốt AI', FALLBACK nếu hiện câu báo Nốt AI đang nghỉ hoặc lỗi, kèm lối ghi "
+        "tay. KHÔNG bấm lưu: sau khi xem xong, bấm Back / Đóng cho tới khi về màn Hôm "
+        "nay, chọn bỏ nếu app hỏi." + RULES,
+        "SUGGESTIONS hoặc FALLBACK",
+        timeout=480,
+    )
+    assert "SUGGESTIONS" in answer, f"{answer!r} (trace {result.trace_id})"
+
+
+@pytest.mark.skipif(
+    os.environ.get("E2E_AI_DISABLED") != "1",
+    reason="đặt ai_enabled = false trên Remote Config, Publish, rồi chạy với E2E_AI_DISABLED=1",
+)
+async def test_t19_ai_disabled_by_remote_config(ask) -> None:
+    """Remote Config `ai_enabled = false`: Kể tự do báo Nốt AI nghỉ, vẫn ghi tay được.
+
+    Cần bản debug (bản release chỉ tải Remote Config mỗi giờ một lần).
+    """
+    answer, result = await ask(
+        "Ở màn Hôm nay, bấm 'Ghi nốt', chọn 'Kể tự do · Nốt AI'. Đọc dòng dưới tiêu "
+        "đề và các nút ở cuối màn. Trả lời AI_OFF_MANUAL nếu có câu 'Nốt AI đang nghỉ' "
+        "và chỉ còn nút 'Ghi tay' (không có nút 'Nhờ Tụi Nốt sắp xếp'), AI_ON nếu vẫn có "
+        "nút 'Nhờ Tụi Nốt sắp xếp'. Bấm 'Ghi tay': trả lời thêm MANUAL_OPENS nếu mở ra "
+        "màn ghi nốt tay. Không lưu gì; bấm Back / Đóng về màn Hôm nay, chọn bỏ nếu app "
+        "hỏi. Trả lời các từ khoá cách nhau dấu cách, ví dụ 'AI_OFF_MANUAL "
+        "MANUAL_OPENS'." + RULES,
+        "AI_OFF_MANUAL|AI_ON và MANUAL_OPENS",
+    )
+    assert "AI_OFF_MANUAL" in answer, f"{answer!r} (trace {result.trace_id})"
+    assert "MANUAL_OPENS" in answer, f"{answer!r} (trace {result.trace_id})"
+
+
+async def test_t20_cross_role_mobile_part(ask) -> None:
+    """Liên vai trò, phần mobile: gửi thẻ → "Đang chờ duyệt"; thẻ đã duyệt hiện
+    "Đã vào kho chung"; hộp thư có tin duyệt. Bước duyệt trên web xem
+    docs/cross-role-flow.md (D-1…D-3). Thẻ thử được rút lại và xoá để hàng chờ
+    của staff vẫn trống."""
+    answer, result = await ask(
+        "Mở tab 'Thử thách', bấm 'Thêm điều tốt của bạn', tạo thẻ tên "
+        f"'{CARD_NAME}' (điền các ô bắt buộc tối thiểu) rồi lưu. Mở thẻ đó, bấm 'Gửi "
+        "cho mọi người' rồi 'Gửi'. Ghi PENDING nếu thẻ hiện 'Đang chờ duyệt'. Sau đó "
+        "bấm 'Rút lại', rồi 'Xoá thẻ này' và xác nhận xoá. Tiếp theo tìm trong tab Thử "
+        "thách một thẻ có dòng 'Đã vào kho chung' (thẻ đã gửi trước đây, có thể phải "
+        "vuốt): ghi APPROVED nếu thấy. Cuối cùng về màn Hôm nay, bấm 'Hộp thư': ghi "
+        "INBOX nếu có tin 'Thẻ của bạn đã vào kho chung', rồi đóng hộp thư. Trả lời các "
+        "từ khoá đã ghi, cách nhau dấu cách, ví dụ 'PENDING APPROVED INBOX'." + RULES,
+        "PENDING, APPROVED, INBOX (những từ thấy được)",
+        timeout=600,
+    )
+    for keyword in ("PENDING", "APPROVED", "INBOX"):
+        assert keyword in answer, f"thiếu {keyword}: {answer!r} (trace {result.trace_id})"
+
+
 # --- Đăng xuất và đăng nhập (chạy cuối vì đổi phiên đăng nhập) --------------
 
 #: Tài khoản email chỉ dùng cho test. Mật khẩu đi qua model của agent, nên

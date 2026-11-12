@@ -1,0 +1,96 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.5, pytest-9.2.0, pluggy-1.7.0 -- D:\Semester 8_FA26\PRM393\Code_Lab3\Lab-03\e2e_test\.venv\Scripts\python.exe
+rootdir: D:\Semester 8_FA26\PRM393\Code_Lab3\Lab-03\e2e_test
+configfile: pyproject.toml
+plugins: asyncio-1.4.1.post1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=session, asyncio_default_test_loop_scope=session
+collecting ... collected 60 items / 48 deselected / 12 selected
+
+test_main_flows.py::test_t14_weekly_card_pdf[run1] PASSED                [  8%]
+test_main_flows.py::test_t14_weekly_card_pdf[run2] PASSED                [ 16%]
+test_main_flows.py::test_t14_weekly_card_pdf[run3] PASSED                [ 25%]
+test_main_flows.py::test_t17_onboarding_starter_plan[run1] PASSED        [ 33%]
+test_main_flows.py::test_t17_onboarding_starter_plan[run2] PASSED        [ 41%]
+test_main_flows.py::test_t17_onboarding_starter_plan[run3] PASSED        [ 50%]
+test_main_flows.py::test_t18_free_tell_ai_suggestions[run1] PASSED       [ 58%]
+test_main_flows.py::test_t18_free_tell_ai_suggestions[run2] FAILED       [ 66%]
+test_main_flows.py::test_t18_free_tell_ai_suggestions[run3] PASSED       [ 75%]
+test_main_flows.py::test_t20_cross_role_mobile_part[run1] PASSED         [ 83%]
+test_main_flows.py::test_t20_cross_role_mobile_part[run2] PASSED         [ 91%]
+test_main_flows.py::test_t20_cross_role_mobile_part[run3] PASSED         [100%]
+
+================================== FAILURES ===================================
+___________________ test_t18_free_tell_ai_suggestions[run2] ___________________
+
+ask = <function ask.<locals>.run at 0x00000287BE14E560>
+
+    async def test_t18_free_tell_ai_suggestions(ask) -> None:
+        """A1 / S03b: Kể tự do → Gemini tách thành nốt gợi ý có nhãn, sửa được.
+    
+        Nội dung Gemini trả về đổi giữa các lần, nên chỉ khẳng định trên nhãn cố
+        định "Gợi ý từ Nốt AI". Không lưu để khỏi để lại nốt trong hũ.
+        """
+>       answer, result = await ask(
+            "Ở màn Hôm nay, bấm 'Ghi nốt', chọn 'Kể tự do · Nốt AI'. Gõ vào ô: 'Sang nay "
+            "minh day som chay bo 2km, chieu hoi thay mot cau, toi met nen ngu som'. Bấm "
+            "'Nhờ Tụi Nốt sắp xếp' (nếu hiện bảng hỏi đồng ý gửi cho Gemini thì đồng ý). Chờ "
+            "tối đa 30 giây. Trả lời SUGGESTIONS nếu hiện danh sách nốt gợi ý có dòng 'Gợi ý "
+            "từ Nốt AI', FALLBACK nếu hiện câu báo Nốt AI đang nghỉ hoặc lỗi, kèm lối ghi "
+            "tay. KHÔNG bấm lưu: sau khi xem xong, bấm Back / Đóng cho tới khi về màn Hôm "
+            "nay, chọn bỏ nếu app hỏi." + RULES,
+            "SUGGESTIONS hoặc FALLBACK",
+            timeout=480,
+        )
+
+test_main_flows.py:271: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+conftest.py:139: in run
+    result = await client.run(
+.venv\Lib\site-packages\artemis_client\client.py:328: in run
+    return await self.wait_for_task(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <artemis_client.client.ArtemisClient object at 0x00000287BE097E00>
+task_id = '09405295-6394-4886-81f7-b1a20e075783', timeout = 480
+poll_interval = None
+
+    async def wait_for_task(
+        self,
+        task_id: str,
+        *,
+        timeout: float = 1800.0,
+        poll_interval: float | None = None,
+    ) -> TaskResult:
+        """Wait until a task reaches a terminal state."""
+        if timeout <= 0:
+            raise ValueError("timeout must be greater than zero")
+        interval = self.poll_interval if poll_interval is None else float(poll_interval)
+        if interval <= 0:
+            raise ValueError("poll_interval must be greater than zero")
+    
+        started = time.monotonic()
+        while True:
+            result = await self.get_task(task_id)
+            if result.done:
+                return result
+            elapsed = time.monotonic() - started
+            if elapsed >= timeout:
+>               raise TaskTimeoutError(task_id, timeout)
+E               artemis_client.errors.TaskTimeoutError: Task 09405295-6394-4886-81f7-b1a20e075783 did not finish within 480 seconds
+
+.venv\Lib\site-packages\artemis_client\client.py:292: TaskTimeoutError
+=================================== PASSES ====================================
+=========================== short test summary info ===========================
+PASSED test_main_flows.py::test_t14_weekly_card_pdf[run1]
+PASSED test_main_flows.py::test_t14_weekly_card_pdf[run2]
+PASSED test_main_flows.py::test_t14_weekly_card_pdf[run3]
+PASSED test_main_flows.py::test_t17_onboarding_starter_plan[run1]
+PASSED test_main_flows.py::test_t17_onboarding_starter_plan[run2]
+PASSED test_main_flows.py::test_t17_onboarding_starter_plan[run3]
+PASSED test_main_flows.py::test_t18_free_tell_ai_suggestions[run1]
+PASSED test_main_flows.py::test_t18_free_tell_ai_suggestions[run3]
+PASSED test_main_flows.py::test_t20_cross_role_mobile_part[run1]
+PASSED test_main_flows.py::test_t20_cross_role_mobile_part[run2]
+PASSED test_main_flows.py::test_t20_cross_role_mobile_part[run3]
+FAILED test_main_flows.py::test_t18_free_tell_ai_suggestions[run2] - artemis_...
+========== 1 failed, 11 passed, 48 deselected in 2812.26s (0:46:52) ===========

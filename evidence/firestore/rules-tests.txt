@@ -1,31 +1,39 @@
-✔ R-01 user cannot change own role
-✔ R-02 admin can change a role
-✔ R-03 user reads own profile; unauthenticated denied
-✔ R-04 unknown collection denied by default
-✔ R-05 user creates own profile with role user (first sign-in)
-✔ R-06 user cannot create own profile as admin or for someone else
-✔ R-07 user writes, reads and deletes own notes
-✔ R-08 user cannot read or write someone else's notes
-✔ R-09 invalid notes are rejected
-✔ R-10 user saves own month sticker only under its own id
-✔ R-11 user keeps private habits and settings; others cannot read them
-✔ R-12 challenge catalog is read-only; progress is private
-✔ R-13 challenge notes keep their result fields within range
-✔ R-15 user adds and deletes their own challenge cards, privately
-✔ R-14 user keeps "first time" groups; names and ideas are checked
-✔ R-16 notes may carry a Cloudinary image; other images are rejected
-✔ R-17 groups may carry a Cloudinary image
-✔ R-18 owner sets and removes own profile photo, but cannot touch role or others
-✔ R-19 staff create, edit and archive catalog cards; users and bad cards are denied
-✔ R-20 user submits a pending card for themselves only
-✔ R-21 owner and staff read a submission; other users do not
-✔ R-22 only staff move pending to approved or rejected; a rejection needs a reason
-✔ R-23 owner withdraws a pending submission but not a reviewed one
-✔ R-24 staff write inbox messages; the owner reads and marks them read
-✔ R-25 staff post announcements that every signed-in user reads
-✔ R-26 staff read user profiles; only an admin changes roles, never their own
-✔ R-27 onboarding answers are private and limited to known values
-✔ R-28 owner saves weekly card PDF metadata; the shape must match the week
-ℹ tests 28
-ℹ pass 28
+# npm run test:rules — 2026-11-11 22:10 — branch docs/final-docs-rules (main ac8e085 + R-29, R-30)
+✔ R-01 user cannot change own role (1802.6995ms)
+✔ R-02 admin can change a role (49.6418ms)
+✔ R-03 user reads own profile; unauthenticated denied (75.3387ms)
+✔ R-04 unknown collection denied by default (25.7948ms)
+✔ R-05 user creates own profile with role user (first sign-in) (34.309ms)
+✔ R-06 user cannot create own profile as admin or for someone else (44.578ms)
+✔ R-07 user writes, reads and deletes own notes (56.1746ms)
+✔ R-08 user cannot read or write someone else's notes (88.0575ms)
+✔ R-09 invalid notes are rejected (121.5332ms)
+✔ R-10 user saves own month sticker only under its own id (42.8994ms)
+✔ R-11 user keeps private habits and settings; others cannot read them (89.5119ms)
+✔ R-12 challenge catalog is read-only; progress is private (139.0442ms)
+✔ R-13 challenge notes keep their result fields within range (48.592ms)
+✔ R-15 user adds and deletes their own challenge cards, privately (211.9059ms)
+✔ R-14 user keeps "first time" groups; names and ideas are checked (167.7021ms)
+✔ R-16 notes may carry a Cloudinary image; other images are rejected (81.2802ms)
+✔ R-17 groups may carry a Cloudinary image (25.3484ms)
+✔ R-18 owner sets and removes own profile photo, but cannot touch role or others (109.5093ms)
+✔ R-19 staff create, edit and archive catalog cards; users and bad cards are denied (165.6465ms)
+✔ R-20 user submits a pending card for themselves only (97.1823ms)
+✔ R-21 owner and staff read a submission; other users do not (221.8332ms)
+✔ R-22 only staff move pending to approved or rejected; a rejection needs a reason (121.3087ms)
+✔ R-23 owner withdraws a pending submission but not a reviewed one (30.3214ms)
+✔ R-24 staff write inbox messages; the owner reads and marks them read (89.0377ms)
+✔ R-25 staff post announcements that every signed-in user reads (129.266ms)
+✔ R-26 staff read user profiles; only an admin changes roles, never their own (107.5934ms)
+✔ R-27 onboarding answers are private and limited to known values (128.2376ms)
+✔ R-28 owner saves weekly card PDF metadata; the shape must match the week (159.6578ms)
+✔ R-29 staff and admin cannot read or write a user's private data (908.7122ms)
+✔ R-30 owner shares a streak card once; shape and size are checked (185.2763ms)
+ℹ tests 30
+ℹ suites 0
+ℹ pass 30
 ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5912.2797

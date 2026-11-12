@@ -3,6 +3,9 @@ abstract final class AppRoutes {
   /// Màn chờ trong lúc chưa biết trạng thái đăng nhập (không có trong Figma).
   static const String splash = '/splash';
   static const String welcome = '/welcome';
+
+  /// Tài khoản `staff` / `admin` đăng nhập vào app: báo dùng web admin.
+  static const String wrongRole = '/wrong-role';
   static const String today = '/today';
   static const String noteNew = '/note/new';
 

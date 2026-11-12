@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lab03/models/app_user.dart';
 import 'package:lab03/router/auth_redirect.dart';
+import 'package:not_core/models/user_role.dart';
 
 void main() {
   const user = AppUser(uid: 'u1');
@@ -61,7 +62,50 @@ void main() {
     });
   });
 
+  group('vai trò (đề Final mục 6)', () {
+    String? withRole(AsyncValue<UserRole> role, String location) =>
+        authRedirect(signedIn, Uri.parse(location), role: role);
+
+    test('đang đọc vai trò: chờ ở /splash, giữ đích', () {
+      expect(
+        withRole(const AsyncLoading<UserRole>(), '/jar'),
+        '/splash?next=%2Fjar',
+      );
+      expect(
+        withRole(const AsyncLoading<UserRole>(), '/splash?next=/jar'),
+        isNull,
+      );
+    });
+
+    test('staff và admin bị đưa sang /wrong-role, kể cả từ /welcome', () {
+      for (final role in <UserRole>[UserRole.staff, UserRole.admin]) {
+        expect(withRole(AsyncData<UserRole>(role), '/today'), '/wrong-role');
+        expect(withRole(AsyncData<UserRole>(role), '/welcome'), '/wrong-role');
+        expect(withRole(AsyncData<UserRole>(role), '/wrong-role'), isNull);
+      }
+    });
+
+    test('user ở /wrong-role (vai trò vừa đổi) về /today', () {
+      expect(
+        withRole(const AsyncData<UserRole>(UserRole.user), '/wrong-role'),
+        '/today',
+      );
+    });
+
+    test('đăng xuất ở /wrong-role thì về /welcome', () {
+      expect(
+        authRedirect(
+          signedOut,
+          Uri.parse('/wrong-role'),
+          role: const AsyncData<UserRole>(UserRole.admin),
+        ),
+        '/welcome',
+      );
+    });
+  });
+
   test('safeNext chỉ nhận đường dẫn nội bộ', () {
+    expect(safeNext('/wrong-role'), isNull);
     expect(safeNext('/jar'), '/jar');
     expect(safeNext('https://evil.example'), isNull);
     expect(safeNext('//evil.example'), isNull);

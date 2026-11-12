@@ -6,6 +6,7 @@ import 'package:lab03/services/analytics_service.dart';
 import 'package:lab03/services/app_exception.dart';
 import 'package:lab03/services/auth_service.dart';
 import 'package:lab03/services/draft_store.dart';
+import 'package:lab03/services/journal_draft_store.dart';
 import 'package:lab03/services/messaging_service.dart';
 import 'package:lab03/services/user_repository.dart';
 import 'package:lab03/viewmodels/auth_view_model.dart';
@@ -16,6 +17,7 @@ void main() {
   late FakeAuthService auth;
   late FakeUserRepository users;
   late FakeDraftStore drafts;
+  late FakeJournalDraftStore journalDrafts;
   late FakeAnalyticsService analytics;
   late FakeMessagingService messaging;
   late ProviderContainer container;
@@ -27,6 +29,7 @@ void main() {
     auth = FakeAuthService();
     users = FakeUserRepository();
     drafts = FakeDraftStore();
+    journalDrafts = FakeJournalDraftStore();
     analytics = FakeAnalyticsService();
     messaging = FakeMessagingService();
     container = ProviderContainer(
@@ -34,6 +37,7 @@ void main() {
         authServiceProvider.overrideWithValue(auth),
         userRepositoryProvider.overrideWithValue(users),
         draftStoreProvider.overrideWithValue(drafts),
+        journalDraftStoreProvider.overrideWithValue(journalDrafts),
         analyticsServiceProvider.overrideWithValue(analytics),
         messagingServiceProvider.overrideWithValue(messaging),
       ],
@@ -178,6 +182,13 @@ void main() {
     await vm().signOut();
     expect(messaging.clearInboxCount, 1);
     expect(container.read(inboxRevisionProvider), revision + 1);
+  });
+
+  test('đăng xuất xoá cả nháp nhật ký (P4)', () async {
+    await vm().signInWithGoogle();
+    journalDrafts.text = 'Trang viết dở.';
+    await vm().signOut();
+    expect(journalDrafts.text, isNull);
   });
 
   test('không chạy hai việc cùng lúc', () async {

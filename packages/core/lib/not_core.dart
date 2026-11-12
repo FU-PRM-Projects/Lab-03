@@ -13,6 +13,7 @@ export 'models/note_type.dart';
 export 'models/user_role.dart';
 export 'services/app_exception.dart';
 export 'services/repositories.dart';
+export 'services/retry.dart';
 export 'theme/app_colors.dart';
 export 'theme/app_theme.dart';
 export 'theme/app_tokens.dart';
