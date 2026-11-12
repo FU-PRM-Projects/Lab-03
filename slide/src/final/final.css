@@ -504,3 +504,56 @@
 .fd .icon-list li { display: flex; gap: 14px; align-items: flex-start; padding: 18px 0; border-bottom: 1px solid var(--line); color: var(--part); }
 .fd .icon-list li > span { display: flex; flex-direction: column; color: var(--muted); font-size: 17px; line-height: 1.4; }
 .fd .icon-list li b { color: var(--ink); font-size: 20px; font-weight: 700; }
+
+/* --- 12/11: fewer boxes. Cards become a thin rule + text; one colour accent per block. --- */
+.fd .card,
+.fd .card.accent,
+.fd .card.ok,
+.fd .card.bad,
+.fd .card.warn {
+  background: none;
+  border: none;
+  border-left: 4px solid var(--line);
+  border-radius: 0;
+  padding: 4px 0 4px 16px;
+}
+.fd .card.accent { border-left-color: var(--part); }
+.fd .card.ok { border-left-color: var(--ok); }
+.fd .card.ok h4 { color: var(--ok); }
+.fd .card.bad { border-left-color: var(--bad); }
+.fd .card.bad h4 { color: var(--bad); }
+.fd .card.warn { border-left-color: var(--warn); }
+.fd .card.warn h4 { color: var(--warn); }
+.fd .cards { gap: 18px 26px; }
+
+.fd .tile {
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  padding: 12px 4px;
+}
+
+.fd .wf {
+  background: none;
+  border-radius: 0;
+  border-top: 5px solid var(--part);
+  padding: 16px 4px 0;
+}
+.fd .wf .ic.big { background: var(--part-soft) !important; }
+
+.fd .stat {
+  background: none;
+  border: none;
+  border-left: 1px solid var(--line);
+  border-radius: 0;
+}
+.fd .stats { gap: 0; }
+
+.fd .step {
+  background: none;
+  border: none;
+  border-top: 3px solid var(--part);
+  border-radius: 0;
+  padding: 10px 2px 0;
+}
