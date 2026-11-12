@@ -428,38 +428,33 @@ export default function FinalDeck() {
         <S
           part="P1 · Problem · 01 Overview"
           title="Nốt: a daily small-wins app with a staff web admin, live on one Firebase project"
-          notes="30 seconds. Name and type: Nốt, an Android app for logging small wins plus a Flutter web admin for staff. One sentence: for students who end the day feeling behind, Nốt makes one small win visible in under 30 s and keeps fresh challenges coming. Users, value, platform. It is live: point at the screenshots. Team and course at the bottom."
-          foot="Live: prm393-not-lab3.web.app (app) · prm393-not-lab3.web.app/admin/ (web admin) · repo github.com/FU-PRM-Projects/Lab-03"
+          notes="30 seconds. Name and type: Nốt, an Android app for logging small wins plus a Flutter web admin for staff. One sentence: for students who end the day feeling behind, Nốt makes one small win visible in under 30 s and keeps fresh challenges coming. Users, value, platform. It is live: point at the screenshots."
         >
-          <div className="col grow" style={{ justifyContent: 'center', gap: 14 }}>
-            <div>
-              <span className="pname-chip">Project name</span>
-              <h3 className="pname">Nốt</h3>
-              <p className="ptype">Small-wins journal app (Android) + staff web admin, on Firebase</p>
-            </div>
-            <p className="pitch">
-              For students who end a long day feeling they got nothing done, Nốt makes <b>one small win visible in under
-              30 seconds</b> and keeps <b>fresh small challenges</b> coming, curated by staff.
-            </p>
-            <div className="uvp">
-              <div className="u">
-                <span>Users</span>
-                <p>Final-year students · staff who curate cards · admins</p>
-              </div>
-              <div className="v">
-                <span>Value</span>
-                <p>One win in 30 s · new cards without an app update · Gemini sorts the day</p>
-              </div>
-              <div className="pl">
-                <span>Platform</span>
-                <p>Flutter Android app · Flutter Web admin · Firebase</p>
-              </div>
-            </div>
-            <p className="team">
-              <b>PRM393 · Final Assignment</b> · Đoàn Thị Kim Thúy (SE190992) · Phùng Thế Quân (SE193519) · Phan Đức
-              Duy (SE193591) · Phan Hữu Phước (SE161951)
-            </p>
-          </div>
+          <ul className="ovl">
+            <li>
+              <span className="ovl-k">Project</span>
+              <p>
+                <b className="ovl-name">Nốt</b> · a small-wins journal: an Android app for users and a web admin for staff,
+                on one Firebase project
+              </p>
+            </li>
+            <li>
+              <span className="ovl-k">In one sentence</span>
+              <p>
+                For students who end a long day feeling they got nothing done, Nốt makes <b>one small win visible in under
+                30 seconds</b> and keeps <b>fresh small challenges</b> coming.
+              </p>
+            </li>
+            <li>
+              <span className="ovl-k">Users &amp; value</span>
+              <p>Final-year students log their day; staff curate challenge cards; admins manage roles.</p>
+              <ul className="ovl-v">
+                <li>One win in 30 s, typed or sorted by Gemini</li>
+                <li>New challenge cards without an app update</li>
+                <li>Staff news reaches every inbox in the same minute</li>
+              </ul>
+            </li>
+          </ul>
           <div className="collage">
             <img className="c-web" src={img('wa-03-dashboard-crop.png')} alt="Web admin dashboard" />
             <img className="c-phone c-a" src={img('m-today.png')} alt="Today screen" />
