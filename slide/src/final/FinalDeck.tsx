@@ -413,7 +413,7 @@ export default function FinalDeck() {
           foot="Live: prm393-not-lab3.web.app (app) · prm393-not-lab3.web.app/admin/ (web admin) · repo FU-PRM-Projects/Lab-03"
         >
           <div className="col grow">
-            <div className="grid" style={{ gridTemplateColumns: '1fr 1fr 1fr', flex: 'none', gridAutoRows: 'auto' }}>
+            <div className="facts">
               {[
                 [Users, 'Users', 'Students · staff · admins'],
                 [Smartphone, 'Platform', 'Flutter Android + Web'],
@@ -421,12 +421,12 @@ export default function FinalDeck() {
               ].map(([Icon, head, text]) => {
                 const I = Icon as typeof Users;
                 return (
-                  <div key={head as string} className="tile" style={{ alignItems: 'center', padding: '12px 14px', gap: 12 }}>
-                    <span className="ic"><I size={22} /></span>
-                    <div>
+                  <div key={head as string}>
+                    <I size={30} />
+                    <span>
                       <span className="k">{head as string}</span>
-                      <p style={{ color: '#1b1d2a', fontWeight: 600, fontSize: 15 }}>{text as string}</p>
-                    </div>
+                      <b>{text as string}</b>
+                    </span>
                   </div>
                 );
               })}
@@ -435,8 +435,8 @@ export default function FinalDeck() {
               <span className="k">Value</span>
               <p>Log one small win in <b>under 30 s</b>, get fresh challenge cards and news <b>without updating the app</b>.</p>
             </div>
-            <span className="k" style={{ marginTop: 4 }}>What the Final added on top of Lab 3</span>
-            <div className="grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+            <span className="k" style={{ marginTop: 8 }}>What the Final added on top of Lab 3</span>
+            <ul className="icon-list">
               {[
                 [UserCog, 'Roles + web admin', 'user / staff / admin · 5 screens'],
                 [ClipboardCheck, 'Cross-role flow', 'share → approve → live update'],
@@ -445,16 +445,16 @@ export default function FinalDeck() {
               ].map(([Icon, head, text]) => {
                 const I = Icon as typeof Users;
                 return (
-                  <div key={head as string} className="tile" style={{ alignItems: 'center', padding: '10px 14px' }}>
-                    <span className="ic"><I size={22} /></span>
-                    <div>
-                      <h4 style={{ fontSize: 17 }}>{head as string}</h4>
-                      <p style={{ fontSize: 15 }}>{text as string}</p>
-                    </div>
-                  </div>
+                  <li key={head as string}>
+                    <I size={26} />
+                    <span>
+                      <b>{head as string}</b>
+                      {text as string}
+                    </span>
+                  </li>
                 );
               })}
-            </div>
+            </ul>
           </div>
           <div className="collage">
             <img className="c-web" src={img('wa-03-dashboard-crop.png')} alt="Web admin dashboard" />
