@@ -41,12 +41,14 @@ function S({
   const [code, ...rest] = part.split(' · ');
   const tone = code.startsWith('P') ? code.toLowerCase() : 'px';
   const chip = code.startsWith('P') ? `${code} ${rest.shift() ?? ''}` : code;
+  const qtag = ['WHY', 'WHAT', 'WHY + WHAT'].includes(rest[rest.length - 1] ?? '') ? rest.pop() : undefined;
   return (
     <Slide className={`fd ${tone}${wide ? ' wide' : ''}`} notes={notes}>
       <Logo />
       <p className="kicker">
         <span className="chip">{chip}</span>
         {rest.join(' · ')}
+        {qtag && <span className="qtag">{qtag === 'WHY' ? 'Why build it?' : qtag === 'WHAT' ? 'What is it?' : 'Why + what'}</span>}
       </p>
       <h2>{title}</h2>
       {sub && <p className="sub">{sub}</p>}
@@ -368,7 +370,7 @@ function Erd() {
 
 const PARTS: Part[] = [
   { code: 'p1', num: '01', name: 'Problem', question: 'Why build it, and what is it?', minutes: '≈ 3.5 min', icon: Compass,
-    slides: ['01 Overview', '02 Context', '03 Problem', '04 Solution', '05 Actors', '06 Features'] },
+    slides: ['§Why build it?', '01 Overview', '02 Context', '03 Problem', '§What is it?', '04 Solution', '05 Actors', '06 Features'] },
   { code: 'p2', num: '02', name: 'Design', question: 'How is the whole system built?', minutes: '≈ 6 min', icon: Layers,
     slides: ['07 Business flow', '08 State machine', '09 Architecture', '10 Stack', '11 UI/UX', '12 Sequence', '13 Classes', '14–15 Database', '16 Traceability'] },
   { code: 'p3', num: '03', name: 'Demo', question: 'How do the workflows run for real?', minutes: '≈ 6.5 min', icon: PlayCircle,
@@ -423,14 +425,14 @@ export default function FinalDeck() {
 
         {/* 01 · Overview */}
         <S
-          part="P1 · Problem · 01 Overview"
+          part="P1 · Problem · 01 Overview · WHY + WHAT"
           title="After a long day, many of us feel we got nothing done; Nốt helps us notice the small wins"
           notes="30 seconds. Start with a feeling everyone knows: at the end of a long day we think we got nothing done, because we remember unfinished tasks, not the small things that went well. Writing those down takes effort when tired, and small goals that never change lose their pull. Our answer: Nốt. One small win in 30 s, fresh challenge cards curated by staff, Gemini to cut the typing. Live on Android + web admin. Next slide: who exactly (persona) and how it works today."
           foot="Android app (users) + Flutter web admin (staff, admins) on one Firebase project · live: prm393-not-lab3.web.app · repo FU-PRM-Projects/Lab-03"
         >
           <div className="col grow" style={{ justifyContent: 'center', paddingBottom: 40 }}>
             <div className="problem">
-              <span className="k">Problem</span>
+              <span className="k">Why · the problem</span>
               <p className="quote">“I didn’t get anything done today.”<span>A thought most of us have at the end of a long day</span></p>
               <ul className="pains">
                 {[
@@ -448,7 +450,8 @@ export default function FinalDeck() {
                 })}
               </ul>
             </div>
-            <p className="answer">
+            <span className="k" style={{ marginTop: 30, color: 'var(--part)' }}>What · our answer</span>
+            <p className="answer" style={{ marginTop: 6 }}>
               Nốt helps us see what went well: <b>one small win, logged in under 30 seconds</b>, and a fresh small
               challenge for tomorrow.
             </p>
@@ -464,7 +467,7 @@ export default function FinalDeck() {
 
         {/* 02 · Context */}
         <S
-          part="P1 · Problem · 02 Context"
+          part="P1 · Problem · 02 Context · WHY"
           title="Minh ends most evenings remembering what he did not finish"
           sub="Lab 2 persona and the habit Nốt was designed around; Lab 3 shipped it for one person, alone."
           notes="Context, not problem yet. Persona Minh, 22, final year. Evening routine: scroll, feel behind. Lab 3 already let him log wins; but content (challenge cards) was a fixed seed list and there was nobody on the other side."
@@ -502,7 +505,7 @@ export default function FinalDeck() {
 
         {/* 03 · Problem */}
         <S
-          part="P1 · Problem · 03 Problem"
+          part="P1 · Problem · 03 Problem · WHY"
           title="Three gaps kept Nốt from being a system: no curator, no channel, slow evenings"
           sub="Each pain point is answered directly on the next slide."
           notes="Pain points with cause and impact. Evidence is our own Lab 3 state (gap review), not a survey; we say that openly."
@@ -532,7 +535,7 @@ export default function FinalDeck() {
 
         {/* 04 · Proposed solution */}
         <S
-          part="P1 · Problem · 04 Proposed solution"
+          part="P1 · Problem · 04 Proposed solution · WHAT"
           title="One Firebase system: a staff web admin, a review flow, and Gemini that sorts the day"
           sub="Every pain point maps to a feature that is live and demonstrated."
           notes="Pain point to solution to value. Then scope: what we built and what we left out on purpose (paid plan services)."
@@ -596,7 +599,7 @@ export default function FinalDeck() {
 
         {/* 05 · Actors */}
         <S
-          part="P1 · Problem · 05 Main actors"
+          part="P1 · Problem · 05 Main actors · WHAT"
           title="Three human roles and two external services, enforced by Security Rules"
           sub="The role lives in users/{uid}.role; only an admin changes it, and never their own."
           notes="Actors match the real permission model in firestore.rules and the web admin's role check."
@@ -657,7 +660,7 @@ export default function FinalDeck() {
 
         {/* 06 · Features */}
         <S
-          part="P1 · Problem · 06 Main features"
+          part="P1 · Problem · 06 Main features · WHAT"
           title="Three core workflows carry the demo; everything else supports them"
           sub="Each workflow has an actor, a trigger and a business result, not a list of buttons."
           notes="Three workflows, one story: the user logs the day, shares a card that staff approve, staff announce it. Other features listed underneath."

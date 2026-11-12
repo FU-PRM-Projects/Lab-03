@@ -42,9 +42,15 @@ export function Agenda({ parts }: { parts: Part[] }) {
               <span className="ag-name">{p.name}</span>
               <span className="ag-q">{p.question}</span>
               <ul>
-                {p.slides.map((s) => (
-                  <li key={s}>{s}</li>
-                ))}
+                {p.slides.map((s) =>
+                  s.startsWith('§') ? (
+                    <li key={s} className="grp">
+                      {s.slice(1)}
+                    </li>
+                  ) : (
+                    <li key={s}>{s}</li>
+                  ),
+                )}
               </ul>
             </div>
           );
@@ -67,9 +73,15 @@ export function Divider({ part, shots }: { part: Part; shots: string[] }) {
         <h1>{part.name}</h1>
         <p className="dv-q">{part.question}</p>
         <ul className="dv-list">
-          {part.slides.map((s) => (
-            <li key={s}>{s}</li>
-          ))}
+          {part.slides.map((s) =>
+            s.startsWith('§') ? (
+              <li key={s} className="grp">
+                {s.slice(1)}
+              </li>
+            ) : (
+              <li key={s}>{s}</li>
+            ),
+          )}
         </ul>
       </div>
       <div className="dv-shots">
