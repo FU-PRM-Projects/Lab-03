@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { Deck, Slide } from '@revealjs/react';
 import RevealNotes from 'reveal.js/plugin/notes';
 import {
-  CheckSquare, Square, Beaker, Compass, Layers, PlayCircle, Bell, Bot, Boxes, CheckCircle2, ClipboardCheck, FileText, Flame, Link2, Megaphone, MoonStar, PenLine, ShieldCheck, Smartphone, Sparkles, UserCog, Users,
+  Beaker, Compass, Layers, PlayCircle, Bell, Bot, Boxes, CheckCircle2, ClipboardCheck, FileText, Flame, Link2, Megaphone, MoonStar, PenLine, ShieldCheck, Smartphone, Sparkles, UserCog, Users,
 } from 'lucide-react';
 
 import ServerlessMap from './ServerlessMap';
@@ -429,26 +429,27 @@ export default function FinalDeck() {
           foot="Android app (users) + Flutter web admin (staff, admins) on one Firebase project · live: prm393-not-lab3.web.app · repo FU-PRM-Projects/Lab-03"
         >
           <div className="col grow" style={{ justifyContent: 'center', paddingBottom: 40 }}>
-            <div className="contrast">
-              <div className="list-undone">
-                <span className="lbl">What we remember at night</span>
-                <ul>
-                  <li><Square size={22} />Finish the report</li>
-                  <li><Square size={22} />Reply to the group chat</li>
-                  <li><Square size={22} />Study chapter 4</li>
-                </ul>
-              </div>
-              <div className="list-done">
-                <span className="lbl">What also happened today</span>
-                <ul>
-                  <li><CheckSquare size={22} />Ran 2 km this morning</li>
-                  <li><CheckSquare size={22} />Asked a question in class</li>
-                  <li><CheckSquare size={22} />Slept before midnight</li>
-                </ul>
-              </div>
+            <div className="problem">
+              <span className="k">Problem</span>
+              <p className="quote">“I didn’t get anything done today.”<span>A thought most of us have at the end of a long day</span></p>
+              <ul className="pains">
+                {[
+                  [CheckCircle2, 'We remember unfinished tasks, not the small things that went well'],
+                  [MoonStar, 'When tired, writing the day down feels like one more task'],
+                  [Boxes, 'Small goals that never change stop motivating us'],
+                ].map(([Icon, text]) => {
+                  const I = Icon as typeof Users;
+                  return (
+                    <li key={text as string}>
+                      <I size={22} />
+                      {text as string}
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
             <p className="answer">
-              Nốt makes the second list visible: <b>one small win, logged in under 30 seconds</b>, and a fresh small
+              Nốt helps us see what went well: <b>one small win, logged in under 30 seconds</b>, and a fresh small
               challenge for tomorrow.
             </p>
           </div>
