@@ -25,8 +25,10 @@ function S({
   sub,
   foot,
   notes,
+  wide,
   children,
 }: {
+  wide?: boolean;
   part: string;
   title: string;
   sub?: string;
@@ -38,7 +40,7 @@ function S({
   const tone = code.startsWith('P') ? code.toLowerCase() : 'px';
   const chip = code.startsWith('P') ? `${code} ${rest.shift() ?? ''}` : code;
   return (
-    <Slide className={`fd ${tone}`} notes={notes}>
+    <Slide className={`fd ${tone}${wide ? ' wide' : ''}`} notes={notes}>
       <Logo />
       <p className="kicker">
         <span className="chip">{chip}</span>
@@ -668,6 +670,7 @@ export default function FinalDeck() {
 
         {/* 10 · Tech stack */}
         <S
+          wide
           part="P2 · Design · 10 Technology stack"
           title="Serverless on Firebase: Security Rules are the backend"
           notes="Read it like an AWS diagram: FE (two Flutter clients) talks over HTTPS to serverless Firebase (BE + AI), which stores data in Firestore. Below: DevOps ships it, Ops watches it. Only services we really use (pubspec, workflows, compose file); no Grafana, monitoring is the Firebase Console."

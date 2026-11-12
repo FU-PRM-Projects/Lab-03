@@ -457,3 +457,10 @@
 .fd .wf dd { margin: 0; }
 .fd .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .fd .chips span { padding: 6px 12px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); font-size: 15px; }
+
+/* Full-bleed diagram slide (slide 10). */
+.reveal .slides section.fd.wide {
+  padding: 30px 22px 18px 30px !important;
+}
+.reveal .slides section.fd.wide h2 { font-size: 32px; }
+.reveal .slides section.fd.wide .body { margin-top: 12px; margin-bottom: 26px; }
