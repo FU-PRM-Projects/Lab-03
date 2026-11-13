@@ -348,61 +348,222 @@ function Architecture() {
   );
 }
 
-/** Slide 12: approve, one interaction across layers. */
-function Sequence() {
-  const lanes = [
-    ['Staff', 60],
-    [':ReviewScreen', 194],
-    [':ReviewActions', 328],
-    [':FirestoreCatalog\nRepository', 462],
-    [':FirestoreSubmission\nRepository', 596],
-    ['Firestore + Rules', 730],
-    ['App (snapshot)', 864],
-  ] as const;
-  const id = useContext(MarkerCtx);
-  const msg = (y: number, from: number, to: number, t: string, color = C.ink, dash = false) => (
-    <g>
-      <path d={`M${from} ${y} H${to + (to > from ? -5 : 5)}`} stroke={color} strokeWidth={1.5} strokeDasharray={dash ? '5 4' : undefined} markerEnd={`url(#${id})`} fill="none" />
-      <text x={(from + to) / 2} y={y - 6} textAnchor="middle" fontSize={12} fill={color}>
-        {t}
-      </text>
-    </g>
-  );
+const K = {
+  ink: '#191919',
+  text: '#424242',
+  muted: '#707070',
+  hairline: '#C5C8CD',
+  accent: '#3D4FD6',
+  green: '#20835A',
+  red: '#BC3D43',
+};
+
+function BaseSvg({ children, viewBox }: { children: ReactNode; viewBox: string }) {
   return (
-    <>
-      {lanes.map(([name, x]) => (
-        <g key={name}>
-          <rect x={x - 62} y={8} width={124} height={34} rx={6} fill="#fff" stroke={C.line} />
-          {name.split('\n').map((p, i, a) => (
-            <text key={p} x={x} y={a.length > 1 ? 22 + i * 13 : 30} textAnchor="middle" fontSize={11} fontWeight={600} fill={C.ink}>
-              {p}
-            </text>
-          ))}
-          <line x1={x} y1={42} x2={x} y2={390} stroke="#ccc" strokeDasharray="4 4" />
-        </g>
-      ))}
-      {msg(70, 60, 194, '1. Duyệt (level)')}
-      {msg(100, 194, 328, '2. approve(submission, level)')}
-      {msg(130, 328, 462, '3. watchAll().first')}
-      {msg(160, 328, 596, '4. approve(level, order)')}
-      {msg(190, 596, 730, '5. batch: card + submission + inbox')}
-      {msg(220, 730, 596, '6. commit ok (1.4 s)', C.ok, true)}
-      {msg(250, 730, 864, '7. snapshot: approved + inbox', C.ok, true)}
-      <rect x={340} y={276} width={566} height={106} rx={6} fill="none" stroke={C.bad} strokeDasharray="5 4" />
-      <text x={352} y={296} fontSize={12.5} fontWeight={700} fill={C.bad}>alt</text>
-      <text x={380} y={296} fontSize={12} fill={C.ink}>[reject, empty reason] → reason-required → "Cần ghi lý do khi từ chối."</text>
-      <text x={380} y={320} fontSize={12} fill={C.ink}>[staff offline &gt; 10 s] → TimeoutException → "Không kết nối được máy chủ"</text>
-      <text x={380} y={344} fontSize={12} fill={C.ink}>[not staff] → requireStaff throws · rules deny (R-22)</text>
-      <text x={380} y={368} fontSize={12} fill={C.muted}>Message names are the real Dart methods; rules are the second guard.</text>
-    </>
+    <svg className="fx-diagram" viewBox={viewBox} preserveAspectRatio="xMidYMid meet"
+      role="img" aria-label="UML diagram for Nốt Final Assignment"
+      style={{ width: '100%', height: '100%', display: 'block', fontFamily: 'Inter, Segoe UI, sans-serif' }}>
+      <defs>
+        <marker id="not-seq-call-v2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0 0L10 5L0 10" fill="none" stroke={K.ink} strokeWidth="1.5" />
+        </marker>
+        <marker id="not-seq-event-v2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0 0L10 5L0 10Z" fill={K.green} />
+        </marker>
+        <marker id="not-uml-dependency-v2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+          <path d="M0 0L10 5L0 10" fill="none" stroke={K.text} strokeWidth="1.3" />
+        </marker>
+        <marker id="not-uml-realization-v2" viewBox="0 0 13 13" refX="12" refY="6.5" markerWidth="12" markerHeight="12" orient="auto">
+          <path d="M0 0L12 6.5L0 13Z" fill="white" stroke={K.ink} strokeWidth="1.3" />
+        </marker>
+      </defs>
+      {children}
+    </svg>
   );
 }
 
-function SequenceDiagram() {
+function SeqMessage({ from, to, y, title, result = false, event = false }: {
+  from: number; to: number; y: number; title: string; result?: boolean; event?: boolean;
+}) {
+  const marker = event ? 'not-seq-event-v2' : 'not-seq-call-v2';
   return (
-    <Svg id="seq" viewBox="-8 0 940 400">
-      <Sequence />
-    </Svg>
+    <g>
+      <line x1={from} y1={y} x2={to + (to > from ? -9 : 9)} y2={y}
+        stroke={event ? K.green : K.ink} strokeWidth={1.35}
+        strokeDasharray={result || event ? '6 4' : undefined}
+        markerEnd={`url(#${marker})`} />
+      <text x={(from + to) / 2} y={y - 6} fontSize={12.1} fill={event ? K.green : K.ink}
+        textAnchor="middle" fontWeight={event ? 600 : 400}>{title}</text>
+    </g>
+  );
+}
+
+/**
+ * True UML sequence: one approval interaction, synchronous calls + returns,
+ * and a two-operand alt for the Firestore commit outcome.
+ * ReviewActions.approve uses CatalogRepository.watchAll().first.timeout(10s)
+ * before SubmissionRepository.approve; the latter commits one 3-write batch.
+ * No direct Mobile<->Web call. Snapshots are async Firestore events.
+ */
+function SequenceDiagram() {
+  const lifelines = [
+    { x: 66, name: ['Staff'], width: 115 },
+    { x: 230, name: ['_SubmissionCard'], width: 147 },
+    { x: 400, name: ['ReviewActions'], width: 150 },
+    { x: 580, name: ['CatalogRepository'], width: 165 },
+    { x: 763, name: ['SubmissionRepository'], width: 176 },
+    { x: 958, name: ['Cloud Firestore', '+ Rules'], width: 172 },
+    { x: 1144, name: ['Mobile app', '(snapshot)'], width: 155 },
+  ];
+  return (
+    <BaseSvg viewBox="0 0 1225 532">
+      {lifelines.map(({ x, name, width }) => (
+        <g key={x}>
+          <rect x={x - width / 2} y={8} width={width} height={43} rx={0}
+            fill="#fff" stroke={K.hairline} strokeWidth={1.35} />
+          {name.map((line, i) => (
+            <text key={line} x={x} y={name.length === 1 ? 35 : 26 + 15 * i}
+              fontSize={12.8} textAnchor="middle" fontWeight={600} fill={K.ink}>{line}</text>
+          ))}
+          <line x1={x} y1={51} x2={x} y2={516} stroke={K.hairline} strokeDasharray="4 5" />
+        </g>
+      ))}
+      <SeqMessage from={66} to={230} y={79} title="Choose Approve + level" />
+      <SeqMessage from={230} to={400} y={109} title="approve(submission, {level})" />
+      <SeqMessage from={400} to={580} y={139} title="watchAll().first.timeout(10s)" />
+      <SeqMessage from={580} to={400} y={169} title="List<CatalogCard>" result />
+      <SeqMessage from={400} to={763} y={201}
+        title="approve(submission, {reviewerUid, level, order})" />
+      <SeqMessage from={763} to={958} y={233} title="batch.commit()" />
+      <rect x={773} y={242} width={397} height={28} fill="#fff" stroke={K.hairline} />
+      <text x={971} y={260} textAnchor="middle" fill={K.muted} fontSize={11.5}>
+        create challenge · update submission · create user inbox
+      </text>
+
+      {/* A proper UML alt combined fragment: two operands and real messages. */}
+      <rect x={156} y={281} width={1058} height={241} fill="none" stroke={K.ink} strokeWidth={1.25} />
+      <rect x={156} y={281} width={42} height={20} fill="#fff" stroke={K.ink} />
+      <text x={165} y={295} fontWeight={700} fontSize={12.5} fill={K.ink}>alt</text>
+      <text x={209} y={295} fontSize={12.5} fill={K.ink}>[commit accepted]</text>
+      <SeqMessage from={958} to={763} y={317} title="commit completed" result />
+      <SeqMessage from={763} to={400} y={339} title="Future<void> completed" result />
+      <SeqMessage from={400} to={230} y={361} title="null (success)" result />
+      <SeqMessage from={958} to={1144} y={386} title="approved + inbox snapshot" event />
+      <line x1={156} y1={407} x2={1214} y2={407} stroke={K.ink} strokeWidth={1.2} strokeDasharray="6 4" />
+      <text x={169} y={428} fontSize={12.5} fill={K.red}>[Firestore write rejected]</text>
+      <SeqMessage from={958} to={763} y={453} title="FirebaseException" result />
+      <SeqMessage from={763} to={400} y={476} title="AppException" result />
+      <SeqMessage from={400} to={230} y={499} title="errorMessage(e)" result />
+    </BaseSvg>
+  );
+}
+
+type UmlClassProps = {
+  x: number; y: number; w: number; name: string;
+  stereotype?: string; attrs?: string[]; ops?: string[];
+  small?: boolean;
+};
+
+function UmlClass({ x, y, w, name, stereotype, attrs = [], ops = [], small }: UmlClassProps) {
+  const head = stereotype ? 44 : 32;
+  const lineH = small ? 17 : 19;
+  const pad = 12;
+  const attrsH = attrs.length ? attrs.length * lineH + 14 : 0;
+  const opsH = ops.length ? ops.length * lineH + 14 : 0;
+  const h = head + attrsH + opsH;
+  return (
+    <g>
+      <rect x={x} y={y} width={w} height={h} fill="#fff" stroke={K.hairline} strokeWidth={1.3} />
+      {stereotype && <text x={x + w / 2} y={y + 15} textAnchor="middle" fontSize={11.8} fill={K.muted}>«{stereotype}»</text>}
+      <text x={x + w / 2} y={y + head - 11} textAnchor="middle" fontSize={Math.min(small ? 12.5 : 14.5, (w - 14) / (name.length * 0.61))}
+        fontWeight={650} fill={K.ink}>{name}</text>
+      <line x1={x} y1={y + head} x2={x + w} y2={y + head} stroke={K.hairline} />
+      {attrs.map((val, i) => <text key={i} x={x + pad} y={y + head + 19 + i * lineH}
+        fontSize={small ? 11.5 : 12.1} fill={K.text}>{val}</text>)}
+      {attrs.length > 0 && ops.length > 0 && <line x1={x} y1={y + head + attrsH}
+        x2={x + w} y2={y + head + attrsH} stroke={K.hairline} />}
+      {ops.map((val, i) => <text key={i} x={x + pad} y={y + head + attrsH + 19 + i * lineH}
+        fontSize={small ? 11.5 : 12.1} fill={K.text}>{val}</text>)}
+    </g>
+  );
+}
+
+function Dependency({ d, realization }: { d: string; realization?: boolean }) {
+  return <path d={d} fill="none" stroke={K.text} strokeWidth={1.4} strokeDasharray="5 4"
+    markerEnd={`url(#${realization ? 'not-uml-realization-v2' : 'not-uml-dependency-v2'})`} />;
+}
+
+/**
+ * Two representative modules, preserving the user's broader scope:
+ * Daily Notes and cross-role Community Moderation.
+ * All classes/operations are grounded in the main branch; dependency and
+ * realization use standard UML dashed arrows (open arrow vs hollow triangle).
+ */
+function ClassDiagram() {
+  return (
+    <BaseSvg viewBox="0 0 1240 515">
+      <text x={20} y={23} fontSize={15} fontWeight={700} fill={K.accent}>DAILY NOTES · MOBILE</text>
+      <text x={606} y={23} fontSize={15} fontWeight={700} fill={K.accent}>COMMUNITY MODERATION · MOBILE + WEB</text>
+      <line x1={584} y1={30} x2={584} y2={508} stroke="#E0E1E4" />
+
+      <UmlClass x={20} y={60} w={246} name="NoteComposerViewModel" ops={[
+        '+ setTitle(title)',
+        '+ save({skipJournal = false})',
+        '+ keepDraft()',
+      ]} />
+      <UmlClass x={312} y={60} w={252} name="NoteRepository" stereotype="interface" ops={[
+        '+ add(draft, {createdAt})',
+        '+ watchRecent({limit})',
+        '+ delete(id)',
+      ]} />
+      <UmlClass x={312} y={327} w={252} name="FirestoreNoteRepository" small ops={[
+        '+ add(draft, {createdAt})',
+      ]} />
+      <UmlClass x={20} y={292} w={225} name="NoteDraft" attrs={[
+        '+ title: String',
+        '+ body: String',
+      ]} />
+      <UmlClass x={20} y={405} w={225} name="Note" attrs={[
+        '+ title: String',
+        '+ createdAt: DateTime',
+      ]} />
+      <Dependency d="M266 113H310" />
+      <Dependency realization d="M438 327V177" />
+      <Dependency d="M140 163V290" />
+      <Dependency d="M312 154H284V446H247" />
+
+      <UmlClass x={606} y={60} w={244} name="CommunityActions" ops={[
+        '+ submit(card)',
+        '+ withdraw(submission)',
+      ]} />
+      <UmlClass x={945} y={60} w={276} name="ReviewActions" ops={[
+        '+ approve(submission, {level})',
+        '+ reject(submission, reason)',
+      ]} />
+      <UmlClass x={746} y={235} w={290} name="SubmissionRepository" stereotype="interface" small ops={[
+        '+ submit({uid, card})',
+        '+ withdraw(id)',
+        '+ approve(submission, {reviewerUid,',
+        '    level, order})',
+        '+ reject(submission, {reviewerUid, reason})',
+      ]} />
+      <UmlClass x={1060} y={235} w={166} name="CatalogRepository" stereotype="interface" small ops={[
+        '+ watchAll()',
+      ]} />
+      <UmlClass x={746} y={435} w={290} name="FirestoreSubmissionRepository" small ops={[
+        '+ approve(submission, …)',
+      ]} />
+      <UmlClass x={592} y={358} w={141} name="ChallengeSubmission" small attrs={[
+        '+ uid: String',
+        '+ status',
+        '+ reason',
+      ]} />
+      <Dependency d="M735 144V187H811V233" />
+      <Dependency d="M1060 144V185H967V233" />
+      <Dependency d="M1110 144V233" />
+      <Dependency realization d="M888 435V378" />
+      <Dependency d="M746 451H737V411" />
+    </BaseSvg>
   );
 }
 
@@ -1065,25 +1226,9 @@ export default function FinalDeck() {
           dense
           part="DESIGN · 13"
           title="Class design"
-          notes="Business rules sit in the repository + Security Rules, not in widgets. Screen → Notifier/actions → service interface → Firestore implementation in packages/core. main.dart wires each provider to its Firebase implementation; fakes replace the interfaces in tests (305 app, 14 web admin, 5 core tests). On-screen footnote moved here: Tests swap in fakes · 290 app · 10 web admin · 5 core"
+          notes="Business rules sit in the repository + Security Rules, not in widgets. Screen → Notifier/actions → service interface → Firestore implementation in packages/core. main.dart wires each provider to its Firebase implementation; fakes replace the interfaces in tests (305 app, 14 web admin, 5 core tests)."
         >
-          <table className="fx-table">
-            <thead>
-              <tr>
-                <th>Layer</th>
-                <th>WF-01 Nốt AI</th>
-                <th>WF-02 Share & review</th>
-                <th>WF-03 Announce</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td><b>Screen</b></td><td><code>FreeTellScreen</code></td><td><code>ReviewScreen</code></td><td><code>AnnouncementsScreen</code></td></tr>
-              <tr><td><b>ViewModel</b></td><td><code>FreeTellViewModel</code></td><td><code>ReviewActions</code></td><td><code>AnnouncementActions</code></td></tr>
-              <tr><td><b>Service</b></td><td><code>AiService</code></td><td><code>SubmissionRepository</code></td><td><code>AnnouncementRepository</code></td></tr>
-              <tr><td><b>Implementation</b></td><td><code>FirebaseAiService</code></td><td><code>FirestoreSubmissionRepository</code></td><td><code>FirestoreAnnouncementRepository</code></td></tr>
-              <tr><td><b>Model</b></td><td><code>AiSortResult</code></td><td><code>ChallengeSubmission</code></td><td><code>Announcement</code></td></tr>
-            </tbody>
-          </table>
+          <ClassDiagram />
         </Page>
 
         {/* 14 · DB conceptual */}
