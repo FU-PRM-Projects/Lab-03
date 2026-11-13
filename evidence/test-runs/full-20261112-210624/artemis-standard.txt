@@ -1,0 +1,26 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.16, pytest-9.2.0, pluggy-1.7.0 -- D:\Lab-03\e2e_test\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: D:\Lab-03\e2e_test
+configfile: pyproject.toml
+plugins: asyncio-1.4.1.post1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=session, asyncio_default_test_loop_scope=session
+collecting ... collected 63 items
+
+test_smoke.py::test_app_opens_to_a_known_screen[run1] PASSED             [  1%]
+test_smoke.py::test_app_opens_to_a_known_screen[run2] PASSED             [  3%]
+test_smoke.py::test_app_opens_to_a_known_screen[run3] PASSED             [  4%]
+test_main_flows.py::test_t02_f1_save_a_note[run1] PASSED                 [  6%]
+test_main_flows.py::test_t02_f1_save_a_note[run2] PASSED                 [  7%]
+test_main_flows.py::test_t02_f1_save_a_note[run3] PASSED                 [  9%]
+test_main_flows.py::test_t04_f1_empty_note_cannot_be_saved[run1] PASSED  [ 11%]
+test_main_flows.py::test_t04_f1_empty_note_cannot_be_saved[run2] PASSED  [ 12%]
+test_main_flows.py::test_t04_f1_empty_note_cannot_be_saved[run3] PASSED  [ 14%]
+test_main_flows.py::test_t05_f1_leaving_asks_to_keep_draft[run1] PASSED  [ 15%]
+test_main_flows.py::test_t05_f1_leaving_asks_to_keep_draft[run2] PASSED  [ 17%]
+test_main_flows.py::test_t05_f1_leaving_asks_to_keep_draft[run3] PASSED  [ 19%]
+test_main_flows.py::test_t06_f1_offline_note_is_kept_on_device[run1] PASSED [ 20%]
+test_main_flows.py::test_t06_f1_offline_note_is_kept_on_device[run2] PASSED [ 22%]
+test_main_flows.py::test_t06_f1_offline_note_is_kept_on_device[run3] PASSED [ 23%]
+test_main_flows.py::test_t13_analytics_note_saved_is_logged[run1] FAILED [ 25%]
+test_main_flows.py::test_t13_analytics_note_saved_is_logged[run2] 

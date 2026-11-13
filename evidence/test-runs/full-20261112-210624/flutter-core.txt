@@ -1,0 +1,7 @@
+00:00 +0: loading D:/Lab-03/packages/core/test/firestore_repositories_test.dart
+00:00 +0: submit ghi thẻ chờ duyệt của đúng người gửi
+00:00 +1: approve thêm thẻ vào kho, đánh dấu đã duyệt và để tin cho người gửi
+00:00 +2: reject cần lý do; có lý do thì người gửi nhận được lý do
+00:00 +3: lưu trữ rồi khôi phục thẻ, không xoá
+00:00 +4: vai trò lạ hoặc thiếu coi như user
+00:00 +5: All tests passed!

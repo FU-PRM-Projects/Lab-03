@@ -1,0 +1,1335 @@
+00:00 +0: loading D:/Lab-03/test/firebase/firebase_messaging_service_test.dart
+00:00 +0: D:/Lab-03/test/firebase/firebase_messaging_service_test.dart: tin lúc app đang mở: hiện thông báo kèm màn đích để chạm mở đúng màn
+00:00 +1: D:/Lab-03/test/firebase/firebase_messaging_service_test.dart: route lạ hoặc thiếu: thông báo vẫn mở về Hôm nay
+00:00 +2: D:/Lab-03/test/firebase/firebase_messaging_service_test.dart: clearInbox xoá hết thông báo đã lưu
+00:00 +3: D:/Lab-03/test/firebase/pdf_report_service_test.dart: PDF Thẻ tuần có font tiếng Việt đóng gói, chạy offline
+00:00 +4: D:/Lab-03/test/firebase/pdf_report_service_test.dart: PDF Thẻ tuần có font tiếng Việt đóng gói, chạy offline
+00:00 +5: D:/Lab-03/test/firebase/pdf_report_service_test.dart: PDF Thẻ tuần có font tiếng Việt đóng gói, chạy offline
+00:00 +6: D:/Lab-03/test/firebase/pdf_report_service_test.dart: PDF Thẻ tuần có font tiếng Việt đóng gói, chạy offline
+00:00 +7: D:/Lab-03/test/firebase/pdf_report_service_test.dart: PDF Thẻ tuần có font tiếng Việt đóng gói, chạy offline
+00:00 +8: D:/Lab-03/test/firebase/pdf_report_service_test.dart: PDF Thẻ tuần có font tiếng Việt đóng gói, chạy offline
+00:00 +9: D:/Lab-03/test/models/first_group_test.dart: FirstGroups.nameKey bỏ dấu, không phân biệt hoa thường, gộp khoảng trắng
+00:00 +10: D:/Lab-03/test/models/first_group_test.dart: slug làm id ổn định từ tên
+00:00 +11: D:/Lab-03/test/models/first_group_test.dart: mốc kế tiếp: Lần đầu → Lần 3 → Lần 10 → hết
+00:00 +12: D:/Lab-03/test/models/first_group_test.dart: 8 nhóm hệ thống có id riêng và tên trong giới hạn
+00:01 +13: D:/Lab-03/test/models_and_utils_test.dart: Mood thang năng lượng S11b: Vui = 5 … Rối = 1
+00:01 +14: D:/Lab-03/test/models_and_utils_test.dart: Mood Mệt và Rối là ngày tệ
+00:01 +15: D:/Lab-03/test/models_and_utils_test.dart: Mood đọc lại từ id Firestore
+00:01 +16: D:/Lab-03/test/models_and_utils_test.dart: NoteType đọc lại từ id Firestore
+00:01 +17: D:/Lab-03/test/models_and_utils_test.dart: ViDateFormat tiêu đề S02 dạng "Thứ Bảy, 24/10"
+00:01 +18: D:/Lab-03/test/models_and_utils_test.dart: ViDateFormat giờ 24 giờ và ngày đọc cho trình đọc màn hình
+00:01 +19: D:/Lab-03/test/router/app_router_test.dart: đã đăng nhập: mở ở S02 có thanh tab 4 mục
+00:02 +20: D:/Lab-03/test/router/app_router_test.dart: đã đăng nhập: mở ở S02 có thanh tab 4 mục
+00:02 +21: D:/Lab-03/test/router/app_router_test.dart: đã đăng nhập: mở ở S02 có thanh tab 4 mục
+00:02 +22: D:/Lab-03/test/router/app_router_test.dart: đã đăng nhập: mở ở S02 có thanh tab 4 mục
+00:02 +23: D:/Lab-03/test/router/app_router_test.dart: đã đăng nhập: mở ở S02 có thanh tab 4 mục
+00:02 +24: D:/Lab-03/test/router/app_router_test.dart: đã đăng nhập: mở ở S02 có thanh tab 4 mục
+00:02 +25: D:/Lab-03/test/router/app_router_test.dart: đã đăng nhập: mở ở S02 có thanh tab 4 mục
+00:02 +26: D:/Lab-03/test/router/app_router_test.dart: đã đăng nhập: mở ở S02 có thanh tab 4 mục
+00:02 +27: D:/Lab-03/test/router/app_router_test.dart: đã đăng nhập: mở ở S02 có thanh tab 4 mục
+00:02 +28: D:/Lab-03/test/router/app_router_test.dart: đã đăng nhập: mở ở S02 có thanh tab 4 mục
+00:02 +29: D:/Lab-03/test/router/app_router_test.dart: đã đăng nhập: mở ở S02 có thanh tab 4 mục
+00:02 +30: D:/Lab-03/test/router/app_router_test.dart: đã đăng nhập: mở ở S02 có thanh tab 4 mục
+00:02 +31: D:/Lab-03/test/router/app_router_test.dart: đã đăng nhập: mở ở S02 có thanh tab 4 mục
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:04 +32: D:/Lab-03/test/screens/auth_flow_test.dart: chưa đăng nhập: mở app ở S01, không thấy thanh tab
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] screen_view {firebase_screen: /welcome}
+[crash] key screen=/welcome
+[analytics] setUserId null
+[crash] user cleared
+00:04 +33: D:/Lab-03/test/screens/challenge_flow_test.dart: S07 ở 360 dp: thẻ, cấp, vuốt đổi thẻ
+00:04 +34: D:/Lab-03/test/screens/challenge_flow_test.dart: S07 ở 360 dp: thẻ, cấp, vuốt đổi thẻ
+00:05 +34: D:/Lab-03/test/screens/free_tell_flow_test.dart: Analytics lỗi vẫn giữ đúng lý do AI đang tắt
+[analytics] bỏ qua ai_error: Bad state: Analytics unavailable
+00:05 +35: D:/Lab-03/test/screens/challenge_flow_test.dart: S07 ở 360 dp: thẻ, cấp, vuốt đổi thẻ
+00:05 +36: D:/Lab-03/test/screens/challenge_flow_test.dart: S07 ở 360 dp: thẻ, cấp, vuốt đổi thẻ
+00:05 +37: D:/Lab-03/test/screens/challenge_flow_test.dart: S07 ở 360 dp: thẻ, cấp, vuốt đổi thẻ
+00:05 +38: D:/Lab-03/test/screens/challenge_flow_test.dart: S07 ở 360 dp: thẻ, cấp, vuốt đổi thẻ
+00:05 +38: D:/Lab-03/test/screens/auth_flow_test.dart: đã đăng nhập: mở thẳng S02
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:05 +39: D:/Lab-03/test/screens/challenge_flow_test.dart: S07 ở 360 dp: thẻ, cấp, vuốt đổi thẻ
+00:06 +39: D:/Lab-03/test/router/app_router_test.dart: màn lồng che thanh tab; Back quay lại tab
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /jar}
+[crash] key screen=/jar
+[analytics] note_viewed {note_type: chien_thang}
+00:06 +40: D:/Lab-03/test/screens/challenge_flow_test.dart: S07 ở 360 dp: thẻ, cấp, vuốt đổi thẻ
+00:06 +41: D:/Lab-03/test/screens/challenge_flow_test.dart: S07 ở 360 dp: thẻ, cấp, vuốt đổi thẻ
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /challenges}
+[crash] key screen=/challenges
+00:06 +42: D:/Lab-03/test/screens/discord_flow_test.dart: S14: phòng của nhóm đã có nốt lên trước, kèm số nốt
+00:06 +42: D:/Lab-03/test/screens/auth_flow_test.dart: Google: nút Loading rồi vào S02 (P1)
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] screen_view {firebase_screen: /welcome}
+[crash] key screen=/welcome
+[analytics] setUserId null
+[crash] user cleared
+[analytics] setUserId set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] setUserId set
+[crash] user set
+[analytics] login {method: google}
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:06 +43: D:/Lab-03/test/screens/discord_flow_test.dart: S14: phòng của nhóm đã có nốt lên trước, kèm số nốt
+00:06 +43: D:/Lab-03/test/router/app_router_test.dart: Back hệ thống ở tab khác về Hôm nay
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /journey}
+[crash] key screen=/journey
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:06 +44: D:/Lab-03/test/screens/discord_flow_test.dart: S14: phòng của nhóm đã có nốt lên trước, kèm số nốt
+00:06 +45: D:/Lab-03/test/screens/discord_flow_test.dart: S14: phòng của nhóm đã có nốt lên trước, kèm số nốt
+00:06 +45: D:/Lab-03/test/screens/auth_flow_test.dart: tài khoản admin mở app: màn báo dùng web admin, đăng xuất về S01 (đề Final mục 6)
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /wrong-role}
+[crash] key screen=/wrong-role
+[analytics] logout {}
+[analytics] setUserId null
+[analytics] screen_view {firebase_screen: /welcome}
+[crash] key screen=/welcome
+[analytics] setUserId null
+[crash] user cleared
+00:07 +46: D:/Lab-03/test/screens/discord_flow_test.dart: S14: phòng của nhóm đã có nốt lên trước, kèm số nốt
+00:07 +46: D:/Lab-03/test/screens/challenge_flow_test.dart: S07 ở 412 dp: thẻ, cấp, vuốt đổi thẻ
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /challenges}
+[crash] key screen=/challenges
+00:07 +47: D:/Lab-03/test/screens/discord_flow_test.dart: S14: phòng của nhóm đã có nốt lên trước, kèm số nốt
+00:07 +47: D:/Lab-03/test/screens/auth_flow_test.dart: đăng nhập Google bằng tài khoản staff: không vào S02
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] screen_view {firebase_screen: /welcome}
+[crash] key screen=/welcome
+[analytics] setUserId null
+[crash] user cleared
+[analytics] setUserId set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] setUserId set
+[crash] user set
+[analytics] login {method: google}
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] screen_view {firebase_screen: /wrong-role}
+[crash] key screen=/wrong-role
+00:07 +48: D:/Lab-03/test/screens/discord_flow_test.dart: S14: phòng của nhóm đã có nốt lên trước, kèm số nốt
+00:07 +48: D:/Lab-03/test/screens/auth_flow_test.dart: không đọc được vai trò (mất mạng): vẫn vào S02 như user
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:07 +49: D:/Lab-03/test/screens/discord_flow_test.dart: S14: phòng của nhóm đã có nốt lên trước, kèm số nốt
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /settings}
+[crash] key screen=/settings
+00:08 +50: D:/Lab-03/test/screens/free_tell_flow_test.dart: A1: lần đầu hỏi đồng ý, Tụi Nốt tách nốt, sửa rồi lưu nốt đã chọn
+00:08 +50: D:/Lab-03/test/screens/auth_flow_test.dart: huỷ chọn tài khoản: SnackBar, vẫn ở S01
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] screen_view {firebase_screen: /welcome}
+[crash] key screen=/welcome
+[analytics] setUserId null
+[crash] user cleared
+00:08 +51: D:/Lab-03/test/screens/free_tell_flow_test.dart: A1: lần đầu hỏi đồng ý, Tụi Nốt tách nốt, sửa rồi lưu nốt đã chọn
+00:08 +51: D:/Lab-03/test/screens/auth_flow_test.dart: mở route khi chưa đăng nhập: đăng nhập xong tới đúng đích (P7)
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] screen_view {firebase_screen: /welcome}
+[crash] key screen=/welcome
+[analytics] setUserId null
+[crash] user cleared
+[analytics] setUserId set
+[analytics] screen_view {firebase_screen: /jar}
+[crash] key screen=/jar
+[analytics] setUserId set
+[crash] user set
+[analytics] login {method: google}
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] screen_view {firebase_screen: /jar}
+[crash] key screen=/jar
+00:08 +52: D:/Lab-03/test/screens/free_tell_flow_test.dart: A1: lần đầu hỏi đồng ý, Tụi Nốt tách nốt, sửa rồi lưu nốt đã chọn
+00:09 +52: D:/Lab-03/test/screens/challenge_flow_test.dart: F3: Nhận → chấm hồi hộp → Xong rồi → Không như ý → S04
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /challenges}
+[crash] key screen=/challenges
+[analytics] challenge_opened {challenge_id: dc-1-1, note_type: dung_cam}
+[analytics] challenge_completed {challenge_id: dc-1-1}
+[analytics] screen_view {firebase_screen: /note/saved/:id}
+[crash] key screen=/note/saved/:id
+[analytics] streak_extended {streak_length: 1, streak_milestone: 0}
+00:09 +53: D:/Lab-03/test/screens/free_tell_flow_test.dart: A1: lần đầu hỏi đồng ý, Tụi Nốt tách nốt, sửa rồi lưu nốt đã chọn
+00:09 +53: D:/Lab-03/test/router/app_router_test.dart: F1: Ghi nốt → S03 → S04 → Về Hôm nay
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] note_saved {mood: none, note_type: chien_thang, has_journal: false, duration_ms: 0}
+[analytics] screen_view {firebase_screen: /note/saved/:id}
+[crash] key screen=/note/saved/:id
+[analytics] streak_extended {streak_length: 1, streak_milestone: 0}
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:09 +54: D:/Lab-03/test/screens/free_tell_flow_test.dart: A1: lần đầu hỏi đồng ý, Tụi Nốt tách nốt, sửa rồi lưu nốt đã chọn
+00:09 +54: D:/Lab-03/test/screens/discord_flow_test.dart: lần đầu mở phòng: S14b rồi mới mở Discord; lần sau mở luôn
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /settings}
+[crash] key screen=/settings
+00:09 +55: D:/Lab-03/test/screens/free_tell_flow_test.dart: A1: lần đầu hỏi đồng ý, Tụi Nốt tách nốt, sửa rồi lưu nốt đã chọn
+00:10 +55: D:/Lab-03/test/screens/auth_flow_test.dart: form email: lỗi dưới ô, đăng nhập được (P2)
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] screen_view {firebase_screen: /welcome}
+[crash] key screen=/welcome
+[analytics] setUserId null
+[crash] user cleared
+[analytics] setUserId set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] setUserId set
+[crash] user set
+[analytics] login {method: email}
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:10 +56: D:/Lab-03/test/screens/free_tell_flow_test.dart: A1: lần đầu hỏi đồng ý, Tụi Nốt tách nốt, sửa rồi lưu nốt đã chọn
+00:10 +56: D:/Lab-03/test/screens/challenge_flow_test.dart: Đổi thẻ dễ hơn: về S07 với thẻ cấp thấp hơn trên đầu
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /challenges}
+[crash] key screen=/challenges
+[analytics] challenge_opened {challenge_id: dc-2-1, note_type: dung_cam}
+00:10 +57: D:/Lab-03/test/screens/free_tell_flow_test.dart: A1: lần đầu hỏi đồng ý, Tụi Nốt tách nốt, sửa rồi lưu nốt đã chọn
+00:10 +57: D:/Lab-03/test/router/app_router_test.dart: S09 không còn nút thở; S02 Stress? → S10
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:10 +58: D:/Lab-03/test/screens/free_tell_flow_test.dart: A1: lần đầu hỏi đồng ý, Tụi Nốt tách nốt, sửa rồi lưu nốt đã chọn
+[crash] key screen=/splash
+[crash] user set
+[crash] key screen=/today
+00:10 +59: D:/Lab-03/test/screens/group_flow_test.dart: groups_enabled tắt: ẩn kệ Nhóm lần đầu ở hũ
+00:11 +59: D:/Lab-03/test/screens/challenge_flow_test.dart: để mai: Back ở S08 về S07, thẻ giữ nguyên, không ghi gì
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /challenges}
+[crash] key screen=/challenges
+[analytics] challenge_opened {challenge_id: dc-1-1, note_type: dung_cam}
+00:11 +60: D:/Lab-03/test/screens/group_flow_test.dart: groups_enabled tắt: ẩn kệ Nhóm lần đầu ở hũ
+00:11 +60: D:/Lab-03/test/screens/discord_flow_test.dart: không mở được Discord: "Mở bằng web" hoặc "Sao chép"
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /settings}
+[crash] key screen=/settings
+00:11 +61: D:/Lab-03/test/screens/group_flow_test.dart: groups_enabled tắt: ẩn kệ Nhóm lần đầu ở hũ
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /jar}
+[crash] key screen=/jar
+00:11 +62: D:/Lab-03/test/screens/auth_flow_test.dart: đăng xuất ở S12: hỏi lại, về S01, xoá dữ liệu trên máy (P8)
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] logout {}
+[analytics] setUserId null
+[analytics] screen_view {firebase_screen: /welcome}
+[crash] key screen=/welcome
+[analytics] setUserId null
+[crash] user cleared
+00:12 +63: D:/Lab-03/test/router/app_router_test.dart: avatar ở màn tab mở S12; nút + mở S03
+00:12 +63: D:/Lab-03/test/screens/free_tell_flow_test.dart: A1: AI lỗi thì giữ đoạn kể và gợi ý ghi tay
+[crash] key screen=/splash
+[crash] user set
+[crash] key screen=/today
+00:12 +64: D:/Lab-03/test/router/app_router_test.dart: avatar ở màn tab mở S12; nút + mở S03
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /challenges}
+[crash] key screen=/challenges
+00:12 +65: D:/Lab-03/test/screens/challenge_flow_test.dart: P3 vận động: chỉnh số phút, Dừng sớm vẫn lưu
+00:12 +65: D:/Lab-03/test/screens/discord_flow_test.dart: discord_enabled tắt: không có lối vào ở Cài đặt
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /settings}
+[crash] key screen=/settings
+00:12 +66: D:/Lab-03/test/screens/challenge_flow_test.dart: P3 vận động: chỉnh số phút, Dừng sớm vẫn lưu
+00:12 +66: D:/Lab-03/test/screens/discord_flow_test.dart: thẻ cấp 3: Mở #chao-hoi → câu chào → Discord → quay lại → ghi nốt
+[analytics] screen_view {firebase_screen: /splash}
+00:12 +66: D:/Lab-03/test/screens/group_flow_test.dart: kệ ở 360 dp: gợi ý hệ thống và Tạo mới
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /jar}
+[crash] key screen=/jar
+00:12 +67: D:/Lab-03/test/screens/challenge_flow_test.dart: P3 vận động: chỉnh số phút, Dừng sớm vẫn lưu
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /challenges}
+[crash] key screen=/challenges
+[analytics] challenge_opened {challenge_id: vd-1-1, note_type: van_dong}
+[analytics] challenge_completed {challenge_id: vd-1-1, minutes: 2}
+[analytics] screen_view {firebase_screen: /note/saved/:id}
+[crash] key screen=/note/saved/:id
+[analytics] streak_extended {streak_length: 1, streak_milestone: 0}
+00:13 +68: D:/Lab-03/test/screens/free_tell_flow_test.dart: A1: cần hỗ trợ thì hiện thẻ "người bạn tin"
+00:13 +68: D:/Lab-03/test/router/app_router_test.dart: tab con của S11 đổi theo ?tab=
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /journey}
+[crash] key screen=/journey
+00:13 +69: D:/Lab-03/test/screens/free_tell_flow_test.dart: A1: cần hỗ trợ thì hiện thẻ "người bạn tin"
+[crash] key screen=/splash
+[crash] user set
+[crash] key screen=/today
+00:13 +70: D:/Lab-03/test/screens/discord_flow_test.dart: thẻ cấp 3: Mở #chao-hoi → câu chào → Discord → quay lại → ghi nốt
+00:13 +70: D:/Lab-03/test/screens/group_flow_test.dart: kệ ở 412 dp: gợi ý hệ thống và Tạo mới
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /jar}
+[crash] key screen=/jar
+00:13 +71: D:/Lab-03/test/screens/discord_flow_test.dart: thẻ cấp 3: Mở #chao-hoi → câu chào → Discord → quay lại → ghi nốt
+00:13 +71: D:/Lab-03/test/screens/challenge_flow_test.dart: lỗi tải kho thẻ: Error state + Thử lại
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /challenges}
+[crash] key screen=/challenges
+00:13 +72: D:/Lab-03/test/screens/discord_flow_test.dart: thẻ cấp 3: Mở #chao-hoi → câu chào → Discord → quay lại → ghi nốt
+00:14 +72: D:/Lab-03/test/screens/challenge_flow_test.dart: custom_challenges_enabled tắt: ẩn nút tự thêm thẻ
+[analytics] screen_view {firebase_screen: /splash}
+00:14 +72: D:/Lab-03/test/screens/group_flow_test.dart: nhóm đã có nốt lên đầu kệ, kèm số nốt và ngày lần đầu
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /jar}
+[crash] key screen=/jar
+00:14 +73: D:/Lab-03/test/screens/discord_flow_test.dart: thẻ cấp 3: Mở #chao-hoi → câu chào → Discord → quay lại → ghi nốt
+00:14 +74: D:/Lab-03/test/screens/discord_flow_test.dart: thẻ cấp 3: Mở #chao-hoi → câu chào → Discord → quay lại → ghi nốt
+00:14 +75: D:/Lab-03/test/screens/discord_flow_test.dart: thẻ cấp 3: Mở #chao-hoi → câu chào → Discord → quay lại → ghi nốt
+00:14 +75: D:/Lab-03/test/screens/challenge_flow_test.dart: custom_challenges_enabled tắt: ẩn nút tự thêm thẻ
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /challenges}
+[crash] key screen=/challenges
+00:14 +76: D:/Lab-03/test/screens/discord_flow_test.dart: thẻ cấp 3: Mở #chao-hoi → câu chào → Discord → quay lại → ghi nốt
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /challenges/:id}
+[crash] key screen=/challenges/:id
+[analytics] challenge_opened {challenge_id: dc-3-1, note_type: dung_cam}
+[analytics] challenge_completed {challenge_id: dc-3-1}
+[analytics] screen_view {firebase_screen: /note/saved/:id}
+[crash] key screen=/note/saved/:id
+[analytics] streak_extended {streak_length: 1, streak_milestone: 0}
+00:15 +77: D:/Lab-03/test/screens/jar_flow_test.dart: nốt có ảnh: Hũ hiện ảnh trên tờ nốt, chi tiết hiện ảnh to
+00:15 +77: D:/Lab-03/test/screens/challenge_flow_test.dart: custom_challenges_enabled bật (mặc định): có nút tự thêm thẻ
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /challenges}
+[crash] key screen=/challenges
+00:15 +78: D:/Lab-03/test/screens/jar_flow_test.dart: nốt có ảnh: Hũ hiện ảnh trên tờ nốt, chi tiết hiện ảnh to
+00:16 +78: D:/Lab-03/test/screens/discord_flow_test.dart: thẻ cấp 3: "Để mai" quay lại, không ghi gì
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /challenges}
+[crash] key screen=/challenges
+[analytics] challenge_opened {challenge_id: dc-3-1, note_type: dung_cam}
+00:16 +79: D:/Lab-03/test/screens/jar_flow_test.dart: nốt có ảnh: Hũ hiện ảnh trên tờ nốt, chi tiết hiện ảnh to
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /jar}
+[crash] key screen=/jar
+[analytics] note_viewed {note_type: chien_thang}
+00:17 +80: D:/Lab-03/test/screens/group_flow_test.dart: tạo nhóm: tên trùng → mở nhóm đó; tên mới → tạo và mở S05e
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /jar}
+[crash] key screen=/jar
+[analytics] group_viewed {group_source: user, group_idea: van_dong, note_count: 0}
+00:17 +81: D:/Lab-03/test/screens/journal_flow_test.dart: viết, chèn câu hỏi gợi ý, chọn câu rõ nhất rồi lưu
+00:18 +81: D:/Lab-03/test/screens/discord_flow_test.dart: liên kết Discord bằng mã 6 ký tự từ bot DM (ràng buộc 1-1) và ngắt kết nối
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /settings}
+[crash] key screen=/settings
+00:19 +82: D:/Lab-03/test/screens/journal_flow_test.dart: viết, chèn câu hỏi gợi ý, chọn câu rõ nhất rồi lưu
+00:19 +82: D:/Lab-03/test/screens/journey_flow_test.dart: 3 tab con ở 360 dp không tràn
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /journey}
+[crash] key screen=/journey
+00:19 +83: D:/Lab-03/test/screens/journal_flow_test.dart: viết, chèn câu hỏi gợi ý, chọn câu rõ nhất rồi lưu
+00:20 +83: D:/Lab-03/test/screens/jar_flow_test.dart: chạm hũ làm bật nốt để đọc lại
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /jar}
+[crash] key screen=/jar
+[analytics] note_viewed {note_type: chien_thang}
+00:20 +84: D:/Lab-03/test/screens/journal_flow_test.dart: viết, chèn câu hỏi gợi ý, chọn câu rõ nhất rồi lưu
+00:20 +84: D:/Lab-03/test/screens/group_flow_test.dart: G1: Ghi lần đầu từ S05e → S04 "Lần đầu tiên!" → Xem nhóm có mốc Lần đầu
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] group_viewed {group_source: system, group_idea: nguoi_la, note_count: 0}
+[analytics] note_saved {mood: none, note_type: chien_thang, has_journal: false, duration_ms: 0}
+[analytics] screen_view {firebase_screen: /note/saved/:id}
+[crash] key screen=/note/saved/:id
+[analytics] streak_extended {streak_length: 1, streak_milestone: 0}
+[analytics] screen_view {firebase_screen: /jar/groups/:groupId}
+[crash] key screen=/jar/groups/:groupId
+[analytics] group_viewed {group_source: system, group_idea: nguoi_la, note_count: 1}
+00:20 +85: D:/Lab-03/test/screens/journal_flow_test.dart: viết, chèn câu hỏi gợi ý, chọn câu rõ nhất rồi lưu
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /note/saved/:id}
+[crash] key screen=/note/saved/:id
+[analytics] streak_extended {streak_length: 1, streak_milestone: 0}
+00:21 +86: D:/Lab-03/test/screens/note_flow_test.dart: happy path ở 360 dp: đủ 3 bước, S04 rồi hũ có nốt
+00:21 +87: D:/Lab-03/test/screens/note_flow_test.dart: happy path ở 360 dp: đủ 3 bước, S04 rồi hũ có nốt
+00:21 +88: D:/Lab-03/test/screens/note_flow_test.dart: happy path ở 360 dp: đủ 3 bước, S04 rồi hũ có nốt
+00:21 +88: D:/Lab-03/test/screens/jar_flow_test.dart: nốt hết hạn rời tường và xuất hiện lại trong hũ
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /jar}
+[crash] key screen=/jar
+00:21 +89: D:/Lab-03/test/screens/note_flow_test.dart: happy path ở 360 dp: đủ 3 bước, S04 rồi hũ có nốt
+00:21 +89: D:/Lab-03/test/screens/journey_flow_test.dart: 3 tab con ở 412 dp không tràn
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /journey}
+[crash] key screen=/journey
+00:21 +90: D:/Lab-03/test/screens/note_flow_test.dart: happy path ở 360 dp: đủ 3 bước, S04 rồi hũ có nốt
+00:22 +90: D:/Lab-03/test/screens/journal_flow_test.dart: chưa viết gì thì không bấm Xong được, Đóng về luôn
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:22 +91: D:/Lab-03/test/screens/note_flow_test.dart: happy path ở 360 dp: đủ 3 bước, S04 rồi hũ có nốt
+00:22 +91: D:/Lab-03/test/screens/jar_flow_test.dart: lưới tờ nốt ở 360 dp, mới nhất trước
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /jar}
+[crash] key screen=/jar
+00:22 +92: D:/Lab-03/test/screens/note_flow_test.dart: happy path ở 360 dp: đủ 3 bước, S04 rồi hũ có nốt
+00:22 +92: D:/Lab-03/test/screens/group_flow_test.dart: lần thứ hai vào nhóm: S04 bình thường, nốt không là lần đầu
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] group_viewed {group_source: system, group_idea: nguoi_la, note_count: 1}
+[analytics] note_saved {mood: none, note_type: chien_thang, has_journal: false, duration_ms: 0}
+[analytics] screen_view {firebase_screen: /note/saved/:id}
+[crash] key screen=/note/saved/:id
+[analytics] streak_extended {streak_length: 1, streak_milestone: 0}
+00:22 +93: D:/Lab-03/test/screens/note_flow_test.dart: happy path ở 360 dp: đủ 3 bước, S04 rồi hũ có nốt
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] note_saved {mood: none, note_type: chien_thang, has_journal: true, duration_ms: 0}
+[analytics] screen_view {firebase_screen: /note/saved/:id}
+[crash] key screen=/note/saved/:id
+[analytics] streak_extended {streak_length: 1, streak_milestone: 0}
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:22 +94: D:/Lab-03/test/screens/journey_flow_test.dart: con đường: chạm thẻ hiện tại mở S08
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /journey}
+[crash] key screen=/journey
+[analytics] challenge_opened {challenge_id: dc-1-2, note_type: dung_cam}
+00:22 +95: D:/Lab-03/test/screens/journal_flow_test.dart: đóng khi đã viết: hỏi "Bỏ trang đang viết?"
+00:23 +95: D:/Lab-03/test/screens/jar_flow_test.dart: lưới tờ nốt ở 412 dp, mới nhất trước
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /jar}
+[crash] key screen=/jar
+00:23 +96: D:/Lab-03/test/screens/journal_flow_test.dart: đóng khi đã viết: hỏi "Bỏ trang đang viết?"
+00:23 +96: D:/Lab-03/test/screens/group_flow_test.dart: xoá nhóm: về Hũ, hết 5 giây thì xoá và nốt rời nhóm
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] group_viewed {group_source: system, group_idea: nguoi_la, note_count: 0}
+[analytics] screen_view {firebase_screen: /jar}
+[crash] key screen=/jar
+00:23 +97: D:/Lab-03/test/screens/journal_flow_test.dart: đóng khi đã viết: hỏi "Bỏ trang đang viết?"
+00:23 +97: D:/Lab-03/test/screens/journey_flow_test.dart: chạm banner mở S08 của thẻ đang làm
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /journey}
+[crash] key screen=/journey
+[analytics] challenge_opened {challenge_id: dc-1-2, note_type: dung_cam}
+00:23 +98: D:/Lab-03/test/screens/journal_flow_test.dart: đóng khi đã viết: hỏi "Bỏ trang đang viết?"
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:23 +99: D:/Lab-03/test/screens/note_flow_test.dart: happy path ở 412 dp: đủ 3 bước, S04 rồi hũ có nốt
+00:24 +99: D:/Lab-03/test/screens/group_flow_test.dart: xoá nhóm rồi Hoàn tác: nhóm còn nguyên
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] group_viewed {group_source: system, group_idea: nguoi_la, note_count: 0}
+[analytics] screen_view {firebase_screen: /jar}
+[crash] key screen=/jar
+00:24 +100: D:/Lab-03/test/screens/note_flow_test.dart: happy path ở 412 dp: đủ 3 bước, S04 rồi hũ có nốt
+00:24 +100: D:/Lab-03/test/screens/journey_flow_test.dart: nút sổ tay trên banner mở tab Thử thách
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /journey}
+[crash] key screen=/journey
+[analytics] screen_view {firebase_screen: /challenges}
+[crash] key screen=/challenges
+00:24 +101: D:/Lab-03/test/screens/note_flow_test.dart: happy path ở 412 dp: đủ 3 bước, S04 rồi hũ có nốt
+00:24 +101: D:/Lab-03/test/screens/journal_flow_test.dart: nháp khi app bị tắt giữa chừng (flow P4) đang gõ thì nháp được lưu trên máy
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:24 +102: D:/Lab-03/test/screens/note_flow_test.dart: happy path ở 412 dp: đủ 3 bước, S04 rồi hũ có nốt
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] note_saved {mood: none, note_type: chien_thang, has_journal: true, duration_ms: 0}
+[analytics] screen_view {firebase_screen: /note/saved/:id}
+[crash] key screen=/note/saved/:id
+[analytics] streak_extended {streak_length: 1, streak_milestone: 0}
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:25 +103: D:/Lab-03/test/screens/nudge_test.dart: đăng nhập: hẹn nhắc lúc bắt đầu khung giờ, xin quyền một lần
+00:25 +103: D:/Lab-03/test/screens/jar_flow_test.dart: chip lọc loại và nút đổi sang danh sách gọn
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /jar}
+[crash] key screen=/jar
+00:25 +104: D:/Lab-03/test/screens/nudge_test.dart: đăng nhập: hẹn nhắc lúc bắt đầu khung giờ, xin quyền một lần
+00:25 +104: D:/Lab-03/test/screens/jar_flow_test.dart: hũ rỗng: "Ghi nốt đầu tiên" mở S03 (T1)
+[analytics] screen_view {firebase_screen: /splash}
+00:25 +104: D:/Lab-03/test/screens/nudge_test.dart: đăng nhập: hẹn nhắc lúc bắt đầu khung giờ, xin quyền một lần
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:25 +105: D:/Lab-03/test/screens/journey_flow_test.dart: con đường leo lên: thẻ đã xong ở dưới, đích ở đỉnh
+00:25 +105: D:/Lab-03/test/screens/nudge_test.dart: tắt Giờ tỉnh ở S09: huỷ lời nhắc
+[analytics] screen_view {firebase_screen: /splash}
+00:25 +105: D:/Lab-03/test/screens/journey_flow_test.dart: con đường leo lên: thẻ đã xong ở dưới, đích ở đỉnh
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /journey}
+[crash] key screen=/journey
+00:25 +106: D:/Lab-03/test/screens/journal_flow_test.dart: nháp khi app bị tắt giữa chừng (flow P4) mở lại: "Tiếp tục bản nháp?" → Viết tiếp điền lại chữ
+00:26 +106: D:/Lab-03/test/screens/note_flow_test.dart: bước ảnh: có Chụp ảnh / Thư viện / Bỏ qua, Tiếp khoá khi chưa có ảnh
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:26 +107: D:/Lab-03/test/screens/journal_flow_test.dart: nháp khi app bị tắt giữa chừng (flow P4) mở lại: "Tiếp tục bản nháp?" → Viết tiếp điền lại chữ
+00:26 +108: D:/Lab-03/test/screens/journal_flow_test.dart: nháp khi app bị tắt giữa chừng (flow P4) mở lại: "Tiếp tục bản nháp?" → Viết tiếp điền lại chữ
+00:26 +109: D:/Lab-03/test/screens/journal_flow_test.dart: nháp khi app bị tắt giữa chừng (flow P4) mở lại: "Tiếp tục bản nháp?" → Viết tiếp điền lại chữ
+00:26 +110: D:/Lab-03/test/screens/journal_flow_test.dart: nháp khi app bị tắt giữa chừng (flow P4) mở lại: "Tiếp tục bản nháp?" → Viết tiếp điền lại chữ
+00:26 +110: D:/Lab-03/test/screens/jar_flow_test.dart: hũ rỗng: "Ghi nốt đầu tiên" mở S03 (T1)
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /jar}
+00:26 +111: D:/Lab-03/test/screens/journal_flow_test.dart: nháp khi app bị tắt giữa chừng (flow P4) mở lại: "Tiếp tục bản nháp?" → Viết tiếp điền lại chữ
+00:26 +111: D:/Lab-03/test/screens/jar_flow_test.dart: hũ rỗng: "Ghi nốt đầu tiên" mở S03 (T1)
+[crash] key screen=/jar
+00:26 +112: D:/Lab-03/test/screens/journal_flow_test.dart: nháp khi app bị tắt giữa chừng (flow P4) mở lại: "Tiếp tục bản nháp?" → Viết tiếp điền lại chữ
+00:26 +113: D:/Lab-03/test/screens/journal_flow_test.dart: nháp khi app bị tắt giữa chừng (flow P4) mở lại: "Tiếp tục bản nháp?" → Viết tiếp điền lại chữ
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:26 +114: D:/Lab-03/test/screens/nudge_test.dart: tắt Giờ tỉnh ở S09: huỷ lời nhắc
+00:26 +114: D:/Lab-03/test/screens/journal_flow_test.dart: nháp khi app bị tắt giữa chừng (flow P4) Bắt đầu trang mới: ô trống, nháp cũ bị xoá
+[analytics] screen_view {firebase_screen: /splash}
+00:26 +114: D:/Lab-03/test/screens/journey_flow_test.dart: làm thẻ không theo thứ tự: thẻ đã xong vẫn ở dưới
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /journey}
+[crash] key screen=/journey
+00:26 +115: D:/Lab-03/test/screens/nudge_test.dart: tắt Giờ tỉnh ở S09: huỷ lời nhắc
+00:26 +115: D:/Lab-03/test/screens/jar_flow_test.dart: lỗi tải: "Chưa tải được hũ" + Thử lại (T2)
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /jar}
+[crash] key screen=/jar
+00:26 +116: D:/Lab-03/test/screens/nudge_test.dart: tắt Giờ tỉnh ở S09: huỷ lời nhắc
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:27 +117: D:/Lab-03/test/screens/note_flow_test.dart: Back ở bước 2 về bước ảnh, rồi hỏi "Giữ nốt đang ghi?" → Giữ nháp
+00:27 +117: D:/Lab-03/test/screens/journal_flow_test.dart: nháp khi app bị tắt giữa chừng (flow P4) Bắt đầu trang mới: ô trống, nháp cũ bị xoá
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:27 +118: D:/Lab-03/test/screens/note_flow_test.dart: Back ở bước 2 về bước ảnh, rồi hỏi "Giữ nốt đang ghi?" → Giữ nháp
+00:27 +118: D:/Lab-03/test/screens/nudge_test.dart: nhắc buổi tối: hẹn lúc 21:30, đổi giờ thì hẹn lại
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:27 +119: D:/Lab-03/test/screens/note_flow_test.dart: Back ở bước 2 về bước ảnh, rồi hỏi "Giữ nốt đang ghi?" → Giữ nháp
+00:28 +119: D:/Lab-03/test/screens/journey_flow_test.dart: Con đường: chip chủ đề, mỗi lần chỉ hiện một đường
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /journey}
+[crash] key screen=/journey
+00:28 +120: D:/Lab-03/test/screens/note_flow_test.dart: Back ở bước 2 về bước ảnh, rồi hỏi "Giữ nốt đang ghi?" → Giữ nháp
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:28 +121: D:/Lab-03/test/screens/onboarding_flow_test.dart: A2: lần đầu đăng nhập mở Làm quen, trả lời 4 bước, lưu hồ sơ khởi đầu
+00:28 +121: D:/Lab-03/test/screens/journal_flow_test.dart: nháp khi app bị tắt giữa chừng (flow P4) không có nháp thì không hỏi
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:28 +122: D:/Lab-03/test/screens/onboarding_flow_test.dart: A2: lần đầu đăng nhập mở Làm quen, trả lời 4 bước, lưu hồ sơ khởi đầu
+00:28 +122: D:/Lab-03/test/screens/nudge_test.dart: chạm nhắc buổi tối: mở S03a
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:28 +123: D:/Lab-03/test/screens/onboarding_flow_test.dart: A2: lần đầu đăng nhập mở Làm quen, trả lời 4 bước, lưu hồ sơ khởi đầu
+00:28 +123: D:/Lab-03/test/screens/journey_flow_test.dart: ít dữ liệu: biểu đồ thay bằng lời nhắc
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /journey}
+[crash] key screen=/journey
+00:28 +124: D:/Lab-03/test/screens/onboarding_flow_test.dart: A2: lần đầu đăng nhập mở Làm quen, trả lời 4 bước, lưu hồ sơ khởi đầu
+00:28 +124: D:/Lab-03/test/screens/jar_flow_test.dart: chạm tờ nốt mở S06, sửa và lưu (P5)
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /jar}
+[crash] key screen=/jar
+[analytics] note_viewed {note_type: nhat_ky}
+00:28 +125: D:/Lab-03/test/screens/onboarding_flow_test.dart: A2: lần đầu đăng nhập mở Làm quen, trả lời 4 bước, lưu hồ sơ khởi đầu
+00:29 +125: D:/Lab-03/test/screens/nudge_test.dart: chưa đăng nhập: không hẹn nhắc
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] screen_view {firebase_screen: /welcome}
+[crash] key screen=/welcome
+[analytics] setUserId null
+[crash] user cleared
+00:29 +126: D:/Lab-03/test/screens/onboarding_flow_test.dart: A2: lần đầu đăng nhập mở Làm quen, trả lời 4 bước, lưu hồ sơ khởi đầu
+00:29 +126: D:/Lab-03/test/screens/note_flow_test.dart: Back có nháp → Bỏ: xoá nháp, về S02
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:29 +127: D:/Lab-03/test/screens/onboarding_flow_test.dart: A2: lần đầu đăng nhập mở Làm quen, trả lời 4 bước, lưu hồ sơ khởi đầu
+00:29 +127: D:/Lab-03/test/screens/journal_flow_test.dart: nháp khi app bị tắt giữa chừng (flow P4) lưu thành nốt thì nháp bị xoá
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /note/saved/:id}
+[crash] key screen=/note/saved/:id
+[analytics] streak_extended {streak_length: 1, streak_milestone: 0}
+00:29 +128: D:/Lab-03/test/screens/onboarding_flow_test.dart: A2: lần đầu đăng nhập mở Làm quen, trả lời 4 bước, lưu hồ sơ khởi đầu
+00:30 +128: D:/Lab-03/test/screens/note_flow_test.dart: Back ở bước ảnh khi chưa có gì: đóng luôn, không hỏi
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:30 +129: D:/Lab-03/test/screens/onboarding_flow_test.dart: A2: lần đầu đăng nhập mở Làm quen, trả lời 4 bước, lưu hồ sơ khởi đầu
+00:30 +129: D:/Lab-03/test/screens/nudge_test.dart: chạm thông báo khi app đang mở: S09 chồng lên, Back về
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:30 +130: D:/Lab-03/test/screens/onboarding_flow_test.dart: A2: lần đầu đăng nhập mở Làm quen, trả lời 4 bước, lưu hồ sơ khởi đầu
+00:30 +130: D:/Lab-03/test/screens/journey_flow_test.dart: lịch: chạm một ngày → sheet các nốt → S06
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /journey}
+[crash] key screen=/journey
+[analytics] note_viewed {note_type: chien_thang}
+00:30 +131: D:/Lab-03/test/screens/onboarding_flow_test.dart: A2: lần đầu đăng nhập mở Làm quen, trả lời 4 bước, lưu hồ sơ khởi đầu
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] onboarding_step {step: 1, skipped: 0}
+[analytics] onboarding_step {step: 2, skipped: 0}
+[analytics] onboarding_step {step: 3, skipped: 1}
+[analytics] onboarding_step {step: 4, skipped: 0}
+[analytics] onboarding_done {source: rules}
+00:30 +132: D:/Lab-03/test/screens/jar_flow_test.dart: Back khi đang sửa có thay đổi → "Bỏ thay đổi?"
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /jar}
+[crash] key screen=/jar
+[analytics] note_viewed {note_type: nhat_ky}
+00:30 +133: D:/Lab-03/test/screens/note_flow_test.dart: mất mạng: vẫn tới S04 với banner Offline
+00:31 +133: D:/Lab-03/test/screens/nudge_test.dart: thông báo mở app: vào thẳng S09, Back về Hôm nay
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /self-control}
+[crash] key screen=/self-control
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:31 +134: D:/Lab-03/test/screens/note_flow_test.dart: mất mạng: vẫn tới S04 với banner Offline
+00:31 +134: D:/Lab-03/test/screens/journey_flow_test.dart: Thẻ tuần: Lưu PDF vào máy → chia sẻ → ghi metadata
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /journey}
+[crash] key screen=/journey
+[analytics] report_exported {format: pdf}
+00:31 +135: D:/Lab-03/test/screens/note_flow_test.dart: mất mạng: vẫn tới S04 với banner Offline
+00:31 +135: D:/Lab-03/test/screens/onboarding_flow_test.dart: A2: bỏ qua làm quen chỉ đánh dấu đã xong
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] onboarding_step {step: 1, skipped: 1}
+00:31 +136: D:/Lab-03/test/screens/note_flow_test.dart: mất mạng: vẫn tới S04 với banner Offline
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] note_saved {mood: none, note_type: chien_thang, has_journal: false, duration_ms: 0}
+[analytics] screen_view {firebase_screen: /note/saved/:id}
+[crash] key screen=/note/saved/:id
+[analytics] streak_extended {streak_length: 1, streak_milestone: 0}
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:31 +137: D:/Lab-03/test/screens/jar_flow_test.dart: xoá: dialog → về Hũ, snackbar Hoàn tác trả nốt lại (P5)
+00:32 +137: D:/Lab-03/test/screens/journey_flow_test.dart: P6: 5 ngày Rối liền → dialog gợi ý hỗ trợ, "Để sau" đóng
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /journey}
+[crash] key screen=/journey
+00:32 +138: D:/Lab-03/test/screens/jar_flow_test.dart: xoá: dialog → về Hũ, snackbar Hoàn tác trả nốt lại (P5)
+00:32 +138: D:/Lab-03/test/screens/note_flow_test.dart: lỗi lưu: SnackBar, ở lại S03 với nội dung cũ
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[crash] non-fatal note_save: AppException(AppErrorKind.permissionDenied, null, null)
+00:32 +139: D:/Lab-03/test/screens/jar_flow_test.dart: xoá: dialog → về Hũ, snackbar Hoàn tác trả nốt lại (P5)
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /jar}
+[crash] key screen=/jar
+[analytics] note_viewed {note_type: tu_chu}
+00:32 +140: D:/Lab-03/test/screens/onboarding_flow_test.dart: đã làm quen thì không mở lại; S12 mở lại được
+00:32 +140: D:/Lab-03/test/screens/note_flow_test.dart: S02: hôm qua Mệt thì hiện một nốt cũ (P6)
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:32 +141: D:/Lab-03/test/screens/onboarding_flow_test.dart: đã làm quen thì không mở lại; S12 mở lại được
+00:33 +142: D:/Lab-03/test/screens/onboarding_flow_test.dart: đã làm quen thì không mở lại; S12 mở lại được
+00:33 +143: D:/Lab-03/test/screens/onboarding_flow_test.dart: đã làm quen thì không mở lại; S12 mở lại được
+00:33 +144: D:/Lab-03/test/screens/onboarding_flow_test.dart: đã làm quen thì không mở lại; S12 mở lại được
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:33 +145: D:/Lab-03/test/screens/jar_flow_test.dart: xoá rồi để hết 5 giây: nốt bị xoá thật
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /jar}
+[crash] key screen=/jar
+[analytics] note_viewed {note_type: tu_chu}
+00:34 +146: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:34 +147: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:34 +148: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:34 +149: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:34 +150: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:34 +151: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:34 +152: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:34 +153: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:34 +154: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:34 +155: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:34 +156: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:34 +157: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:34 +158: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:34 +159: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:34 +160: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:34 +161: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:35 +162: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:35 +163: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:35 +164: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:35 +165: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:35 +166: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:35 +167: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:35 +168: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:35 +169: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:35 +169: D:/Lab-03/test/viewmodels/auth_view_model_test.dart: Google lỗi tạo hồ sơ không làm hỏng đăng nhập
+[crash] non-fatal ensureProfile: AppException(AppErrorKind.permissionDenied, null, null)
+00:35 +170: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +171: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +172: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +173: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +174: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +175: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +176: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +177: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +178: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +179: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +180: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +181: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +182: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +183: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +184: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +185: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +186: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +187: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +187: D:/Lab-03/test/screens/settings_flow_test.dart: S12 ở 360 dp: đủ 3 nhóm và khu demo
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:36 +188: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +189: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +190: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +191: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +191: D:/Lab-03/test/viewmodels/challenges_test.dart: ViewModel S07 thẻ tự thêm: lên đầu chồng; làm xong không đổi tiến độ cấp, xuống cuối và có dấu "đã làm hôm nay"
+[analytics] challenge_opened {challenge_id: my-1, note_type: dung_cam}
+00:36 +192: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +192: D:/Lab-03/test/viewmodels/challenges_test.dart: ViewModel S07 thẻ tự thêm: lên đầu chồng; làm xong không đổi tiến độ cấp, xuống cuối và có dấu "đã làm hôm nay"
+[analytics] challenge_completed {challenge_id: my-1}
+00:36 +193: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +194: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +195: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +196: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +197: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +198: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +199: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +200: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +201: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +202: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +203: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +203: D:/Lab-03/test/viewmodels/challenges_test.dart: ViewModel S08 Suôn sẻ: nốt thử thách có mức hồi hộp, thẻ được đánh dấu
+[analytics] challenge_opened {challenge_id: dc-1-1, note_type: dung_cam}
+00:36 +203: D:/Lab-03/test/viewmodels/jar_and_detail_view_model_test.dart: NoteDeleter (P5) xoá thất bại: báo lỗi, nốt hiện lại
+[crash] non-fatal note_delete: AppException(AppErrorKind.network, null, null)
+00:36 +204: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:36 +204: D:/Lab-03/test/viewmodels/challenges_test.dart: ViewModel S08 Suôn sẻ: nốt thử thách có mức hồi hộp, thẻ được đánh dấu
+[analytics] challenge_completed {challenge_id: dc-1-1}
+00:37 +205: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:37 +206: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:37 +206: D:/Lab-03/test/viewmodels/challenges_test.dart: ViewModel S08 Không như ý: ghi "Mình đã mở lời." và vẫn tính là đã làm
+[analytics] challenge_opened {challenge_id: dc-1-2, note_type: dung_cam}
+00:37 +206: D:/Lab-03/test/viewmodels/jar_and_detail_view_model_test.dart: NoteDetailViewModel (S06) sửa tiêu đề và nhật ký rồi lưu
+[analytics] note_viewed {note_type: chien_thang}
+00:37 +206: D:/Lab-03/test/viewmodels/challenges_test.dart: ViewModel S08 Không như ý: ghi "Mình đã mở lời." và vẫn tính là đã làm
+[analytics] challenge_completed {challenge_id: dc-1-2}
+00:37 +207: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:37 +207: D:/Lab-03/test/viewmodels/challenges_test.dart: ViewModel P3 vận động dừng sớm: lưu số phút thực tế
+[analytics] challenge_opened {challenge_id: vd-1-3, note_type: van_dong}
+00:37 +208: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:37 +208: D:/Lab-03/test/viewmodels/jar_and_detail_view_model_test.dart: NoteDetailViewModel (S06) tiêu đề trống hoặc quá 120 ký tự: báo lỗi, không lưu
+[analytics] note_viewed {note_type: chien_thang}
+00:37 +208: D:/Lab-03/test/viewmodels/challenges_test.dart: ViewModel P3 vận động dừng sớm: lưu số phút thực tế
+[analytics] challenge_completed {challenge_id: vd-1-3, minutes: 4}
+00:37 +209: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:37 +210: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:37 +210: D:/Lab-03/test/viewmodels/jar_and_detail_view_model_test.dart: NoteDetailViewModel (S06) "Gợi ý" thêm câu hỏi gợi mở vào nhật ký (P4)
+[analytics] note_viewed {note_type: chien_thang}
+00:37 +210: D:/Lab-03/test/viewmodels/challenges_test.dart: ViewModel làm thẻ cuối của cấp: lên cấp 2
+[analytics] challenge_opened {challenge_id: dc-1-3, note_type: dung_cam}
+[analytics] challenge_completed {challenge_id: dc-1-3}
+00:37 +211: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:37 +212: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:37 +212: D:/Lab-03/test/viewmodels/jar_and_detail_view_model_test.dart: NoteDetailViewModel (S06) "Viết thêm" từ S04: mở sẵn chế độ sửa
+[analytics] note_viewed {note_type: chien_thang}
+00:37 +213: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:37 +213: D:/Lab-03/test/viewmodels/challenges_test.dart: ViewModel Đổi thẻ dễ hơn: thẻ dễ hơn lên đầu S07; thẻ dễ nhất thì báo
+[analytics] challenge_opened {challenge_id: dc-2-2, note_type: dung_cam}
+00:37 +213: D:/Lab-03/test/viewmodels/jar_and_detail_view_model_test.dart: NoteDetailViewModel (S06) lỗi lưu: báo lỗi, giữ chế độ sửa
+[analytics] note_viewed {note_type: chien_thang}
+00:37 +213: D:/Lab-03/test/viewmodels/challenges_test.dart: ViewModel Đổi thẻ dễ hơn: thẻ dễ hơn lên đầu S07; thẻ dễ nhất thì báo
+[analytics] challenge_opened {challenge_id: dc-1-1, note_type: dung_cam}
+00:37 +213: D:/Lab-03/test/viewmodels/jar_and_detail_view_model_test.dart: NoteDetailViewModel (S06) lỗi lưu: báo lỗi, giữ chế độ sửa
+[crash] non-fatal note_update: AppException(AppErrorKind.permissionDenied, null, null)
+00:37 +214: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+00:37 +215: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 360 dp: 3 chạm tới S04
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] self_control_logged {has_habit: false}
+[analytics] screen_view {firebase_screen: /note/saved/:id}
+[crash] key screen=/note/saved/:id
+[analytics] streak_extended {streak_length: 1, streak_milestone: 0}
+00:37 +216: D:/Lab-03/test/screens/settings_flow_test.dart: S12 ở 412 dp: đủ 3 nhóm và khu demo
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:37 +217: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 412 dp: 3 chạm tới S04
+00:37 +218: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 412 dp: 3 chạm tới S04
+00:37 +219: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 412 dp: 3 chạm tới S04
+00:37 +220: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 412 dp: 3 chạm tới S04
+00:37 +221: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 412 dp: 3 chạm tới S04
+00:37 +222: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 412 dp: 3 chạm tới S04
+00:37 +223: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 412 dp: 3 chạm tới S04
+00:37 +224: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 412 dp: 3 chạm tới S04
+00:37 +225: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 412 dp: 3 chạm tới S04
+00:37 +226: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 412 dp: 3 chạm tới S04
+00:37 +227: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 412 dp: 3 chạm tới S04
+00:37 +228: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 412 dp: 3 chạm tới S04
+00:37 +229: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 412 dp: 3 chạm tới S04
+00:38 +230: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 412 dp: 3 chạm tới S04
+00:38 +231: D:/Lab-03/test/screens/self_control_flow_test.dart: dừng được ở 412 dp: 3 chạm tới S04
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] self_control_logged {has_habit: false}
+[analytics] screen_view {firebase_screen: /note/saved/:id}
+[crash] key screen=/note/saved/:id
+[analytics] streak_extended {streak_length: 1, streak_milestone: 0}
+00:38 +232: D:/Lab-03/test/screens/settings_flow_test.dart: bật khoá ở S12 → S09 che thói quen
+00:38 +233: D:/Lab-03/test/screens/settings_flow_test.dart: bật khoá ở S12 → S09 che thói quen
+00:38 +234: D:/Lab-03/test/screens/settings_flow_test.dart: bật khoá ở S12 → S09 che thói quen
+00:38 +235: D:/Lab-03/test/screens/settings_flow_test.dart: bật khoá ở S12 → S09 che thói quen
+00:38 +236: D:/Lab-03/test/screens/settings_flow_test.dart: bật khoá ở S12 → S09 che thói quen
+00:38 +237: D:/Lab-03/test/screens/settings_flow_test.dart: bật khoá ở S12 → S09 che thói quen
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+00:38 +238: D:/Lab-03/test/screens/settings_flow_test.dart: bật khoá ở S12 → S09 che thói quen
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:38 +239: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:38 +240: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:38 +241: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:38 +242: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:38 +243: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:38 +243: D:/Lab-03/test/viewmodels/note_composer_view_model_test.dart: lỗi lưu: báo lỗi, giữ nội dung làm nháp
+[crash] non-fatal note_save: AppException(AppErrorKind.permissionDenied, null, null)
+00:38 +243: D:/Lab-03/test/viewmodels/self_control_and_breathing_test.dart: SelfControlViewModel (S09) "Mình vừa dừng lại": ghi một nốt tự chủ có giờ, mở S04
+[analytics] self_control_logged {has_habit: false}
+00:38 +244: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:38 +245: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:38 +246: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:38 +247: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:38 +248: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:38 +249: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:38 +250: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:38 +251: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:38 +252: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:38 +253: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:38 +254: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:38 +255: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:38 +256: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:38 +257: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:38 +258: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:38 +259: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:38 +260: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:38 +261: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:38 +262: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:38 +262: D:/Lab-03/test/viewmodels/today_and_saved_view_model_test.dart: NoteSavedViewModel (S04) "Nốt thứ N tháng này" và tiến độ mốc tháng
+[analytics] streak_extended {streak_length: 1, streak_milestone: 0}
+00:38 +263: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:38 +263: D:/Lab-03/test/viewmodels/today_and_saved_view_model_test.dart: NoteSavedViewModel (S04) nốt đầu tiên trong ngày nối chuỗi và đánh dấu firstNoteToday
+[analytics] streak_extended {streak_length: 2, streak_milestone: 0}
+00:38 +264: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:38 +265: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:38 +266: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:38 +267: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:38 +268: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:38 +269: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:39 +270: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:39 +271: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:39 +272: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+00:39 +273: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi 1 thói quen: ghi luôn kèm tên thói quen
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] self_control_logged {has_habit: true}
+[analytics] screen_view {firebase_screen: /note/saved/:id}
+[crash] key screen=/note/saved/:id
+[analytics] streak_extended {streak_length: 1, streak_milestone: 0}
+00:39 +274: D:/Lab-03/test/screens/self_control_flow_test.dart: theo dõi nhiều thói quen: "Bạn vừa dừng gì?" rồi ghi
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] self_control_logged {has_habit: true}
+[analytics] screen_view {firebase_screen: /note/saved/:id}
+[crash] key screen=/note/saved/:id
+[analytics] streak_extended {streak_length: 1, streak_milestone: 0}
+00:40 +275: D:/Lab-03/test/widgets/add_note_fab_test.dart: AddNoteFab không tham gia Hero
+00:40 +276: D:/Lab-03/test/widgets/breathing_buddy_test.dart: nét mặt đổi theo nhịp: hít, giữ, thở, xong
+00:40 +277: D:/Lab-03/test/screens/self_control_flow_test.dart: Stress? ở S02: S10 thở → Cơn sóng đã hạ → Ghi vào hũ → S04
+00:40 +278: D:/Lab-03/test/screens/self_control_flow_test.dart: Stress? ở S02: S10 thở → Cơn sóng đã hạ → Ghi vào hũ → S04
+00:40 +279: D:/Lab-03/test/screens/self_control_flow_test.dart: Stress? ở S02: S10 thở → Cơn sóng đã hạ → Ghi vào hũ → S04
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /note/saved/:id}
+[crash] key screen=/note/saved/:id
+[analytics] streak_extended {streak_length: 1, streak_milestone: 0}
+00:40 +280: D:/Lab-03/test/widgets/components_test.dart: AppButton Loading giữ nguyên bề rộng và chặn chạm
+00:40 +281: D:/Lab-03/test/widgets/components_test.dart: AppButton Loading giữ nguyên bề rộng và chặn chạm
+00:41 +282: D:/Lab-03/test/widgets/note_photo_test.dart: NoteTile nốt có ảnh: hiện ảnh nhỏ và báo "có ảnh" cho TalkBack
+00:41 +283: D:/Lab-03/test/widgets/note_photo_test.dart: NoteTile nốt có ảnh: hiện ảnh nhỏ và báo "có ảnh" cho TalkBack
+00:41 +284: D:/Lab-03/test/widgets/streak_widgets_test.dart: thẻ S02: chuỗi, kỷ lục, câu nhắc và mốc kế tiếp
+00:41 +285: D:/Lab-03/test/widgets/streak_widgets_test.dart: thẻ S02: chuỗi, kỷ lục, câu nhắc và mốc kế tiếp
+00:41 +286: D:/Lab-03/test/widgets/streak_widgets_test.dart: thẻ S02: chuỗi, kỷ lục, câu nhắc và mốc kế tiếp
+00:41 +287: D:/Lab-03/test/widgets/streak_widgets_test.dart: thẻ S02: chuỗi, kỷ lục, câu nhắc và mốc kế tiếp
+00:41 +287: D:/Lab-03/test/screens/self_control_flow_test.dart: đang khoá: thói quen bị che, Mở khoá rồi mới thấy
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:41 +288: D:/Lab-03/test/widgets/streak_widgets_test.dart: thẻ S02: chuỗi, kỷ lục, câu nhắc và mốc kế tiếp
+00:41 +289: D:/Lab-03/test/widgets/streak_widgets_test.dart: thẻ S02: chuỗi, kỷ lục, câu nhắc và mốc kế tiếp
+00:41 +290: D:/Lab-03/test/widgets/streak_widgets_test.dart: thẻ S02: chuỗi, kỷ lục, câu nhắc và mốc kế tiếp
+00:41 +291: D:/Lab-03/test/widgets/streak_widgets_test.dart: thẻ S02: chuỗi, kỷ lục, câu nhắc và mốc kế tiếp
+00:41 +292: D:/Lab-03/test/screens/self_control_flow_test.dart: đã lỡ lướt: sheet → "Nhận ra cũng là bắt đầu tự chủ"
+00:41 +293: D:/Lab-03/test/screens/self_control_flow_test.dart: đã lỡ lướt: sheet → "Nhận ra cũng là bắt đầu tự chủ"
+00:41 +294: D:/Lab-03/test/screens/self_control_flow_test.dart: đã lỡ lướt: sheet → "Nhận ra cũng là bắt đầu tự chủ"
+00:41 +295: D:/Lab-03/test/screens/self_control_flow_test.dart: đã lỡ lướt: sheet → "Nhận ra cũng là bắt đầu tự chủ"
+00:41 +296: D:/Lab-03/test/screens/self_control_flow_test.dart: đã lỡ lướt: sheet → "Nhận ra cũng là bắt đầu tự chủ"
+00:41 +297: D:/Lab-03/test/screens/self_control_flow_test.dart: đã lỡ lướt: sheet → "Nhận ra cũng là bắt đầu tự chủ"
+00:41 +298: D:/Lab-03/test/screens/self_control_flow_test.dart: đã lỡ lướt: sheet → "Nhận ra cũng là bắt đầu tự chủ"
+00:42 +299: D:/Lab-03/test/screens/self_control_flow_test.dart: đã lỡ lướt: sheet → "Nhận ra cũng là bắt đầu tự chủ"
+00:42 +300: D:/Lab-03/test/screens/self_control_flow_test.dart: đã lỡ lướt: sheet → "Nhận ra cũng là bắt đầu tự chủ"
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:42 +301: D:/Lab-03/test/widgets/components_test.dart: showAppDialog nút chính trả về true
+00:42 +302: D:/Lab-03/test/screens/self_control_flow_test.dart: đã lỡ lướt: "Xem trong hũ" mở hũ ở bộ lọc Nhật ký
+00:42 +303: D:/Lab-03/test/screens/self_control_flow_test.dart: đã lỡ lướt: "Xem trong hũ" mở hũ ở bộ lọc Nhật ký
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+[analytics] screen_view {firebase_screen: /jar}
+[crash] key screen=/jar
+00:43 +304: D:/Lab-03/test/screens/self_control_flow_test.dart: + Thêm thói quen mới
+[analytics] screen_view {firebase_screen: /splash}
+[crash] key screen=/splash
+[analytics] setUserId set
+[crash] user set
+[analytics] screen_view {firebase_screen: /today}
+[crash] key screen=/today
+00:43 +305: All tests passed!

@@ -1,0 +1,21 @@
+
+> test:rules
+> firebase emulators:exec --project demo-prm393 --only firestore "node --test tests/firestore.rules.test.js"
+
+!!  emulators: firebase-tools will drop support for Java version < 21 soon in firebase-tools@15. Please install a JDK at version 21 or above to get a compatible runtime.
+i  emulators: Starting emulators: firestore
+i  emulators: Detected demo project ID "demo-prm393", emulated services will use a demo configuration and attempts to access non-emulated services for this project will fail.
+!  firestore: Port 8080 is not open on localhost (127.0.0.1,::1), could not start Firestore Emulator.
+!  firestore: To select a different host/port, specify that host/port in a firebase.json config file:
+      {
+        // ...
+        "emulators": {
+          "firestore": {
+            "host": "HOST",
+            "port": "PORT"
+          }
+        }
+      }
+i  emulators: Shutting down emulators.
+
+Error: Could not start Firestore Emulator, port taken.

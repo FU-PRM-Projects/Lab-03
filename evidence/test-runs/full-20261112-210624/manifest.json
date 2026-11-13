@@ -1,0 +1,45 @@
+{
+  "startedAt": "2026-11-12T21:06:24+07:00",
+  "gitCommit": "ee473d40e5a470c30f406e69f48874848eb2c27c",
+  "device": "emulator-5554",
+  "project": "prm393-not-lab3",
+  "rulesProject": "demo-prm393",
+  "unitResults": {
+    "app": {
+      "passed": 305,
+      "failed": 0
+    },
+    "web_admin": {
+      "passed": 14,
+      "failed": 0
+    },
+    "core": {
+      "passed": 5,
+      "failed": 0
+    }
+  },
+  "rules": {
+    "passed": 30,
+    "failed": 0,
+    "port": 8180
+  },
+  "artemisStandard": {
+    "state": "running",
+    "runsPerCase": 3,
+    "log": "artemis-standard.txt",
+    "junit": "artemis-standard.xml"
+  },
+  "emailTests": {
+    "state": "awaiting_explicit_credential_transmission_approval",
+    "accountPrepared": true,
+    "credentials": "stored only under ignored .dart_tool/test-accounts; not included in evidence"
+  },
+  "aiOffTest": {
+    "state": "requires_remote_config_change_after_standard_suite",
+    "firebaseCliAuthenticated": false
+  },
+  "exploratory": {
+    "state": "not_started",
+    "runSeparately": true
+  }
+}
