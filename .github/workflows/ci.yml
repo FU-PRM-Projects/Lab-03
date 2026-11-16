@@ -121,7 +121,7 @@ jobs:
       # Cache bộ phân phối Gradle (~200 MB) và thư viện giữa các lần chạy, để
       # không phải tải lại từ GitHub Releases (hay trả 504).
       - name: Set up Gradle cache
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Install Flutter
         uses: subosito/flutter-action@v2
